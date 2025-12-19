@@ -52,7 +52,7 @@ Commit my changes with message "Added dark mode" and push to dev branch
 ```
 
 🚀 **Your changes auto-deploy to the dev site!**  
-Check: https://boxboxcric--dev-{random}.web.app (link appears in GitHub Actions)
+Dev Site: **https://boxboxcric--dev-boxboxcric.web.app**
 
 ---
 
@@ -60,7 +60,7 @@ Check: https://boxboxcric--dev-{random}.web.app (link appears in GitHub Actions)
 
 | What | Link |
 |------|------|
-| Dev Site | Check GitHub Actions for URL |
+| **Dev Site** | https://boxboxcric--dev-boxboxcric.web.app |
 | Live Site | https://boxboxcric.web.app |
 | GitHub | https://github.com/ashwkun/crickbox |
 
