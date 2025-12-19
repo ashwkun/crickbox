@@ -4,23 +4,21 @@ Welcome! Since you're using Antigravity (AI coding agent), here are prompts to g
 
 ---
 
-## Step 1: Clone the Project
+## Step 1: Create a GitHub Account
 
-**Prompt to give Antigravity:**
-```
-Clone the repo https://github.com/ashwkun/crickbox and run npm install
-```
+1. Go to https://github.com/signup
+2. Create an account with your email
+3. **Tell Aswin your GitHub username** so he can give you access
 
 ---
 
-## Step 2: Run Locally
+## Step 2: Clone the Project
 
-**Prompt:**
-```
-Start the dev server for this project
-```
+Once Aswin confirms you have access, give Antigravity this prompt:
 
-Then open: **http://localhost:1234** in your browser
+```
+Clone the repo https://github.com/ashwkun/crickbox and run npm install
+```
 
 ---
 
@@ -53,14 +51,18 @@ Add a filter to show only Test matches
 Commit my changes with message "Added dark mode" and push to dev branch
 ```
 
-That's it! The site auto-deploys after push.
+🚀 **Your changes auto-deploy to the dev site!**  
+Check: https://boxboxcric--dev-{random}.web.app (link appears in GitHub Actions)
 
 ---
 
 ## 🔗 Important Links
 
-- **Live Site:** https://boxboxcric.web.app
-- **GitHub:** https://github.com/ashwkun/crickbox
+| What | Link |
+|------|------|
+| Dev Site | Check GitHub Actions for URL |
+| Live Site | https://boxboxcric.web.app |
+| GitHub | https://github.com/ashwkun/crickbox |
 
 ---
 
@@ -82,11 +84,25 @@ Just ask Antigravity:
 What's wrong with my code?
 ```
 ```
-Why isn't the dev server starting?
+Why isn't my push working?
 ```
 ```
 How do I undo my last change?
 ```
+
+---
+
+# 📋 FOR ASWIN: Add Collaborator
+
+To give your friend push access:
+
+1. Go to https://github.com/ashwkun/crickbox/settings/access
+2. Click **"Add people"**
+3. Enter their GitHub username
+4. Select **"Write"** role
+5. Click **"Add"**
+
+They'll get an email to accept the invitation.
 
 ---
 
