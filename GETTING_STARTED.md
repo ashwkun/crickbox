@@ -52,7 +52,7 @@ Commit my changes with message "Added dark mode" and push to dev branch
 ```
 
 🚀 **Your changes auto-deploy to the dev site!**  
-Dev Site: **https://boxboxcric--dev-i8l76b1p.web.app**
+Dev Site: **https://boxboxcric-dev.web.app**
 
 ---
 
@@ -60,7 +60,7 @@ Dev Site: **https://boxboxcric--dev-i8l76b1p.web.app**
 
 | What | Link |
 |------|------|
-| **Dev Site** | https://boxboxcric--dev-i8l76b1p.web.app |
+| **Dev Site** | https://boxboxcric-dev.web.app |
 | Live Site | https://boxboxcric.web.app |
 | GitHub | https://github.com/ashwkun/crickbox |
 

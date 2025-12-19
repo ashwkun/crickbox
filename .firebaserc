@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "boxboxcric"
-  }
+  },
+  "targets": {
+    "boxboxcric": {
+      "hosting": {
+        "prod": [
+          "boxboxcric"
+        ],
+        "dev": [
+          "boxboxcric-dev"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
