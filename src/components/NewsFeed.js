@@ -1,114 +1,94 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { proxyFetch } from '../utils/api';
 
-// Direct ESPN API call
-const NEWS_API = "https://onefeed.fan.api.espn.com/apis/v3/cached/contentEngine/oneFeed/leagues/cricket";
+const NEWS_API = 'https://onefeed.fan.api.espn.com/apis/v3/cached/contentEngine/oneFeed?&page=1&limit=15&sport=cricket';
 
 export default function NewsFeed() {
-    const [feed, setFeed] = useState([]);
+    const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
-        fetch(NEWS_API)
-            .then(res => res.json())
-            .then(data => {
-                const items = data.feed?.flatMap(entry => entry.data?.now || []) || [];
-                setFeed(items.slice(0, 8));
+        const fetchNews = async () => {
+            try {
+                const data = await proxyFetch(NEWS_API);
+                const articles = data.feed
+                    ?.filter(item => item.data?.now?.[0]?.headline)
+                    .slice(0, 10)
+                    .map(item => ({
+                        id: item.data.now[0].id,
+                        headline: item.data.now[0].headline,
+                        description: item.data.now[0].description,
+                        image: item.data.now[0].images?.[0]?.url,
+                        published: item.data.now[0].published,
+                        link: item.data.now[0].links?.web?.href
+                    })) || [];
+                setNews(articles);
+            } catch (err) {
+                console.error('News fetch error:', err);
+                setError(true);
+            } finally {
                 setLoading(false);
-            })
-            .catch(err => {
-                setError("Failed to load news");
-                setLoading(false);
-            });
+            }
+        };
+        fetchNews();
     }, []);
 
-    if (loading) return <div style={styles.loading}>Loading news...</div>;
-    if (error) return <div style={styles.error}>{error}</div>;
+    const formatTime = (dateStr) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diff = Math.floor((now - date) / 1000 / 60);
+        if (diff < 60) return `${diff}m ago`;
+        if (diff < 1440) return `${Math.floor(diff / 60)}h ago`;
+        return date.toLocaleDateString();
+    };
 
-    return (
-        <div style={styles.container}>
-            {feed.map(item => {
-                const image = item.images?.[0]?.url;
-                return (
-                    <div key={item.id} style={styles.card}>
-                        {image && <img src={image} alt="" style={styles.image} />}
-                        <div style={styles.content}>
-                            <h3 style={styles.headline}>{item.headline}</h3>
-                            <p style={styles.description}>{item.description}</p>
-                            <div style={styles.meta}>
-                                <span style={styles.type}>{item.type}</span>
-                                <span style={styles.time}>
-                                    {new Date(item.published).toLocaleDateString()}
-                                </span>
-                            </div>
+    if (loading) {
+        return (
+            <div className="news-scroll">
+                {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="news-card">
+                        <div className="skeleton" style={{ height: 120 }}></div>
+                        <div style={{ padding: 12 }}>
+                            <div className="skeleton" style={{ height: 14, marginBottom: 8 }}></div>
+                            <div className="skeleton" style={{ height: 14, width: '60%' }}></div>
                         </div>
                     </div>
-                );
-            })}
+                ))}
+            </div>
+        );
+    }
+
+    if (error || news.length === 0) {
+        return <div className="empty-state">Unable to load news</div>;
+    }
+
+    return (
+        <div className="news-scroll">
+            {news.map(article => (
+                <div
+                    key={article.id}
+                    className="news-card"
+                    onClick={() => article.link && window.open(article.link, '_blank')}
+                >
+                    {article.image ? (
+                        <img
+                            src={article.image}
+                            alt=""
+                            className="news-image"
+                            loading="lazy"
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                    ) : (
+                        <div className="news-image" style={{ background: '#262626' }}></div>
+                    )}
+                    <div className="news-content">
+                        <h4 className="news-title">{article.headline}</h4>
+                        <span className="news-meta">{formatTime(article.published)}</span>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
-
-const styles = {
-    container: { display: 'flex', flexDirection: 'column', gap: '12px' },
-    loading: { padding: '16px', color: '#666', textAlign: 'center' },
-    error: { padding: '16px', color: '#ef4444', backgroundColor: '#fef2f2', borderRadius: '8px' },
-    card: {
-        display: 'flex',
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.08)'
-    },
-    image: {
-        width: '100px',
-        height: '100px',
-        objectFit: 'cover',
-        flexShrink: 0
-    },
-    content: {
-        padding: '12px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        flex: 1,
-        minWidth: 0
-    },
-    headline: {
-        margin: 0,
-        fontSize: '14px',
-        fontWeight: '600',
-        color: '#111',
-        lineHeight: 1.3,
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-    },
-    description: {
-        margin: '6px 0 0',
-        fontSize: '12px',
-        color: '#666',
-        lineHeight: 1.4,
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-    },
-    meta: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: '8px'
-    },
-    type: {
-        fontSize: '10px',
-        fontWeight: '600',
-        color: '#2563eb',
-        textTransform: 'uppercase'
-    },
-    time: {
-        fontSize: '10px',
-        color: '#999'
-    }
-};
