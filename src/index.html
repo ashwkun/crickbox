@@ -1,12 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cricket API Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="color-scheme" content="dark">
+    <meta name="msapplication-navbutton-color" content="#0a0a0a">
+    <meta name="description" content="Live Cricket Scores, Fixtures & Series - box.cric">
+
+    <!-- iOS PWA meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="box.cric">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+
+    <!-- Manifest -->
+    <link rel="manifest" href="./manifest.json">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-72.png">
+
+    <title>box.cric - Live Cricket</title>
+
+    <!-- Preconnect to APIs -->
+    <link rel="preconnect" href="https://cricket-proxy.boxboxcric.workers.dev">
+    <link rel="preconnect" href="https://en.wikipedia.org">
 </head>
+
 <body class="bg-gray-100">
     <div id="root"></div>
     <script type="module" src="./index.js"></script>
 </body>
+
 </html>
