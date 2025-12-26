@@ -1,8 +1,21 @@
 import React from 'react';
 import WikiImage from './WikiImage';
+import { Match, Participant } from '../types';
+
+interface SeriesHubProps {
+    seriesName: string;
+    matches: Match[];
+    onBack: () => void;
+    onMatchClick: (match: Match) => void;
+}
+
+interface Standings {
+    wins: Record<string, number>;
+    draws: number;
+}
 
 // Parse winner from event_status text
-const parseWinner = (status, participants) => {
+const parseWinner = (status: string | undefined, participants: Participant[] | undefined): string | null => {
     if (!status) return null;
     const statusLower = status.toLowerCase();
 
@@ -22,8 +35,8 @@ const parseWinner = (status, participants) => {
 };
 
 // Calculate series standings
-const calculateStandings = (matches) => {
-    const wins = {};
+const calculateStandings = (matches: Match[]): Standings => {
+    const wins: Record<string, number> = {};
     let draws = 0;
 
     matches.forEach(m => {
@@ -41,7 +54,7 @@ const calculateStandings = (matches) => {
 };
 
 // Normalize format
-const normalizeFormat = (format) => {
+const normalizeFormat = (format: string | undefined): string => {
     if (!format) return '';
     const f = format.toUpperCase();
     if (f.includes('TEST')) return 'TEST';
@@ -49,20 +62,20 @@ const normalizeFormat = (format) => {
     return 'T20';
 };
 
-const SeriesHub = ({ seriesName, matches, onBack, onMatchClick }) => {
+const SeriesHub: React.FC<SeriesHubProps> = ({ seriesName, matches, onBack, onMatchClick }) => {
     const teams = matches[0]?.participants || [];
-    const tourName = matches[0]?.tour_name || '';
+    const tourName = (matches[0] as any)?.tour_name || '';
 
     // Sort matches by date
     const sortedMatches = [...matches].sort((a, b) =>
-        new Date(a.start_date) - new Date(b.start_date)
+        new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
     );
 
     // Calculate standings
     const { wins, draws } = calculateStandings(matches);
 
     // Format standings
-    const formatStandings = () => {
+    const formatStandings = (): string => {
         if (teams.length < 2) return '';
         const [t1, t2] = teams.map(t => t.short_name);
         const w1 = wins[t1] || 0;
@@ -75,10 +88,8 @@ const SeriesHub = ({ seriesName, matches, onBack, onMatchClick }) => {
         return text;
     };
 
-    const getMatchStatus = (match) => {
+    const getMatchStatus = (match: Match): string => {
         if (match.event_state === 'U') {
-            const now = new Date();
-            const start = new Date(match.start_date);
             const isNext = sortedMatches.find(m => m.event_state === 'U')?.game_id === match.game_id;
             if (isNext) return 'next';
             return 'upcoming';
@@ -87,12 +98,12 @@ const SeriesHub = ({ seriesName, matches, onBack, onMatchClick }) => {
         return 'completed';
     };
 
-    const formatDate = (dateStr) => {
+    const formatDate = (dateStr: string): string => {
         const d = new Date(dateStr);
         return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     };
 
-    const getResultText = (match) => {
+    const getResultText = (match: Match): string => {
         if (match.event_state === 'U') {
             const d = new Date(match.start_date);
             return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
@@ -173,8 +184,8 @@ const SeriesHub = ({ seriesName, matches, onBack, onMatchClick }) => {
                                 {status === 'upcoming' && '○'}
                             </div>
                             <div className="series-match-date">{formatDate(match.start_date)}</div>
-                            <div className="series-match-name">{match.event_name || 'Match'}</div>
-                            <div className="series-match-venue">{match.venue_name?.split(',')[0] || ''}</div>
+                            <div className="series-match-name">{(match as any).event_name || 'Match'}</div>
+                            <div className="series-match-venue">{(match as any).venue_name?.split(',')[0] || ''}</div>
                             <div className={`series-match-result ${status}`}>{getResultText(match)}</div>
                         </div>
                     );

@@ -86,12 +86,14 @@
 }
 
 .match-team-logo {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
     border-radius: 8px;
     background: var(--bg-secondary);
     object-fit: contain;
-    padding: 4px;
+    padding: 2px;
     flex-shrink: 0;
 }
 
@@ -206,12 +208,14 @@
 }
 
 .hero-team-logo {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
     border-radius: 12px;
     background: var(--bg-secondary);
     object-fit: contain;
-    padding: 6px;
+    padding: 2px;
     flex-shrink: 0;
 }
 
@@ -370,12 +374,14 @@
 }
 
 .upcoming-team-logo {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     border-radius: 10px;
     background: var(--bg-secondary);
     object-fit: contain;
-    padding: 4px;
+    padding: 2px;
 }
 
 .upcoming-team-name {

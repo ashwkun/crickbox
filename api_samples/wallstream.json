@@ -1,0 +1,203 @@
+{
+  "sport": "Cricket",
+  "sport_id": 1,
+  "edition": "The Ashes, 2025/26",
+  "edition_id": 8273,
+  "tag": {
+    "type": "match",
+    "value": 253245
+  },
+  "assets": [
+    {
+      "id": 40428333,
+      "asset_order": 1354,
+      "flag": null,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": null,
+      "headline": "We are back for Australia's second dig with the bat.",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:59:08.92",
+      "publish_time_utc": "2025-12-26T06:59:08.92",
+      "custom_metadata": {
+        "asset": "{\"Over\":\"\",\"Runs\":\"\",\"Detail\":\"general\",\"Isball\":false,\"Bowler\":\"\",\"Batsman\":\"\",\"Bowler_Name\":\"\",\"Batsman_Name\":\"\",\"Commentary\":\"We are back for Australia's second dig with the bat. Remember, they will only bat for an over. And the speculations were correct about Scott Boland\u00a0coming out to open as the nightwatchman. He joins Travis Head\u00a0as they both walk to the crease. Gus Atkinson\u00a0has the new ball and is raring to go with Boland to face the first ball. Here we go...\",\"Batsman_Details\":{},\"Non_Striker_Details\":{},\"Bowler_Details\":{}}"
+      },
+      "tags": []
+    },
+    {
+      "id": 40428331,
+      "asset_order": 1353,
+      "flag": null,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": null,
+      "headline": "... THIRD INNINGS ...",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:58:55.817",
+      "publish_time_utc": "2025-12-26T06:58:55.817",
+      "custom_metadata": {
+        "asset": "{\"Over\":\"\",\"Runs\":\"\",\"Detail\":\"general\",\"Isball\":false,\"Bowler\":\"\",\"Batsman\":\"\",\"Bowler_Name\":\"\",\"Batsman_Name\":\"\",\"Commentary\":\"... THIRD INNINGS ...\",\"Batsman_Details\":{},\"Non_Striker_Details\":{},\"Bowler_Details\":{}}"
+      },
+      "tags": []
+    },
+    {
+      "id": 40428329,
+      "asset_order": 1352,
+      "flag": null,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": null,
+      "headline": "While Australia stitched together four partnerships into double figures, England",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:58:49.793",
+      "publish_time_utc": "2025-12-26T06:58:49.793",
+      "custom_metadata": {
+        "asset": "{\"Over\":\"\",\"Runs\":\"\",\"Detail\":\"innings_break\",\"Isball\":false,\"Bowler\":\"\",\"Batsman\":\"\",\"Bowler_Name\":\"\",\"Batsman_Name\":\"\",\"Commentary\":\"While Australia stitched together four partnerships into double figures, England managed only two. The damage was done early by Mitchell Starc and Michael Neser, before Neser and the local favourite Scott Boland sliced through the middle order with surgical precision, sharing seven wickets between them. The pitch had its own demons and indentations, but consistently landing the ball in the right areas still demanded accuracy and control, qualities the Australian bowlers displayed in abundance. Back in a bit with Australia's second attempt with the bat.\",\"Batsman_Details\":{},\"Non_Striker_Details\":{},\"Bowler_Details\":{}}"
+      },
+      "tags": []
+    },
+    {
+      "id": 40428321,
+      "asset_order": 1351,
+      "flag": null,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": null,
+      "headline": "Michael Neser\u00a0is up for a quick chat with Isa Guha",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:57:43.273",
+      "publish_time_utc": "2025-12-26T06:57:43.273",
+      "custom_metadata": {
+        "asset": "{\"Over\":\"\",\"Runs\":\"\",\"Detail\":\"innings_break\",\"Isball\":false,\"Bowler\":\"\",\"Batsman\":\"\",\"Bowler_Name\":\"\",\"Batsman_Name\":\"\",\"Commentary\":\"Michael Neser\u00a0is up for a quick chat with Isa Guha on the sidelines.\u00a0He informs that Scott Boland sprinted off, but he doesn't know whether he would be opening the batting. Shares that batting has been tough and that the ball was nipping around, so it was about putting the ball in the right areas.\u00a0Shares that playing on Boxing Day is a dream come true and gives him goosebumps. Feels that it is not easy out there with the ball moving, and it\u2019s about finding the right balance between defence and attack with the bat.\",\"Batsman_Details\":{},\"Non_Striker_Details\":{},\"Bowler_Details\":{}}"
+      },
+      "tags": []
+    },
+    {
+      "id": 40428311,
+      "asset_order": 1350,
+      "flag": null,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": null,
+      "headline": "Amid all the talk about the pitch, the batters\u2019 technique",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:54:27.903",
+      "publish_time_utc": "2025-12-26T06:54:27.903",
+      "custom_metadata": {
+        "asset": "{\"Over\":\"\",\"Runs\":\"\",\"Detail\":\"innings_break\",\"Isball\":false,\"Bowler\":\"\",\"Batsman\":\"\",\"Bowler_Name\":\"\",\"Batsman_Name\":\"\",\"Commentary\":\"Amid all the talk about the pitch, the batters\u2019 technique often gets overshadowed. Sure, it hasn\u2019t been easy to bat on, but it wasn\u2019t a wicket that justifies the scores of just 152 or 110 either. Being reduced to 8/3 with the top three blown away, England needed someone to play a calming influence, but Root, the most suitable one to do so, also couldn't carry forward, nicking one behind. At 16/4, it was Harry Brook\u00a0who responded with a counterattack of 41 runs before perishing. After that, within the blink of an eye, 68/6 became 91/9, before a brief last wicket resistance from Gus Atkinson,\u00a0who was the second highest scorer for England after Brook.\",\"Batsman_Details\":{},\"Non_Striker_Details\":{},\"Bowler_Details\":{}}"
+      },
+      "tags": []
+    },
+    {
+      "id": 40428297,
+      "asset_order": 1349,
+      "flag": null,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": null,
+      "headline": "That's the 20th wicket of the day. If England were",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:50:39.14",
+      "publish_time_utc": "2025-12-26T06:50:39.14",
+      "custom_metadata": {
+        "asset": "{\"Over\":\"\",\"Runs\":\"\",\"Detail\":\"innings_break\",\"Isball\":false,\"Bowler\":\"\",\"Batsman\":\"\",\"Bowler_Name\":\"\",\"Batsman_Name\":\"\",\"Commentary\":\"That's the 20th wicket of the day. If England were excellent with the ball, Australia responded with even greater lethal intent. Jake Weatherald\u00a0sprints off the field, so does Travis Head as Australia will come out to bat for one over before Stumps.\u00a0It appears that Scott Boland has run off as well, and there is some chat happening between Cummins and Smith at the sidelines. It is now confirmed that Australia have opted for a heavy roller before they come out to bat.\",\"Batsman_Details\":{},\"Non_Striker_Details\":{},\"Bowler_Details\":{}}"
+      },
+      "tags": []
+    },
+    {
+      "id": 40428288,
+      "asset_order": 1347,
+      "flag": null,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": 3,
+      "headline": "29.5 Cameron Green to Gus Atkinson,w,0 Run",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:49:36.567",
+      "publish_time_utc": "2025-12-26T06:49:36.567",
+      "custom_metadata": {
+        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.5\",\"Iswicket\":true,\"Dismissed\":\"69416\",\"Dismissed_Name\":\"Gus Atkinson\",\"Runs\":\"0\",\"Detail\":\"w\",\"Isball\":true,\"Bowler\":\"66870\",\"Batsman\":\"69416\",\"Bowler_Name\":\"Cameron Green\",\"Batsman_Name\":\"Gus Atkinson\",\"Commentary\":\"OUT! CLEANED HIM UP! The change in length does the trick for Cameron Green. After four short balls in a row, Green pushes the ball up on the fuller side, on middle. Gus Atkinson\u00a0backs away, expecting it to be a short ball. Ends up giving himself too much room and cannot make any connection. He is beaten on the outside edge and the ball crashes into the stumps. 28 (35) for Gus. England\u00a0have been bowled out for 110 as Australia secure a 42-run lead.\",\"OverNo\":\"30\",\"BallNo\":\"5\",\"Ball_Number\":\"179\",\"This_Over\":\"0,0,0,0,0(W),\",\"Batsman_Details\":{\"name\":\"Gus Atkinson\",\"Runs\":\"28\",\"Balls\":\"35\",\"Fours\":\"3\",\"Sixes\":\"1\",\"id\":\"69416\"},\"Non_Striker_Details\":{\"name\":\"Josh Tongue\",\"Runs\":\"1\",\"Balls\":\"9\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66292\"},\"Bowler_Details\":{\"name\":\"Cameron Green\",\"Overs\":\"0.5\",\"Maidens\":\"0\",\"Runs\":\"0\",\"Wickets\":\"1\",\"Ball_bowled\":\"5\",\"Dot_balls\":\"5\",\"id\":\"66870\"},\"Ball_Speed\":\"141.8\",\"Ball_Line_Length\":\"20,5,10,5,39,16\",\"Dismissal_Type\":\"bowled\",\"Dismissal_Id\":\"b\"}"
+      },
+      "tags": []
+    },
+    {
+      "id": 40428277,
+      "asset_order": 1343,
+      "flag": null,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": null,
+      "headline": "29.4 Cameron Green to Gus Atkinson,0 Run",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:48:40.997",
+      "publish_time_utc": "2025-12-26T06:48:40.997",
+      "custom_metadata": {
+        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.4\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"66870\",\"Batsman\":\"69416\",\"Bowler_Name\":\"Cameron Green\",\"Batsman_Name\":\"Gus Atkinson\",\"Commentary\":\"Atkinson backs away and Green follows him with a short ball. Gus manages to glide it to deep backward point.\",\"OverNo\":\"30\",\"BallNo\":\"4\",\"Ball_Number\":\"178\",\"This_Over\":\"0,0,0,0, \",\"Batsman_Details\":{\"name\":\"Gus Atkinson\",\"Runs\":\"28\",\"Balls\":\"34\",\"Fours\":\"3\",\"Sixes\":\"1\",\"id\":\"69416\"},\"Non_Striker_Details\":{\"name\":\"Josh Tongue\",\"Runs\":\"1\",\"Balls\":\"9\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66292\"},\"Bowler_Details\":{\"name\":\"Cameron Green\",\"Overs\":\"0.4\",\"Maidens\":\"0\",\"Runs\":\"0\",\"Wickets\":\"0\",\"Ball_bowled\":\"4\",\"Dot_balls\":\"4\",\"id\":\"66870\"},\"Ball_Speed\":\"142.4\",\"Zone\":\"4\",\"Angle\":\"144\",\"Distance\":\"4\",\"Ball_Line_Length\":\"25,16,11,16,54,16\"}"
+      },
+      "tags": []
+    },
+    {
+      "id": 40428268,
+      "asset_order": 1340,
+      "flag": null,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": null,
+      "headline": "29.3 Cameron Green to Gus Atkinson,0 Run",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:48:06.71",
+      "publish_time_utc": "2025-12-26T06:48:06.71",
+      "custom_metadata": {
+        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.3\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"66870\",\"Batsman\":\"69416\",\"Bowler_Name\":\"Cameron Green\",\"Batsman_Name\":\"Gus Atkinson\",\"Commentary\":\"Green goes into the surface, on middle. Gus walks inside the line and hooks it down to deep fine leg.\",\"OverNo\":\"30\",\"BallNo\":\"3\",\"Ball_Number\":\"177\",\"This_Over\":\"0,0,0,\",\"Batsman_Details\":{\"name\":\"Gus Atkinson\",\"Runs\":\"28\",\"Balls\":\"33\",\"Fours\":\"3\",\"Sixes\":\"1\",\"id\":\"69416\"},\"Non_Striker_Details\":{\"name\":\"Josh Tongue\",\"Runs\":\"1\",\"Balls\":\"9\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66292\"},\"Bowler_Details\":{\"name\":\"Cameron Green\",\"Overs\":\"0.3\",\"Maidens\":\"0\",\"Runs\":\"0\",\"Wickets\":\"0\",\"Ball_bowled\":\"3\",\"Dot_balls\":\"3\",\"id\":\"66870\"},\"Ball_Speed\":\"133.5\",\"Zone\":\"2\",\"Angle\":\"51\",\"Distance\":\"4\",\"Ball_Line_Length\":\"17,20,10,10,57,13\"}"
+      },
+      "tags": []
+    },
+    {
+      "id": 40428259,
+      "asset_order": 1338,
+      "flag": 2,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": null,
+      "headline": "29.2 Cameron Green to Gus Atkinson,0 Run",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-26T06:47:21.28",
+      "publish_time_utc": "2025-12-26T06:47:21.28",
+      "custom_metadata": {
+        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.2\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"66870\",\"Batsman\":\"69416\",\"Bowler_Name\":\"Cameron Green\",\"Batsman_Name\":\"Gus Atkinson\",\"Commentary\":\"Ouch! Green bangs it into the deck, over off and middle. Not as short as Gus Atkinson\u00a0initially thought\u00a0and he felt the ball would sail over his head. As a result, he did not duck and just stood out there. Ended up copping a blow on the left bicep.\",\"OverNo\":\"30\",\"BallNo\":\"2\",\"Ball_Number\":\"176\",\"This_Over\":\"0,0,\",\"Batsman_Details\":{\"name\":\"Gus Atkinson\",\"Runs\":\"28\",\"Balls\":\"32\",\"Fours\":\"3\",\"Sixes\":\"1\",\"id\":\"69416\"},\"Non_Striker_Details\":{\"name\":\"Josh Tongue\",\"Runs\":\"1\",\"Balls\":\"9\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66292\"},\"Bowler_Details\":{\"name\":\"Cameron Green\",\"Overs\":\"0.2\",\"Maidens\":\"0\",\"Runs\":\"0\",\"Wickets\":\"0\",\"Ball_bowled\":\"2\",\"Dot_balls\":\"2\",\"id\":\"66870\"},\"Ball_Speed\":\"137.6\",\"Ball_Line_Length\":\"22,17,11,6,54,14\"}"
+      },
+      "tags": []
+    }
+  ],
+  "deleted_assets": ""
+}

@@ -1,11 +1,11 @@
-export const safeSetItem = (key, value) => {
+export const safeSetItem = (key: string, value: string): void => {
     try {
         localStorage.setItem(key, value);
     } catch (e) {
-        if (e.name === 'QuotaExceededError' || e.code === 22) {
+        const error = e as Error & { code?: number };
+        if (error.name === 'QuotaExceededError' || error.code === 22) {
             console.warn('LocalStorage Quota Exceeded. Clearing old cache...');
             try {
-                // Simple strategy: Clear everything and try one last time
                 localStorage.clear();
                 localStorage.setItem(key, value);
             } catch (retryError) {

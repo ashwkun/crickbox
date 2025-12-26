@@ -1,8 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, CSSProperties } from 'react';
 import { safeSetItem } from '../utils/storage';
 
+// Types
+interface WikiImageProps {
+    name?: string;
+    id?: string;
+    type?: 'team' | 'player' | 'series' | 'tournament';
+    style?: CSSProperties;
+    circle?: boolean;
+    className?: string;
+}
+
 // Country code mapping for national teams
-const COUNTRY_CODES = {
+const COUNTRY_CODES: Record<string, string> = {
     'india': 'in',
     'australia': 'au',
     'england': 'gb-eng',
@@ -41,11 +51,11 @@ const WISDEN_SERIES_IMG = "https://www.wisden.com/static-assets/images/series/";
 
 // Fallbacks
 const TEAM_FALLBACK = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIGZpbGw9IiNjODFkMjUiLz48L3N2Zz4=";
-const PLAYER_FALLBACK = "https://www.espncricinfo.com/static/images/squad-placeholder.png";
-const SERIES_FALLBACK = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMNCA1djZWMTE1bDgtNC41TDQgMTZWMTF2LTZMMTIgMnl6IiBmaWxsPSIjYzgxZDI1Ii8+PC9zdmc+"; // Simple shield placeholder
+const PLAYER_FALLBACK = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23374151'/%3E%3Ccircle cx='50' cy='38' r='18' fill='%239ca3af'/%3E%3Cellipse cx='50' cy='85' rx='28' ry='22' fill='%239ca3af'/%3E%3C/svg%3E";
+const SERIES_FALLBACK = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyIDJMNCA1djZWMTE1bDgtNC41TDQgMTZWMTF2LTZMMTIgMnl6IiBmaWxsPSIjYzgxZDI1Ii8+PC9zdmc+";
 
 // Get flag URL from FlagsCDN
-const getFlagUrl = (teamName) => {
+export const getFlagUrl = (teamName: string | undefined): string | null => {
     if (!teamName) return null;
     const cleanName = teamName.toLowerCase().replace(/(-w|women|women's|-u19|under-19)/gi, '').trim();
     const code = COUNTRY_CODES[cleanName];
@@ -56,8 +66,15 @@ const getFlagUrl = (teamName) => {
 };
 
 // WikiImage Component (Wisden Assets -> Wikipedia -> Flag -> Placeholder)
-const WikiImage = ({ name, id, type = 'team', style, circle = false, className }) => {
-    const [src, setSrc] = useState(null);
+const WikiImage: React.FC<WikiImageProps> = React.memo(({
+    name,
+    id,
+    type = 'team',
+    style,
+    circle = false,
+    className
+}) => {
+    const [src, setSrc] = useState<string | null>(null);
     const [errorCount, setErrorCount] = useState(0);
 
     useEffect(() => {
@@ -71,7 +88,7 @@ const WikiImage = ({ name, id, type = 'team', style, circle = false, className }
 
         // Strategy 1: Wisden Asset (if ID available) - PRIORITY
         if (id && errorCount === 0) {
-            let url;
+            let url: string | undefined;
             if (type === 'player') url = `${WISDEN_PLAYER_IMG}${id}.png`;
             else if (type === 'team') url = `${WISDEN_TEAM_IMG}${id}.png`;
             else if (type === 'series' || type === 'tournament') url = `${WISDEN_SERIES_IMG}${id}.png`;
@@ -93,7 +110,6 @@ const WikiImage = ({ name, id, type = 'team', style, circle = false, className }
         }
 
         // Strategy 3: Fetch from Wikipedia (if no ID or Wisden failed)
-        // Only run if we haven't failed Wiki already (errorCount <= 1 implies we might have failed Wisden, so try Wiki)
         if (errorCount === (id ? 1 : 0)) {
             fetchWiki(name, type);
         }
@@ -105,18 +121,18 @@ const WikiImage = ({ name, id, type = 'team', style, circle = false, className }
                 if (flagUrl) {
                     setSrc(flagUrl);
                 } else {
-                    setSrc(TEAM_FALLBACK); // Final fallback for team
+                    setSrc(TEAM_FALLBACK);
                 }
             } else if (type === 'series' || type === 'tournament') {
                 setSrc(SERIES_FALLBACK);
             } else {
-                setSrc(PLAYER_FALLBACK); // Final fallback for player
+                setSrc(PLAYER_FALLBACK);
             }
         }
 
     }, [name, id, type, errorCount, src]);
 
-    const fetchWiki = async (name, type) => {
+    const fetchWiki = async (name: string | undefined, type: string) => {
         if (!name) {
             setErrorCount(prev => prev + 1);
             return;
@@ -142,23 +158,34 @@ const WikiImage = ({ name, id, type = 'team', style, circle = false, className }
                 const cacheKey = `wiki_img_v5_${name}`;
                 safeSetItem(cacheKey, thumb);
             } else {
-                setErrorCount(prev => prev + 1); // Wiki failed
+                setErrorCount(prev => prev + 1);
             }
         } catch (e) {
-            // console.warn('Wiki fetch warning', e);
-            setErrorCount(prev => prev + 1); // Wiki failed
+            setErrorCount(prev => prev + 1);
         }
     };
 
     const handleError = () => {
-        setSrc(null); // Clear current src to trigger effect
-        setErrorCount(prev => prev + 1); // Increment error level
+        setSrc(null);
+        setErrorCount(prev => prev + 1);
+    };
+
+    // Detect if loaded image is empty or Wisden's placeholder
+    // Wisden returns 200 OK with content-length: 0 for missing players
+    const handleLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const img = e.currentTarget;
+        // Empty image (content-length: 0) will have naturalWidth/Height of 0
+        // Very small images (<=64px) from Wisden are placeholders
+        if (type === 'player' && (img.naturalWidth === 0 || img.naturalHeight === 0 ||
+            (img.naturalWidth <= 64 && img.naturalHeight <= 64 && src?.includes('wisden.com')))) {
+            setSrc(PLAYER_FALLBACK);
+        }
     };
 
     // Calculate generic style
-    const imgStyle = circle
-        ? { ...style, borderRadius: '50%', objectFit: 'cover' }
-        : { ...style, objectFit: 'contain' };
+    const imgStyle: CSSProperties = circle
+        ? { ...style, borderRadius: '50%', objectFit: 'cover' as const }
+        : { ...style, objectFit: 'contain' as const };
 
     let fallback = TEAM_FALLBACK;
     if (type === 'player') fallback = PLAYER_FALLBACK;
@@ -173,9 +200,12 @@ const WikiImage = ({ name, id, type = 'team', style, circle = false, className }
             className={className}
             alt={name || 'Asset'}
             onError={handleError}
+            onLoad={handleLoad}
             loading="lazy"
         />
     );
-};
+});
+
+WikiImage.displayName = 'WikiImage';
 
 export default WikiImage;

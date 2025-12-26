@@ -1,8 +1,16 @@
 import React from 'react';
 import WikiImage from './WikiImage';
+import { Match } from '../types';
+
+interface UpcomingCardProps {
+    match: Match;
+    onClick: (match: Match) => void;
+    showTournamentButton?: boolean;
+    onViewTournament?: (seriesId: string) => void;
+}
 
 // Normalize format to only ODI, TEST, or T20
-const normalizeFormat = (format) => {
+const normalizeFormat = (format: string | undefined): string => {
     if (!format) return '';
     const f = format.toUpperCase();
     if (f.includes('TEST')) return 'TEST';
@@ -13,7 +21,7 @@ const normalizeFormat = (format) => {
 };
 
 // Shorten series name - extract just format count or tournament name
-const shortenSeriesName = (name) => {
+const shortenSeriesName = (name: string | undefined): string => {
     if (!name) return '';
 
     // Pattern: "[Country] in [Country], X [Format] Series, [Year]" → "X [Format]"
@@ -30,7 +38,7 @@ const shortenSeriesName = (name) => {
 };
 
 // Calendar-style card for upcoming matches (with optional tournament button)
-const UpcomingCard = ({ match, onClick, showTournamentButton, onViewTournament }) => {
+const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({ match, onClick, showTournamentButton, onViewTournament }) => {
     const startDate = new Date(match.start_date);
 
     const month = startDate.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
@@ -102,6 +110,8 @@ const UpcomingCard = ({ match, onClick, showTournamentButton, onViewTournament }
             )}
         </div>
     );
-};
+});
+
+UpcomingCard.displayName = 'UpcomingCard';
 
 export default UpcomingCard;

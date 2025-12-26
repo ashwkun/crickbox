@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
+import WikiImage from './WikiImage';
+import { Match } from '../types';
+
+interface TournamentHubProps {
+    tournamentName: string;
+    matches: Match[];
+    onBack: () => void;
+    onMatchClick: (match: Match) => void;
+}
 
 // Shorten series name for display
-const shortenSeriesName = (name) => {
+const shortenSeriesName = (name: string | undefined): string => {
     if (!name) return '';
     const bilateralMatch = name.match(/(\d+)\s*(T20I?|ODI|Test|Youth ODI|Youth T20I)/i);
     if (bilateralMatch) {
@@ -14,23 +23,23 @@ const shortenSeriesName = (name) => {
 };
 
 // Tournament Hub - Shows all matches in a tournament
-const TournamentHub = ({ tournamentName, matches, onBack, onMatchClick }) => {
+const TournamentHub: React.FC<TournamentHubProps> = ({ tournamentName, matches, onBack, onMatchClick }) => {
     // Sort matches by date
     const sortedMatches = [...matches].sort((a, b) =>
-        new Date(a.start_date) - new Date(b.start_date)
+        new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
     );
 
-    const formatDate = (dateStr) => {
+    const formatDate = (dateStr: string): string => {
         const d = new Date(dateStr);
         return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
     };
 
-    const formatTime = (dateStr) => {
+    const formatTime = (dateStr: string): string => {
         const d = new Date(dateStr);
         return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
     };
 
-    const getMatchStatus = (match) => {
+    const getMatchStatus = (match: Match): string => {
         if (match.event_state === 'U') {
             const isNext = sortedMatches.find(m => m.event_state === 'U')?.game_id === match.game_id;
             return isNext ? 'next' : 'upcoming';
@@ -39,14 +48,14 @@ const TournamentHub = ({ tournamentName, matches, onBack, onMatchClick }) => {
         return 'completed';
     };
 
-    const getResultText = (match) => {
+    const getResultText = (match: Match): string => {
         if (match.event_state === 'U') return formatTime(match.start_date);
         if (match.event_state === 'L') return 'LIVE';
         return match.short_event_status || 'Completed';
     };
 
     // Get unique teams count
-    const uniqueTeams = new Set();
+    const uniqueTeams = new Set<string>();
     matches.forEach(m => {
         m.participants?.forEach(p => uniqueTeams.add(p.short_name));
     });

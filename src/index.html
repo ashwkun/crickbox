@@ -26,11 +26,34 @@
     <!-- Preconnect to APIs -->
     <link rel="preconnect" href="https://cricket-proxy.boxboxcric.workers.dev">
     <link rel="preconnect" href="https://en.wikipedia.org">
+
+    <!-- PRELOAD: Start fetching data BEFORE React loads -->
+    <script>
+        (function () {
+            // Format date helper
+            function formatDate(d) {
+                return String(d.getDate()).padStart(2, '0') + String(d.getMonth() + 1).padStart(2, '0') + d.getFullYear();
+            }
+            var today = new Date();
+            var past = new Date(); past.setDate(today.getDate() - 30);
+            var dateRange = formatDate(past) + '-' + formatDate(today);
+
+            var proxy = 'https://cricket-proxy.boxboxcric.workers.dev/?url=';
+            var base = 'https://www.wisden.com/default.aspx?methodtype=3&client=e656463796&sport=1&league=0&timezone=0530&language=en';
+
+            // Start all fetches immediately - store promises globally
+            window.__preloadData = {
+                live: fetch(proxy + encodeURIComponent(base + '&gamestate=1')).then(r => r.json()).catch(() => null),
+                upcoming: fetch(proxy + encodeURIComponent(base + '&gamestate=2&days=10')).then(r => r.json()).catch(() => null),
+                results: fetch(proxy + encodeURIComponent(base + '&daterange=' + dateRange)).then(r => r.json()).catch(() => null)
+            };
+        })();
+    </script>
 </head>
 
 <body class="bg-gray-100">
     <div id="root"></div>
-    <script type="module" src="./index.js"></script>
+    <script type="module" src="./index.tsx"></script>
 </body>
 
 </html>

@@ -3,8 +3,17 @@ import { proxyFetch } from '../utils/api';
 
 const NEWS_API = 'https://onefeed.fan.api.espn.com/apis/v3/cached/contentEngine/oneFeed?&page=1&limit=15&sport=cricket';
 
-export default function NewsFeed() {
-    const [news, setNews] = useState([]);
+interface NewsArticle {
+    id: string;
+    headline: string;
+    description?: string;
+    image?: string;
+    published?: string;
+    link?: string;
+}
+
+export default function NewsFeed(): React.ReactElement {
+    const [news, setNews] = useState<NewsArticle[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
@@ -12,10 +21,10 @@ export default function NewsFeed() {
         const fetchNews = async () => {
             try {
                 const data = await proxyFetch(NEWS_API);
-                const articles = data.feed
-                    ?.filter(item => item.data?.now?.[0]?.headline)
+                const articles: NewsArticle[] = data.feed
+                    ?.filter((item: any) => item.data?.now?.[0]?.headline)
                     .slice(0, 10)
-                    .map(item => ({
+                    .map((item: any) => ({
                         id: item.data.now[0].id,
                         headline: item.data.now[0].headline,
                         description: item.data.now[0].description,
@@ -34,11 +43,11 @@ export default function NewsFeed() {
         fetchNews();
     }, []);
 
-    const formatTime = (dateStr) => {
+    const formatTime = (dateStr: string | undefined): string => {
         if (!dateStr) return '';
         const date = new Date(dateStr);
         const now = new Date();
-        const diff = Math.floor((now - date) / 1000 / 60);
+        const diff = Math.floor((now.getTime() - date.getTime()) / 1000 / 60);
         if (diff < 60) return `${diff}m ago`;
         if (diff < 1440) return `${Math.floor(diff / 60)}h ago`;
         return date.toLocaleDateString();
@@ -78,7 +87,7 @@ export default function NewsFeed() {
                             alt=""
                             className="news-image"
                             loading="lazy"
-                            onError={(e) => { e.target.style.display = 'none'; }}
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                         />
                     ) : (
                         <div className="news-image" style={{ background: '#262626' }}></div>

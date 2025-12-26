@@ -4,10 +4,12 @@ import App from './App';
 import './index.css';
 
 const container = document.getElementById('root');
-const root = createRoot(container);
-root.render(<App />);
+if (container) {
+    const root = createRoot(container);
+    root.render(<App />);
+}
 
-// Register Service Worker for PWA (using eval to bypass Parcel's transformer)
+// Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         const swUrl = '/sw.js';

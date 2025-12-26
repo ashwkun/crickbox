@@ -1,8 +1,20 @@
 import React from 'react';
 import WikiImage from './WikiImage';
+import { Match, Participant } from '../types';
+
+interface SeriesCardProps {
+    seriesName: string;
+    matches: Match[];
+    onClick: (match: Match) => void;
+}
+
+interface Standings {
+    wins: Record<string, number>;
+    draws: number;
+}
 
 // Parse winner from event_status text like "India won by 295 runs"
-const parseWinner = (status, participants) => {
+const parseWinner = (status: string | undefined, participants: Participant[] | undefined): string | null => {
     if (!status) return null;
     const statusLower = status.toLowerCase();
 
@@ -23,8 +35,8 @@ const parseWinner = (status, participants) => {
 };
 
 // Calculate series standings from completed matches
-const calculateStandings = (seriesMatches) => {
-    const wins = {};
+const calculateStandings = (seriesMatches: Match[]): Standings => {
+    const wins: Record<string, number> = {};
     let draws = 0;
 
     seriesMatches.forEach(m => {
@@ -42,7 +54,7 @@ const calculateStandings = (seriesMatches) => {
 };
 
 // Normalize format to only ODI, TEST, or T20
-const normalizeFormat = (format) => {
+const normalizeFormat = (format: string | undefined): string => {
     if (!format) return '';
     const f = format.toUpperCase();
     if (f.includes('TEST')) return 'TEST';
@@ -51,14 +63,14 @@ const normalizeFormat = (format) => {
 };
 
 // Series Card for bilateral tours (2 teams)
-const SeriesCard = ({ seriesName, matches, onClick }) => {
+const SeriesCard: React.FC<SeriesCardProps> = ({ seriesName, matches, onClick }) => {
     // Get teams from first match
     const teams = matches[0]?.participants || [];
 
     // Find next upcoming match
     const nextMatch = matches
         .filter(m => m.event_state === 'U')
-        .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))[0];
+        .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())[0];
 
     // Calculate standings
     const { wins, draws } = calculateStandings(matches);

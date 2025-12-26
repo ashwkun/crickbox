@@ -5,3 +5,8 @@ dist/
 *.log
 .DS_Store
 GETTING_STARTED.md
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!api_samples/*.json

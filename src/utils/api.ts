@@ -16,9 +16,15 @@ export const WISDEN_SCORECARD = `https://www.wisden.com/cricket/v1/game/scorecar
 // Refresh intervals
 export const REFRESH_INTERVAL = 30000;
 
-// Fetch helper with CORS proxy
-export const proxyFetch = async (url) => {
-    const res = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`);
+// Fetch helper with CORS proxy and cache-busting
+export const proxyFetch = async (url: string, bypassCache = false) => {
+    // Add timestamp to bypass cache if needed
+    const cacheBuster = bypassCache ? `&_t=${Date.now()}` : '';
+    const fullUrl = `${CORS_PROXY}${encodeURIComponent(url + cacheBuster)}`;
+
+    const res = await fetch(fullUrl, {
+        cache: bypassCache ? 'no-store' : 'default'
+    });
     return await res.json();
 };
 
