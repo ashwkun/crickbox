@@ -1118,7 +1118,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
                                                 {/* Ball Detail (Runs/Wicket text) */}
                                                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginBottom: 4 }}>
-                                                    {ballDetailText}
+                                                    {resultText}
                                                 </div>
 
                                                 {/* Body: Commentary */}
