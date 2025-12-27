@@ -113,6 +113,10 @@ export const fetchWallstream = async (gameId: string, pageSize = 10, inningsCoun
                         isFour,
                         isSix,
                         isball,
+                        // IDs for inference
+                        batsmanId: asset.Batsman_Details?.id || asset.Batsman || '',
+                        nonStrikerId: asset.Non_Striker_Details?.id || '',
+                        bowlerId: asset.Bowler_Details?.id || asset.Bowler || '',
                     };
                 } catch {
                     return null;

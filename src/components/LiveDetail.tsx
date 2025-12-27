@@ -1050,127 +1050,37 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     return detailMap[detail.toLowerCase()] || detail.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
                                 };
 
-                                // Event Card (Non-ball commentary like 'Innings Break', 'Stumps', etc.)
-                                if (!ball.isball) {
-                                    const formattedDetail = formatDetail(ball.detail);
-                                    const isNewBatter = ball.detail?.toLowerCase() === 'next_batsman_in';
-                                    const isNewBowler = ball.detail?.toLowerCase() === 'change_of_bowler';
+                                // Note: We removed the old explicit event block since U19 balls are always 'isball: true'.
+                                // Event inference is now handled inside the main ball loop below.
 
-                                    // Helper: Find previous actual ball (Newer in time, lower index)
-                                    const findPrevBall = () => {
-                                        for (let i = idx - 1; i >= 0; i--) {
-                                            if (wallstream.balls[i].isball) return wallstream.balls[i];
-                                        }
-                                        return null;
-                                    };
 
-                                    // Extract player name from commentary for new batter events
-                                    // e.g. "Ben Stokes is in" -> "Ben Stokes"
-                                    let entityName = '';
-                                    let entityRole: 'batsmen' | 'bowler' = 'batsmen';
+                                // Helper to check if commentary body should be shown
+                                // Event Card (Non-ball commentary like 'Innings Break', 'Stumps', etc.) - REMOVED as U19 API balls are always 'isball: true'.
 
-                                    if (isNewBatter && ball.commentary) {
-                                        entityRole = 'batsmen';
-                                        const found = findPlayerNameInText(ball.commentary);
-                                        if (found) {
-                                            entityName = found;
-                                        } else {
-                                            const nameMatch = ball.commentary.match(/(?:walks|is in|comes out|out to bat|out goes .+ and in walks|joins)\s*([A-Z][a-z]+(?: [A-Z][a-z]+)*)/i) ||
-                                                ball.commentary.match(/([A-Z][a-z]+(?: [A-Z][a-z]+)*)\s*(?:is in|walks|comes out|joins)/i);
-                                            if (nameMatch) entityName = nameMatch[1].replace(/\s+$/, '');
-                                        }
-                                    } else if (isNewBowler) {
-                                        entityRole = 'bowler';
-                                        // For explicit bowler change event, look at the NEWER ball (prev index) because list is descending
-                                        const prevBall = findPrevBall();
-                                        if (prevBall && prevBall.bowlerName) {
-                                            entityName = prevBall.bowlerName;
-                                        }
+                                // --- INFERENCE LOGIC ---
+                                // Note: 'wallstream.balls' is descending (latest first). 'prevBall' is at idx + 1.
+                                const prevBall = wallstream?.balls?.[idx + 1];
+
+                                // New Bowler: Change in ID.
+                                // We mainly care if it differs from the previous delivery.
+                                const isBowlerChangeCard = prevBall && ball.bowlerId !== prevBall.bowlerId;
+
+                                // New Batter: If PREVIOUS ball was a wicket, we assume THIS ball starts with a new batter.
+                                const isNewBatterCard = prevBall && prevBall.isWicket;
+
+                                // Extract Entity Name for New Batter
+                                let newBatterName = '';
+                                if (isNewBatterCard) {
+                                    // Compare IDs to see who is new
+                                    const prevIds = [prevBall.batsmanId, prevBall.nonStrikerId];
+                                    const currIds = [ball.batsmanId, ball.nonStrikerId];
+                                    const newId = currIds.find(id => !prevIds.includes(id));
+                                    if (newId) {
+                                        if (newId === ball.batsmanId) newBatterName = ball.batsmanName;
+                                        else newBatterName = ball.nonStrikerName;
                                     }
-
-                                    return (
-                                        <div key={idx} style={{ display: 'flex', gap: 16, position: 'relative', paddingBottom: 24 }}>
-                                            {/* Timeline Line */}
-                                            {!isLast && <div style={{ position: 'absolute', left: 14, top: 28, bottom: 0, width: 2, background: 'rgba(255,255,255,0.05)' }} />}
-
-                                            {/* Marker Icon */}
-                                            <div style={{
-                                                position: 'relative', zIndex: 2, width: 30, height: 30, borderRadius: '50%',
-                                                background: (isNewBatter || isNewBowler) ? `rgba(${isNewBatter ? '34, 197, 94' : '139, 92, 246'}, 0.15)` : 'rgba(59, 130, 246, 0.15)',
-                                                border: `1px solid ${(isNewBatter || isNewBowler) ? `rgba(${isNewBatter ? '34, 197, 94' : '139, 92, 246'}, 0.3)` : 'rgba(59, 130, 246, 0.3)'}`,
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                color: (isNewBatter || isNewBowler) ? (isNewBatter ? '#22c55e' : '#8b5cf6') : '#3b82f6',
-                                                fontSize: 14, fontWeight: 800, fontFamily: 'serif'
-                                            }}>
-                                                {(isNewBatter || isNewBowler) ? '→' : 'i'}
-                                            </div>
-
-                                            {/* Content */}
-                                            <div style={{ flex: 1, marginTop: 4 }}>
-                                                {(isNewBatter || isNewBowler) && entityName ? (() => {
-                                                    const playerId = findPlayerIdByName(entityName);
-                                                    // Look up player H2H using ID if available, then name
-                                                    const h2hPlayer = findPlayerInH2H(entityName, entityRole, playerId);
-                                                    const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, entityRole) : null;
-                                                    const iccRanking = h2hPlayer?.icc_ranking;
-                                                    // Specific for bowler: check if bowled
-                                                    let bowlerStatsText: React.ReactNode | null = null;
-                                                    if (entityRole === 'bowler') {
-                                                        const prevBall = findPrevBall();
-                                                        const targetBall = prevBall || nextActualBall; // Fallback to next if prev not available (unlikely for change event)
-
-                                                        if (targetBall) {
-                                                            const hasBowled = targetBall.bowlerOvers && parseFloat(targetBall.bowlerOvers) >= 1;
-                                                            if (hasBowled) {
-                                                                bowlerStatsText = <span>{targetBall.bowlerOvers}ov • {targetBall.bowlerMaidens}m • {targetBall.bowlerRuns}r • {targetBall.bowlerWickets}w</span>;
-                                                            }
-                                                        }
-                                                    }
-
-                                                    const themeColor = entityRole === 'batsmen' ? '#22c55e' : '#8b5cf6';
-                                                    const title = entityRole === 'batsmen' ? 'New Batter' : 'Bowling Change';
-
-                                                    return (
-                                                        <div style={{
-                                                            background: `rgba(${entityRole === 'batsmen' ? '34, 197, 94' : '139, 92, 246'}, 0.08)`,
-                                                            border: `1px solid rgba(${entityRole === 'batsmen' ? '34, 197, 94' : '139, 92, 246'}, 0.2)`,
-                                                            borderRadius: 12,
-                                                            padding: 12,
-                                                            display: 'flex',
-                                                            gap: 12,
-                                                            alignItems: 'center'
-                                                        }}>
-                                                            <WikiImage
-                                                                name={entityName}
-                                                                id={playerId}
-                                                                type="player"
-                                                                circle={true}
-                                                                style={{ width: 48, height: 48, background: 'rgba(255,255,255,0.1)' }}
-                                                            />
-                                                            <div style={{ flex: 1 }}>
-                                                                <div style={{ fontSize: 11, color: themeColor, fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>{title}</div>
-                                                                <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{entityName}</div>
-                                                                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2, display: 'flex', gap: 8 }}>
-                                                                    {bowlerStatsText ? bowlerStatsText : (
-                                                                        <>
-                                                                            {recentForm && <span>{recentForm.label}: {recentForm.value}</span>}
-                                                                            {iccRanking && <span style={{ color: themeColor }}>#{iccRanking} ICC</span>}
-                                                                            {!recentForm && !iccRanking && entityRole === 'bowler' && <span>First spell</span>}
-                                                                        </>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })() : (
-                                                    <>
-                                                        {formattedDetail && <div style={{ fontSize: 11, fontWeight: 700, color: '#3b82f6', textTransform: 'uppercase', marginBottom: 4 }}>{formattedDetail}</div>}
-                                                        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', lineHeight: '1.5' }}>{ball.commentary}</div>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
+                                    // Fallback
+                                    if (!newBatterName) newBatterName = ball.batsmanName;
                                 }
 
                                 // Helper to check if commentary body should be shown
@@ -1179,6 +1089,67 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
                                 return (
                                     <React.Fragment key={idx}>
+
+                                        {/* 1. Over Separator (First) */}
+                                        {showOverSeparator && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, opacity: 0.6 }}>
+                                                <div style={{ width: 30, display: 'flex', justifyContent: 'center' }}><div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} /></div>
+                                                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+                                                <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>End of Over {nextOverNum + 1}</div>
+                                                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+                                            </div>
+                                        )}
+
+                                        {/* 2. Event Cards (New Bowler / New Batter) - After Separator, Before Ball */}
+                                        {isBowlerChangeCard && (() => {
+                                            const newBowlerName = ball.bowlerName;
+                                            const targetBall = ball; // Use current ball stats for the new bowler
+                                            const hasBowled = targetBall.bowlerOvers && parseFloat(targetBall.bowlerOvers) >= 0.1;
+
+                                            const bowlerId = findPlayerIdByName(newBowlerName);
+                                            const h2hPlayer = !hasBowled ? findPlayerInH2H(newBowlerName, 'bowler', bowlerId) : null;
+                                            const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'bowler') : null;
+                                            const iccRanking = h2hPlayer?.icc_ranking;
+
+                                            return (
+                                                <div style={{
+                                                    display: 'flex', gap: 12, marginBottom: 24, padding: 12,
+                                                    background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: 12, alignItems: 'center', marginLeft: 46 // Indent to align with content
+                                                }}>
+                                                    <WikiImage name={newBowlerName} id={bowlerId} type="player" circle={true} style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.1)' }} />
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ fontSize: 11, color: '#8b5cf6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>Bowling Change</div>
+                                                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{newBowlerName}</div>
+                                                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
+                                                            {hasBowled ? `${targetBall.bowlerOvers}ov • ${targetBall.bowlerWickets}w` : 'First Spell'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
+
+                                        {isNewBatterCard && newBatterName && (() => {
+                                            const playerId = findPlayerIdByName(newBatterName);
+                                            const h2hPlayer = findPlayerInH2H(newBatterName, 'batsmen', playerId);
+                                            const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'batsmen') : null;
+
+                                            // Ensure we don't show duplicate cards if multiple balls happen? No, strict index check.
+                                            return (
+                                                <div style={{
+                                                    display: 'flex', gap: 12, marginBottom: 24, padding: 12,
+                                                    background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', borderRadius: 12, alignItems: 'center', marginLeft: 46
+                                                }}>
+                                                    <WikiImage name={newBatterName} id={playerId} type="player" circle={true} style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.1)' }} />
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ fontSize: 11, color: '#22c55e', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>New Batter</div>
+                                                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{newBatterName}</div>
+                                                        {recentForm && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>{recentForm.label}: {recentForm.value}</div>}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
+
+                                        {/* 3. The Ball Card Itself */}
                                         <div style={{ display: 'flex', gap: 16, position: 'relative', paddingBottom: 24, alignItems: showBody ? 'flex-start' : 'center' }}>
                                             {/* Timeline Line */}
                                             {!isLast && <div style={{ position: 'absolute', left: 14, top: 28, bottom: 0, width: 2, background: 'rgba(255,255,255,0.05)' }} />}
@@ -1207,68 +1178,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                     </div>
                                                 </div>
 
-                                                {/* Body: Commentary - Only show if it adds value beyond basic run count */}
+                                                {/* Body: Commentary */}
                                                 {showBody && (
                                                     <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: '1.5', fontFamily: 'Inter, sans-serif' }}>
                                                         {ball.commentary}
                                                     </div>
                                                 )}
-
                                             </div>
                                         </div>
-                                        {/* Over Separator */}
-                                        {
-                                            showOverSeparator && (
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, opacity: 0.6 }}>
-                                                    <div style={{ width: 30, display: 'flex', justifyContent: 'center' }}><div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} /></div>
-                                                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
-                                                    <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>End of Over {nextOverNum + 1}</div>
-                                                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
-                                                </div>
-                                            )
-                                        }
-
-                                        {/* Bowler Change Card - Moved AFTER Separator */}
-                                        {isBowlerChange && (() => {
-                                            const newBowlerName = ball.bowlerName;
-                                            const targetBall = ball;
-                                            const hasBowled = targetBall.bowlerOvers && parseFloat(targetBall.bowlerOvers) >= 1;
-
-                                            const bowlerId = findPlayerIdByName(newBowlerName);
-                                            const h2hPlayer = !hasBowled ? findPlayerInH2H(newBowlerName, 'bowler', bowlerId) : null;
-                                            const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'bowler') : null;
-                                            const iccRanking = h2hPlayer?.icc_ranking;
-
-                                            return (
-                                                <div style={{
-                                                    display: 'flex',
-                                                    gap: 12,
-                                                    marginBottom: 24, // Added margin bottom since it's now freestanding
-                                                    padding: 12,
-                                                    background: 'rgba(139, 92, 246, 0.08)',
-                                                    border: '1px solid rgba(139, 92, 246, 0.2)',
-                                                    borderRadius: 12,
-                                                    alignItems: 'center'
-                                                }}>
-                                                    <WikiImage name={newBowlerName} id={bowlerId} type="player" circle={true} style={{ width: 48, height: 48, background: 'rgba(255,255,255,0.1)' }} />
-                                                    <div style={{ flex: 1 }}>
-                                                        <div style={{ fontSize: 11, color: '#8b5cf6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>Bowling Change</div>
-                                                        <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{newBowlerName}</div>
-                                                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2, display: 'flex', gap: 8 }}>
-                                                            {hasBowled ? (
-                                                                <span>{targetBall.bowlerOvers}ov • {targetBall.bowlerMaidens}m • {targetBall.bowlerRuns}r • {targetBall.bowlerWickets}w</span>
-                                                            ) : (
-                                                                <>
-                                                                    {recentForm && <span>{recentForm.label}: {recentForm.value}</span>}
-                                                                    {iccRanking && <span style={{ color: '#8b5cf6' }}>#{iccRanking} ICC</span>}
-                                                                    {!recentForm && !iccRanking && <span>First spell</span>}
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })()}
                                     </React.Fragment>
                                 );
                             })}
