@@ -283,8 +283,8 @@ export default function App(): React.ReactElement {
                 }}
             />
 
-            {/* Main Content with Pull-to-Refresh */}
-            <PullToRefresh disabled={!!selectedMatch}>
+            {/* Main Content with Pull-to-Refresh - works on all screens */}
+            <PullToRefresh>
                 <main className="main-content" style={{ paddingTop: 85 }}>
                     <HomePage
                         matches={matches}
