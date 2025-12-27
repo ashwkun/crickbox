@@ -867,33 +867,42 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                             })()}
 
                             {((scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5']) || (latestBall?.thisOver?.length > 0) || (getScorecardThisOver().length > 0)) && (
-                                <div style={{ display: 'flex', alignItems: 'center', height: 48, marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                    {/* Last 5 Overs - Fixed Compact Width */}
+                                <div style={{ display: 'flex', height: 50, marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+
+                                    {/* Last 5 Overs - Compact & Bottom Aligned */}
                                     <div style={{
-                                        width: 90,
+                                        width: 70,
                                         height: '100%',
-                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                                        borderRight: '1px solid rgba(255,255,255,0.1)'
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end',
+                                        paddingBottom: 8
                                     }}>
-                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 3, letterSpacing: 0.5 }}>Last 5 Ov</div>
+                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 8, letterSpacing: 0.5 }}>Last 5 Ov</div>
                                         {scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5'] ? (
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', fontFamily: 'monospace' }}>
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', fontFamily: 'monospace', lineHeight: 1 }}>
                                                 {scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Score}/{scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Wicket}
                                             </div>
                                         ) : (
-                                            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>-</div>
+                                            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', lineHeight: 1 }}>-</div>
                                         )}
                                     </div>
 
-                                    {/* This Over balls - Takes Remaining Space */}
+                                    {/* Separator - Short & Bottom Aligned */}
+                                    <div style={{
+                                        width: 1, height: 16,
+                                        background: 'rgba(255,255,255,0.1)',
+                                        alignSelf: 'flex-end', marginBottom: 10
+                                    }} />
+
+                                    {/* This Over balls - Expands & Bottom Aligned */}
                                     <div style={{
                                         flex: 1,
                                         height: '100%',
-                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                                        paddingLeft: 12
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end',
+                                        paddingBottom: 6 // Align circles (approx 24px height) with text
                                     }}>
-                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 4, letterSpacing: 0.5 }}>This Over</div>
-                                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 8, letterSpacing: 0.5 }}>This Over</div>
+
+                                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                                             {(() => {
                                                 const scLimit = getScorecardThisOver();
                                                 const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
@@ -912,12 +921,13 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             {(() => {
                                                 const scLimit = getScorecardThisOver();
                                                 const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                                // Show empty slots if less than 6 balls
+                                                // Show empty slots only if we have few balls to maintain min height look
+                                                // If we have > 6 balls, don't show dots, just show balls
                                                 return Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
                                                     <div key={`e-${idx}`} style={{
                                                         width: 6, height: 6, borderRadius: '50%',
                                                         background: 'rgba(255,255,255,0.08)',
-                                                        margin: '9px 9px' // visually align center as dots
+                                                        margin: '9px 9px'
                                                     }} />
                                                 ));
                                             })()}
