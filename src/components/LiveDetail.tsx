@@ -866,57 +866,65 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 );
                             })()}
 
-                            {((scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5']) || (latestBall?.thisOver?.length > 0) || (getScorecardThisOver().length > 0)) && (
-                                <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-                                        {/* Last 5 Overs */}
-                                        <div style={{ textAlign: 'center', minWidth: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>Last 5 Ov</div>
-                                            {scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5'] ? (
-                                                <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', fontFamily: 'monospace', height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Score}/{scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Wicket}
-                                                </div>
-                                            ) : (
-                                                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)', height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>—</div>
-                                            )}
-                                        </div>
+                            <div style={{
+                                marginTop: 12,
+                                paddingTop: 16,
+                                borderTop: '1px solid rgba(255,255,255,0.1)',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                paddingLeft: 4, paddingRight: 4
+                            }}>
+                                {/* Recent Stats (Left) - Bowler Figures */}
+                                {(() => {
+                                    const stats = getRecentStats(activeBowler?.name || latestBall?.bowlerName);
+                                    if (stats) {
+                                        const parts = stats.value.split('@'); // "2 Wic @ 4.5 Eco"
+                                        const mainStat = parts[0]?.trim();
+                                        const subStat = parts[1] ? `@${parts[1]}` : '';
 
-                                        {/* This Over balls */}
-                                        <div style={{ flex: 1, textAlign: 'center' }}>
-                                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>This Over</div>
-                                            <div style={{ display: 'flex', gap: 5, justifyContent: 'center' }}>
-                                                {(() => {
-                                                    const scLimit = getScorecardThisOver();
-                                                    const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                                    return thisOverBalls.map((ball: any, idx: number) => (
-                                                        <div key={idx} style={{
-                                                            width: 24, height: 24, borderRadius: '50%',
-                                                            background: getBallColor(ball),
-                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                            fontSize: 10, fontWeight: 700, color: '#fff',
-                                                        }}>
-                                                            {getBallDisplay(ball)}
-                                                        </div>
-                                                    ));
-                                                })()}
-                                                {(() => {
-                                                    const scLimit = getScorecardThisOver();
-                                                    const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                                    return Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
-                                                        <div key={`e-${idx}`} style={{
-                                                            width: 24, height: 24, borderRadius: '50%',
-                                                            background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(255,255,255,0.1)',
-                                                        }} />
-                                                    ));
-                                                })()}
+                                        return (
+                                            <div>
+                                                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 2, letterSpacing: 0.5 }}>Recent</div>
+                                                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{mainStat}</div>
+                                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>{subStat}</div>
                                             </div>
-                                        </div>
+                                        );
+                                    }
+                                    return <div />;
+                                })()}
 
-                                        {/* Placeholder for symmetry */}
-                                        <div style={{ minWidth: 70 }} />
+                                {/* This Over Balls (Right) */}
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>This Over</div>
+                                    <div style={{ display: 'flex', gap: 6 }}>
+                                        {(() => {
+                                            const scLimit = getScorecardThisOver();
+                                            const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+
+                                            return thisOverBalls.map((ball: any, i: number) => (
+                                                <div key={i} style={{
+                                                    width: 24, height: 24, borderRadius: '50%',
+                                                    background: 'rgba(255,255,255,0.1)', // Glassy
+                                                    border: '1px solid rgba(255,255,255,0.1)',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    fontSize: 10, fontWeight: 600, color: '#fff',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                }}>
+                                                    {getBallDisplay(ball)}
+                                                </div>
+                                            ));
+                                        })()}
+                                        {(() => {
+                                            const scLimit = getScorecardThisOver();
+                                            const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                                            // Fill remaining dots? Optional. Let's keep it clean and only show bowled balls to save space/noise
+                                            if (thisOverBalls.length === 0) return <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>Start of over</div>;
+                                            return null;
+                                        })()}
                                     </div>
                                 </div>
-                            )}
+                            </div>
                         </div>
                     );
                 })()}
