@@ -163,9 +163,30 @@ export default function useCricketData(): UseCricketDataReturn {
         const liveTimer = setInterval(fetchLive, LIVE_INTERVAL);
         const heavyTimer = setInterval(() => fetchHeavy(false), FULL_REFRESH_INTERVAL);
 
+        // VISIBILITY HANDLER: Refresh match list when app returns from background
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                console.log('[PWA] useCricketData: App visible, refreshing match list...');
+                fetchLive();
+            }
+        };
+
+        const handlePageShow = (event: PageTransitionEvent) => {
+            if (event.persisted) {
+                console.log('[PWA] useCricketData: Page restored from BFCache, refreshing...');
+                fetchLive();
+                fetchHeavy(false);
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('pageshow', handlePageShow);
+
         return () => {
             clearInterval(liveTimer);
             clearInterval(heavyTimer);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('pageshow', handlePageShow);
         };
     }, []);
 

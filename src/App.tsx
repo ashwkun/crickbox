@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import HomePage from './components/HomePage';
 import InstallPrompt from './components/InstallPrompt';
 import MatchDetail from './components/MatchDetail';
@@ -99,12 +99,16 @@ export default function App(): React.ReactElement {
         return () => window.removeEventListener('popstate', handlePopState);
     }, [matches, selectedSeries, selectedTournament]);
 
+    // Ref to store current loadData function for visibility handler
+    const loadDataRef = useRef<(() => void) | null>(null);
+
     // Fetch scorecard and wallstream together for live/completed matches
-    // For live matches, refresh every 15 seconds - SYNCHRONIZED
+    // For live matches, refresh every 10 seconds - SYNCHRONIZED
     useEffect(() => {
         if (!selectedMatch) {
             setScorecard(null);
             setWallstream(null);
+            loadDataRef.current = null;
             return;
         }
 
@@ -114,6 +118,7 @@ export default function App(): React.ReactElement {
         if (!isLive && !isCompleted) {
             setScorecard(null);
             setWallstream(null);
+            loadDataRef.current = null;
             return;
         }
 
@@ -123,6 +128,7 @@ export default function App(): React.ReactElement {
 
         // Fetch both scorecard and wallstream together
         const loadData = async () => {
+            console.log('[PWA] Loading data for match:', selectedMatch.game_id);
             const sc = await fetchScorecard(selectedMatch.game_id);
 
             // Update innings count from fresh scorecard
@@ -135,12 +141,13 @@ export default function App(): React.ReactElement {
                 : null;
 
             if (isMounted) {
-                // Batch both updates together to ensure single re-render
-                // React 18 auto-batches, but explicitly group for clarity
                 setScorecard(sc);
                 setWallstream(isLive ? ws : null);
             }
         };
+
+        // Store loadData in ref so visibility handler can call it
+        loadDataRef.current = loadData;
 
         // Initial load
         loadData();
@@ -152,10 +159,41 @@ export default function App(): React.ReactElement {
 
         return () => {
             isMounted = false;
+            loadDataRef.current = null;
             if (intervalId) clearInterval(intervalId);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedMatch?.game_id, selectedMatch?.event_state]);
+
+    // VISIBILITY HANDLER: Refresh data when app returns from background
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                console.log('[PWA] App visible, refreshing data...');
+                // Call the current loadData function if available
+                if (loadDataRef.current) {
+                    loadDataRef.current();
+                }
+            }
+        };
+
+        const handlePageShow = (event: PageTransitionEvent) => {
+            if (event.persisted) {
+                console.log('[PWA] Page restored from BFCache, refreshing...');
+                if (loadDataRef.current) {
+                    loadDataRef.current();
+                }
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('pageshow', handlePageShow);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('pageshow', handlePageShow);
+        };
+    }, []);
 
     // Handle match selection with URL update
     const handleSelectMatch = useCallback((match: Match) => {
