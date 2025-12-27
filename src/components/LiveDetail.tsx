@@ -684,13 +684,19 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     // But user wants strict scorecard? Let's try scorecard first.
 
                     // Determine Striker / Non-Striker
+                    // Determine Striker / Non-Striker
                     let striker = activeBatsmen?.find(b => b.isStriker);
-                    let nonStriker = activeBatsmen?.find(b => !b.isStriker);
+                    let nonStriker = activeBatsmen?.find(b => !b.isStriker && b !== striker);
 
-                    // If both undefined or no isStriker flag, default to 0 and 1
-                    if (!striker && activeBatsmen && activeBatsmen.length > 0) striker = activeBatsmen[0];
-                    if (!nonStriker && activeBatsmen && activeBatsmen.length > 1) nonStriker = activeBatsmen[1];
-                    if (striker && nonStriker && striker.name === nonStriker.name) nonStriker = null; // Safety
+                    // If no striker flag found, default to 0 and 1
+                    if (!striker && activeBatsmen && activeBatsmen.length > 0) {
+                        striker = activeBatsmen[0];
+                        if (activeBatsmen.length > 1) nonStriker = activeBatsmen[1];
+                    }
+                    // If striker found but no non-striker (and we have 2 players), pick the other one
+                    if (striker && !nonStriker && activeBatsmen && activeBatsmen.length > 1) {
+                        nonStriker = activeBatsmen.find(b => b !== striker);
+                    }
 
                     // If scorecard fails, fallback to latestBall (but user prefers scorecard)
                     // We will use scorecard data if available, else Wallstream
@@ -722,16 +728,17 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     <div style={{ fontSize: 13, fontWeight: 600, color: '#22c55e', textTransform: 'uppercase', marginBottom: 2 }}>{sName}</div>
                                     <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', lineHeight: 1 }}>
                                         {sRuns || '0'}<span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.6)', marginLeft: 4 }}>({sBalls || '0'})</span>
-                                        {(() => {
-                                            const stats = getBoundaryStats(sName);
-                                            if (stats) return (
-                                                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginLeft: 6 }}>
-                                                    {stats.fours}x4 {stats.sixes}x6
-                                                </span>
-                                            );
-                                            return null;
-                                        })()}
                                     </div>
+                                    {/* Boundary Stats Below Score */}
+                                    {(() => {
+                                        const stats = getBoundaryStats(sName);
+                                        if (stats) return (
+                                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 4, fontWeight: 500 }}>
+                                                {stats.fours}x4 &nbsp; {stats.sixes}x6
+                                            </div>
+                                        );
+                                        return null;
+                                    })()}
                                 </div>
 
                                 <div style={{ textAlign: 'center', minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -780,6 +787,16 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', lineHeight: 1 }}>
                                         {nsRuns || '0'}<span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.6)', marginLeft: 4 }}>({nsBalls || '0'})</span>
                                     </div>
+                                    {/* Boundary Stats Below Score */}
+                                    {(() => {
+                                        const stats = getBoundaryStats(nsName);
+                                        if (stats) return (
+                                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 4, fontWeight: 500 }}>
+                                                {stats.fours}x4 &nbsp; {stats.sixes}x6
+                                            </div>
+                                        );
+                                        return null;
+                                    })()}
                                 </div>
                             </div>
 
