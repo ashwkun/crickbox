@@ -134,17 +134,19 @@ export default function App(): React.ReactElement {
                 : null;
 
             if (isMounted) {
+                // Batch both updates together to ensure single re-render
+                // React 18 auto-batches, but explicitly group for clarity
                 setScorecard(sc);
-                if (isLive) setWallstream(ws);
+                setWallstream(isLive ? ws : null);
             }
         };
 
         // Initial load
         loadData();
 
-        // For live matches, poll every 15 seconds
+        // For live matches, poll every 10 seconds
         if (isLive) {
-            intervalId = setInterval(loadData, 15000);
+            intervalId = setInterval(loadData, 10000);
         }
 
         return () => {

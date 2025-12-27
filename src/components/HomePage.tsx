@@ -45,28 +45,9 @@ interface SelectedTournament {
 type ProcessedUpcomingItem = ProcessedSeriesItem | ProcessedMatchItem;
 
 // Filter for international men's matches + BBL
+// Filter for international men's matches + BBL
 const isInternationalMens = (match: Match): boolean => {
-    const teams = match.participants?.map(p => p.short_name || '').join(' ').toUpperCase() || '';
-    const leagueCode = (match as any).league_code?.toLowerCase() || '';
-    const seriesName = match.series_name?.toLowerCase() || '';
-
-    // Exclude women's and youth matches
-    if (teams.includes('-W') || leagueCode.includes('women')) return false;
-    if (teams.includes('-U19') || teams.includes('-U') || leagueCode.includes('youth') || leagueCode.includes('under')) return false;
-
-    // Allow BBL (Big Bash League)
-    if (seriesName.includes('big bash') || seriesName.includes('bbl')) return true;
-
-    // Filter out other domestic leagues
-    if (leagueCode.includes('domestic') || leagueCode.includes('premier') || leagueCode.includes('trophy')) {
-        if (!leagueCode.includes('hazare')) return false;
-    }
-
-    if (leagueCode.includes('icc')) return true;
-
-    const format = match.event_format?.toLowerCase() || '';
-    if (format === 'test' || format === 'odi' || format === 't20') return true;
-
+    // Disable filtering - let all games pass through as per user request
     return true;
 };
 
