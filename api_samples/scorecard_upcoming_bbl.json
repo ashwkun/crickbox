@@ -1,0 +1,1155 @@
+{
+  "data": {
+    "Timestamp": "12/22/2025T18:28:23.185+05:30",
+    "Matchdetail": {
+      "Team_Home": "1263",
+      "Team_Away": "1262",
+      "Match": {
+        "Livecoverage": "yes",
+        "Id": "263500",
+        "Code": "bhad12272025263500",
+        "League": "australian_domestic",
+        "League_Id": "6",
+        "Number": "Match 13",
+        "Type": "T20",
+        "Date": "12/27/2025",
+        "Time": "18:15",
+        "Revised_time_utc": "",
+        "Offset": "+10:00",
+        "Group": "",
+        "Coverage_level_id": "8",
+        "Coverage_level": "Live Scorecard, Ball-by-Ball and Commentary",
+        "Match_ordinal": "13",
+        "Daynight": "yes",
+        "Comp_type_id": "6",
+        "End_date": "12/27/2025",
+        "End_time": "22:15",
+        "Upcoming": true,
+        "Live": false,
+        "Recent": false,
+        "StartDate": "12/27/2025T08:15+00:00",
+        "is_provisional_date": false,
+        "is_provisional_time": false,
+        "match_in_progress": false,
+        "is_rescheduled": false,
+        "first_ball_bowled": false
+      },
+      "Series": {
+        "Id": "13215",
+        "Name": "Big Bash League, 2025/26",
+        "Series_short_display_name": "BBL, 2025/26",
+        "Series_start_date": "12/14/2025",
+        "Series_end_date": "1/25/2026",
+        "Series_end_date_ist": null,
+        "Series_end_date_gmt": null,
+        "Series_start_date_ist": null,
+        "Series_start_date_gmt": null,
+        "Series_type": "Tournament",
+        "Status": "",
+        "Tour": "9965",
+        "Tour_Name": "Big Bash League, 2025/26",
+        "Has_standings": "true",
+        "Calendar_file_name": "calendar_new_domestic_australian",
+        "Streaming_platform": [],
+        "Broadcasting_platform": [],
+        "is_provisional_date": false,
+        "Series_match_count": 44,
+        "Series_completed": false
+      },
+      "Venue": {
+        "Id": "22",
+        "Name": "The Gabba, Brisbane",
+        "Country": "Australia",
+        "City": "Brisbane",
+        "Latitude": "-27.485833",
+        "Longitude": "153.038448",
+        "Venue_Weather": {},
+        "Pitch_Detail": {
+          "Pitch_Suited_For_Id": "",
+          "Pitch_Suited_For": "",
+          "Pitch_Surface_Id": "",
+          "Pitch_Surface": ""
+        },
+        "Neutralvenue": "false"
+      },
+      "Officials": {
+        "Umpires": "",
+        "Referee": "",
+        "Referee_Id": "",
+        "Umpire1_Name": "",
+        "Umpire2_Name": "",
+        "Umpire3_Name": "",
+        "Umpire1_Id": "",
+        "Umpire2_Id": "",
+        "Umpire3_Id": ""
+      },
+      "Weather": "",
+      "Tosswonby": "",
+      "Toss_elected_to": "",
+      "Status": "Match Yet To Begin",
+      "Status_Id": "115",
+      "Match_display_status": "Upcoming",
+      "Prematch": "Match begins at 13:45 IST (08:15 GMT)",
+      "Lineup_status": 0
+    },
+    "Teams": {
+      "1263": {
+        "Name_Full": "Brisbane Heat",
+        "Name_Short": "HEA",
+        "Players": {
+          "11724": {
+            "Position": "1",
+            "Name_Full": "Colin Munro",
+            "Name_Short": "C Munro",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "56",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "30.22",
+              "Strikerate": "129.91",
+              "Runs": "1481"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 5,
+            "nationality": "New Zealand"
+          },
+          "101791": {
+            "Position": "2",
+            "Name_Full": "Hugh Weibgen",
+            "Name_Short": "H Weibgen",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "9",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "22.80",
+              "Strikerate": "118.75",
+              "Runs": "114"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "70777": {
+            "Position": "3",
+            "Name_Full": "Lachlan Hearne",
+            "Name_Short": "L Hearne",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "0",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "0",
+              "Strikerate": "0",
+              "Runs": "0"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "65083": {
+            "Position": "4",
+            "Name_Full": "Marnus Labuschagne",
+            "Name_Short": "M Labuschagne",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "28",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "23.84",
+              "Strikerate": "122.28",
+              "Runs": "620"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "22.83",
+              "Economyrate": "9.72",
+              "Wickets": "12"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "65050": {
+            "Position": "5",
+            "Name_Full": "Matt Renshaw",
+            "Name_Short": "M Renshaw",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "83",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "27.26",
+              "Strikerate": "135.75",
+              "Runs": "1963"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "37.66",
+              "Economyrate": "7.88",
+              "Wickets": "9"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "67267": {
+            "Position": "6",
+            "Name_Full": "Max Bryant",
+            "Name_Short": "M Bryant",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "74",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "23.64",
+              "Strikerate": "139.31",
+              "Runs": "1584"
+            },
+            "Bowling": {
+              "Style": "RM",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "10048": {
+            "Position": "7",
+            "Name_Full": "Usman Khawaja",
+            "Name_Short": "U Khawaja",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "70",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "33.31",
+              "Strikerate": "131.84",
+              "Runs": "2132"
+            },
+            "Bowling": {
+              "Style": "RM",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "63098": {
+            "Position": "8",
+            "Name_Full": "Jack Wildermuth",
+            "Name_Short": "J Wildermuth",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Matches": "55",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "13.80",
+              "Strikerate": "132.26",
+              "Runs": "414"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "31.40",
+              "Economyrate": "8.23",
+              "Wickets": "47"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "39447": {
+            "Position": "9",
+            "Name_Full": "Michael Neser",
+            "Name_Short": "M Neser",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Matches": "103",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "14.47",
+              "Strikerate": "127.34",
+              "Runs": "666"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "24.36",
+              "Economyrate": "8.40",
+              "Wickets": "115"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "68008": {
+            "Position": "10",
+            "Name_Full": "Nathan McSweeney",
+            "Name_Short": "N McSweeney",
+            "Iscaptain": true,
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Matches": "28",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "26.91",
+              "Strikerate": "116.39",
+              "Runs": "646"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "16.80",
+              "Economyrate": "8.26",
+              "Wickets": "5"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "101793": {
+            "Position": "11",
+            "Name_Full": "Thomas Balkin",
+            "Name_Short": "T Balkin",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Matches": "0",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "0",
+              "Strikerate": "0",
+              "Runs": "0"
+            },
+            "Bowling": {
+              "Style": "RM",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "60299": {
+            "Position": "12",
+            "Name_Full": "Jimmy Peirson",
+            "Name_Short": "J Peirson",
+            "Iskeeper": true,
+            "Skill": "4",
+            "Skill_Name": "Wicket Keeper",
+            "Role": "Wicket Keeper",
+            "Matches": "117",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "22.62",
+              "Strikerate": "122.92",
+              "Runs": "1855"
+            },
+            "Bowling": {
+              "Style": "",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "63627": {
+            "Position": "13",
+            "Name_Full": "Tom Alsop",
+            "Name_Short": "T Alsop",
+            "Iskeeper": true,
+            "Skill": "4",
+            "Skill_Name": "Wicket Keeper",
+            "Role": "Wicket Keeper",
+            "Matches": "5",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "26.25",
+              "Strikerate": "136.36",
+              "Runs": "105"
+            },
+            "Bowling": {
+              "Style": "",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "102053": {
+            "Position": "14",
+            "Name_Full": "Callum Vidler",
+            "Name_Short": "C Vidler",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "0",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "0",
+              "Strikerate": "0",
+              "Runs": "0"
+            },
+            "Bowling": {
+              "Style": "RM",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "103894": {
+            "Position": "15",
+            "Name_Full": "Liam Haskett",
+            "Name_Short": "L Haskett",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "5",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "7",
+              "Strikerate": "70",
+              "Runs": "7"
+            },
+            "Bowling": {
+              "Style": "LFM",
+              "Average": "70",
+              "Economyrate": "13.12",
+              "Wickets": "3"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "65047": {
+            "Position": "16",
+            "Name_Full": "Matthew Kuhnemann",
+            "Name_Short": "M Kuhnemann",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "57",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "6.57",
+              "Strikerate": "73.01",
+              "Runs": "46"
+            },
+            "Bowling": {
+              "Style": "SLO",
+              "Average": "29.93",
+              "Economyrate": "7.78",
+              "Wickets": "46"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "127316": {
+            "Position": "17",
+            "Name_Full": "Ollie Patterson",
+            "Name_Short": "O Patterson",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "0",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "0",
+              "Strikerate": "0",
+              "Runs": "0"
+            },
+            "Bowling": {
+              "Style": "LM",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "91088": {
+            "Position": "18",
+            "Name_Full": "Patrick Dooley",
+            "Name_Short": "P Dooley",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "21",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "13.50",
+              "Strikerate": "81.81",
+              "Runs": "54"
+            },
+            "Bowling": {
+              "Style": "LWS",
+              "Average": "22.19",
+              "Economyrate": "7.60",
+              "Wickets": "26"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "66833": {
+            "Position": "19",
+            "Name_Full": "Shaheen Afridi",
+            "Name_Short": "S Afridi",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "3",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "0",
+              "Strikerate": "0",
+              "Runs": "0"
+            },
+            "Bowling": {
+              "Style": "LF",
+              "Average": "63.50",
+              "Economyrate": "11.90",
+              "Wickets": "2"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 6,
+            "nationality": "Pakistan"
+          },
+          "67778": {
+            "Position": "20",
+            "Name_Full": "Spencer Johnson",
+            "Name_Short": "S Johnson",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "28",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "8",
+              "Strikerate": "126.31",
+              "Runs": "48"
+            },
+            "Bowling": {
+              "Style": "LF",
+              "Average": "19.21",
+              "Economyrate": "7.55",
+              "Wickets": "41"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "66516": {
+            "Position": "21",
+            "Name_Full": "Xavier Bartlett",
+            "Name_Short": "X Bartlett",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "52",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "15",
+              "Strikerate": "117.80",
+              "Runs": "225"
+            },
+            "Bowling": {
+              "Style": "RFM",
+              "Average": "23.44",
+              "Economyrate": "8.59",
+              "Wickets": "63"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          }
+        }
+      },
+      "1262": {
+        "Name_Full": "Adelaide Strikers",
+        "Name_Short": "STR",
+        "Players": {
+          "18958": {
+            "Position": "1",
+            "Name_Full": "Alex Ross",
+            "Name_Short": "A Ross",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "113",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "27.68",
+              "Strikerate": "129.25",
+              "Runs": "2187"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "10062": {
+            "Position": "2",
+            "Name_Full": "Chris Lynn",
+            "Name_Short": "C Lynn",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "128",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "36",
+              "Strikerate": "149.66",
+              "Runs": "3960"
+            },
+            "Bowling": {
+              "Style": "SLO",
+              "Average": "25",
+              "Economyrate": "6.81",
+              "Wickets": "3"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "66110": {
+            "Position": "3",
+            "Name_Full": "Jason Sangha",
+            "Name_Short": "J Sangha",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "35",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "31.40",
+              "Strikerate": "120.28",
+              "Runs": "848"
+            },
+            "Bowling": {
+              "Style": "LB",
+              "Average": "25.80",
+              "Economyrate": "8.69",
+              "Wickets": "5"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "25663": {
+            "Position": "4",
+            "Name_Full": "Mackenzie Harvey",
+            "Name_Short": "M Harvey",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "45",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "20.11",
+              "Strikerate": "117.72",
+              "Runs": "704"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "83365": {
+            "Position": "5",
+            "Name_Full": "Thomas Kelly",
+            "Name_Short": "T Kelly",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "34",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "20.45",
+              "Strikerate": "118.20",
+              "Runs": "409"
+            },
+            "Bowling": {
+              "Style": "",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "62023": {
+            "Position": "6",
+            "Name_Full": "Travis Head",
+            "Name_Short": "T Head",
+            "Skill": "1",
+            "Skill_Name": "Batsman",
+            "Role": "Batter",
+            "Matches": "57",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "27.88",
+              "Strikerate": "130.40",
+              "Runs": "1394"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "25.50",
+              "Economyrate": "8.05",
+              "Wickets": "18"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "78388": {
+            "Position": "7",
+            "Name_Full": "Harry Manenti",
+            "Name_Short": "H Manenti",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Matches": "2",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "11",
+              "Strikerate": "122.22",
+              "Runs": "11"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 125,
+            "nationality": "Italy"
+          },
+          "58482": {
+            "Position": "8",
+            "Name_Full": "Jamie Overton",
+            "Name_Short": "J Overton",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Matches": "19",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "61.20",
+              "Strikerate": "150.73",
+              "Runs": "306"
+            },
+            "Bowling": {
+              "Style": "RF",
+              "Average": "20.82",
+              "Economyrate": "8.62",
+              "Wickets": "29"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "131702": {
+            "Position": "9",
+            "Name_Full": "Jerrssis Wadia",
+            "Name_Short": "J Wadia",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Matches": "0",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "0",
+              "Strikerate": "0",
+              "Runs": "0"
+            },
+            "Bowling": {
+              "Style": "SLO",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "72440": {
+            "Position": "10",
+            "Name_Full": "Liam Scott",
+            "Name_Short": "L Scott",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Matches": "10",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "25.16",
+              "Strikerate": "138.53",
+              "Runs": "151"
+            },
+            "Bowling": {
+              "Style": "RFM",
+              "Average": "70",
+              "Economyrate": "11.66",
+              "Wickets": "2"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "63846": {
+            "Position": "11",
+            "Name_Full": "Matthew Short",
+            "Name_Short": "M Short",
+            "Skill": "3",
+            "Skill_Name": "All-Rounder",
+            "Role": "All-Rounder",
+            "Matches": "86",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "28.96",
+              "Strikerate": "143.10",
+              "Runs": "2201"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "32.41",
+              "Economyrate": "7.59",
+              "Wickets": "34"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "63706": {
+            "Position": "12",
+            "Name_Full": "Alex Carey",
+            "Name_Short": "A Carey",
+            "Iskeeper": true,
+            "Skill": "4",
+            "Skill_Name": "Wicket Keeper",
+            "Role": "Wicket Keeper",
+            "Matches": "59",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "33.75",
+              "Strikerate": "130.07",
+              "Runs": "1890"
+            },
+            "Bowling": {
+              "Style": "",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "67690": {
+            "Position": "13",
+            "Name_Full": "Harry Nielsen",
+            "Name_Short": "H Nielsen",
+            "Iskeeper": true,
+            "Skill": "4",
+            "Skill_Name": "Wicket Keeper",
+            "Role": "Wicket Keeper",
+            "Matches": "50",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "19.95",
+              "Strikerate": "118.29",
+              "Runs": "459"
+            },
+            "Bowling": {
+              "Style": "OB",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "55485": {
+            "Position": "14",
+            "Name_Full": "Cameron Boyce",
+            "Name_Short": "C Boyce",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "104",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "10.54",
+              "Strikerate": "115.14",
+              "Runs": "327"
+            },
+            "Bowling": {
+              "Style": "LB",
+              "Average": "24.32",
+              "Economyrate": "7.52",
+              "Wickets": "113"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "64306": {
+            "Position": "15",
+            "Name_Full": "Hasan Ali",
+            "Name_Short": "H Ali",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "1",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "0",
+              "Strikerate": "200",
+              "Runs": "4"
+            },
+            "Bowling": {
+              "Style": "RMF",
+              "Average": "0",
+              "Economyrate": "9.00",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 6,
+            "nationality": "Pakistan"
+          },
+          "65532": {
+            "Position": "16",
+            "Name_Full": "Henry Thornton",
+            "Name_Short": "H Thornton",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "33",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "11",
+              "Strikerate": "80",
+              "Runs": "44"
+            },
+            "Bowling": {
+              "Style": "RF",
+              "Average": "19.88",
+              "Economyrate": "8.66",
+              "Wickets": "50"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "88002": {
+            "Position": "17",
+            "Name_Full": "Jordan Buckingham",
+            "Name_Short": "J Buckingham",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "3",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "0",
+              "Strikerate": "0",
+              "Runs": "0"
+            },
+            "Bowling": {
+              "Style": "RFM",
+              "Average": "48",
+              "Economyrate": "9.60",
+              "Wickets": "2"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "67274": {
+            "Position": "18",
+            "Name_Full": "Lloyd Pope",
+            "Name_Short": "L Pope",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "41",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "1.75",
+              "Strikerate": "50",
+              "Runs": "7"
+            },
+            "Bowling": {
+              "Style": "LBG",
+              "Average": "22.71",
+              "Economyrate": "8.43",
+              "Wickets": "49"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          },
+          "64498": {
+            "Position": "19",
+            "Name_Full": "Luke Wood",
+            "Name_Short": "L Wood",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "15",
+            "Batting": {
+              "Style": "LHB",
+              "Average": "6.66",
+              "Strikerate": "80",
+              "Runs": "40"
+            },
+            "Bowling": {
+              "Style": "LFM",
+              "Average": "21.60",
+              "Economyrate": "8.69",
+              "Wickets": "23"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 3,
+            "nationality": "England"
+          },
+          "101802": {
+            "Position": "20",
+            "Name_Full": "Tom Straker",
+            "Name_Short": "T Straker",
+            "Skill": "2",
+            "Skill_Name": "Bowler",
+            "Role": "Bowler",
+            "Matches": "0",
+            "Batting": {
+              "Style": "RHB",
+              "Average": "0",
+              "Strikerate": "0",
+              "Runs": "0"
+            },
+            "Bowling": {
+              "Style": "RM",
+              "Average": "0",
+              "Economyrate": "0.0",
+              "Wickets": "0"
+            },
+            "status_id": 12,
+            "status": "Available",
+            "nationality_id": 1,
+            "nationality": "Australia"
+          }
+        }
+      }
+    },
+    "Notes": {
+      "1": [],
+      "2": []
+    },
+    "SerialNumber": 3,
+    "other_info": null
+  },
+  "meta": {
+    "app_status_code": 1,
+    "message": "Success",
+    "pagination": false,
+    "count": 0,
+    "timestamp": {
+      "utc_time": "12/26/2025 7:46:26 PM"
+    }
+  }
+}

@@ -4,7 +4,12 @@ import { Match } from '../types';
 
 interface UpcomingCardProps {
     match: Match;
+    matches?: Match[]; // For series view - array of all matches in the series
     onClick: (match: Match) => void;
+    // Series button (bilaterals)
+    showSeriesButton?: boolean;
+    onViewSeries?: (seriesId: string, matches?: Match[]) => void;
+    // Tournament button
     showTournamentButton?: boolean;
     onViewTournament?: (seriesId: string) => void;
 }
@@ -37,8 +42,16 @@ const shortenSeriesName = (name: string | undefined): string => {
         .trim();
 };
 
-// Calendar-style card for upcoming matches (with optional tournament button)
-const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({ match, onClick, showTournamentButton, onViewTournament }) => {
+// Unified calendar-style card for upcoming matches
+const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
+    match,
+    matches,
+    onClick,
+    showSeriesButton,
+    onViewSeries,
+    showTournamentButton,
+    onViewTournament
+}) => {
     const startDate = new Date(match.start_date);
 
     const month = startDate.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
@@ -50,10 +63,13 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({ match, onClick, 
     const seriesName = shortenSeriesName(match.series_name);
     const matchFormat = normalizeFormat(match.event_format);
 
+    const hasButton = (showSeriesButton && onViewSeries) || (showTournamentButton && onViewTournament);
+
     return (
-        <div className={`expandable-card ${showTournamentButton ? '' : ''}`}>
+        <div className="expandable-card">
+            {/* Main Card */}
             <div
-                className={`upcoming-card ${showTournamentButton ? 'has-tournament' : ''}`}
+                className={`upcoming-card ${hasButton ? 'has-series' : ''}`}
                 onClick={() => onClick(match)}
             >
                 {/* Calendar Date Block */}
@@ -74,7 +90,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({ match, onClick, 
                                         name={team.name}
                                         id={team.id}
                                         type="team"
-                                        style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'contain', background: '#1a1a1a', padding: 4 }}
+                                        style={{ maxHeight: 40, width: 'auto', height: 'auto', borderRadius: 10, background: '#1a1a1a', padding: 4 }}
                                     />
                                     <span className="upcoming-team-name">{team.name}</span>
                                 </div>
@@ -83,7 +99,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({ match, onClick, 
                         ))}
                     </div>
 
-                    {/* Series Name - Above divider */}
+                    {/* Series Name */}
                     {seriesName && (
                         <div className="upcoming-series">{seriesName}</div>
                     )}
@@ -91,13 +107,23 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({ match, onClick, 
                     {/* Divider */}
                     <div className="upcoming-divider"></div>
 
-                    {/* Footer: Time + Format only */}
+                    {/* Footer: Time + Format */}
                     <div className="upcoming-footer">
                         <span className="upcoming-time">{time}</span>
                         {matchFormat && <span className="upcoming-format">{matchFormat}</span>}
                     </div>
                 </div>
             </div>
+
+            {/* View Series Button */}
+            {showSeriesButton && onViewSeries && (
+                <button
+                    className="view-series-button"
+                    onClick={(e) => { e.stopPropagation(); onViewSeries(match.series_id, matches); }}
+                >
+                    View Series →
+                </button>
+            )}
 
             {/* View Tournament Button */}
             {showTournamentButton && onViewTournament && (

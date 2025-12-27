@@ -119,7 +119,7 @@ const SeriesCard: React.FC<SeriesCardProps> = ({ seriesName, matches, onClick })
                                 name={team.name}
                                 id={team.id}
                                 type="team"
-                                style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'contain', background: '#1a1a1a', padding: 4 }}
+                                style={{ maxHeight: 48, width: 'auto', height: 'auto', borderRadius: 12, background: '#1a1a1a', padding: 4 }}
                             />
                             <span className="series-team-name">{team.short_name}</span>
                         </div>

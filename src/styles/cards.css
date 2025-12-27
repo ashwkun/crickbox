@@ -389,10 +389,11 @@
     font-weight: 700;
     color: var(--text-primary);
     text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 80px;
+    line-height: 1.3;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .upcoming-vs {

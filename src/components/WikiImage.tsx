@@ -86,7 +86,16 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
     useEffect(() => {
         if (src) return; // Already resolved a source
 
-        // Strategy 1: Wisden Asset (if ID available) - PRIORITY
+        // Strategy 0: For recognized national teams, use FlagCDN FIRST (high quality flags)
+        if (type === 'team' && errorCount === 0) {
+            const flagUrl = getFlagUrl(name);
+            if (flagUrl) {
+                setSrc(flagUrl);
+                return;
+            }
+        }
+
+        // Strategy 1: Wisden Asset (for franchises/non-national teams, or if flag wasn't available)
         if (id && errorCount === 0) {
             let url: string | undefined;
             if (type === 'player') url = `${WISDEN_PLAYER_IMG}${id}.png`;
@@ -114,15 +123,10 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
             fetchWiki(name, type);
         }
 
-        // Strategy 4: Flag Fallback (for teams)
+        // Strategy 4: Fallback placeholder
         if ((errorCount === 2 && id) || (errorCount === 1 && !id)) {
             if (type === 'team') {
-                const flagUrl = getFlagUrl(name);
-                if (flagUrl) {
-                    setSrc(flagUrl);
-                } else {
-                    setSrc(TEAM_FALLBACK);
-                }
+                setSrc(TEAM_FALLBACK);
             } else if (type === 'series' || type === 'tournament') {
                 setSrc(SERIES_FALLBACK);
             } else {
@@ -182,10 +186,16 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
         }
     };
 
-    // Calculate generic style
-    const imgStyle: CSSProperties = circle
-        ? { ...style, borderRadius: '50%', objectFit: 'cover' as const }
-        : { ...style, objectFit: 'contain' as const };
+    // Calculate generic style - different for flags vs logos
+    const isFlag = src?.includes('flagcdn.com');
+
+    let imgStyle: CSSProperties;
+    if (circle) {
+        imgStyle = { ...style, borderRadius: '50%', objectFit: 'cover' as const };
+    } else {
+        // Both flags and logos: use contain to show full image without clipping
+        imgStyle = { ...style, objectFit: 'contain' as const };
+    }
 
     let fallback = TEAM_FALLBACK;
     if (type === 'player') fallback = PLAYER_FALLBACK;

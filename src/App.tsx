@@ -130,7 +130,7 @@ export default function App(): React.ReactElement {
             }
 
             const ws = isLive
-                ? await fetchWallstream(selectedMatch.game_id, 10, currentInningsCount)
+                ? await fetchWallstream(selectedMatch.game_id, 50, currentInningsCount)
                 : null;
 
             if (isMounted) {
@@ -176,6 +176,15 @@ export default function App(): React.ReactElement {
 
     // --- Series / Tournament Handlers ---
 
+    // Helper to check if series is bilateral
+    const isBilateral = (seriesMatches: Match[]): boolean => {
+        const uniqueTeams = new Set<string>();
+        seriesMatches.forEach(m => {
+            m.participants?.forEach(p => uniqueTeams.add(p.short_name));
+        });
+        return uniqueTeams.size <= 2;
+    };
+
     const handleOpenSeries = async (seriesId: string, seriesMatches?: Match[]) => {
         // If match detail is open, close it (but keep history clean?)
         if (selectedMatch) {
@@ -184,6 +193,13 @@ export default function App(): React.ReactElement {
         }
 
         const initialMatches = seriesMatches || matches.filter(m => m.series_id === seriesId);
+
+        // Smart Detection: If not bilateral, treat as Tournament
+        if (!isBilateral(initialMatches)) {
+            handleOpenTournament(seriesId);
+            return;
+        }
+
         const seriesName = initialMatches[0]?.series_name || 'Series';
 
         setSelectedSeries({ seriesId, seriesName, matches: initialMatches });
@@ -192,6 +208,8 @@ export default function App(): React.ReactElement {
 
         const extendedMatches = await fetchExtendedResults(2);
         const allSeriesMatches = extendedMatches.filter(m => m.series_id === seriesId);
+
+        // Check again after extended fetch? Likely initial check is enough.
         setSelectedSeries(prev => prev ? { ...prev, matches: allSeriesMatches } : null);
     };
 

@@ -3,7 +3,6 @@ import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
 import CompletedCard from './CompletedCard';
 import UpcomingCard from './UpcomingCard';
-import SeriesUpcomingCard from './ExpandableUpcomingCard';
 import SeriesHub from './SeriesHub';
 import TournamentHub from './TournamentHub';
 
@@ -122,6 +121,18 @@ export default function HomePage({
     const [upcomingLimit, setUpcomingLimit] = useState(10);
     const [resultsLimit, setResultsLimit] = useState(8);
     const resultsScrollRef = useRef<HTMLDivElement>(null);
+    const upcomingScrollRef = useRef<HTMLDivElement>(null);
+
+    const loadMoreUpcoming = () => {
+        const currentScrollLeft = upcomingScrollRef.current?.scrollLeft || 0;
+        setUpcomingLimit(prev => prev + 10);
+        // Preserve scroll position so View More button stays in place
+        setTimeout(() => {
+            if (upcomingScrollRef.current) {
+                upcomingScrollRef.current.scrollLeft = currentScrollLeft;
+            }
+        }, 50);
+    };
 
     const loadMoreResults = () => {
         const currentScrollLeft = resultsScrollRef.current?.scrollLeft || 0;
@@ -141,7 +152,8 @@ export default function HomePage({
     };
 
     // Forwarding to props
-    const openSeries = (seriesId: string, seriesMatches: Match[]) => {
+    // Forwarding to props
+    const openSeries = (seriesId: string, seriesMatches?: Match[]) => {
         onOpenSeries(seriesId, seriesMatches);
     };
 
@@ -157,18 +169,38 @@ export default function HomePage({
         onCloseTournament();
     };
 
+    // Helper to check if match should appear in live section
+    const shouldShowInLive = (match: Match): boolean => {
+        const startTime = new Date(match.start_date).getTime();
+        const now = Date.now();
+        const thirtyMins = 30 * 60 * 1000;
+        const startsWithin30Mins = startTime - now <= thirtyMins && startTime - now > -60 * 60 * 1000;
+
+        // Also include delayed matches (they already started but are interrupted)
+        const isDelayed = match.short_event_status?.toLowerCase().includes('delayed') ||
+            match.event_status?.toLowerCase().includes('delayed');
+
+        return startsWithin30Mins || (isDelayed && startTime < now);
+    };
+
     // Memoized computations to prevent recalculation on every render
     const liveMatches = useMemo(() =>
         matches
-            .filter(m => m.event_state === 'L')
+            .filter(m => m.event_state === 'L' || (m.event_state === 'U' && shouldShowInLive(m)))
             .filter(isInternationalMens)
-            .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()),
+            .sort((a, b) => {
+                // Live matches first, then by start time
+                if (a.event_state === 'L' && b.event_state !== 'L') return -1;
+                if (b.event_state === 'L' && a.event_state !== 'L') return 1;
+                return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+            }),
         [matches]
     );
 
     const upcomingMatches = useMemo(() =>
         matches
             .filter(m => m.event_state === 'U')
+            .filter(m => !shouldShowInLive(m)) // Exclude pre-live matches
             .filter(m => !m.event_status?.toLowerCase().includes('cancel') && !m.event_status?.toLowerCase().includes('abandon'))
             .filter(isInternationalMens)
             .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()),
@@ -267,6 +299,7 @@ export default function HomePage({
                 result.push({
                     type: 'single',
                     match,
+                    seriesId: sid !== 'unknown' ? sid : undefined,
                     firstDate: new Date(match.start_date)
                 });
             }
@@ -319,9 +352,15 @@ export default function HomePage({
                         <SkeletonMatchCard />
                     </div>
                 ) : liveMatches.length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div className="horizontal-scroll">
                         {liveMatches.map(match => (
-                            <MatchCard key={match.game_id} match={match} onClick={openMatch} isHero={true} />
+                            <MatchCard
+                                key={match.game_id}
+                                match={match}
+                                onClick={openMatch}
+                                isHero={true}
+                                onSeriesClick={(seriesId) => openSeries(seriesId, undefined)}
+                            />
                         ))}
                     </div>
                 ) : (
@@ -341,13 +380,15 @@ export default function HomePage({
                         <SkeletonMatchCard />
                     </div>
                 ) : processedUpcoming.length > 0 ? (
-                    <div className="horizontal-scroll">
+                    <div className="horizontal-scroll" ref={upcomingScrollRef}>
                         {processedUpcoming.slice(0, upcomingLimit).map((item, idx) =>
                             item.type === 'series' ? (
-                                <SeriesUpcomingCard
+                                <UpcomingCard
                                     key={(item as ProcessedSeriesItem).matches[0].game_id}
+                                    match={(item as ProcessedSeriesItem).matches[0]}
                                     matches={(item as ProcessedSeriesItem).matches}
                                     onClick={openMatch}
+                                    showSeriesButton={true}
                                     onViewSeries={openSeries}
                                 />
                             ) : item.type === 'tournament' ? (
@@ -363,13 +404,15 @@ export default function HomePage({
                                     key={(item as ProcessedMatchItem).match.game_id}
                                     match={(item as ProcessedMatchItem).match}
                                     onClick={openMatch}
+                                    showSeriesButton={(item as ProcessedMatchItem).seriesId !== undefined}
+                                    onViewSeries={(item as ProcessedMatchItem).seriesId ? openSeries : undefined}
                                 />
                             )
                         )}
                         {upcomingLimit < processedUpcoming.length && (
                             <button
                                 className="view-more-card"
-                                onClick={() => setUpcomingLimit(prev => prev + 10)}
+                                onClick={loadMoreUpcoming}
                             >
                                 <span className="view-more-icon">+</span>
                                 <span className="view-more-text">View More</span>

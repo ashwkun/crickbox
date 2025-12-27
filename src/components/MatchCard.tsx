@@ -1,9 +1,69 @@
-import React from 'react';
-import WikiImage from './WikiImage';
+import React, { useState, useEffect } from 'react';
+import WikiImage, { getFlagUrl } from './WikiImage';
 import { getTeamColor } from '../utils/teamColors';
 import { getMatchStatusConfig } from '../utils/matchStatus';
 
-const MatchCard = ({ match, onClick, isHero = false }) => {
+// Live countdown component for pre-live matches
+const CountdownStatusBox: React.FC<{ match: any }> = ({ match }) => {
+    const [now, setNow] = useState(Date.now());
+    const isPreLive = match.event_state === 'U';
+    const startTime = new Date(match.start_date).getTime();
+    const isCountingDown = isPreLive && startTime > now;
+
+    useEffect(() => {
+        if (!isCountingDown) return;
+        const interval = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(interval);
+    }, [isCountingDown]);
+
+    const boxStyle: React.CSSProperties = {
+        marginTop: 10,
+        padding: '10px 14px',
+        background: 'rgba(0, 0, 0, 0.3)',
+        borderRadius: 10,
+        textAlign: 'center',
+        minHeight: 46,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        gap: 4,
+    };
+
+    if (isCountingDown) {
+        const diff = Math.max(0, startTime - now);
+        const mins = Math.floor(diff / 60000);
+        const secs = Math.floor((diff % 60000) / 1000);
+        return (
+            <div style={boxStyle}>
+                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: 1 }}>
+                    Match starts in
+                </span>
+                <span style={{ fontSize: 24, fontWeight: 700, color: '#3b82f6' }}>
+                    {mins > 0 && <>{mins}<span style={{ fontSize: 14, opacity: 0.7 }}>m </span></>}
+                    {secs}<span style={{ fontSize: 14, opacity: 0.7 }}>s</span>
+                </span>
+            </div>
+        );
+    }
+
+    return (
+        <div style={boxStyle}>
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: 500, lineHeight: 1.4 }}>
+                {match.event_sub_status || match.event_status || '\u00A0'}
+            </span>
+        </div>
+    );
+};
+
+interface MatchCardProps {
+    match: any;
+    onClick: (match: any) => void;
+    isHero?: boolean;
+    onSeriesClick?: (seriesId: string) => void;
+}
+
+const MatchCard: React.FC<MatchCardProps> = ({ match, onClick, isHero = false, onSeriesClick }) => {
     const team1 = match.participants?.[0];
     const team2 = match.participants?.[1];
 
@@ -78,65 +138,133 @@ const MatchCard = ({ match, onClick, isHero = false }) => {
         `,
         borderRadius: '20px',
         padding: '20px',
-        margin: '0 20px',
+        margin: '0 8px',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
         cursor: 'pointer',
+        minWidth: 300,
+        width: 'calc(100vw - 48px)', // 16px page padding + 8px card margin on each side
+        maxWidth: 380,
+        flexShrink: 0,
     };
 
     if (isHero) {
         return (
             <div style={heroStyle} onClick={() => onClick(match)}>
-                {/* Header: Series name + Day indicator + Status */}
+                {/* Row 1: Series/Tour name - centered */}
+                <div
+                    onClick={(e) => {
+                        if (onSeriesClick) {
+                            e.stopPropagation(); // Prevent card click
+                            onSeriesClick(match.series_id);
+                        }
+                    }}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        marginBottom: 12,
+                        cursor: onSeriesClick ? 'pointer' : 'default',
+                    }}
+                >
+                    <span style={{
+                        fontSize: 13,
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        fontWeight: 500,
+                        textAlign: 'center',
+                    }}>
+                        {match.series_name}
+                    </span>
+                    {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)' }}>›</span>}
+                </div>
+
+                {/* Row 2: Chips - Day | Status | Match format */}
                 <div style={{
                     display: 'flex',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
                     marginBottom: 16,
+                    flexWrap: 'wrap',
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+                    {/* Day chip (Test matches only) */}
+                    {match.event_day && (
                         <span style={{
-                            fontSize: 12,
-                            color: 'rgba(255, 255, 255, 0.6)',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            maxWidth: '150px',
+                            fontSize: 10,
+                            fontWeight: 600,
+                            padding: '4px 10px',
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            borderRadius: 20,
+                            color: 'rgba(255, 255, 255, 0.8)',
                         }}>
-                            {match.series_name}
+                            Day {match.event_day}
                         </span>
-                        {match.event_day && (
-                            <span style={{
-                                fontSize: 10,
-                                fontWeight: 600,
-                                padding: '2px 8px',
-                                background: 'rgba(255, 255, 255, 0.1)',
-                                borderRadius: 4,
-                                color: 'rgba(255, 255, 255, 0.7)',
-                            }}>
-                                Day {match.event_day}
-                            </span>
-                        )}
-                    </div>
-                    {match.event_state === 'L' && (() => {
-                        const statusConfig = getMatchStatusConfig(match.short_event_status);
-                        return (
-                            <span style={{
-                                fontSize: 10,
-                                fontWeight: 700,
-                                padding: '4px 10px',
-                                background: statusConfig.bgColor,
-                                borderRadius: 20,
-                                color: statusConfig.color,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 5,
-                            }}>
-                                <span style={{ width: 5, height: 5, background: statusConfig.color, borderRadius: '50%' }} />
-                                {statusConfig.text}
-                            </span>
-                        );
+                    )}
+
+                    {/* Status chip (color-coded) */}
+                    {(() => {
+                        const isPreLive = match.event_state === 'U';
+                        const isDelayed = match.short_event_status?.toLowerCase().includes('delayed') ||
+                            match.event_status?.toLowerCase().includes('delayed');
+
+                        if (match.event_state === 'L') {
+                            // Actually live
+                            const statusConfig = getMatchStatusConfig(match.short_event_status, match.event_status);
+                            return (
+                                <span style={{
+                                    fontSize: 10,
+                                    fontWeight: 700,
+                                    padding: '4px 10px',
+                                    background: statusConfig.bgColor,
+                                    borderRadius: 20,
+                                    color: statusConfig.color,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 5,
+                                }}>
+                                    <span
+                                        className={statusConfig.isLive ? 'pulse-dot' : ''}
+                                        style={{ width: 5, height: 5, background: statusConfig.color, borderRadius: '50%' }}
+                                    />
+                                    {statusConfig.text}
+                                </span>
+                            );
+                        } else if (isPreLive && isDelayed) {
+                            // Pre-live but delayed
+                            return (
+                                <span style={{
+                                    fontSize: 10,
+                                    fontWeight: 700,
+                                    padding: '4px 10px',
+                                    background: 'rgba(245, 158, 11, 0.15)',
+                                    borderRadius: 20,
+                                    color: '#f59e0b',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 5,
+                                }}>
+                                    <span style={{ width: 5, height: 5, background: '#f59e0b', borderRadius: '50%' }} />
+                                    DELAYED
+                                </span>
+                            );
+                        }
+                        return null;
                     })()}
+
+                    {/* Match format chip (e.g., Test 4/5) */}
+                    {match.event_name && (
+                        <span style={{
+                            fontSize: 10,
+                            fontWeight: 600,
+                            padding: '4px 10px',
+                            background: 'rgba(59, 130, 246, 0.15)',
+                            borderRadius: 20,
+                            color: '#3b82f6',
+                        }}>
+                            {match.event_format?.toUpperCase() || ''} {match.event_name.match(/\d+/)?.[0] || ''}
+                        </span>
+                    )}
                 </div>
 
                 {/* Teams Row */}
@@ -157,17 +285,26 @@ const MatchCard = ({ match, onClick, isHero = false }) => {
                             name={team1?.name}
                             id={team1?.id}
                             type="team"
-                            style={{ width: 52, height: 52, objectFit: 'contain' }}
+                            style={getFlagUrl(team1?.name)
+                                ? { width: 52, height: 52, objectFit: 'contain' }
+                                : { maxHeight: 52, width: 'auto', height: 'auto' }
+                            }
                         />
-                        <span style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            color: '#fff',
-                            textAlign: 'center',
-                            whiteSpace: 'normal',
-                            lineHeight: 1.2,
-                        }}>{team1?.short_name}</span>
-                        <div style={{ minHeight: 36, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{
+                            minHeight: 36,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <span style={{
+                                fontSize: 13,
+                                fontWeight: 700,
+                                color: '#fff',
+                                textAlign: 'center',
+                                lineHeight: 1.3,
+                            }}>{team1?.name}</span>
+                        </div>
+                        <div style={{ height: 48, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
                             {renderHeroScore(team1?.value, isTeam1Batting)}
                         </div>
                     </div>
@@ -191,36 +328,33 @@ const MatchCard = ({ match, onClick, isHero = false }) => {
                             name={team2?.name}
                             id={team2?.id}
                             type="team"
-                            style={{ width: 52, height: 52, objectFit: 'contain' }}
+                            style={getFlagUrl(team2?.name)
+                                ? { width: 52, height: 52, objectFit: 'contain' }
+                                : { maxHeight: 52, width: 'auto', height: 'auto' }
+                            }
                         />
-                        <span style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            color: '#fff',
-                            textAlign: 'center',
-                            whiteSpace: 'normal',
-                            lineHeight: 1.2,
-                        }}>{team2?.short_name}</span>
-                        <div style={{ minHeight: 36, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{
+                            minHeight: 36,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}>
+                            <span style={{
+                                fontSize: 13,
+                                fontWeight: 700,
+                                color: '#fff',
+                                textAlign: 'center',
+                                lineHeight: 1.3,
+                            }}>{team2?.name}</span>
+                        </div>
+                        <div style={{ height: 48, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
                             {renderHeroScore(team2?.value, isTeam2Batting)}
                         </div>
                     </div>
                 </div>
 
-                {/* Status - show event_sub_status (e.g., "Australia lead by 46 runs") */}
-                {(match.event_sub_status || match.event_status) && (
-                    <div style={{
-                        marginTop: 16,
-                        padding: '10px 14px',
-                        background: 'rgba(0, 0, 0, 0.3)',
-                        borderRadius: 10,
-                        textAlign: 'center',
-                    }}>
-                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
-                            {match.event_sub_status || match.event_status}
-                        </span>
-                    </div>
-                )}
+                {/* Status / Countdown Box */}
+                <CountdownStatusBox match={match} />
             </div>
         );
     }
@@ -248,7 +382,7 @@ const MatchCard = ({ match, onClick, isHero = false }) => {
                                 id={team.id}
                                 type="team"
                                 className="match-team-logo"
-                                style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'contain' }}
+                                style={{ maxHeight: 36, width: 'auto', height: 'auto', borderRadius: 8 }}
                             />
                             <span className="match-team-name">{team.short_name}</span>
                         </div>

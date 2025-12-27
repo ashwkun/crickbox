@@ -90,6 +90,11 @@ body {
     animation: pulse 2s infinite;
 }
 
+/* Pulsing dot for active play */
+.pulse-dot {
+    animation: pulse 1.5s infinite;
+}
+
 /* Skeleton Loader */
 .skeleton {
     background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);

@@ -43,6 +43,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
     // Progressive Loading States
     const [loadingH2H, setLoadingH2H] = useState(true);
     const [loadingSquads, setLoadingSquads] = useState(true);
+    const [selectedSquadIdx, setSelectedSquadIdx] = useState(0);
 
     const team1 = match.participants?.[0];
     const team2 = match.participants?.[1];
@@ -125,15 +126,66 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
                 }
             }
 
-            // Always fetch Squads (SquadPreview expects this format)
+            // HYBRID SQUAD APPROACH: Try Scorecard first, fallback to H2H per team
             if (team1?.id && team2?.id) {
                 try {
-                    const [sq1, sq2] = await Promise.all([
-                        fetchSquad(team1.id, match.series_id),
-                        fetchSquad(team2.id, match.series_id)
-                    ]);
-                    setSquad1(sq1);
-                    setSquad2(sq2);
+                    // Check if Scorecard has squad data
+                    const scorecardTeams = scorecardResult.status === 'fulfilled'
+                        ? scorecardResult.value?.data?.Teams
+                        : null;
+
+                    // Get player counts from Scorecard
+                    const team1ScorecardPlayers: any = scorecardTeams ?
+                        Object.entries(scorecardTeams).find(([_, t]: [string, any]) =>
+                            t.Name_Short === team1.short_name || t.Name_Full?.includes(team1.name)
+                        )?.[1] : null;
+                    const team2ScorecardPlayers: any = scorecardTeams ?
+                        Object.entries(scorecardTeams).find(([_, t]: [string, any]) =>
+                            t.Name_Short === team2.short_name || t.Name_Full?.includes(team2.name)
+                        )?.[1] : null;
+
+                    const team1Count = team1ScorecardPlayers?.Players ? Object.keys(team1ScorecardPlayers.Players).length : 0;
+                    const team2Count = team2ScorecardPlayers?.Players ? Object.keys(team2ScorecardPlayers.Players).length : 0;
+
+                    // Convert Scorecard format to SquadData format
+                    const scorecardToSquad = (teamData: any, teamInfo: any): SquadData | null => {
+                        if (!teamData?.Players || Object.keys(teamData.Players).length === 0) return null;
+                        return {
+                            team_id: parseInt(teamInfo.id),
+                            team_name: teamData.Name_Full || teamInfo.name,
+                            team_short_name: teamData.Name_Short || teamInfo.short_name,
+                            players: Object.entries(teamData.Players)
+                                .sort((a: any, b: any) => parseInt(a[1].Position || '99') - parseInt(b[1].Position || '99'))
+                                .map(([playerId, p]: [string, any]) => ({
+                                    player_id: parseInt(playerId),
+                                    player_name: p.Name_Full,
+                                    short_name: p.Name_Short || p.Name_Full,
+                                    role: p.Role || p.Skill_Name,
+                                    skill: p.Skill_Name,
+                                    is_captain: p.Iscaptain === true || p.Iscaptain === 'true',
+                                    is_keeper: p.Iskeeper === true || p.Iskeeper === 'true'
+                                }))
+                        };
+                    };
+
+                    // Team 1: Use Scorecard if available, else H2H
+                    let finalSquad1: SquadData | null = null;
+                    if (team1Count > 0) {
+                        finalSquad1 = scorecardToSquad(team1ScorecardPlayers, team1);
+                    } else {
+                        finalSquad1 = await fetchSquad(team1.id, match.series_id);
+                    }
+
+                    // Team 2: Use Scorecard if available, else H2H
+                    let finalSquad2: SquadData | null = null;
+                    if (team2Count > 0) {
+                        finalSquad2 = scorecardToSquad(team2ScorecardPlayers, team2);
+                    } else {
+                        finalSquad2 = await fetchSquad(team2.id, match.series_id);
+                    }
+
+                    setSquad1(finalSquad1);
+                    setSquad2(finalSquad2);
                 } catch (err) {
                     console.error("Failed to load Squads", err);
                 }
@@ -290,7 +342,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
                             id={team1?.id}
                             type="team"
                             className="team-logo-hero"
-                            style={{ width: 60, height: 60, objectFit: 'contain' }}
+                            style={{ maxHeight: 60, width: 'auto', height: 'auto' }}
                         />
                         <span className="upcoming-team-name left">
                             {team1?.name}
@@ -309,7 +361,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
                             id={team2?.id}
                             type="team"
                             className="team-logo-hero"
-                            style={{ width: 60, height: 60, objectFit: 'contain' }}
+                            style={{ maxHeight: 60, width: 'auto', height: 'auto' }}
                         />
                         <span className="upcoming-team-name right">
                             {team2?.name}
@@ -441,11 +493,57 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
             )}
 
             {/* Squads Section - Now AFTER Recent Form */}
-            {!loadingSquads && (scorecardData?.Teams || squad1 || squad2) && (
-                <div className="section-container fade-in">
-                    <SquadPreview squad1={squad1} squad2={squad2} />
-                </div>
-            )}
+            {!loadingSquads && (squad1 || squad2) && (() => {
+                const squads = [squad1, squad2].filter(Boolean) as SquadData[];
+                const selectedSquad = squads[selectedSquadIdx] || squads[0];
+                if (!selectedSquad) return null;
+
+                return (
+                    <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: '16px 20px', marginBottom: 16, border: '1px solid var(--border-color)' }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 12 }}>Squads</div>
+                        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                            {squads.map((sq, idx) => (
+                                <button
+                                    key={sq.team_id || idx}
+                                    onClick={() => setSelectedSquadIdx(idx)}
+                                    style={{
+                                        flex: 1,
+                                        padding: '10px 12px',
+                                        borderRadius: 10,
+                                        border: 'none',
+                                        background: selectedSquadIdx === idx ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255,255,255,0.05)',
+                                        color: selectedSquadIdx === idx ? '#22c55e' : 'rgba(255,255,255,0.6)',
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                    }}
+                                >
+                                    {sq.team_short_name || sq.team_name}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {selectedSquad.players?.map((player, idx) => (
+                                <div key={player.player_id || idx} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                    <WikiImage name={player.short_name || player.player_name} id={player.player_id?.toString()} type="player" style={{ width: 32, height: 32 }} circle={true} />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontSize: 13, color: '#fff', fontWeight: 500 }}>
+                                            {player.short_name || player.player_name}
+                                            {player.is_captain && <span style={{ color: '#22c55e', marginLeft: 6, fontSize: 10 }}>C</span>}
+                                            {player.is_keeper && <span style={{ color: '#60a5fa', marginLeft: 6, fontSize: 10 }}>WK</span>}
+                                        </div>
+                                    </div>
+                                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+                                        {player.role || player.skill || ''}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* Skeleton Loading for Squads - Only when H2H is done but squads still loading */}
             {!loadingH2H && loadingSquads && (

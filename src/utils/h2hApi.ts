@@ -123,6 +123,18 @@ export interface H2HData {
                 }>;
             };
         };
+        last_n_matches?: {
+            teams: Array<{
+                id: number;
+                name: string;
+                short_name: string;
+                top_players: {
+                    n: number;
+                    batsmen: { player: any[] };
+                    bowler: { player: any[] };
+                };
+            }>;
+        };
     };
 }
 

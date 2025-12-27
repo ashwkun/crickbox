@@ -118,11 +118,11 @@ export const fetchWallstream = async (gameId: string, pageSize = 10, inningsCoun
                     return null;
                 }
             })
-            .filter((b: BallData | null) => b && b.isball) as BallData[]; // Only include actual ball deliveries
+            .filter((b: BallData | null) => b !== null) as BallData[]; // Include balls and events
 
         return {
-            balls,
-            latestBall: balls[0] || null,
+            balls, // contains both balls and events for the timeline
+            latestBall: balls.find(b => b.isball) || null, // ensure hero card shows actual player data from latest *ball*
         };
     } catch (error) {
         console.error('Wallstream fetch error:', error);

@@ -132,7 +132,7 @@ const SeriesHub: React.FC<SeriesHubProps> = ({ seriesName, matches, onBack, onMa
                         name={seriesName}
                         id={seriesName?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}
                         type="series"
-                        style={{ width: 64, height: 64, borderRadius: 12, objectFit: 'cover' }}
+                        style={{ maxHeight: 64, width: 'auto', height: 'auto', borderRadius: 12 }}
                     />
                     <div>
                         <h1 className="series-hub-title" style={{ marginBottom: 4 }}>{seriesName}</h1>
@@ -150,7 +150,7 @@ const SeriesHub: React.FC<SeriesHubProps> = ({ seriesName, matches, onBack, onMa
                                 <WikiImage
                                     name={team.name}
                                     type="team"
-                                    style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'contain', background: '#1a1a1a', padding: 4 }}
+                                    style={{ maxHeight: 48, width: 'auto', height: 'auto', borderRadius: 12, background: '#1a1a1a', padding: 4 }}
                                 />
                                 <span className="standings-team-name">{team.short_name}</span>
                             </div>

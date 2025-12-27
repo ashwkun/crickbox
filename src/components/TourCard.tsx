@@ -48,7 +48,7 @@ const TourCard = ({ tour, matches, onClick }) => {
                                 name={team.name}
                                 id={team.id}
                                 type="team"
-                                style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'contain', background: '#1f1f1f', padding: 4 }}
+                                style={{ maxHeight: 40, width: 'auto', height: 'auto', borderRadius: 10, background: '#1f1f1f', padding: 4 }}
                             />
                             <span style={{ fontSize: 16, fontWeight: 600, color: '#fff' }}>{team.short_name}</span>
                         </div>

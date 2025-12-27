@@ -142,10 +142,10 @@ const CompletedCard = ({ match, onClick, showSeriesButton, onViewSeries, showTou
                                     id={team.id}
                                     type="team"
                                     style={{
-                                        width: 32,
-                                        height: 32,
+                                        maxHeight: 32,
+                                        width: 'auto',
+                                        height: 'auto',
                                         borderRadius: 8,
-                                        objectFit: 'contain',
                                         background: '#1f1f1f',
                                         padding: 3
                                     }}
