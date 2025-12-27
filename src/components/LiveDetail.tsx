@@ -871,12 +871,12 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
                                     {/* Last 5 Overs - Compact & Bottom Aligned */}
                                     <div style={{
-                                        width: 70,
+                                        width: 60,
                                         height: '100%',
                                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end',
                                         paddingBottom: 8
                                     }}>
-                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 8, letterSpacing: 0.5 }}>Last 5 Ov</div>
+                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 4, letterSpacing: 0.5 }}>Last 5 Ov</div>
                                         {scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5'] ? (
                                             <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', fontFamily: 'monospace', lineHeight: 1 }}>
                                                 {scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Score}/{scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Wicket}
@@ -898,9 +898,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                         flex: 1,
                                         height: '100%',
                                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end',
-                                        paddingBottom: 6 // Align circles (approx 24px height) with text
+                                        paddingBottom: 6, // Align circles (approx 24px height) with text
+                                        paddingLeft: 4, paddingRight: 4
                                     }}>
-                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 8, letterSpacing: 0.5 }}>This Over</div>
+                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 4, letterSpacing: 0.5 }}>This Over</div>
 
                                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                                             {(() => {
