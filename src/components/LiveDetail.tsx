@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import LiveInsights from './LiveInsights';
 import WikiImage, { getFlagUrl } from './WikiImage';
 import { WallstreamData } from '../utils/wallstreamApi';
 import { getTeamColor } from '../utils/teamColors';
@@ -180,28 +181,19 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         return null;
     };
 
+
     // Helper: Get this over from scorecard (10s poll source)
     // Returns array of strings like ["0", "1LB", "W"]
     const getScorecardThisOver = (): string[] => {
         if (!scorecard?.Innings?.length) return [];
         const currentInn = scorecard.Innings[scorecard.Innings.length - 1];
 
-        // Find the active bowler
-        // In scorecard, Bowlers list has "Isbowlingnow" flag usually, or we check last overs
-        // Actually, the API structure usually puts "ThisOver" inside the bowler object or innings object
-        // Let's check the Bowlers array for "Isbowlingnow": true or similar
-
-        // Strategy: Look for "ThisOver" in the current active bowler
         if (currentInn.Bowlers) {
             for (const b of currentInn.Bowlers) {
                 if (b.Isbowlingnow || b.Isbowlingnow === 'true' || b.Isbowlingnow === true) {
-                    // Found active bowler
                     if (b.ThisOver && Array.isArray(b.ThisOver)) {
-                        // Convert complex objects {T: "lb", B: "1"} to strings if needed
-                        // Or if it's already string array
                         return b.ThisOver.map((ball: any) => {
                             if (typeof ball === 'string') return ball;
-                            // Handle object format: {T: "lb", B: "1"} -> "1LB"
                             const runs = ball.B || '0';
                             const type = ball.T ? ball.T.toUpperCase() : '';
 
@@ -215,7 +207,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     }
                 }
             }
-            // Fallback: use last bowler if no "Isbowlingnow" (rare)
             const lastBowler = currentInn.Bowlers[currentInn.Bowlers.length - 1];
             if (lastBowler?.ThisOver) {
                 return lastBowler.ThisOver.map((ball: any) => {
@@ -230,6 +221,62 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             }
         }
         return [];
+    };
+
+    // Helper: Get active batsmen from scorecard
+    const getCurrentBatsmenFromScorecard = () => {
+        if (!scorecard?.Innings?.length) return null;
+        const currentInn = scorecard.Innings[scorecard.Innings.length - 1];
+        if (!currentInn.Batsmen) return null;
+
+        // Find undefeated batsmen
+        const activeBatsmen = currentInn.Batsmen.filter((b: any) => !b.Dismissal || b.Dismissal === '');
+
+        // Map to easier format
+        // We need player names from Teams object
+        const battingTeamId = currentInn.Battingteam;
+        const players = scorecard.Teams?.[battingTeamId]?.Players || {};
+
+        return activeBatsmen.map((b: any) => {
+            const p = players[b.Batsman];
+            return {
+                name: p?.Name_Full || p?.Name_Short || b.Batsman,
+                runs: b.Runs,
+                balls: b.Balls,
+                fours: b.Fours,
+                sixes: b.Sixes,
+                strikeRate: b.Strikerate,
+                isStriker: b.Striker === true || b.Striker === 'true' // Some APIs mark this
+            };
+        });
+    };
+
+    // Helper: Get active bowler from scorecard
+    const getCurrentBowlerFromScorecard = () => {
+        if (!scorecard?.Innings?.length) return null;
+        const currentInn = scorecard.Innings[scorecard.Innings.length - 1];
+        if (!currentInn.Bowlers) return null;
+
+        const bowler = currentInn.Bowlers.find((b: any) => b.Isbowlingnow || b.Isbowlingnow === 'true' || b.Isbowlingnow === true);
+        if (!bowler) return null;
+
+        const bowlingTeamId = currentInn.Bowlingteam; // Usually available, or infer from match participants
+        // Actually bowler ID is in bowler.Bowler
+        // Find name from other team
+        // We need to find which team is bowling. It's the one NOT batting.
+        const team1Id = match.participants?.[0]?.id;
+        const team2Id = match.participants?.[1]?.id;
+        const bowlingTeamIdCalc = currentInn.Battingteam === team1Id ? team2Id : team1Id;
+        const players = scorecard.Teams?.[bowlingTeamIdCalc]?.Players || {};
+
+        const p = players[bowler.Bowler];
+        return {
+            name: p?.Name_Full || p?.Name_Short || bowler.Bowler,
+            wickets: bowler.Wickets,
+            runs: bowler.Runs,
+            overs: bowler.Overs,
+            maidens: bowler.Maidens
+        };
     };
 
     const team1 = match.participants?.[0];
@@ -591,9 +638,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 <span style={{ fontSize: 13, color: '#fff', fontWeight: 500, lineHeight: '1.4', display: 'block' }}>{currentStatus}</span>
             </div>
 
-            import LiveInsights from './LiveInsights';
 
-            // ... inside the component ...
 
             {/* === INSIGHTS VIEW === */}
             {activeTab === 'insights' && h2hData && (
@@ -632,195 +677,230 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 </style>
 
                 {/* Live Situation Panel */}
-                {latestBall && (
-                    <div style={{
-                        background: 'var(--bg-card)',
-                        borderRadius: 16,
-                        padding: '20px 20px',
-                        marginBottom: 16,
-                        position: 'relative',
-                        border: '1px solid var(--border-color)',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                        overflow: 'hidden'
-                    }}>
+                {(latestBall || scorecard?.Innings?.length > 0) && (() => {
+                    const activeBatsmen = getCurrentBatsmenFromScorecard();
+                    const activeBowler = getCurrentBowlerFromScorecard();
 
-                        {/* Event Info */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, gap: 10 }}>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>Striker</div>
-                                <div style={{ fontSize: 14, fontWeight: 600, color: '#22c55e' }}>{latestBall?.batsmanName}</div>
-                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
-                                    {latestBall?.batsmanRuns || '0'}<span style={{ fontSize: 9 }}>({latestBall?.batsmanBalls || '0'})</span>
-                                    {(() => {
-                                        const stats = getBoundaryStats(latestBall?.batsmanName);
-                                        if (stats) return (
-                                            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginLeft: 6 }}>
-                                                {stats.fours}x4 {stats.sixes}x6
-                                            </span>
-                                        );
-                                        return null;
-                                    })()}
+                    // Fallback to latestBall if scorecard helpers return nothing (though unlikely with strict scorecard)
+                    // But user wants strict scorecard? Let's try scorecard first.
+
+                    // Determine Striker / Non-Striker
+                    let striker = activeBatsmen?.find(b => b.isStriker);
+                    let nonStriker = activeBatsmen?.find(b => !b.isStriker);
+
+                    // If both undefined or no isStriker flag, default to 0 and 1
+                    if (!striker && activeBatsmen && activeBatsmen.length > 0) striker = activeBatsmen[0];
+                    if (!nonStriker && activeBatsmen && activeBatsmen.length > 1) nonStriker = activeBatsmen[1];
+                    if (striker && nonStriker && striker.name === nonStriker.name) nonStriker = null; // Safety
+
+                    // If scorecard fails, fallback to latestBall (but user prefers scorecard)
+                    // We will use scorecard data if available, else Wallstream
+                    const sName = striker?.name || latestBall?.batsmanName;
+                    const sRuns = striker ? striker.runs : latestBall?.batsmanRuns;
+                    const sBalls = striker ? striker.balls : latestBall?.batsmanBalls;
+
+                    const nsName = nonStriker?.name || latestBall?.nonStrikerName;
+                    const nsRuns = nonStriker ? nonStriker.runs : latestBall?.nonStrikerRuns;
+                    const nsBalls = nonStriker ? nonStriker.balls : latestBall?.nonStrikerBalls;
+
+                    return (
+                        <div style={{
+                            background: 'var(--bg-card)',
+                            borderRadius: 16,
+                            padding: '20px 20px',
+                            marginBottom: 16,
+                            position: 'relative',
+
+                            border: '1px solid var(--border-color)',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                            overflow: 'hidden'
+                        }}>
+
+                            {/* Event Info */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, gap: 10 }}>
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>Striker</div>
+                                    <div style={{ fontSize: 14, fontWeight: 600, color: '#22c55e' }}>{sName}</div>
+                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
+                                        {sRuns || '0'}<span style={{ fontSize: 9 }}>({sBalls || '0'})</span>
+                                        {(() => {
+                                            const stats = getBoundaryStats(sName);
+                                            if (stats) return (
+                                                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginLeft: 6 }}>
+                                                    {stats.fours}x4 {stats.sixes}x6
+                                                </span>
+                                            );
+                                            return null;
+                                        })()}
+                                    </div>
+                                </div>
+
+                                <div style={{ textAlign: 'center', minWidth: 60 }}>
+                                    <div style={{
+                                        width: 40, height: 40, borderRadius: '50%',
+                                        background: (() => {
+                                            // Prioritize Scorecard API for this over
+                                            const scLimit = getScorecardThisOver();
+                                            const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+
+                                            const lastBallVal = thisOverBalls.length > 0
+                                                ? thisOverBalls[thisOverBalls.length - 1]
+                                                : (latestBall?.detail || latestBall?.runs || '0');
+                                            return getBallColor(lastBallVal);
+                                        })(),
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px',
+                                        fontSize: 13, fontWeight: 700, color: '#fff',
+                                        animation: 'pulse-glow 2s infinite'
+                                    }}>
+                                        {(() => {
+                                            const scLimit = getScorecardThisOver();
+                                            const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+
+                                            const lastBallVal = thisOverBalls.length > 0
+                                                ? thisOverBalls[thisOverBalls.length - 1]
+                                                : (latestBall?.detail || latestBall?.runs || '0');
+                                            return getBallDisplay(lastBallVal);
+                                        })()}
+                                    </div>
+                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Last Ball</div>
+                                </div>
+
+                                <div style={{ flex: 1, textAlign: 'right' }}>
+                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>Non-Striker</div>
+                                    <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{nsName}</div>
+                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
+                                        {nsRuns || '0'}<span style={{ fontSize: 9 }}>({nsBalls || '0'})</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div style={{ textAlign: 'center', minWidth: 60 }}>
-                                <div style={{
-                                    width: 40, height: 40, borderRadius: '50%',
-                                    background: (() => {
-                                        // Prioritize Scorecard API for this over
-                                        const scLimit = getScorecardThisOver();
-                                        const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
 
-                                        const lastBallVal = thisOverBalls.length > 0
-                                            ? thisOverBalls[thisOverBalls.length - 1]
-                                            : (latestBall?.detail || latestBall?.runs || '0');
-                                        return getBallColor(lastBallVal);
-                                    })(),
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px',
-                                    fontSize: 13, fontWeight: 700, color: '#fff',
-                                    animation: 'pulse-glow 2s infinite'
-                                }}>
-                                    {(() => {
-                                        const scLimit = getScorecardThisOver();
-                                        const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                            {/* Run Rates Row */}
+                            {scorecard?.Innings?.length > 0 && (() => {
+                                const inn = scorecard.Innings[scorecard.Innings.length - 1];
+                                const crr = parseFloat(inn.Runrate) || 0;
+                                const reviewDetails = inn.ReviewDetails;
 
-                                        const lastBallVal = thisOverBalls.length > 0
-                                            ? thisOverBalls[thisOverBalls.length - 1]
-                                            : (latestBall?.detail || latestBall?.runs || '0');
-                                        return getBallDisplay(lastBallVal);
-                                    })()}
-                                </div>
-                                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Last Ball</div>
-                            </div>
+                                // Calculate RRR for limited-overs chases
+                                let rrr: number | null = null;
+                                const matchType = scorecard.Matchdetail?.Match?.Type?.toLowerCase() || '';
+                                const isLimitedOvers = matchType.includes('t20') || matchType.includes('odi') || matchType.includes('one-day');
 
-                            <div style={{ flex: 1, textAlign: 'right' }}>
-                                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>Non-Striker</div>
-                                <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{latestBall?.nonStrikerName}</div>
-                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
-                                    {latestBall?.nonStrikerRuns || '0'}<span style={{ fontSize: 9 }}>({latestBall?.nonStrikerBalls || '0'})</span>
-                                </div>
-                            </div>
-                        </div>
+                                if (isLimitedOvers && scorecard.Innings.length >= 2) {
+                                    // Chase scenario: Current innings is 2nd (or 4th in super over etc.)
+                                    const targetInnings = scorecard.Innings[scorecard.Innings.length - 2];
+                                    const target = parseInt(targetInnings.Total) + 1; // Need to beat this
+                                    const currentScore = parseInt(inn.Total) || 0;
+                                    const runsNeeded = target - currentScore;
+                                    const allotedBalls = parseInt(inn.AllotedBalls) || 120; // Default T20
+                                    const ballsBowled = parseInt(inn.Total_Balls_Bowled) || 0;
+                                    const ballsRemaining = allotedBalls - ballsBowled;
 
-
-                        {/* Run Rates Row */}
-                        {scorecard?.Innings?.length > 0 && (() => {
-                            const inn = scorecard.Innings[scorecard.Innings.length - 1];
-                            const crr = parseFloat(inn.Runrate) || 0;
-                            const reviewDetails = inn.ReviewDetails;
-
-                            // Calculate RRR for limited-overs chases
-                            let rrr: number | null = null;
-                            const matchType = scorecard.Matchdetail?.Match?.Type?.toLowerCase() || '';
-                            const isLimitedOvers = matchType.includes('t20') || matchType.includes('odi') || matchType.includes('one-day');
-
-                            if (isLimitedOvers && scorecard.Innings.length >= 2) {
-                                // Chase scenario: Current innings is 2nd (or 4th in super over etc.)
-                                const targetInnings = scorecard.Innings[scorecard.Innings.length - 2];
-                                const target = parseInt(targetInnings.Total) + 1; // Need to beat this
-                                const currentScore = parseInt(inn.Total) || 0;
-                                const runsNeeded = target - currentScore;
-                                const allotedBalls = parseInt(inn.AllotedBalls) || 120; // Default T20
-                                const ballsBowled = parseInt(inn.Total_Balls_Bowled) || 0;
-                                const ballsRemaining = allotedBalls - ballsBowled;
-
-                                if (runsNeeded > 0 && ballsRemaining > 0) {
-                                    rrr = (runsNeeded / ballsRemaining) * 6;
+                                    if (runsNeeded > 0 && ballsRemaining > 0) {
+                                        rrr = (runsNeeded / ballsRemaining) * 6;
+                                    }
                                 }
-                            }
 
-                            return (
-                                <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
-                                    {/* Toss chip - hide during chase (when RRR is shown) */}
-                                    {rrr === null && scorecard?.Matchdetail?.Tosswonby && (
-                                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
-                                            <span>Toss:</span>
-                                            <span style={{ fontWeight: 700 }}>{scorecard.Teams?.[scorecard.Matchdetail.Tosswonby]?.Name_Short || 'TBD'}</span>
-                                            {scorecard.Matchdetail.Toss_elected_to?.toLowerCase() === 'bat' ? (
-                                                <GiCricketBat size={11} />
-                                            ) : (
-                                                <IoBaseball size={10} />
-                                            )}
-                                        </span>
-                                    )}
-                                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: 6 }}>
-                                        CRR: <span style={{ color: '#60a5fa', fontWeight: 700 }}>{crr.toFixed(2)}</span>
-                                    </span>
-                                    {rrr !== null && (
+                                return (
+                                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+                                        {/* Toss chip - hide during chase (when RRR is shown) */}
+                                        {rrr === null && scorecard?.Matchdetail?.Tosswonby && (
+                                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                <span>Toss:</span>
+                                                <span style={{ fontWeight: 700 }}>{scorecard.Teams?.[scorecard.Matchdetail.Tosswonby]?.Name_Short || 'TBD'}</span>
+                                                {scorecard.Matchdetail.Toss_elected_to?.toLowerCase() === 'bat' ? (
+                                                    <GiCricketBat size={11} />
+                                                ) : (
+                                                    <IoBaseball size={10} />
+                                                )}
+                                            </span>
+                                        )}
                                         <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: 6 }}>
-                                            RRR: <span style={{ color: rrr > crr ? '#ef4444' : '#22c55e', fontWeight: 700 }}>{rrr.toFixed(2)}</span>
+                                            CRR: <span style={{ color: '#60a5fa', fontWeight: 700 }}>{crr.toFixed(2)}</span>
                                         </span>
-                                    )}
-                                    {reviewDetails && (
-                                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                                            <span>DRS:</span>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                                                <GiCricketBat size={12} />
-                                                <span style={{ fontWeight: 700 }}>{reviewDetails.Batting_review_count ?? 0}</span>
+                                        {rrr !== null && (
+                                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: 6 }}>
+                                                RRR: <span style={{ color: rrr > crr ? '#ef4444' : '#22c55e', fontWeight: 700 }}>{rrr.toFixed(2)}</span>
                                             </span>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                                                <IoBaseball size={11} />
-                                                <span style={{ fontWeight: 700 }}>{reviewDetails.Bowling_review_count ?? 0}</span>
+                                        )}
+                                        {reviewDetails && (
+                                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                <span>DRS:</span>
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                                    <GiCricketBat size={12} />
+                                                    <span style={{ fontWeight: 700 }}>{reviewDetails.Batting_review_count ?? 0}</span>
+                                                </span>
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                                    <IoBaseball size={11} />
+                                                    <span style={{ fontWeight: 700 }}>{reviewDetails.Bowling_review_count ?? 0}</span>
+                                                </span>
                                             </span>
-                                        </span>
-                                    )}
-                                </div>
-                            );
-                        })()}
-
-                        {latestBall.thisOver.length > 0 && (
-                            <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-                                    {/* Last 5 Overs */}
-                                    <div style={{ textAlign: 'center', minWidth: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>Last 5 Ov</div>
-                                        {scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5'] ? (
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', fontFamily: 'monospace', height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                {scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Score}/{scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Wicket}
-                                            </div>
-                                        ) : (
-                                            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)', height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>—</div>
                                         )}
                                     </div>
+                                );
+                            })()}
 
-                                    {/* This Over balls */}
-                                    <div style={{ flex: 1, textAlign: 'center' }}>
-                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>This Over</div>
-                                        <div style={{ display: 'flex', gap: 5, justifyContent: 'center' }}>
-                                            {(() => {
-                                                const scLimit = getScorecardThisOver();
-                                                const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                                return thisOverBalls.map((ball: any, idx: number) => (
-                                                    <div key={idx} style={{
-                                                        width: 24, height: 24, borderRadius: '50%',
-                                                        background: getBallColor(ball),
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        fontSize: 10, fontWeight: 700, color: '#fff',
-                                                    }}>
-                                                        {getBallDisplay(ball)}
-                                                    </div>
-                                                ));
-                                            })()}
-                                            {(() => {
-                                                const scLimit = getScorecardThisOver();
-                                                const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                                return Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
-                                                    <div key={`e-${idx}`} style={{
-                                                        width: 24, height: 24, borderRadius: '50%',
-                                                        background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(255,255,255,0.1)',
-                                                    }} />
-                                                ));
-                                            })()}
+                            {((scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5']) || (latestBall?.thisOver?.length > 0) || (getScorecardThisOver().length > 0)) && (
+                                <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                                        {/* Last 5 Overs */}
+                                        <div style={{ textAlign: 'center', minWidth: 70, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>Last 5 Ov</div>
+                                            {scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5'] ? (
+                                                <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', fontFamily: 'monospace', height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    {scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Score}/{scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Wicket}
+                                                </div>
+                                            ) : (
+                                                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)', height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>—</div>
+                                            )}
+                                        </div>
+
+                                        {/* This Over balls */}
+                                        <div style={{ flex: 1, textAlign: 'center' }}>
+                                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>This Over</div>
+                                            <div style={{ display: 'flex', gap: 5, justifyContent: 'center' }}>
+                                                {(() => {
+                                                    const scLimit = getScorecardThisOver();
+                                                    const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                                                    return thisOverBalls.map((ball: any, idx: number) => (
+                                                        <div key={idx} style={{
+                                                            width: 24, height: 24, borderRadius: '50%',
+                                                            background: getBallColor(ball),
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                            fontSize: 10, fontWeight: 700, color: '#fff',
+                                                        }}>
+                                                            {getBallDisplay(ball)}
+                                                        </div>
+                                                    ));
+                                                })()}
+                                                {(() => {
+                                                    const scLimit = getScorecardThisOver();
+                                                    const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                                                    return Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
+                                                        <div key={`e-${idx}`} style={{
+                                                            width: 24, height: 24, borderRadius: '50%',
+                                                            background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(255,255,255,0.1)',
+                                                        }} />
+                                                    ));
+                                                })()}
+                                            </div>
+                                        </div>
+
+                                        {/* Bowler Details - Restored & Scorecard Connected */}
+                                        <div style={{ minWidth: 80, textAlign: 'right' }}>
+                                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>Bowler</div>
+                                            <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{activeBowler?.name || latestBall?.bowlerName}</div>
+                                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>
+                                                {activeBowler ? `${activeBowler.wickets}-${activeBowler.runs} (${activeBowler.overs})` :
+                                                    `${latestBall?.bowlerWickets}-${latestBall?.bowlerRuns} (${latestBall?.bowlerOvers})`}
+                                            </div>
                                         </div>
                                     </div>
-
-                                    {/* Placeholder for symmetry */}
-                                    <div style={{ minWidth: 70 }} />
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                )}
+                            )}
+                        </div>
+                    );
+                })()}
 
                 {!wallstream && (
                     <div style={{ background: 'var(--bg-card)', borderRadius: 16, padding: 20, marginBottom: 16, border: '1px solid var(--border-color)' }}>
