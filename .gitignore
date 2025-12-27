@@ -9,4 +9,3 @@ GETTING_STARTED.md
 !package.json
 !package-lock.json
 !tsconfig.json
-!api_samples/*.json

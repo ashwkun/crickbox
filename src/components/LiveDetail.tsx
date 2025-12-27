@@ -1104,7 +1104,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                         {isBowlerChangeCard && (() => {
                                             const newBowlerName = ball.bowlerName;
                                             const targetBall = ball; // Use current ball stats for the new bowler
-                                            const hasBowled = targetBall.bowlerOvers && parseFloat(targetBall.bowlerOvers) >= 0.1;
+                                            // Show Recent Form if it's the very first ball (0.1 ov) of his spell
+                                            // Show Current Match Stats from 2nd ball onwards (> 0.1 ov)
+                                            const hasBowled = targetBall.bowlerOvers && parseFloat(targetBall.bowlerOvers) > 0.1;
 
                                             // Priority: Use explicit ID from data, fallback to name lookup
                                             const bowlerId = ball.bowlerId || findPlayerIdByName(newBowlerName);
