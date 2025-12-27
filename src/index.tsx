@@ -1,17 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import { RefreshProvider } from './contexts/RefreshContext';
 import './index.css';
 
 const container = document.getElementById('root');
 if (container) {
     const root = createRoot(container);
-    root.render(
-        <RefreshProvider>
-            <App />
-        </RefreshProvider>
-    );
+    root.render(<App />);
 }
 
 // Register Service Worker for PWA

@@ -42,13 +42,6 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
-    /* Disable Chrome's default pull-to-refresh to allow custom implementation */
-    overscroll-behavior-y: contain;
-}
-
-html {
-    /* Also needed for PWA full-screen */
-    overscroll-behavior-y: contain;
 }
 
 /* Hide Scrollbar */

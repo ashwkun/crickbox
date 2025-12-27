@@ -1,47 +1,22 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import HomePage from './components/HomePage';
 import InstallPrompt from './components/InstallPrompt';
 import MatchDetail from './components/MatchDetail';
 import FloatingHeader from './components/FloatingHeader';
-import PullToRefresh from './components/PullToRefresh';
 import useCricketData from './utils/useCricketData';
 import { fetchWallstream, WallstreamData } from './utils/wallstreamApi';
-import { useRefresh } from './contexts/RefreshContext';
 import { Match, Scorecard, Series, Tournament } from './types';
 
 export default function App(): React.ReactElement {
-    const { matches, loading, fetchScorecard, fetchExtendedResults, refreshData } = useCricketData();
-    const { refreshTrigger, setIsRefreshing } = useRefresh();
+    const { matches, loading, fetchScorecard, fetchExtendedResults } = useCricketData();
     const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
     const [scorecard, setScorecard] = useState<Scorecard | null>(null);
     const [wallstream, setWallstream] = useState<WallstreamData | null>(null);
     const [pendingMatchId, setPendingMatchId] = useState<string | null>(null);
-    const isFirstRender = useRef(true);
 
     // Navigation State (Lifted from HomePage)
     const [selectedSeries, setSelectedSeries] = useState<Series | null>(null);
     const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
-
-    // Handle refresh trigger from context (visibility change, pull-to-refresh)
-    useEffect(() => {
-        // Skip first render to avoid double-fetch on mount
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
-
-        console.log('[App] Refresh triggered:', refreshTrigger);
-
-        // Refresh data via the hook's refresh function
-        if (refreshData) {
-            refreshData().finally(() => {
-                setIsRefreshing(false);
-            });
-        } else {
-            // Fallback: just mark as done
-            setTimeout(() => setIsRefreshing(false), 1000);
-        }
-    }, [refreshTrigger, refreshData, setIsRefreshing]);
 
     // Parse URL on initial load to get pending match ID
     useEffect(() => {
@@ -283,25 +258,23 @@ export default function App(): React.ReactElement {
                 }}
             />
 
-            {/* Main Content with Pull-to-Refresh - works on all screens */}
-            <PullToRefresh>
-                <main className="main-content" style={{ paddingTop: 85 }}>
-                    <HomePage
-                        matches={matches}
-                        loading={loading}
-                        fetchExtendedResults={fetchExtendedResults}
-                        onSelectMatch={handleSelectMatch}
+            {/* Main Content */}
+            <main className="main-content" style={{ paddingTop: 85 }}>
+                <HomePage
+                    matches={matches}
+                    loading={loading}
+                    fetchExtendedResults={fetchExtendedResults}
+                    onSelectMatch={handleSelectMatch}
 
-                        // State passed down
-                        selectedSeries={selectedSeries}
-                        selectedTournament={selectedTournament}
-                        onOpenSeries={handleOpenSeries}
-                        onCloseSeries={handleCloseSeries}
-                        onOpenTournament={handleOpenTournament}
-                        onCloseTournament={handleCloseTournament}
-                    />
-                </main>
-            </PullToRefresh>
+                    // State passed down
+                    selectedSeries={selectedSeries}
+                    selectedTournament={selectedTournament}
+                    onOpenSeries={handleOpenSeries}
+                    onCloseSeries={handleCloseSeries}
+                    onOpenTournament={handleOpenTournament}
+                    onCloseTournament={handleCloseTournament}
+                />
+            </main>
 
             {/* Detail Overlay */}
             {selectedMatch && (

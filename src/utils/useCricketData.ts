@@ -43,7 +43,6 @@ interface UseCricketDataReturn {
     loading: boolean;
     fetchScorecard: (gameId: string) => Promise<Scorecard | null>;
     fetchExtendedResults: (chunks?: number) => Promise<Match[]>;
-    refreshData: () => Promise<void>;
 }
 
 export default function useCricketData(): UseCricketDataReturn {
@@ -217,16 +216,5 @@ export default function useCricketData(): UseCricketDataReturn {
         return mergedArray;
     };
 
-    // Manual refresh function - fetches both live and heavy data with cache bypass
-    const refreshData = async (): Promise<void> => {
-        console.log('[useCricketData] Refreshing all data');
-        await Promise.all([
-            fetchWithRetry(`${WISDEN_MATCHES}&gamestate=1`, 0, true).then(data => {
-                if (data?.matches) updateState(data.matches, false);
-            }).catch(() => { }),
-            fetchHeavy(false)
-        ]);
-    };
-
-    return { matches, loading, fetchScorecard, fetchExtendedResults, refreshData };
+    return { matches, loading, fetchScorecard, fetchExtendedResults };
 }
