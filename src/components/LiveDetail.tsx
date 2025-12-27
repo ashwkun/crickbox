@@ -161,6 +161,13 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         }
     };
 
+    // Wrapper: Get recent stats by name (for Live Detail UI)
+    const getRecentStats = (playerName: string | undefined) => {
+        if (!playerName) return null;
+        const player = findPlayerInH2H(playerName, 'bowler');
+        return getRecentForm(player, 'bowler');
+    };
+
     const getBoundaryStats = (playerName: string | undefined) => {
         if (!playerName || !scorecard?.Innings?.length) return null;
 
