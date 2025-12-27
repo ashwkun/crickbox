@@ -14,12 +14,25 @@ const TEAM_COLORS: Record<string, string> = {
     'Afghanistan': '#0066CC', // Blue
     'Ireland': '#53AA30', // Green
     'Zimbabwe': '#E51937', // Red
-    'Netherlands': '#FF6600', // Orange
+    // Associates & Others
+    'Scotland': '#002C5B',
+    'Nepal': '#003DA5',
+    'UAE': '#000000',
+    'USA': '#2C498D',
+    'Namibia': '#003580',
+    'Oman': '#D61921',
+    'Papua New Guinea': '#E31837',
+    'Canada': '#FF0000',
+    'Hong Kong': '#D60C18',
+    'Jersey': '#E30613',
+    'Uganda': '#FCDD09',
+    'Italy': '#0058A7',
 
     // IPL
     'Chennai Super Kings': '#F9CD05',
     'Mumbai Indians': '#004BA0',
     'Royal Challengers Bangalore': '#EC1C24',
+    'Royal Challengers Bengaluru': '#EC1C24', // New name
     'Kolkata Knight Riders': '#3A225D',
     'Delhi Capitals': '#0078BC',
     'Punjab Kings': '#DD1F2D',
@@ -27,6 +40,29 @@ const TEAM_COLORS: Record<string, string> = {
     'Sunrisers Hyderabad': '#F7A721',
     'Lucknow Super Giants': '#3CF5F9',
     'Gujarat Titans': '#1B2133',
+
+    // WPL (Women's Premier League)
+    'Mumbai Indians Women': '#004BA0',
+    'Royal Challengers Bangalore Women': '#EC1C24',
+    'Delhi Capitals Women': '#0078BC',
+    'UP Warriorz': '#FFD700',
+    'Gujarat Giants': '#FF6600',
+
+    // PSL (Pakistan Super League)
+    'Lahore Qalandars': '#54C25C',
+    'Karachi Kings': '#FF0000',
+    'Islamabad United': '#E31E24',
+    'Peshawar Zalmi': '#FCD015',
+    'Quetta Gladiators': '#4E2E8F',
+    'Multan Sultans': '#00703C',
+
+    // SA20
+    'Sunrisers Eastern Cape': '#F7A721',
+    'Pretoria Capitals': '#0078BC',
+    'Paarl Royals': '#EA1A85',
+    'Durban Super Giants': '#3CF5F9', // Use LSG color
+    'Joburg Super Kings': '#F9CD05',
+    'MI Cape Town': '#004BA0',
 
     // BBL (Big Bash)
     'Adelaide Strikers': '#0077C8',
@@ -37,9 +73,52 @@ const TEAM_COLORS: Record<string, string> = {
     'Perth Scorchers': '#F26F21',
     'Sydney Sixers': '#E5007D',
     'Sydney Thunder': '#96C93D',
+
+    // The Hundred (Men & Women)
+    'Birmingham Phoenix': '#F26522',
+    'London Spirit': '#0071B9',
+    'Manchester Originals': '#000000',
+    'Northern Superchargers': '#662D91',
+    'Oval Invincibles': '#3CB878',
+    'Southern Brave': '#00FF00', // Bright Lime
+    'Trent Rockets': '#FFD200',
+    'Welsh Fire': '#EF3E42',
+
+    // CPL (Caribbean Premier League)
+    'Trinbago Knight Riders': '#3A225D',
+    'Guyana Amazon Warriors': '#00A651',
+    'Barbados Royals': '#003366',
+    'St Kitts & Nevis Patriots': '#EC1C24',
+    'Saint Lucia Kings': '#005DAA',
+    'Antigua & Barbuda Falcons': '#FFC425',
+
+    // BPL (Bangladesh Premier League)
+    'Comilla Victorians': '#ED1B24',
+    'Rangpur Riders': '#1B75BC',
+    'Sylhet Strikers': '#6D2077',
+    'Fortune Barishal': '#F58220',
+    'Khulna Tigers': '#582C83',
+    'Chattogram Challengers': '#2E3192',
+
+    // ILT20
+    'Abu Dhabi Knight Riders': '#3A225D',
+    'Desert Vipers': '#D21F3C',
+    'Dubai Capitals': '#0078BC',
+    'Gulf Giants': '#F58220',
+    'MI Emirates': '#004BA0',
+    'Sharjah Warriors': '#367C2B',
+
+    // MLC (Major League Cricket)
+    'MI New York': '#004BA0',
+    'Seattle Orcas': '#65B32E',
+    'Texas Super Kings': '#F9CD05',
+    'San Francisco Unicorns': '#F47920',
+    'Los Angeles Knight Riders': '#3A225D',
+    'Washington Freedom': '#DA291C',
 };
 
 const TEAM_ALIASES: Record<string, string> = {
+    // International
     'IND': 'India',
     'AUS': 'Australia',
     'ENG': 'England',
@@ -53,6 +132,18 @@ const TEAM_ALIASES: Record<string, string> = {
     'IRE': 'Ireland',
     'ZIM': 'Zimbabwe',
     'NED': 'Netherlands',
+    'SCO': 'Scotland',
+    'NEP': 'Nepal',
+    'UAE': 'UAE',
+    'USA': 'USA',
+    'NAM': 'Namibia',
+    'OMA': 'Oman',
+    'PNG': 'Papua New Guinea',
+    'CAN': 'Canada',
+    'HK': 'Hong Kong',
+    'ITA': 'Italy',
+
+    // IPL
     'CSK': 'Chennai Super Kings',
     'MI': 'Mumbai Indians',
     'RCB': 'Royal Challengers Bangalore',
@@ -63,15 +154,50 @@ const TEAM_ALIASES: Record<string, string> = {
     'SRH': 'Sunrisers Hyderabad',
     'LSG': 'Lucknow Super Giants',
     'GT': 'Gujarat Titans',
+
+    // PSL
+    'LQ': 'Lahore Qalandars',
+    'KK': 'Karachi Kings',
+    'IU': 'Islamabad United',
+    'PZ': 'Peshawar Zalmi',
+    'QG': 'Quetta Gladiators',
+    'MS': 'Multan Sultans',
+
     // BBL
     'STR': 'Adelaide Strikers',
     'HEA': 'Brisbane Heat',
     'HUR': 'Hobart Hurricanes',
     'REN': 'Melbourne Renegades',
     'STA': 'Melbourne Stars',
-    'SCO': 'Perth Scorchers',
+    // 'SCO': 'Perth Scorchers', // Conflict with Scotland
     'SIX': 'Sydney Sixers',
     'THU': 'Sydney Thunder',
+
+    // The Hundred
+    'BPH': 'Birmingham Phoenix',
+    'LNS': 'London Spirit',
+    'MNR': 'Manchester Originals',
+    'NOS': 'Northern Superchargers',
+    'OVI': 'Oval Invincibles',
+    'SOB': 'Southern Brave',
+    'TRT': 'Trent Rockets',
+    'WEF': 'Welsh Fire',
+
+    // SA20
+    'SEC': 'Sunrisers Eastern Cape',
+    'PC': 'Pretoria Capitals',
+    'PR': 'Paarl Royals',
+    'DSG': 'Durban Super Giants',
+    'JSK': 'Joburg Super Kings',
+    'MICT': 'MI Cape Town',
+
+    // MLC
+    'MINY': 'MI New York',
+    'SEO': 'Seattle Orcas',
+    'TSK': 'Texas Super Kings',
+    'SFU': 'San Francisco Unicorns',
+    'LAKR': 'Los Angeles Knight Riders',
+    'WAF': 'Washington Freedom',
 };
 
 // Helper for fuzzy matching or direct lookup

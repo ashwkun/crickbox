@@ -866,7 +866,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 );
                             })()}
 
-                            {((scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5']) || (latestBall?.thisOver?.length > 0) || (getScorecardThisOver().length > 0)) && (
+                            {((scorecard?.Innings?.[(scorecard.Innings?.length || 1) - 1]?.LastOvers?.['5']) || ((latestBall?.thisOver?.length ?? 0) > 0) || (getScorecardThisOver().length > 0)) && (
                                 <div style={{ display: 'flex', height: 50, marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
 
                                     {/* Last 5 Overs - Compact & Bottom Aligned */}
@@ -877,9 +877,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                         paddingBottom: 8
                                     }}>
                                         <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 4, letterSpacing: 0.5 }}>Last 5 Ov</div>
-                                        {scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5'] ? (
+                                        {scorecard?.Innings?.[(scorecard.Innings?.length ?? 1) - 1]?.LastOvers?.['5'] ? (
                                             <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', fontFamily: 'monospace', lineHeight: 1 }}>
-                                                {scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Score}/{scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Wicket}
+                                                {scorecard?.Innings?.[(scorecard.Innings?.length ?? 1) - 1]?.LastOvers?.['5']?.Score}/{scorecard?.Innings?.[(scorecard.Innings?.length ?? 1) - 1]?.LastOvers?.['5']?.Wicket}
                                             </div>
                                         ) : (
                                             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', lineHeight: 1 }}>-</div>
