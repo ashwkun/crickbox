@@ -559,7 +559,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         style={{
                             fontSize: 10,
                             fontWeight: 700,
-                            padding: '6px 12px',
+                            padding: '4px 10px',
                             background: activeTab === 'insights' ? '#a855f7' : 'rgba(168, 85, 247, 0.15)',
                             borderRadius: 20,
                             color: activeTab === 'insights' ? '#fff' : '#c084fc',
@@ -764,12 +764,12 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 6 }}>Last Ball</div>
 
                                     {/* Bowler Details - Centered below Last Ball */}
-                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 6, marginTop: 2, width: '100%' }}>
-                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 2 }}>{activeBowler?.name || latestBall?.bowlerName}</div>
-                                        <div style={{ fontSize: 11, color: '#fff', fontWeight: 600 }}>
+                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 6, marginTop: 4, width: '100%' }}>
+                                        <div style={{ fontSize: 11, color: '#fff', fontWeight: 700, marginBottom: 2, letterSpacing: 0.5 }}>{activeBowler?.name || latestBall?.bowlerName}</div>
+                                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>
                                             {activeBowler ? `${activeBowler.wickets}-${activeBowler.runs}` :
                                                 `${latestBall?.bowlerWickets}-${latestBall?.bowlerRuns}`}
-                                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', marginLeft: 3 }}>
+                                            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginLeft: 4 }}>
                                                 ({activeBowler ? activeBowler.overs : latestBall?.bowlerOvers})
                                             </span>
                                         </div>
