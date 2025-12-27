@@ -27,6 +27,10 @@ export interface BallData {
     isFour: boolean;
     isSix: boolean;
     isball: boolean;
+    // Player IDs for inference
+    batsmanId?: string;
+    nonStrikerId?: string;
+    bowlerId?: string;
 }
 
 export interface WallstreamData {
