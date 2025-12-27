@@ -1116,7 +1116,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                     <div style={{ fontSize: 14, color: '#fff' }}>
                                                         <span style={{ fontWeight: 600 }}>{ball.bowlerName}</span> to <span style={{ fontWeight: 600 }}>{ball.batsmanName}</span>
                                                     </div>
-                                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{ball.over}</div>
                                                 </div>
 
                                                 {/* Ball Detail (Runs/Wicket text) */}
