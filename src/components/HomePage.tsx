@@ -158,10 +158,13 @@ export default function HomePage({
         const startsWithin30Mins = startTime - now <= thirtyMins && startTime - now > -60 * 60 * 1000;
 
         // Also include delayed matches (they already started but are interrupted)
+        // BUT expire them after 12 hours if they haven't transitioned to Live
         const isDelayed = match.short_event_status?.toLowerCase().includes('delayed') ||
             match.event_status?.toLowerCase().includes('delayed');
 
-        return startsWithin30Mins || (isDelayed && startTime < now);
+        const isExpired = now - startTime > 12 * 60 * 60 * 1000; // 12 hours
+
+        return startsWithin30Mins || (isDelayed && startTime < now && !isExpired);
     };
 
     // Memoized computations to prevent recalculation on every render
