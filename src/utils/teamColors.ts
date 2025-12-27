@@ -99,6 +99,8 @@ const TEAM_COLORS: Record<string, string> = {
     'Thailand': '#2D2A4A',
     'Bhutan': '#FF5F00',
     'Maldives': '#007E3A',
+    'Myanmar': '#FECB00', // Yellow
+    'Cambodia': '#032EA1', // Royal Blue
     'Vanuatu': '#D21034',
     'Fiji': '#6ECFF6',
     'Samoa': '#003366',
@@ -221,6 +223,8 @@ const TEAM_ALIASES: Record<string, string> = {
     'THA': 'Thailand',
     'BHU': 'Bhutan',
     'MDV': 'Maldives',
+    'MYA': 'Myanmar',
+    'CAB': 'Cambodia',
     'VAN': 'Vanuatu',
     'FIJ': 'Fiji',
     'SAM': 'Samoa',
