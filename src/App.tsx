@@ -337,7 +337,16 @@ export default function App(): React.ReactElement {
             {/* PWA Install Prompt */}
             <InstallPrompt forceShow={showInstallPrompt} onClose={() => setShowInstallPrompt(false)} />
 
-            {/* Sticky Reload Button */}
+            {/* 
+              RELOAD BUTTON - HIDDEN (Dec 2025)
+              ================================
+              Commented out after implementing automatic visibility-based refresh.
+              The app now auto-refreshes data when:
+              - User switches back to the app (visibilitychange event)
+              - Page is restored from BFCache (pageshow event)
+              
+              If auto-refresh proves unreliable, uncomment to restore the button.
+              
             <button
                 onClick={() => window.location.reload()}
                 style={{
@@ -374,6 +383,7 @@ export default function App(): React.ReactElement {
                     <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
                 </svg>
             </button>
+            */}
         </div>
     );
 }
