@@ -1160,9 +1160,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                     display: 'flex', gap: 12, marginBottom: 12, padding: 10, position: 'relative',
                                                     background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: 10, alignItems: 'center', marginLeft: 40
                                                 }}>
-                                                    {/* Timeline Line through event card */}
+                                                    {/* Timeline Line through event card - extends beyond to connect */}
                                                     <div style={{
-                                                        position: 'absolute', left: -27, top: 0, bottom: 0, width: 2, background: 'rgba(255, 255, 255, 0.08)'
+                                                        position: 'absolute', left: -26, top: -6, bottom: -6, width: 2, background: 'rgba(255, 255, 255, 0.08)'
                                                     }} />
                                                     <WikiImage name={newBowlerName} id={bowlerId} type="player" circle={true} style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.1)' }} />
                                                     <div style={{ flex: 1 }}>
@@ -1194,9 +1194,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                     display: 'flex', gap: 12, marginBottom: 12, padding: 10, position: 'relative',
                                                     background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', borderRadius: 10, alignItems: 'center', marginLeft: 40
                                                 }}>
-                                                    {/* Timeline Line through event card */}
+                                                    {/* Timeline Line through event card - extends beyond to connect */}
                                                     <div style={{
-                                                        position: 'absolute', left: -27, top: 0, bottom: 0, width: 2, background: 'rgba(255, 255, 255, 0.08)'
+                                                        position: 'absolute', left: -26, top: -6, bottom: -6, width: 2, background: 'rgba(255, 255, 255, 0.08)'
                                                     }} />
                                                     <WikiImage name={newBatterName} id={playerId} type="player" circle={true} style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.1)' }} />
                                                     <div style={{ flex: 1 }}>
