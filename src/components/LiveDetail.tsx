@@ -1063,7 +1063,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
                                 // New Bowler: Change in ID.
                                 // We mainly care if it differs from the previous delivery.
-                                const isBowlerChangeCard = prevBall && ball.bowlerId !== prevBall.bowlerId;
+                                const isBowlerChangeCard = prevBall && (ball as any).bowlerId !== (prevBall as any).bowlerId;
 
                                 // New Batter: If PREVIOUS ball was a wicket, we assume THIS ball starts with a new batter.
                                 const isNewBatterCard = prevBall && prevBall.isWicket;
@@ -1072,11 +1072,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 let newBatterName = '';
                                 if (isNewBatterCard) {
                                     // Compare IDs to see who is new
-                                    const prevIds = [prevBall.batsmanId, prevBall.nonStrikerId];
-                                    const currIds = [ball.batsmanId, ball.nonStrikerId];
+                                    const prevIds = [(prevBall as any).batsmanId, (prevBall as any).nonStrikerId];
+                                    const currIds = [(ball as any).batsmanId, (ball as any).nonStrikerId];
                                     const newId = currIds.find(id => !prevIds.includes(id));
                                     if (newId) {
-                                        if (newId === ball.batsmanId) newBatterName = ball.batsmanName;
+                                        if (newId === (ball as any).batsmanId) newBatterName = ball.batsmanName;
                                         else newBatterName = ball.nonStrikerName;
                                     }
                                     // Fallback
@@ -1117,8 +1117,15 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                 </div>
 
                                                 {/* Ball Detail (Runs/Wicket text) */}
-                                                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginBottom: 4 }}>
-                                                    {resultText}
+                                                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
+                                                    <div style={{ fontSize: 11, fontWeight: 800, color: resultColor, textTransform: 'uppercase', background: `${resultColor}15`, padding: '2px 8px', borderRadius: 6 }}>
+                                                        {resultText}
+                                                    </div>
+                                                    {ball.detail && formatDetail(ball.detail) && (
+                                                        <div style={{ fontSize: 11, fontWeight: 600, color: '#a1a1aa', background: '#27272a', padding: '2px 8px', borderRadius: 6, textTransform: 'uppercase' }}>
+                                                            {formatDetail(ball.detail)}
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 {/* Body: Commentary */}
@@ -1131,10 +1138,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                         </div>
 
                                         {/* 1. Event Cards (Moved Below Ball to reverse-chronologically sit between Ball and Prev Over Separator) */}
-                                        {/* Debug Log for specific overs */}
-                                        {(ball.over === '49.1' || ball.over === '48.6') && (
-                                            console.log(`[Render] Ball ${ball.over}: Change=${isBowlerChangeCard}, ID=${ball.bowlerId}, PrevID=${prevBall?.bowlerId}`) || null
-                                        )}
 
                                         {isBowlerChangeCard && (() => {
                                             const newBowlerName = ball.bowlerName;
@@ -1142,30 +1145,38 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             const oversFloat = targetBall.bowlerOvers ? parseFloat(targetBall.bowlerOvers) : 0;
                                             const hasBowled = oversFloat > 0.1;
 
-                                            const bowlerId = ball.bowlerId || findPlayerIdByName(newBowlerName);
+                                            const bowlerId = (ball as any).bowlerId || findPlayerIdByName(newBowlerName);
                                             const h2hPlayer = !hasBowled ? findPlayerInH2H(newBowlerName, 'bowler', bowlerId) : null;
+                                            const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'bowler') : null;
+
+                                            // DEBUG BOX: To verify strict visibility
+                                            const debugBox = <div style={{ background: 'red', color: 'white', padding: 4, fontSize: 10, margin: '4px 0 4px 46px' }}>DEBUG: BOWLER CHANGE DETECTED</div>;
 
                                             return (
-                                                <div style={{
-                                                    display: 'flex', gap: 12, marginBottom: 24, padding: 12,
-                                                    background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: 12, alignItems: 'center', marginLeft: 46
-                                                }}>
-                                                    <WikiImage name={newBowlerName} id={bowlerId} type="player" circle={true} style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.1)' }} />
-                                                    <div style={{ flex: 1 }}>
-                                                        <div style={{ fontSize: 11, color: '#8b5cf6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>Bowling Change</div>
-                                                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{newBowlerName}</div>
-                                                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
-                                                            {hasBowled ? `${targetBall.bowlerOvers}ov • ${targetBall.bowlerWickets}w` : 'First Spell'}
+                                                <>
+                                                    {debugBox}
+                                                    <div style={{
+                                                        display: 'flex', gap: 12, marginBottom: 24, padding: 12,
+                                                        background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: 12, alignItems: 'center', marginLeft: 46
+                                                    }}>
+                                                        <WikiImage name={newBowlerName} id={bowlerId} type="player" circle={true} style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.1)' }} />
+                                                        <div style={{ flex: 1 }}>
+                                                            <div style={{ fontSize: 11, color: '#8b5cf6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>Bowling Change</div>
+                                                            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{newBowlerName}</div>
+                                                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
+                                                                {hasBowled ? `${targetBall.bowlerOvers}ov • ${targetBall.bowlerWickets}w` : 'First Spell'}
+                                                            </div>
+                                                            {recentForm && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>{recentForm.label}: {recentForm.value}</div>}
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </>
                                             );
                                         })()}
 
                                         {isNewBatterCard && newBatterName && (() => {
                                             let playerId: string | undefined = undefined;
-                                            if (newBatterName === ball.batsmanName) playerId = ball.batsmanId;
-                                            else if (newBatterName === ball.nonStrikerName) playerId = ball.nonStrikerId;
+                                            if (newBatterName === ball.batsmanName) playerId = (ball as any).batsmanId;
+                                            else if (newBatterName === ball.nonStrikerName) playerId = (ball as any).nonStrikerId;
 
                                             if (!playerId) playerId = findPlayerIdByName(newBatterName);
 
@@ -1514,7 +1525,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         );
                     })()
                 }
-            </div>
+            </div >
         </div >
     );
 };
