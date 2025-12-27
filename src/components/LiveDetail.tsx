@@ -1162,7 +1162,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                 }}>
                                                     {/* Timeline Line through event card - extends beyond to connect */}
                                                     <div style={{
-                                                        position: 'absolute', left: -26, top: -6, bottom: -6, width: 2, background: 'rgba(255, 255, 255, 0.08)'
+                                                        position: 'absolute', left: -28, top: -6, bottom: -6, width: 2, background: 'rgba(255, 255, 255, 0.08)'
                                                     }} />
                                                     <WikiImage name={newBowlerName} id={bowlerId} type="player" circle={true} style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.1)' }} />
                                                     <div style={{ flex: 1 }}>
@@ -1196,7 +1196,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                 }}>
                                                     {/* Timeline Line through event card - extends beyond to connect */}
                                                     <div style={{
-                                                        position: 'absolute', left: -26, top: -6, bottom: -6, width: 2, background: 'rgba(255, 255, 255, 0.08)'
+                                                        position: 'absolute', left: -28, top: -6, bottom: -6, width: 2, background: 'rgba(255, 255, 255, 0.08)'
                                                     }} />
                                                     <WikiImage name={newBatterName} id={playerId} type="player" circle={true} style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.1)' }} />
                                                     <div style={{ flex: 1 }}>
