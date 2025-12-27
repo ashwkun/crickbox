@@ -639,7 +639,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             </div>
 
 
-
             {/* === INSIGHTS VIEW === */}
             {activeTab === 'insights' && h2hData && (
                 <LiveInsights h2hData={h2hData} />
@@ -735,7 +734,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     </div>
                                 </div>
 
-                                <div style={{ textAlign: 'center', minWidth: 60 }}>
+                                <div style={{ textAlign: 'center', minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     <div style={{
                                         width: 40, height: 40, borderRadius: '50%',
                                         background: (() => {
@@ -762,7 +761,19 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             return getBallDisplay(lastBallVal);
                                         })()}
                                     </div>
-                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Last Ball</div>
+                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 6 }}>Last Ball</div>
+
+                                    {/* Bowler Details - Centered below Last Ball */}
+                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 6, marginTop: 2, width: '100%' }}>
+                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 2 }}>{activeBowler?.name || latestBall?.bowlerName}</div>
+                                        <div style={{ fontSize: 11, color: '#fff', fontWeight: 600 }}>
+                                            {activeBowler ? `${activeBowler.wickets}-${activeBowler.runs}` :
+                                                `${latestBall?.bowlerWickets}-${latestBall?.bowlerRuns}`}
+                                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', marginLeft: 3 }}>
+                                                ({activeBowler ? activeBowler.overs : latestBall?.bowlerOvers})
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div style={{ flex: 1, textAlign: 'right' }}>
@@ -886,15 +897,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             </div>
                                         </div>
 
-                                        {/* Bowler Details - Restored & Scorecard Connected */}
-                                        <div style={{ minWidth: 80, textAlign: 'right' }}>
-                                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>Bowler</div>
-                                            <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{activeBowler?.name || latestBall?.bowlerName}</div>
-                                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>
-                                                {activeBowler ? `${activeBowler.wickets}-${activeBowler.runs} (${activeBowler.overs})` :
-                                                    `${latestBall?.bowlerWickets}-${latestBall?.bowlerRuns} (${latestBall?.bowlerOvers})`}
-                                            </div>
-                                        </div>
+                                        {/* Placeholder for symmetry */}
+                                        <div style={{ minWidth: 70 }} />
                                     </div>
                                 </div>
                             )}
