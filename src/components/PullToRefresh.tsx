@@ -1,106 +1,105 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRefresh } from '../contexts/RefreshContext';
 
-interface PullToRefreshProps {
-    children: React.ReactNode;
-    disabled?: boolean;
-}
+const THRESHOLD = 60;
 
-const THRESHOLD = 70; // Pull distance to trigger refresh
-const MAX_PULL = 100; // Maximum pull distance
-
-export default function PullToRefresh({ children, disabled = false }: PullToRefreshProps) {
-    const { triggerRefresh, isRefreshing } = useRefresh();
+export default function PullToRefresh({ children }: { children: React.ReactNode }) {
+    const { triggerRefresh, isRefreshing, setIsRefreshing } = useRefresh();
     const [pullY, setPullY] = useState(0);
     const startY = useRef(0);
-    const pulling = useRef(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const isPulling = useRef(false);
 
-    const onTouchStart = useCallback((e: React.TouchEvent) => {
-        if (disabled || isRefreshing) return;
-
-        // Only start if scrolled to top
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        if (scrollTop > 0) return;
-
-        startY.current = e.touches[0].clientY;
-        pulling.current = true;
-    }, [disabled, isRefreshing]);
-
-    const onTouchMove = useCallback((e: React.TouchEvent) => {
-        if (!pulling.current || disabled || isRefreshing) return;
-
-        const currentY = e.touches[0].clientY;
-        const diff = currentY - startY.current;
-
-        if (diff > 0) {
-            // Diminishing returns - harder to pull further
-            const pull = Math.min(diff * 0.4, MAX_PULL);
-            setPullY(pull);
+    // Reset after 3 seconds max
+    useEffect(() => {
+        if (isRefreshing) {
+            const timer = setTimeout(() => setIsRefreshing(false), 3000);
+            return () => clearTimeout(timer);
         }
-    }, [disabled, isRefreshing]);
+    }, [isRefreshing, setIsRefreshing]);
 
-    const onTouchEnd = useCallback(() => {
-        if (!pulling.current) return;
-        pulling.current = false;
+    useEffect(() => {
+        // Use native event listeners for better scroll handling
+        const handleTouchStart = (e: TouchEvent) => {
+            // Only engage if at very top of page
+            if (window.scrollY <= 1 && !isRefreshing) {
+                startY.current = e.touches[0].clientY;
+                isPulling.current = false; // Will become true only on move down
+            }
+        };
 
-        if (pullY >= THRESHOLD && !isRefreshing) {
-            triggerRefresh();
-        }
+        const handleTouchMove = (e: TouchEvent) => {
+            if (isRefreshing) return;
 
-        // Always reset pull distance
-        setPullY(0);
-    }, [pullY, isRefreshing, triggerRefresh]);
+            const currentY = e.touches[0].clientY;
+            const diff = currentY - startY.current;
 
-    const showIndicator = pullY > 10 || isRefreshing;
-    const progress = Math.min(pullY / THRESHOLD, 1);
+            // Only activate if at top and pulling down
+            if (window.scrollY <= 1 && diff > 10) {
+                isPulling.current = true;
+                const pull = Math.min(diff * 0.35, 80);
+                setPullY(pull);
+            } else if (window.scrollY > 1) {
+                // Scrolled away, cancel pull
+                isPulling.current = false;
+                setPullY(0);
+            }
+        };
+
+        const handleTouchEnd = () => {
+            if (isPulling.current && pullY >= THRESHOLD) {
+                triggerRefresh();
+            }
+            isPulling.current = false;
+            setPullY(0);
+        };
+
+        // Use passive: true to not block scrolling
+        document.addEventListener('touchstart', handleTouchStart, { passive: true });
+        document.addEventListener('touchmove', handleTouchMove, { passive: true });
+        document.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+        return () => {
+            document.removeEventListener('touchstart', handleTouchStart);
+            document.removeEventListener('touchmove', handleTouchMove);
+            document.removeEventListener('touchend', handleTouchEnd);
+        };
+    }, [isRefreshing, pullY, triggerRefresh]);
+
+    const showIndicator = pullY > 5 || isRefreshing;
+    const indicatorHeight = isRefreshing ? 45 : pullY;
 
     return (
-        <div
-            ref={containerRef}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-            style={{ position: 'relative' }}
-        >
-            {/* Refresh indicator */}
+        <>
+            {/* Fixed refresh indicator at top */}
             {showIndicator && (
                 <div style={{
                     position: 'fixed',
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: isRefreshing ? 50 : pullY,
+                    height: indicatorHeight,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     zIndex: 9999,
                     background: 'rgba(15, 15, 15, 0.95)',
-                    transition: pulling.current ? 'none' : 'height 0.2s ease-out',
-                    overflow: 'hidden'
+                    transition: isPulling.current ? 'none' : 'height 0.15s ease-out'
                 }}>
                     <div style={{
-                        width: 28,
-                        height: 28,
+                        width: 24,
+                        height: 24,
                         borderRadius: '50%',
-                        border: '3px solid rgba(59, 130, 246, 0.3)',
+                        border: '2.5px solid rgba(59, 130, 246, 0.3)',
                         borderTopColor: '#3b82f6',
-                        transform: isRefreshing ? undefined : `rotate(${progress * 360}deg)`,
-                        animation: isRefreshing ? 'ptr-spin 0.8s linear infinite' : 'none',
-                        opacity: progress > 0.2 ? 1 : progress * 5
+                        animation: isRefreshing ? 'ptr-spin 0.7s linear infinite' : 'none',
+                        transform: isRefreshing ? undefined : `rotate(${(pullY / THRESHOLD) * 360}deg)`
                     }} />
                 </div>
             )}
 
-            {/* Main content */}
             {children}
 
-            <style>{`
-                @keyframes ptr-spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-            `}</style>
-        </div>
+            <style>{`@keyframes ptr-spin { to { transform: rotate(360deg); } }`}</style>
+        </>
     );
 }
