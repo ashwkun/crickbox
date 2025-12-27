@@ -26,6 +26,33 @@ const formatDate = (date: Date): string => {
     return `${d}${m}${y}`;
 };
 
+// Team Name Sanitization Helper
+const sanitizeTeamName = (name: string): string => {
+    if (!name) return name;
+    // user requested "Royal Challengers Bengaluru" -> "Royal Challengers"
+    return name
+        .replace(/Royal Challengers Bangalore/gi, 'Royal Challengers')
+        .replace(/Royal Challengers Bengaluru/gi, 'Royal Challengers');
+};
+
+const sanitizeMatch = (m: Match): Match => {
+    if (m.participants) {
+        m.participants.forEach(p => {
+            if (p.name) p.name = sanitizeTeamName(p.name);
+        });
+    }
+    return m;
+};
+
+const sanitizeScorecard = (sc: Scorecard): Scorecard => {
+    if (sc.Teams) {
+        Object.values(sc.Teams).forEach(team => {
+            if (team.Name_Full) team.Name_Full = sanitizeTeamName(team.Name_Full);
+        });
+    }
+    return sc;
+};
+
 const fetchWithRetry = async (url: string, retries: number = 1, bypassCache = false): Promise<MatchesResponse> => {
     for (let i = 0; i <= retries; i++) {
         try {
@@ -52,7 +79,11 @@ export default function useCricketData(): UseCricketDataReturn {
     const initialLoadComplete = useRef<boolean>(false);
 
     const updateState = (newMatches: Match[], forceLoadingOff: boolean = false): void => {
-        newMatches.forEach(m => matchesRef.current.set(m.game_id, m));
+        // Sanitize incoming matches
+        newMatches.forEach(m => {
+            const cleanMatch = sanitizeMatch(m);
+            matchesRef.current.set(cleanMatch.game_id, cleanMatch);
+        });
         const merged = Array.from(matchesRef.current.values());
         setMatches(merged);
         safeSetItem(CACHE_KEY, JSON.stringify(merged));
@@ -194,7 +225,10 @@ export default function useCricketData(): UseCricketDataReturn {
     const fetchScorecard = async (gameId: string): Promise<Scorecard | null> => {
         try {
             const data = await proxyFetch(`${WISDEN_SCORECARD}${gameId}`, true);
-            return data.data;
+            if (data?.data) {
+                return sanitizeScorecard(data.data);
+            }
+            return null;
         } catch (err) {
             return null;
         }
