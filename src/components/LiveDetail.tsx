@@ -867,52 +867,60 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                             })()}
 
                             {((scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5']) || (latestBall?.thisOver?.length > 0) || (getScorecardThisOver().length > 0)) && (
-                                <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 40 }}>
-                                        {/* Last 5 Overs */}
-                                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(255,255,255,0.1)' }}>
-                                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 2 }}>Last 5 Overs</div>
-                                            {scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5'] ? (
-                                                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', fontFamily: 'monospace' }}>
-                                                    {scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Score}/{scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Wicket}
-                                                </div>
-                                            ) : (
-                                                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>-</div>
-                                            )}
-                                        </div>
-
-                                        {/* This Over balls */}
-                                        <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                            <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>This Over</div>
-                                            <div style={{ display: 'flex', gap: 6 }}>
-                                                {(() => {
-                                                    const scLimit = getScorecardThisOver();
-                                                    const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                                    return thisOverBalls.map((ball: any, idx: number) => (
-                                                        <div key={idx} style={{
-                                                            width: 22, height: 22, borderRadius: '50%',
-                                                            background: getBallColor(ball),
-                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                            fontSize: 9, fontWeight: 700, color: '#fff',
-                                                            boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-                                                        }}>
-                                                            {getBallDisplay(ball)}
-                                                        </div>
-                                                    ));
-                                                })()}
-                                                {(() => {
-                                                    const scLimit = getScorecardThisOver();
-                                                    const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                                    // Show empty slots if less than 6 balls
-                                                    return Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
-                                                        <div key={`e-${idx}`} style={{
-                                                            width: 6, height: 6, borderRadius: '50%',
-                                                            background: 'rgba(255,255,255,0.1)',
-                                                            margin: '8px 8px' // visually align center as dots
-                                                        }} />
-                                                    ));
-                                                })()}
+                                <div style={{ display: 'flex', alignItems: 'center', height: 48, marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                    {/* Last 5 Overs - Fixed Compact Width */}
+                                    <div style={{
+                                        width: 90,
+                                        height: '100%',
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                                        borderRight: '1px solid rgba(255,255,255,0.1)'
+                                    }}>
+                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 3, letterSpacing: 0.5 }}>Last 5 Ov</div>
+                                        {scorecard?.Innings?.[scorecard.Innings.length - 1]?.LastOvers?.['5'] ? (
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', fontFamily: 'monospace' }}>
+                                                {scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Score}/{scorecard.Innings[scorecard.Innings.length - 1].LastOvers['5'].Wicket}
                                             </div>
+                                        ) : (
+                                            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>-</div>
+                                        )}
+                                    </div>
+
+                                    {/* This Over balls - Takes Remaining Space */}
+                                    <div style={{
+                                        flex: 1,
+                                        height: '100%',
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                                        paddingLeft: 12
+                                    }}>
+                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 4, letterSpacing: 0.5 }}>This Over</div>
+                                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                                            {(() => {
+                                                const scLimit = getScorecardThisOver();
+                                                const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                                                return thisOverBalls.map((ball: any, idx: number) => (
+                                                    <div key={idx} style={{
+                                                        width: 24, height: 24, borderRadius: '50%',
+                                                        background: getBallColor(ball),
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        fontSize: 9, fontWeight: 700, color: '#fff',
+                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                                    }}>
+                                                        {getBallDisplay(ball)}
+                                                    </div>
+                                                ));
+                                            })()}
+                                            {(() => {
+                                                const scLimit = getScorecardThisOver();
+                                                const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                                                // Show empty slots if less than 6 balls
+                                                return Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
+                                                    <div key={`e-${idx}`} style={{
+                                                        width: 6, height: 6, borderRadius: '50%',
+                                                        background: 'rgba(255,255,255,0.08)',
+                                                        margin: '9px 9px' // visually align center as dots
+                                                    }} />
+                                                ));
+                                            })()}
                                         </div>
                                     </div>
                                 </div>
