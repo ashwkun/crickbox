@@ -318,7 +318,7 @@ export default function App(): React.ReactElement {
                     justifyContent: 'center',
                     cursor: 'pointer',
                     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
-                    zIndex: 999,
+                    zIndex: 2500,
                     transition: 'transform 0.2s, background 0.2s',
                 }}
                 onMouseEnter={(e) => {

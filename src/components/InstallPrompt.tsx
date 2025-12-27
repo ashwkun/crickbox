@@ -50,12 +50,12 @@ const InstallPrompt: React.FC<InstallPromptProps> = ({ forceShow = false, onClos
         };
     }, []);
 
-    // Handle forceShow prop
+    // Handle forceShow prop - reset showPrompt when forceShow changes to false
     useEffect(() => {
-        if (forceShow && !isStandalone) {
+        if (forceShow) {
             setShowPrompt(true);
         }
-    }, [forceShow, isStandalone]);
+    }, [forceShow]);
 
     const handleInstall = async () => {
         if (deferredPrompt) {
@@ -74,7 +74,8 @@ const InstallPrompt: React.FC<InstallPromptProps> = ({ forceShow = false, onClos
         onClose?.();
     };
 
-    if (!showPrompt || isStandalone) return null;
+    // Show if either forceShow is true OR internal showPrompt is true (and not standalone)
+    if ((!showPrompt && !forceShow) || isStandalone) return null;
 
     // Styles
     const styles = {
