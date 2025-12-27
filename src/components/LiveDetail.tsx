@@ -735,33 +735,30 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 </div>
 
                                 <div style={{ textAlign: 'center', minWidth: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    {/* Partnership Display (Replacing Last Ball) */}
                                     <div style={{
-                                        width: 40, height: 40, borderRadius: '50%',
-                                        background: (() => {
-                                            // Prioritize Scorecard API for this over
-                                            const scLimit = getScorecardThisOver();
-                                            const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-
-                                            const lastBallVal = thisOverBalls.length > 0
-                                                ? thisOverBalls[thisOverBalls.length - 1]
-                                                : (latestBall?.detail || latestBall?.runs || '0');
-                                            return getBallColor(lastBallVal);
-                                        })(),
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 6px',
-                                        fontSize: 13, fontWeight: 700, color: '#fff',
-                                        animation: 'pulse-glow 2s infinite'
+                                        marginBottom: 6,
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
                                     }}>
                                         {(() => {
-                                            const scLimit = getScorecardThisOver();
-                                            const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-
-                                            const lastBallVal = thisOverBalls.length > 0
-                                                ? thisOverBalls[thisOverBalls.length - 1]
-                                                : (latestBall?.detail || latestBall?.runs || '0');
-                                            return getBallDisplay(lastBallVal);
+                                            const currentPartnership = scorecard?.Innings?.[scorecard.Innings.length - 1]?.Partnership_Current;
+                                            if (currentPartnership) {
+                                                return (
+                                                    <>
+                                                        <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+                                                            {currentPartnership.Runs}
+                                                            <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.6)', marginLeft: 4 }}>
+                                                                ({currentPartnership.Balls})
+                                                            </span>
+                                                        </div>
+                                                    </>
+                                                );
+                                            }
+                                            // Fallback if no partnership data
+                                            return <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>-</div>;
                                         })()}
                                     </div>
-                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 6 }}>Last Ball</div>
+                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 6 }}>Partnership</div>
 
                                     {/* Bowler Details - Centered below Last Ball */}
                                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 6, marginTop: 4, width: '100%' }}>
