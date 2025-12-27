@@ -1094,22 +1094,22 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     <React.Fragment key={idx}>
 
                                         {/* 3. The Ball Card Itself (Rendered First in this block, appearing on Top) */}
-                                        <div style={{ display: 'flex', gap: 12, position: 'relative', paddingBottom: 20, alignItems: showBody ? 'flex-start' : 'center' }}>
-                                            {/* Timeline Line */}
+                                        <div style={{ display: 'flex', gap: 12, position: 'relative', paddingBottom: 16, alignItems: showBody ? 'flex-start' : 'center' }}>
+                                            {/* Timeline Line - centered on ball */}
                                             <div style={{
-                                                position: 'absolute', left: 11, top: 0, bottom: 0, width: 2, background: 'rgba(255, 255, 255, 0.08)',
-                                                display: idx === wallstream.balls.length - 1 ? 'none' : 'block' // Hide for very last item
+                                                position: 'absolute', left: 13, top: 0, bottom: 0, width: 2, background: 'rgba(255, 255, 255, 0.08)',
+                                                display: idx === wallstream.balls.length - 1 ? 'none' : 'block'
                                             }} />
 
-                                            {/* Ball/Event Dot - Matches "This Over" style */}
+                                            {/* Ball/Event Dot - 28px, full over.ball */}
                                             <div style={{
-                                                zIndex: 1, width: 24, height: 24, borderRadius: '50%',
+                                                zIndex: 1, width: 28, height: 28, borderRadius: '50%',
                                                 background: markerColor,
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                fontSize: 9, fontWeight: 700, color: '#fff',
+                                                fontSize: 10, fontWeight: 700, color: '#fff',
                                                 boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                                             }}>
-                                                {markerText.split('.')[1] || markerText}
+                                                {markerText}
                                             </div>
 
                                             {/* Content Block */}
@@ -1157,17 +1157,23 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
                                             return (
                                                 <div style={{
-                                                    display: 'flex', gap: 12, marginBottom: 16, padding: 10,
-                                                    background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: 10, alignItems: 'center', marginLeft: 36
+                                                    display: 'flex', gap: 12, marginBottom: 12, padding: 10, position: 'relative',
+                                                    background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: 10, alignItems: 'center', marginLeft: 40
                                                 }}>
-                                                    <WikiImage name={newBowlerName} id={bowlerId} type="player" circle={true} style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.1)' }} />
+                                                    {/* Timeline Line through event card */}
+                                                    <div style={{
+                                                        position: 'absolute', left: -27, top: 0, bottom: 0, width: 2, background: 'rgba(255, 255, 255, 0.08)'
+                                                    }} />
+                                                    <WikiImage name={newBowlerName} id={bowlerId} type="player" circle={true} style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.1)' }} />
                                                     <div style={{ flex: 1 }}>
-                                                        <div style={{ fontSize: 11, color: '#8b5cf6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>Bowling Change</div>
+                                                        <div style={{ fontSize: 10, color: '#8b5cf6', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>Bowling Change</div>
                                                         <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{newBowlerName}</div>
-                                                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
-                                                            {hasBowled ? `${targetBall.bowlerOvers}ov • ${targetBall.bowlerWickets}w` : 'First Spell'}
+                                                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
+                                                            {hasBowled
+                                                                ? `${targetBall.bowlerOvers}ov • ${targetBall.bowlerWickets}/${targetBall.bowlerRuns} • ${targetBall.bowlerMaidens}m`
+                                                                : 'First Spell'}
                                                         </div>
-                                                        {recentForm && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>{recentForm.label}: {recentForm.value}</div>}
+                                                        {recentForm && <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{recentForm.label}: {recentForm.value}</div>}
                                                     </div>
                                                 </div>
                                             );
@@ -1185,14 +1191,18 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
                                             return (
                                                 <div style={{
-                                                    display: 'flex', gap: 12, marginBottom: 16, padding: 10,
-                                                    background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', borderRadius: 10, alignItems: 'center', marginLeft: 36
+                                                    display: 'flex', gap: 12, marginBottom: 12, padding: 10, position: 'relative',
+                                                    background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', borderRadius: 10, alignItems: 'center', marginLeft: 40
                                                 }}>
-                                                    <WikiImage name={newBatterName} id={playerId} type="player" circle={true} style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.1)' }} />
+                                                    {/* Timeline Line through event card */}
+                                                    <div style={{
+                                                        position: 'absolute', left: -27, top: 0, bottom: 0, width: 2, background: 'rgba(255, 255, 255, 0.08)'
+                                                    }} />
+                                                    <WikiImage name={newBatterName} id={playerId} type="player" circle={true} style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.1)' }} />
                                                     <div style={{ flex: 1 }}>
-                                                        <div style={{ fontSize: 11, color: '#22c55e', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>New Batter</div>
+                                                        <div style={{ fontSize: 10, color: '#22c55e', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>New Batter</div>
                                                         <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{newBatterName}</div>
-                                                        {recentForm && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>{recentForm.label}: {recentForm.value}</div>}
+                                                        {recentForm && <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{recentForm.label}: {recentForm.value}</div>}
                                                     </div>
                                                 </div>
                                             );
@@ -1200,10 +1210,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
                                         {/* 4. Over Separator (Moved to BOTTOM) */}
                                         {showOverSeparator && (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, opacity: 0.5 }}>
-                                                <div style={{ width: 24, display: 'flex', justifyContent: 'center' }}><div style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} /></div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, opacity: 0.5 }}>
+                                                <div style={{ width: 28, display: 'flex', justifyContent: 'center' }}><div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} /></div>
                                                 <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
-                                                <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>End of Over {nextOverNum + 1}</div>
+                                                <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>End of Over {nextOverNum + 1}</div>
                                                 <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
                                             </div>
                                         )}
