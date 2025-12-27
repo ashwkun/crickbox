@@ -511,17 +511,21 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         onClick={() => setActiveTab(activeTab === 'live' ? 'insights' : 'live')}
                         style={{
                             fontSize: 10,
-                            fontWeight: 600,
-                            padding: '4px 10px',
-                            background: activeTab === 'insights' ? 'rgba(168, 85, 247, 0.25)' : 'rgba(168, 85, 247, 0.1)',
+                            fontWeight: 700,
+                            padding: '6px 12px',
+                            background: activeTab === 'insights' ? '#a855f7' : 'rgba(168, 85, 247, 0.15)',
                             borderRadius: 20,
-                            color: activeTab === 'insights' ? '#c084fc' : '#a855f7',
+                            color: activeTab === 'insights' ? '#fff' : '#c084fc',
                             cursor: 'pointer',
                             transition: 'all 0.2s ease',
-                            border: activeTab === 'insights' ? '1px solid rgba(168, 85, 247, 0.4)' : '1px solid transparent',
+                            border: activeTab === 'insights' ? '1px solid #a855f7' : '1px solid rgba(168, 85, 247, 0.3)',
+                            boxShadow: activeTab === 'insights' ? '0 2px 8px rgba(168, 85, 247, 0.4)' : 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4
                         }}
                     >
-                        💡 Insights
+                        {activeTab === 'live' ? 'View Insights' : 'Back to Live'}
                     </span>
                 </div>
 
@@ -761,37 +765,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                             </div>
                         </div>
 
-                        {/* This Over & Stats */}
-                        <div style={{ padding: '0 8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                                <div>
-                                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 6 }}>This Over</div>
-                                    <div style={{ display: 'flex', gap: 6 }}>
-                                        {(() => {
-                                            const scLimit = getScorecardThisOver();
-                                            const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                            return thisOverBalls.map((ball: any, idx: number) => (
-                                                <div key={idx} style={{
-                                                    width: 24, height: 24, borderRadius: '50%',
-                                                    background: getBallColor(ball),
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 10, fontWeight: 700, color: '#fff'
-                                                }}>
-                                                    {getBallDisplay(ball)}
-                                                </div>
-                                            ));
-                                        })()}
-                                    </div>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 6 }}>Bowler</div>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{latestBall?.bowlerName}</div>
-                                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>
-                                        {latestBall?.bowlerWickets}-{latestBall?.bowlerRuns} ({latestBall?.bowlerOvers})
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         {/* Run Rates Row */}
                         {scorecard?.Innings?.length > 0 && (() => {
@@ -877,22 +850,30 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     <div style={{ flex: 1, textAlign: 'center' }}>
                                         <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>This Over</div>
                                         <div style={{ display: 'flex', gap: 5, justifyContent: 'center' }}>
-                                            {latestBall.thisOver.map((ball, idx) => (
-                                                <div key={idx} style={{
-                                                    width: 24, height: 24, borderRadius: '50%',
-                                                    background: getBallColor(ball),
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 10, fontWeight: 700, color: '#fff',
-                                                }}>
-                                                    {getBallDisplay(ball)}
-                                                </div>
-                                            ))}
-                                            {Array(Math.max(0, 6 - latestBall.thisOver.length)).fill(null).map((_, idx) => (
-                                                <div key={`e-${idx}`} style={{
-                                                    width: 24, height: 24, borderRadius: '50%',
-                                                    background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(255,255,255,0.1)',
-                                                }} />
-                                            ))}
+                                            {(() => {
+                                                const scLimit = getScorecardThisOver();
+                                                const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                                                return thisOverBalls.map((ball: any, idx: number) => (
+                                                    <div key={idx} style={{
+                                                        width: 24, height: 24, borderRadius: '50%',
+                                                        background: getBallColor(ball),
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        fontSize: 10, fontWeight: 700, color: '#fff',
+                                                    }}>
+                                                        {getBallDisplay(ball)}
+                                                    </div>
+                                                ));
+                                            })()}
+                                            {(() => {
+                                                const scLimit = getScorecardThisOver();
+                                                const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                                                return Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
+                                                    <div key={`e-${idx}`} style={{
+                                                        width: 24, height: 24, borderRadius: '50%',
+                                                        background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(255,255,255,0.1)',
+                                                    }} />
+                                                ));
+                                            })()}
                                         </div>
                                     </div>
 
