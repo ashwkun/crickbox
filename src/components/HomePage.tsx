@@ -185,6 +185,16 @@ export default function HomePage({
         matches
             .filter(m => m.event_state === 'U')
             .filter(m => !shouldShowInLive(m)) // Exclude pre-live matches
+            .filter(m => {
+                // Filter out matches that started more than 12 hours ago (stale)
+                // BUT keep Test matches as they last multiple days
+                const startTime = new Date(m.start_date).getTime();
+                const now = Date.now();
+                const isTest = m.event_format?.toLowerCase().includes('test');
+                const isStale = !isTest && (now - startTime > 12 * 60 * 60 * 1000);
+
+                return !isStale;
+            })
             .filter(m => !m.event_status?.toLowerCase().includes('cancel') && !m.event_status?.toLowerCase().includes('abandon'))
             .filter(isInternationalMens)
             .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()),
