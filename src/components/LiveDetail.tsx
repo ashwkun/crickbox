@@ -1106,7 +1106,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             const targetBall = ball; // Use current ball stats for the new bowler
                                             const hasBowled = targetBall.bowlerOvers && parseFloat(targetBall.bowlerOvers) >= 0.1;
 
-                                            const bowlerId = findPlayerIdByName(newBowlerName);
+                                            // Priority: Use explicit ID from data, fallback to name lookup
+                                            const bowlerId = ball.bowlerId || findPlayerIdByName(newBowlerName);
                                             const h2hPlayer = !hasBowled ? findPlayerInH2H(newBowlerName, 'bowler', bowlerId) : null;
                                             const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'bowler') : null;
                                             const iccRanking = h2hPlayer?.icc_ranking;
@@ -1129,7 +1130,16 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                         })()}
 
                                         {isNewBatterCard && newBatterName && (() => {
-                                            const playerId = findPlayerIdByName(newBatterName);
+                                            // 'newId' was calculated in the inference block logic, but not exposed here?
+                                            // We need to access the ID corresponding to 'newBatterName'.
+                                            // The logic above stored 'entityName' (newBatterName) but didn't store the ID?
+                                            // We can re-derive it easily since we know who it is.
+                                            let playerId: string | undefined = undefined;
+                                            if (newBatterName === ball.batsmanName) playerId = ball.batsmanId;
+                                            else if (newBatterName === ball.nonStrikerName) playerId = ball.nonStrikerId;
+
+                                            if (!playerId) playerId = findPlayerIdByName(newBatterName);
+
                                             const h2hPlayer = findPlayerInH2H(newBatterName, 'batsmen', playerId);
                                             const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'batsmen') : null;
 
