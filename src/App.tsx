@@ -13,6 +13,7 @@ export default function App(): React.ReactElement {
     const [scorecard, setScorecard] = useState<Scorecard | null>(null);
     const [wallstream, setWallstream] = useState<WallstreamData | null>(null);
     const [pendingMatchId, setPendingMatchId] = useState<string | null>(null);
+    const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
     // Navigation State (Lifted from HomePage)
     const [selectedSeries, setSelectedSeries] = useState<Series | null>(null);
@@ -256,6 +257,7 @@ export default function App(): React.ReactElement {
                     else if (selectedSeries) handleCloseSeries();
                     else if (selectedTournament) handleCloseTournament();
                 }}
+                onLogoClick={() => setShowInstallPrompt(true)}
             />
 
             {/* Main Content */}
@@ -295,7 +297,7 @@ export default function App(): React.ReactElement {
             )}
 
             {/* PWA Install Prompt */}
-            <InstallPrompt />
+            <InstallPrompt forceShow={showInstallPrompt} onClose={() => setShowInstallPrompt(false)} />
 
             {/* Sticky Reload Button */}
             <button
@@ -316,7 +318,7 @@ export default function App(): React.ReactElement {
                     justifyContent: 'center',
                     cursor: 'pointer',
                     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
-                    zIndex: 1000,
+                    zIndex: 999,
                     transition: 'transform 0.2s, background 0.2s',
                 }}
                 onMouseEnter={(e) => {

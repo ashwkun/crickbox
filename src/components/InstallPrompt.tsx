@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 const appIcon = new URL('../icons/pwa-logo.png', import.meta.url).href;
 
-const InstallPrompt = () => {
+interface InstallPromptProps {
+    forceShow?: boolean;
+    onClose?: () => void;
+}
+
+const InstallPrompt: React.FC<InstallPromptProps> = ({ forceShow = false, onClose }) => {
     const [showPrompt, setShowPrompt] = useState(false);
     const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [isIOS, setIsIOS] = useState(false);
@@ -45,12 +50,20 @@ const InstallPrompt = () => {
         };
     }, []);
 
+    // Handle forceShow prop
+    useEffect(() => {
+        if (forceShow && !isStandalone) {
+            setShowPrompt(true);
+        }
+    }, [forceShow, isStandalone]);
+
     const handleInstall = async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             if (outcome === 'accepted') {
                 setShowPrompt(false);
+                onClose?.();
             }
             setDeferredPrompt(null);
         }
@@ -58,6 +71,7 @@ const InstallPrompt = () => {
 
     const handleDismiss = () => {
         setShowPrompt(false);
+        onClose?.();
     };
 
     if (!showPrompt || isStandalone) return null;
