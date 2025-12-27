@@ -1090,35 +1090,65 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 return (
                                     <React.Fragment key={idx}>
 
-                                        {/* 1. Event Cards (New Bowler / New Batter) - Proposed Move: Before Separator? Or just verify logic */}
-                                        {/* User suspects Over SEparator issues. Let's keep them distinct but ensure logic fires. */}
+                                        {/* 3. The Ball Card Itself (Rendered First in this block, appearing on Top) */}
+                                        <div style={{ display: 'flex', gap: 16, position: 'relative', paddingBottom: 24, alignItems: showBody ? 'flex-start' : 'center' }}>
+                                            {/* Timeline Line */}
+                                            <div style={{
+                                                position: 'absolute', left: 19, top: 0, bottom: 0, width: 2, background: 'rgba(255, 255, 255, 0.1)',
+                                                display: idx === wallstream.balls.length - 1 ? 'none' : 'block' // Hide for very last item
+                                            }} />
 
+                                            {/* Ball/Event Dot */}
+                                            <div style={{
+                                                zIndex: 1, width: 40, height: 40, borderRadius: '50%', background: '#18181b', border: `2px solid ${markerColor}`,
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: markerColor
+                                            }}>
+                                                {markerText}
+                                            </div>
+
+                                            {/* Content Block */}
+                                            <div style={{ flex: 1, paddingTop: 0 }}>
+                                                {/* Header: Bowler to Batsman */}
+                                                <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, marginBottom: 4 }}>
+                                                    <div style={{ fontSize: 14, color: '#fff' }}>
+                                                        <span style={{ fontWeight: 600 }}>{ball.bowlerName}</span> to <span style={{ fontWeight: 600 }}>{ball.batsmanName}</span>
+                                                    </div>
+                                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{ball.over}</div>
+                                                </div>
+
+                                                {/* Ball Detail (Runs/Wicket text) */}
+                                                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginBottom: 4 }}>
+                                                    {ballDetailText}
+                                                </div>
+
+                                                {/* Body: Commentary */}
+                                                {showBody && (
+                                                    <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: '1.5', fontFamily: 'Inter, sans-serif' }}>
+                                                        {ball.commentary}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* 1. Event Cards (Moved Below Ball to reverse-chronologically sit between Ball and Prev Over Separator) */}
                                         {/* Debug Log for specific overs */}
                                         {(ball.over === '49.1' || ball.over === '48.6') && (
                                             console.log(`[Render] Ball ${ball.over}: Change=${isBowlerChangeCard}, ID=${ball.bowlerId}, PrevID=${prevBall?.bowlerId}`) || null
                                         )}
 
                                         {isBowlerChangeCard && (() => {
-                                            // debug log
-                                            // console.log('Rendering Bowler Change:', ball.bowlerName, ball.over);
-
                                             const newBowlerName = ball.bowlerName;
-                                            const targetBall = ball; // Use current ball stats for the new bowler
-                                            // Show Recent Form if it's the very first ball (0.1 ov) of his spell
-                                            // Show Current Match Stats from 2nd ball onwards (> 0.1 ov)
+                                            const targetBall = ball;
                                             const oversFloat = targetBall.bowlerOvers ? parseFloat(targetBall.bowlerOvers) : 0;
                                             const hasBowled = oversFloat > 0.1;
 
-                                            // Priority: Use explicit ID from data, fallback to name lookup
                                             const bowlerId = ball.bowlerId || findPlayerIdByName(newBowlerName);
                                             const h2hPlayer = !hasBowled ? findPlayerInH2H(newBowlerName, 'bowler', bowlerId) : null;
-                                            const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'bowler') : null;
-                                            const iccRanking = h2hPlayer?.icc_ranking;
 
                                             return (
                                                 <div style={{
                                                     display: 'flex', gap: 12, marginBottom: 24, padding: 12,
-                                                    background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: 12, alignItems: 'center', marginLeft: 46 // Indent to align with content
+                                                    background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: 12, alignItems: 'center', marginLeft: 46
                                                 }}>
                                                     <WikiImage name={newBowlerName} id={bowlerId} type="player" circle={true} style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.1)' }} />
                                                     <div style={{ flex: 1 }}>
@@ -1133,10 +1163,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                         })()}
 
                                         {isNewBatterCard && newBatterName && (() => {
-                                            // 'newId' was calculated in the inference block logic, but not exposed here?
-                                            // We need to access the ID corresponding to 'newBatterName'.
-                                            // The logic above stored 'entityName' (newBatterName) but didn't store the ID?
-                                            // We can re-derive it easily since we know who it is.
                                             let playerId: string | undefined = undefined;
                                             if (newBatterName === ball.batsmanName) playerId = ball.batsmanId;
                                             else if (newBatterName === ball.nonStrikerName) playerId = ball.nonStrikerId;
@@ -1146,7 +1172,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             const h2hPlayer = findPlayerInH2H(newBatterName, 'batsmen', playerId);
                                             const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'batsmen') : null;
 
-                                            // Ensure we don't show duplicate cards if multiple balls happen? No, strict index check.
                                             return (
                                                 <div style={{
                                                     display: 'flex', gap: 12, marginBottom: 24, padding: 12,
@@ -1162,13 +1187,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             );
                                         })()}
 
-                                        {/* 2. Over Separator (Moved AFTER events as per test? No, keep logic: Separator cleans up PREV over. Event introduces NEW over state.) */}
-                                        {/* Wait, if I move Separator AFTER events, then visually: Event -> Separator -> Ball. */}
-                                        {/* That implies Event is part of OLD over? No. */}
-                                        {/* Let's stick to ORDER: Separator -> Events -> Ball. */}
-                                        {/* But User suspects interference. I will ensure they are clearly distinct code blocks. */}
-                                        {/* I will RE-INSERT Separator logic HERE to verify it's not "swallowed" logic. */}
-
+                                        {/* 4. Over Separator (Moved to BOTTOM) */}
                                         {showOverSeparator && (
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, opacity: 0.6 }}>
                                                 <div style={{ width: 30, display: 'flex', justifyContent: 'center' }}><div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} /></div>
@@ -1177,44 +1196,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                 <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
                                             </div>
                                         )}
-
-                                        {/* 3. The Ball Card Itself */}
-                                        <div style={{ display: 'flex', gap: 16, position: 'relative', paddingBottom: 24, alignItems: showBody ? 'flex-start' : 'center' }}>
-                                            {/* Timeline Line */}
-                                            {!isLast && <div style={{ position: 'absolute', left: 14, top: 28, bottom: 0, width: 2, background: 'rgba(255,255,255,0.05)' }} />}
-
-                                            {/* Ball Marker */}
-                                            <div style={{
-                                                position: 'relative', zIndex: 2,
-                                                width: 30, height: 30, borderRadius: '50%',
-                                                background: markerColor,
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                fontSize: 10, fontWeight: 700, color: '#fff',
-                                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                            }}>
-                                                {markerText}
-                                            </div>
-
-                                            {/* Content Block */}
-                                            <div style={{ flex: 1, marginTop: 0 }}>
-                                                {/* Header: Bowler to Batsman */}
-                                                <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: 8, marginBottom: 4 }}>
-                                                    <div style={{ fontSize: 14, color: '#fff' }}>
-                                                        <span style={{ fontWeight: 600 }}>{ball.bowlerName}</span> to <span style={{ fontWeight: 600 }}>{ball.batsmanName}</span>
-                                                    </div>
-                                                    <div style={{ fontSize: 11, fontWeight: 800, color: resultColor, textTransform: 'uppercase', background: `${resultColor}15`, padding: '2px 8px', borderRadius: 6 }}>
-                                                        {resultText}
-                                                    </div>
-                                                </div>
-
-                                                {/* Body: Commentary */}
-                                                {showBody && (
-                                                    <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: '1.5', fontFamily: 'Inter, sans-serif' }}>
-                                                        {ball.commentary}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
                                     </React.Fragment>
                                 );
                             })}
