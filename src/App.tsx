@@ -296,6 +296,44 @@ export default function App(): React.ReactElement {
 
             {/* PWA Install Prompt */}
             <InstallPrompt />
+
+            {/* Sticky Reload Button */}
+            <button
+                onClick={() => window.location.reload()}
+                style={{
+                    position: 'fixed',
+                    bottom: 24,
+                    right: 24,
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    background: 'rgba(24, 24, 27, 0.7)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+                    zIndex: 1000,
+                    transition: 'transform 0.2s, background 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(39, 39, 42, 0.8)';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(24, 24, 27, 0.7)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                }}
+                title="Reload Page"
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="23 4 23 10 17 10" />
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+            </button>
         </div>
     );
 }
