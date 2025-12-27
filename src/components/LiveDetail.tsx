@@ -719,9 +719,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, gap: 10 }}>
                                 <div style={{ flex: 1 }}>
                                     <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>Striker</div>
-                                    <div style={{ fontSize: 14, fontWeight: 600, color: '#22c55e' }}>{sName}</div>
-                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
-                                        {sRuns || '0'}<span style={{ fontSize: 9 }}>({sBalls || '0'})</span>
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#22c55e', textTransform: 'uppercase', marginBottom: 2 }}>{sName}</div>
+                                    <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+                                        {sRuns || '0'}<span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.6)', marginLeft: 4 }}>({sBalls || '0'})</span>
                                         {(() => {
                                             const stats = getBoundaryStats(sName);
                                             if (stats) return (
@@ -745,9 +745,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             if (currentPartnership) {
                                                 return (
                                                     <>
-                                                        <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+                                                        <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
                                                             {currentPartnership.Runs}
-                                                            <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.6)', marginLeft: 4 }}>
+                                                            <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.6)', marginLeft: 4 }}>
                                                                 ({currentPartnership.Balls})
                                                             </span>
                                                         </div>
@@ -776,9 +776,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
                                 <div style={{ flex: 1, textAlign: 'right' }}>
                                     <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>Non-Striker</div>
-                                    <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{nsName}</div>
-                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>
-                                        {nsRuns || '0'}<span style={{ fontSize: 9 }}>({nsBalls || '0'})</span>
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', textTransform: 'uppercase', marginBottom: 2 }}>{nsName}</div>
+                                    <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+                                        {nsRuns || '0'}<span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.6)', marginLeft: 4 }}>({nsBalls || '0'})</span>
                                     </div>
                                 </div>
                             </div>

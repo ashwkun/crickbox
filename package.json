@@ -4,7 +4,7 @@
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html",
-    "ship": "npm run build && git add . && git commit -m \"Auto Update $(date)\" && git push && firebase deploy --only hosting",
+    "ship": "npm run build && firebase deploy --only hosting:prod && git add . && git commit -m \"Auto Update $(date)\" && git push",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
