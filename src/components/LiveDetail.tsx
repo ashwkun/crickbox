@@ -1090,17 +1090,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 return (
                                     <React.Fragment key={idx}>
 
-                                        {/* 1. Over Separator (First) */}
-                                        {showOverSeparator && (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, opacity: 0.6 }}>
-                                                <div style={{ width: 30, display: 'flex', justifyContent: 'center' }}><div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} /></div>
-                                                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
-                                                <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>End of Over {nextOverNum + 1}</div>
-                                                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
-                                            </div>
+                                        {/* 1. Event Cards (New Bowler / New Batter) - Proposed Move: Before Separator? Or just verify logic */}
+                                        {/* User suspects Over SEparator issues. Let's keep them distinct but ensure logic fires. */}
+
+                                        {/* Debug Log for specific overs */}
+                                        {(ball.over === '49.1' || ball.over === '48.6') && (
+                                            console.log(`[Render] Ball ${ball.over}: Change=${isBowlerChangeCard}, ID=${ball.bowlerId}, PrevID=${prevBall?.bowlerId}`) || null
                                         )}
 
-                                        {/* 2. Event Cards (New Bowler / New Batter) - After Separator, Before Ball */}
                                         {isBowlerChangeCard && (() => {
                                             // debug log
                                             // console.log('Rendering Bowler Change:', ball.bowlerName, ball.over);
@@ -1164,6 +1161,22 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                 </div>
                                             );
                                         })()}
+
+                                        {/* 2. Over Separator (Moved AFTER events as per test? No, keep logic: Separator cleans up PREV over. Event introduces NEW over state.) */}
+                                        {/* Wait, if I move Separator AFTER events, then visually: Event -> Separator -> Ball. */}
+                                        {/* That implies Event is part of OLD over? No. */}
+                                        {/* Let's stick to ORDER: Separator -> Events -> Ball. */}
+                                        {/* But User suspects interference. I will ensure they are clearly distinct code blocks. */}
+                                        {/* I will RE-INSERT Separator logic HERE to verify it's not "swallowed" logic. */}
+
+                                        {showOverSeparator && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, opacity: 0.6 }}>
+                                                <div style={{ width: 30, display: 'flex', justifyContent: 'center' }}><div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} /></div>
+                                                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+                                                <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>End of Over {nextOverNum + 1}</div>
+                                                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+                                            </div>
+                                        )}
 
                                         {/* 3. The Ball Card Itself */}
                                         <div style={{ display: 'flex', gap: 16, position: 'relative', paddingBottom: 24, alignItems: showBody ? 'flex-start' : 'center' }}>
