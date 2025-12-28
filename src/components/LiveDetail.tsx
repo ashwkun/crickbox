@@ -1093,9 +1093,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 const isRedundantBody = ball.commentary && /^(no run|dot ball|\d+\s*runs?|wide|bye|leg\s*bye|four|six|wicket)[!.]*$/i.test(ball.commentary.trim());
                                 const showBody = ball.commentary && !isRedundantBody;
 
-                                // Skip rendering explicit change_of_bowler API events - these have no data
+                                // Skip rendering explicit non-ball API events (change_of_bowler, change_of_ball, etc.)
+                                // These have no bowler/batsman data and would render empty cards or trigger false bowling changes
                                 // Our inferred bowling change card will handle them with proper bowler stats
-                                if (!ball.isball && ball.detail?.toLowerCase() === 'change_of_bowler') {
+                                if (!ball.isball) {
                                     return null;
                                 }
 
