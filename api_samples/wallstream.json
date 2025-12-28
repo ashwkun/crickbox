@@ -1,963 +1,202 @@
 {
   "sport": "Cricket",
   "sport_id": 1,
-  "edition": "The Ashes, 2025/26",
-  "edition_id": 8273,
+  "edition": "Sri Lanka Women in India, 5 T20I Series, 2025",
+  "edition_id": 13512,
   "tag": {
     "type": "match",
-    "value": 253245
+    "value": 268163
   },
   "assets": [
     {
-      "id": 40439283,
-      "asset_order": 2543,
-      "flag": 2,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "30.5 Jhye Richardson to Harry Brook,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:13:46.613",
-      "publish_time_utc": "2025-12-27T06:13:46.613",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"30.5\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Winds it up! He is seemingly not nudging ten singles to get it done. Oh, hang on! Steve Smith\u00a0has reviewed this for caught behind.\",\"OverNo\":\"31\",\"BallNo\":\"5\",\"Ball_Number\":\"185\",\"This_Over\":\"0,0,0,4,0,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"13\",\"Balls\":\"16\",\"Fours\":\"2\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"2\",\"Balls\":\"7\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"4.5\",\"Maidens\":\"1\",\"Runs\":\"22\",\"Wickets\":\"2\",\"Ball_bowled\":\"29\",\"Dot_balls\":\"19\",\"id\":\"65051\"},\"Ball_Speed\":\"138.6\",\"Ball_Line_Length\":\"19,14,9,8,43,15\",\"Review_Detail\":{\"Batting_Review_Count\":\"2\",\"Bowling_Review_Count\":\"2\",\"Team_Id\":1,\"Review_Type\":\"Team DRS\",\"Review_Type_Id\":2,\"Review_For\":\"Caught\",\"Review_For_Id\":2,\"Review_Output\":\"\"}}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439272,
-      "asset_order": 2540,
+      "id": 50000001,
+      "asset_order": 120,
       "flag": 2,
       "type": "Commentary",
       "source": "Commentary",
       "source_id": 2,
       "filter_id": 1,
-      "headline": "30.4 Jhye Richardson to Harry Brook,4 Runs",
+      "headline": "19.6 Kawya Kavindi to Harmanpreet Kaur,6 Runs",
       "body": "",
       "display_pic": null,
       "display_value": null,
-      "publish_time": "2025-12-27T06:13:00.347",
-      "publish_time_utc": "2025-12-27T06:13:00.347",
+      "publish_time": "2025-12-28T15:30:00.000",
+      "publish_time_utc": "2025-12-28T15:30:00.000",
       "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"30.4\",\"Runs\":\"4\",\"Detail\":\"\",\"Isball\":true,\"Isboundary\":true,\"Bowler\":\"65051\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"FOUR! Into the gap! Richardson digs one short and on the bodyline. Harry Brook\u00a0gets into a really nice position on the back foot and pulls it away to deep back square leg for a boundary. England need 10 runs to win now.\",\"OverNo\":\"31\",\"BallNo\":\"4\",\"Ball_Number\":\"184\",\"This_Over\":\"0,0,0,4,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"13\",\"Balls\":\"15\",\"Fours\":\"2\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"2\",\"Balls\":\"7\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"4.4\",\"Maidens\":\"1\",\"Runs\":\"22\",\"Wickets\":\"2\",\"Ball_bowled\":\"28\",\"Dot_balls\":\"18\",\"id\":\"65051\"},\"Ball_Speed\":\"135.1\",\"Zone\":\"2\",\"Angle\":\"50\",\"Distance\":\"5\",\"Ball_Line_Length\":\"20,24,9,6,57,13\"}"
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"19.6\",\"Runs\":\"6\",\"Detail\":\"\",\"Isball\":true,\"Isboundary\":true,\"Bowler\":\"89744\",\"Batsman\":\"59348\",\"Bowler_Name\":\"Kawya Kavindi\",\"Batsman_Name\":\"Harmanpreet Kaur\",\"Commentary\":\"SIX! A fitting end! Kavindi bowls full and wide, and Harmanpreet smashes it over long-off for a massive six! India finish on 221/2!\",\"OverNo\":\"20\",\"BallNo\":\"6\",\"Ball_Number\":\"120\",\"This_Over\":\"2,1,6,1,4,6,\",\"Batsman_Details\":{\"name\":\"Harmanpreet Kaur\",\"Runs\":\"16\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"1\",\"id\":\"59348\"},\"Non_Striker_Details\":{\"name\":\"Richa Ghosh\",\"Runs\":\"40\",\"Balls\":\"16\",\"Fours\":\"4\",\"Sixes\":\"3\",\"id\":\"74530\"},\"Bowler_Details\":{\"name\":\"Kawya Kavindi\",\"Overs\":\"4.0\",\"Maidens\":\"0\",\"Runs\":\"43\",\"Wickets\":\"0\",\"Ball_bowled\":\"24\",\"Dot_balls\":\"6\",\"id\":\"89744\"},\"Ball_Speed\":\"108.5\",\"Zone\":\"5\",\"Angle\":\"210\",\"Distance\":\"5\",\"is_over_end\":true}"
       },
       "tags": []
     },
     {
-      "id": 40439263,
-      "asset_order": 2537,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "30.3 Jhye Richardson to Harry Brook,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:12:26.103",
-      "publish_time_utc": "2025-12-27T06:12:26.103",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"30.3\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Another full ball, slower one at 109.4 kph, outside off, Brook drags it across but mistimes it along the ground to mid on.\",\"OverNo\":\"31\",\"BallNo\":\"3\",\"Ball_Number\":\"183\",\"This_Over\":\"0,0,0,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"9\",\"Balls\":\"14\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"2\",\"Balls\":\"7\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"4.3\",\"Maidens\":\"1\",\"Runs\":\"18\",\"Wickets\":\"2\",\"Ball_bowled\":\"27\",\"Dot_balls\":\"18\",\"id\":\"65051\"},\"Ball_Speed\":\"109.4\",\"Zone\":\"7\",\"Angle\":\"290\",\"Distance\":\"3\",\"Ball_Line_Length\":\"13,4,10,6,34,11\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439236,
-      "asset_order": 2534,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "30.2 Jhye Richardson to Harry Brook,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:11:52.833",
-      "publish_time_utc": "2025-12-27T06:11:52.833",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"30.2\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Brook advances on this full delivery, and heaves it off the inner half of the bat, but Scott Boland\u00a0slides to his left and cuts it off from mid on.\",\"OverNo\":\"31\",\"BallNo\":\"2\",\"Ball_Number\":\"182\",\"This_Over\":\"0,0,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"9\",\"Balls\":\"13\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"2\",\"Balls\":\"7\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"4.2\",\"Maidens\":\"1\",\"Runs\":\"18\",\"Wickets\":\"2\",\"Ball_bowled\":\"26\",\"Dot_balls\":\"17\",\"id\":\"65051\"},\"Ball_Speed\":\"136.9\",\"Zone\":\"7\",\"Angle\":\"282\",\"Distance\":\"3\",\"Ball_Line_Length\":\"19,3,11,7,41,15\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439213,
-      "asset_order": 2531,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "30.1 Jhye Richardson to Harry Brook,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:11:16.503",
-      "publish_time_utc": "2025-12-27T06:11:16.503",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"30.1\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Tails in on middle and leg, on a fractionally fuller length. Harry Brook\u00a0solidly blocks it right under the bat.\",\"OverNo\":\"31\",\"BallNo\":\"1\",\"Ball_Number\":\"181\",\"This_Over\":\"0,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"9\",\"Balls\":\"12\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"2\",\"Balls\":\"7\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"4.1\",\"Maidens\":\"1\",\"Runs\":\"18\",\"Wickets\":\"2\",\"Ball_bowled\":\"25\",\"Dot_balls\":\"16\",\"id\":\"65051\"},\"Ball_Speed\":\"131.6\",\"Zone\":\"7\",\"Angle\":\"278\",\"Distance\":\"3\",\"Ball_Line_Length\":\"18,4,10,7,41,16\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439192,
-      "asset_order": 2529,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "29.6 Mitchell Starc to Ben Stokes,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:10:18.087",
-      "publish_time_utc": "2025-12-27T06:10:18.087",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.6\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"10053\",\"Batsman\":\"10130\",\"Bowler_Name\":\"Mitchell Starc\",\"Batsman_Name\":\"Ben Stokes\",\"Commentary\":\"Pitched fuller and around off, Stokes smashes it down the ground, and beats Starc's attempt to stop on his follow-through, but cannot get past the\u00a0mid off fielder.\",\"Over_Summary\":{\"Over\":\"30\",\"Runs\":\"3\",\"Wickets\":\"0\",\"Score\":\"161/5\"},\"OverNo\":\"30\",\"BallNo\":\"6\",\"Ball_Number\":\"180\",\"This_Over\":\"1,0,0,0,2,0,\",\"Batsman_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"2\",\"Balls\":\"7\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"9\",\"Balls\":\"11\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Mitchell Starc\",\"Overs\":\"8.6\",\"Maidens\":\"0\",\"Runs\":\"46\",\"Wickets\":\"1\",\"Ball_bowled\":\"54\",\"Dot_balls\":\"31\",\"id\":\"10053\"},\"Ball_Speed\":\"141.0\",\"Zone\":\"6\",\"Angle\":\"257\",\"Distance\":\"3\",\"Ball_Line_Length\":\"23,3,29,3,35,23\",\"is_over_end\":true}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439183,
-      "asset_order": 2526,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "29.5 Mitchell Starc to Ben Stokes,2 Runs",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:09:35.79",
-      "publish_time_utc": "2025-12-27T06:09:35.79",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.5\",\"Runs\":\"2\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"10053\",\"Batsman\":\"10130\",\"Bowler_Name\":\"Mitchell Starc\",\"Batsman_Name\":\"Ben Stokes\",\"Commentary\":\"The length is dragged back, on the pads, Ben Stokes\u00a0steers it through square leg for a couple of quick runs.\",\"OverNo\":\"30\",\"BallNo\":\"5\",\"Ball_Number\":\"179\",\"This_Over\":\"1,0,0,0,2,\",\"Batsman_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"2\",\"Balls\":\"6\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"9\",\"Balls\":\"11\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Mitchell Starc\",\"Overs\":\"8.5\",\"Maidens\":\"0\",\"Runs\":\"46\",\"Wickets\":\"1\",\"Ball_bowled\":\"53\",\"Dot_balls\":\"30\",\"id\":\"10053\"},\"Ball_Speed\":\"139.6\",\"Zone\":\"8\",\"Angle\":\"356\",\"Distance\":\"4\",\"Ball_Line_Length\":\"22,4,29,11,41,22\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439174,
-      "asset_order": 2523,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "29.4 Mitchell Starc to Ben Stokes,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:08:42.397",
-      "publish_time_utc": "2025-12-27T06:08:42.397",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.4\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"10053\",\"Batsman\":\"10130\",\"Bowler_Name\":\"Mitchell Starc\",\"Batsman_Name\":\"Ben Stokes\",\"Commentary\":\"Aims the stumps, with a little bit of reverse on a fuller length. Ben Stokes\u00a0squeezes it out by jamming his bat down in time.\",\"OverNo\":\"30\",\"BallNo\":\"4\",\"Ball_Number\":\"178\",\"This_Over\":\"1,0,0,0,\",\"Batsman_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"0\",\"Balls\":\"5\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"9\",\"Balls\":\"11\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Mitchell Starc\",\"Overs\":\"8.4\",\"Maidens\":\"0\",\"Runs\":\"44\",\"Wickets\":\"1\",\"Ball_bowled\":\"52\",\"Dot_balls\":\"30\",\"id\":\"10053\"},\"Ball_Speed\":\"138.4\",\"Zone\":\"3\",\"Angle\":\"129\",\"Distance\":\"1\",\"Ball_Line_Length\":\"22,2,30,1,27,20\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439153,
-      "asset_order": 2520,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "29.3 Mitchell Starc to Ben Stokes,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:08:04.16",
-      "publish_time_utc": "2025-12-27T06:08:04.16",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.3\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"10053\",\"Batsman\":\"10130\",\"Bowler_Name\":\"Mitchell Starc\",\"Batsman_Name\":\"Ben Stokes\",\"Commentary\":\"Pushed down leg, full in length. Stokes misses to flick. Carey does extremely well behind the stumps with a full-length dive to his right.\",\"OverNo\":\"30\",\"BallNo\":\"3\",\"Ball_Number\":\"177\",\"This_Over\":\"1,0,0,\",\"Batsman_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"0\",\"Balls\":\"4\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"9\",\"Balls\":\"11\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Mitchell Starc\",\"Overs\":\"8.3\",\"Maidens\":\"0\",\"Runs\":\"44\",\"Wickets\":\"1\",\"Ball_bowled\":\"51\",\"Dot_balls\":\"29\",\"id\":\"10053\"},\"Ball_Speed\":\"140.6\",\"Ball_Line_Length\":\"13,2,29,8,31,13\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439130,
-      "asset_order": 2517,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "29.2 Mitchell Starc to Ben Stokes,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:07:16.807",
-      "publish_time_utc": "2025-12-27T06:07:16.807",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.2\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"10053\",\"Batsman\":\"10130\",\"Bowler_Name\":\"Mitchell Starc\",\"Batsman_Name\":\"Ben Stokes\",\"Commentary\":\"Over the stumps. A length ball, on off, Ben Stokes\u00a0steps out of the crease and eases it back to the bowler.\",\"OverNo\":\"30\",\"BallNo\":\"2\",\"Ball_Number\":\"176\",\"This_Over\":\"1,0,\",\"Batsman_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"0\",\"Balls\":\"3\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"9\",\"Balls\":\"11\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Mitchell Starc\",\"Overs\":\"8.2\",\"Maidens\":\"0\",\"Runs\":\"44\",\"Wickets\":\"1\",\"Ball_bowled\":\"50\",\"Dot_balls\":\"28\",\"id\":\"10053\"},\"Ball_Speed\":\"139.0\",\"Zone\":\"6\",\"Angle\":\"251\",\"Distance\":\"1\",\"Ball_Line_Length\":\"22,7,30,6,43,20\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439119,
-      "asset_order": 2515,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "29.1 Mitchell Starc to Harry Brook,1 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:06:21.547",
-      "publish_time_utc": "2025-12-27T06:06:21.547",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"29.1\",\"Runs\":\"1\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"10053\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Mitchell Starc\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Mitchell Starc\u00a0is back on with one last effort. Bowls from a wider angle from around the wickets. Short and angling into the batter, Harry hangs back and tucks it wide of mid-wicket for a single.\",\"OverNo\":\"30\",\"BallNo\":\"1\",\"Ball_Number\":\"175\",\"This_Over\":\"1,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"9\",\"Balls\":\"11\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"0\",\"Balls\":\"2\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Bowler_Details\":{\"name\":\"Mitchell Starc\",\"Overs\":\"8.1\",\"Maidens\":\"0\",\"Runs\":\"44\",\"Wickets\":\"1\",\"Ball_bowled\":\"49\",\"Dot_balls\":\"27\",\"id\":\"10053\"},\"Ball_Speed\":\"139.4\",\"Zone\":\"8\",\"Angle\":\"348\",\"Distance\":\"3\",\"Ball_Line_Length\":\"22,3,10,1,43,15\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439110,
-      "asset_order": 2512,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "28.6 Jhye Richardson to Ben Stokes,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:04:46.783",
-      "publish_time_utc": "2025-12-27T06:04:46.783",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"28.6\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"10130\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Ben Stokes\",\"Commentary\":\"A pinpoint yorker, in front of the stumps, Ben Stokes jams his bat down in time and shovels it out to the bowler. A rhythmic over from Richardson.\",\"Over_Summary\":{\"Over\":\"29\",\"Runs\":\"4\",\"Wickets\":\"1\",\"Score\":\"158/5\"},\"OverNo\":\"29\",\"BallNo\":\"8\",\"Ball_Number\":\"174\",\"This_Over\":\"1(1NB),0,1(1NB),2,0,0(W),0,0,\",\"Batsman_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"0\",\"Balls\":\"2\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"3.6\",\"Maidens\":\"1\",\"Runs\":\"18\",\"Wickets\":\"2\",\"Ball_bowled\":\"24\",\"Dot_balls\":\"15\",\"id\":\"65051\"},\"Ball_Speed\":\"136.5\",\"Zone\":\"7\",\"Angle\":\"293\",\"Distance\":\"1\",\"Ball_Line_Length\":\"22,1,10,5,26,20\",\"is_over_end\":true}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439087,
-      "asset_order": 2509,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "28.5 Jhye Richardson to Ben Stokes,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:04:11.483",
-      "publish_time_utc": "2025-12-27T06:04:11.483",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"28.5\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"10130\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Ben Stokes\",\"Commentary\":\"Speared fuller, on the leg stump line, watchfully pushed away to mid on by Stokes.\",\"OverNo\":\"29\",\"BallNo\":\"7\",\"Ball_Number\":\"173\",\"This_Over\":\"1(1NB),0,1(1NB),2,0,0(W),0,\",\"Batsman_Details\":{\"name\":\"Ben Stokes\",\"Runs\":\"0\",\"Balls\":\"1\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10130\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"3.5\",\"Maidens\":\"1\",\"Runs\":\"18\",\"Wickets\":\"2\",\"Ball_bowled\":\"23\",\"Dot_balls\":\"14\",\"id\":\"65051\"},\"Ball_Speed\":\"138.3\",\"Zone\":\"7\",\"Angle\":\"309\",\"Distance\":\"3\",\"Ball_Line_Length\":\"18,1,9,5,34,15\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439067,
-      "asset_order": 2508,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "The English skipper, Ben Stokes\u00a0is in.",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:02:25.767",
-      "publish_time_utc": "2025-12-27T06:02:25.767",
-      "custom_metadata": {
-        "asset": "{\"Over\":\"\",\"Runs\":\"\",\"Detail\":\"next_batsman_in\",\"Isball\":false,\"Bowler\":\"\",\"Batsman\":\"\",\"Bowler_Name\":\"\",\"Batsman_Name\":\"\",\"Commentary\":\"The English skipper, Ben Stokes\u00a0is in.\",\"Batsman_Details\":{},\"Non_Striker_Details\":{},\"Bowler_Details\":{}}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439025,
-      "asset_order": 2506,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": 3,
-      "headline": "28.4 Jhye Richardson to Joe Root,w,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:01:08.173",
-      "publish_time_utc": "2025-12-27T06:01:08.173",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"28.4\",\"Iswicket\":true,\"Dismissed\":\"10129\",\"Dismissed_Name\":\"Joe Root\",\"Runs\":\"0\",\"Detail\":\"w\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"OUT! LBW! Richardson gets his second wicket off a peach of a delivery. Tails back into the batter, on a good length, Joe Root\u00a0plays all over it to defend, as he is cramped up for room and wears on the thigh pad.\u00a0Jhye Richardson\u00a0and the Aussies behind the batter confidently appeal for LBW, and the umpire, Kumar Dharmasena, instantly raises his finger. And almost immediately, Joe Root\u00a0sends it for a review. No bat involved and the Ball Tracking comes up with the umpire's call as the ball clips the leg stump. Joe Root\u00a0cannot get his side through as he departs on 15 (38). England are 158/5, requiring another 17 runs.\",\"OverNo\":\"29\",\"BallNo\":\"6\",\"Ball_Number\":\"172\",\"This_Over\":\"1(1NB),0,1(1NB),2,0,0(W),\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"15\",\"Balls\":\"38\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"3.4\",\"Maidens\":\"1\",\"Runs\":\"18\",\"Wickets\":\"2\",\"Ball_bowled\":\"22\",\"Dot_balls\":\"13\",\"id\":\"65051\"},\"Ball_Speed\":\"135.2\",\"Ball_Line_Length\":\"22,5,11,11,43,14\",\"Dismissal_Type\":\"lbw\",\"Dismissal_Id\":\"lbw\",\"Review_Detail\":{\"Batting_Review_Count\":\"2\",\"Bowling_Review_Count\":\"2\",\"Team_Id\":3,\"Review_Type\":\"Team DRS\",\"Review_Type_Id\":2,\"Review_For\":\"LBW\",\"Review_For_Id\":3,\"Review_Output\":\"Retained\",\"Review_Output_Id\":3}}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40439003,
-      "asset_order": 2502,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "28.3 Jhye Richardson to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T06:00:26.81",
-      "publish_time_utc": "2025-12-27T06:00:26.81",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"28.3\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"An attempted yorker, on middle and leg, Root clips it to short mid-wicket.\",\"OverNo\":\"29\",\"BallNo\":\"5\",\"Ball_Number\":\"171\",\"This_Over\":\"1(1NB),0,1(1NB),2,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"15\",\"Balls\":\"37\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"3.3\",\"Maidens\":\"1\",\"Runs\":\"18\",\"Wickets\":\"1\",\"Ball_bowled\":\"21\",\"Dot_balls\":\"12\",\"id\":\"65051\"},\"Ball_Speed\":\"135.9\",\"Zone\":\"8\",\"Angle\":\"347\",\"Distance\":\"3\",\"Ball_Line_Length\":\"18,2,10,8,32,16\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438972,
-      "asset_order": 2500,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "28.2 Jhye Richardson to Joe Root,2 Runs",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:59:48.58",
-      "publish_time_utc": "2025-12-27T05:59:48.58",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"28.2\",\"Runs\":\"2\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Serves it up, full and on middle, Joe Root\u00a0gets on the front foot and cracks the straight drive with a stable head. The ball, however, slows in the outfield and mid on chases it down. Two taken.\",\"OverNo\":\"29\",\"BallNo\":\"4\",\"Ball_Number\":\"170\",\"This_Over\":\"1(1NB),0,1(1NB),2,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"15\",\"Balls\":\"36\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"3.2\",\"Maidens\":\"1\",\"Runs\":\"18\",\"Wickets\":\"1\",\"Ball_bowled\":\"20\",\"Dot_balls\":\"11\",\"id\":\"65051\"},\"Ball_Speed\":\"131.7\",\"Zone\":\"7\",\"Angle\":\"276\",\"Distance\":\"4\",\"Ball_Line_Length\":\"18,2,9,8,39,15\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438955,
-      "asset_order": 2498,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "28.2 Jhye Richardson to Joe Root,nb,1 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:58:59.14",
-      "publish_time_utc": "2025-12-27T05:58:59.14",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"28.2\",\"Runs\":\"1\",\"Detail\":\"nb\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"A bit of reverse on this one from a length, curving into the pads, Joe Root\u00a0tries to nudge it around the corner, but misses and wears high on the thigh pad. Oh dear! Another No Ball for overstepping. England need 19 more runs.\",\"OverNo\":\"29\",\"BallNo\":\"3\",\"Ball_Number\":\"170\",\"This_Over\":\"1(1NB),0,1(1NB), \",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"13\",\"Balls\":\"35\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"3.1\",\"Maidens\":\"1\",\"Runs\":\"16\",\"Wickets\":\"1\",\"Ball_bowled\":\"19\",\"Dot_balls\":\"11\",\"id\":\"65051\"},\"Ball_Speed\":\"131.0\",\"Ball_Line_Length\":\"24,7,10,12,44,16\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438934,
-      "asset_order": 2495,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "28.1 Jhye Richardson to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:58:18.797",
-      "publish_time_utc": "2025-12-27T05:58:18.797",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"28.1\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Lands it full and outside off, Joe Root leans on the front foot and drives it straight to extra cover.\",\"OverNo\":\"29\",\"BallNo\":\"2\",\"Ball_Number\":\"169\",\"This_Over\":\"1(1NB),0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"13\",\"Balls\":\"34\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"3.1\",\"Maidens\":\"1\",\"Runs\":\"15\",\"Wickets\":\"1\",\"Ball_bowled\":\"19\",\"Dot_balls\":\"11\",\"id\":\"65051\"},\"Ball_Speed\":\"131.5\",\"Zone\":\"5\",\"Angle\":\"190\",\"Distance\":\"3\",\"Ball_Line_Length\":\"14,3,11,4,41,12\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438927,
-      "asset_order": 2492,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "28.1 Jhye Richardson to Joe Root,nb,1 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:57:46.54",
-      "publish_time_utc": "2025-12-27T05:57:46.54",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"28.1\",\"Runs\":\"1\",\"Detail\":\"nb\",\"Isball\":true,\"Bowler\":\"65051\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Jhye Richardson\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"At 130.1 kph, this is bashed on a length, outside off. Joe Root\u00a0cuts it off the back foot to backward point. Richardson has overstepped and No Ball is signalled by the on-field umpire.\",\"OverNo\":\"29\",\"BallNo\":\"1\",\"Ball_Number\":\"169\",\"This_Over\":\"1(1NB),\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"13\",\"Balls\":\"33\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Jhye Richardson\",\"Overs\":\"3.0\",\"Maidens\":\"1\",\"Runs\":\"15\",\"Wickets\":\"1\",\"Ball_bowled\":\"18\",\"Dot_balls\":\"10\",\"id\":\"65051\"},\"Ball_Speed\":\"130.1\",\"Zone\":\"4\",\"Angle\":\"140\",\"Distance\":\"3\",\"Ball_Line_Length\":\"15,5,10,0,44,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438904,
-      "asset_order": 2489,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "27.6 Michael Neser to Harry Brook,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:56:34.957",
-      "publish_time_utc": "2025-12-27T05:56:34.957",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"27.6\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Angling on the leg stump, Harry flicks this full ball to mid on.\",\"Over_Summary\":{\"Over\":\"28\",\"Runs\":\"8\",\"Wickets\":\"0\",\"Score\":\"154/4\"},\"OverNo\":\"28\",\"BallNo\":\"6\",\"Ball_Number\":\"168\",\"This_Over\":\"2,4,1,0,1,0,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"10\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"13\",\"Balls\":\"32\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"7.6\",\"Maidens\":\"1\",\"Runs\":\"54\",\"Wickets\":\"0\",\"Ball_bowled\":\"48\",\"Dot_balls\":\"25\",\"id\":\"39447\"},\"Ball_Speed\":\"131.4\",\"Zone\":\"7\",\"Angle\":\"307\",\"Distance\":\"2\",\"Ball_Line_Length\":\"22,4,10,1,40,15\",\"is_over_end\":true}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438887,
-      "asset_order": 2487,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "27.5 Michael Neser to Joe Root,1 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:55:56.63",
-      "publish_time_utc": "2025-12-27T05:55:56.63",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"27.5\",\"Runs\":\"1\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Length ball, outside off, slashed off the back foot to the right of backward point. Jake Weatherald\u00a0dives to his right and makes a half stop, allowing the batters to rush\u00a0for a single.\",\"OverNo\":\"28\",\"BallNo\":\"5\",\"Ball_Number\":\"167\",\"This_Over\":\"2,4,1,0,1,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"13\",\"Balls\":\"32\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"9\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"7.5\",\"Maidens\":\"1\",\"Runs\":\"54\",\"Wickets\":\"0\",\"Ball_bowled\":\"47\",\"Dot_balls\":\"24\",\"id\":\"39447\"},\"Ball_Speed\":\"127.0\",\"Zone\":\"4\",\"Angle\":\"143\",\"Distance\":\"4\",\"Ball_Line_Length\":\"16,7,10,12,43,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438877,
-      "asset_order": 2486,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "27.4 Michael Neser to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:55:15.36",
-      "publish_time_utc": "2025-12-27T05:55:15.36",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"27.4\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Back of a length, fairly outside off, skidding through. Joe lines up for a square cut, but gets rushed into the shot and misses. Quick glovework by Carey who is up to the wickets. He flashes off the bails but Root is glued in\u00a0the crease.\",\"OverNo\":\"28\",\"BallNo\":\"4\",\"Ball_Number\":\"166\",\"This_Over\":\"2,4,1,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"31\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"9\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"7.4\",\"Maidens\":\"1\",\"Runs\":\"53\",\"Wickets\":\"0\",\"Ball_bowled\":\"46\",\"Dot_balls\":\"24\",\"id\":\"39447\"},\"Ball_Speed\":\"131.0\",\"Ball_Line_Length\":\"15,5,9,7,42,13\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438859,
-      "asset_order": 2481,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "27.3 Michael Neser to Harry Brook,1 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:54:40.053",
-      "publish_time_utc": "2025-12-27T05:54:40.053",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"27.3\",\"Runs\":\"1\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Short of a length, outside off, Brook plays it late off the back foot and guides it with the pace to deep third for a single. England need 22 more.\",\"OverNo\":\"28\",\"BallNo\":\"3\",\"Ball_Number\":\"165\",\"This_Over\":\"2,4,1,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"8\",\"Balls\":\"9\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"30\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"7.3\",\"Maidens\":\"1\",\"Runs\":\"53\",\"Wickets\":\"0\",\"Ball_bowled\":\"45\",\"Dot_balls\":\"23\",\"id\":\"39447\"},\"Ball_Speed\":\"133.0\",\"Zone\":\"4\",\"Angle\":\"135\",\"Distance\":\"3\",\"Ball_Line_Length\":\"15,7,9,5,45,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438848,
-      "asset_order": 2478,
-      "flag": null,
+      "id": 50000002,
+      "asset_order": 117,
+      "flag": 1,
       "type": "Commentary",
       "source": "Commentary",
       "source_id": 2,
       "filter_id": 1,
-      "headline": "27.2 Michael Neser to Harry Brook,4 Runs",
+      "headline": "19.5 Kawya Kavindi to Harmanpreet Kaur,4 Runs",
       "body": "",
       "display_pic": null,
       "display_value": null,
-      "publish_time": "2025-12-27T05:53:57.58",
-      "publish_time_utc": "2025-12-27T05:53:57.58",
+      "publish_time": "2025-12-28T15:29:30.000",
+      "publish_time_utc": "2025-12-28T15:29:30.000",
       "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"27.2\",\"Runs\":\"4\",\"Detail\":\"\",\"Isball\":true,\"Isboundary\":true,\"Bowler\":\"39447\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"FOUR! That's punished with authority! A friendly half volley from Neser, around off. Harry Brook\u00a0accepts the invitation and smokes it over mid off for a cracking boundary. 150 UP FOR ENGLAND!\",\"OverNo\":\"28\",\"BallNo\":\"2\",\"Ball_Number\":\"164\",\"This_Over\":\"2,4,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"7\",\"Balls\":\"8\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"30\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"7.2\",\"Maidens\":\"1\",\"Runs\":\"52\",\"Wickets\":\"0\",\"Ball_bowled\":\"44\",\"Dot_balls\":\"23\",\"id\":\"39447\"},\"Ball_Speed\":\"133.9\",\"Zone\":\"5\",\"Angle\":\"221\",\"Distance\":\"5\",\"Ball_Line_Length\":\"16,4,10,1,40,13\"}"
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"19.5\",\"Runs\":\"4\",\"Detail\":\"\",\"Isball\":true,\"Isboundary\":true,\"Bowler\":\"89744\",\"Batsman\":\"59348\",\"Bowler_Name\":\"Kawya Kavindi\",\"Batsman_Name\":\"Harmanpreet Kaur\",\"Commentary\":\"FOUR! Harmanpreet steps out and drives beautifully through covers for a boundary!\",\"OverNo\":\"20\",\"BallNo\":\"5\",\"Ball_Number\":\"119\",\"This_Over\":\"2,1,6,1,4,\",\"Batsman_Details\":{\"name\":\"Harmanpreet Kaur\",\"Runs\":\"10\",\"Balls\":\"9\",\"Fours\":\"1\",\"Sixes\":\"0\",\"id\":\"59348\"},\"Ball_Speed\":\"112.3\"}"
       },
       "tags": []
     },
     {
-      "id": 40438841,
-      "asset_order": 2475,
+      "id": 50000003,
+      "asset_order": 114,
       "flag": null,
       "type": "Commentary",
       "source": "Commentary",
       "source_id": 2,
       "filter_id": null,
-      "headline": "27.1 Michael Neser to Harry Brook,2 Runs",
+      "headline": "19.4 Kawya Kavindi to Richa Ghosh,1 Run",
       "body": "",
       "display_pic": null,
       "display_value": null,
-      "publish_time": "2025-12-27T05:53:22.303",
-      "publish_time_utc": "2025-12-27T05:53:22.303",
+      "publish_time": "2025-12-28T15:29:00.000",
+      "publish_time_utc": "2025-12-28T15:29:00.000",
       "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"27.1\",\"Runs\":\"2\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Just outside off, on a good length, Brook stands deep in the crease and guides it between gully and backward point for a couple of runs.\",\"OverNo\":\"28\",\"BallNo\":\"1\",\"Ball_Number\":\"163\",\"This_Over\":\"2,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"3\",\"Balls\":\"7\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"30\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"7.1\",\"Maidens\":\"1\",\"Runs\":\"48\",\"Wickets\":\"0\",\"Ball_bowled\":\"43\",\"Dot_balls\":\"23\",\"id\":\"39447\"},\"Zone\":\"3\",\"Angle\":\"133\",\"Distance\":\"4\",\"Ball_Line_Length\":\"14,5,10,10,43,12\"}"
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"19.4\",\"Runs\":\"1\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"89744\",\"Batsman\":\"74530\",\"Bowler_Name\":\"Kawya Kavindi\",\"Batsman_Name\":\"Richa Ghosh\",\"Commentary\":\"Worked away to deep mid-wicket for a single. Ghosh retains the strike with 2 balls remaining.\",\"OverNo\":\"20\",\"BallNo\":\"4\",\"Ball_Number\":\"118\",\"This_Over\":\"2,1,6,1,\",\"Batsman_Details\":{\"name\":\"Richa Ghosh\",\"Runs\":\"40\",\"Balls\":\"16\",\"Fours\":\"4\",\"Sixes\":\"3\",\"id\":\"74530\"},\"Ball_Speed\":\"110.8\"}"
       },
       "tags": []
     },
     {
-      "id": 40438834,
-      "asset_order": 2473,
+      "id": 50000004,
+      "asset_order": 111,
+      "flag": 2,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": 2,
+      "headline": "19.3 Kawya Kavindi to Richa Ghosh,6 Runs",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-28T15:28:30.000",
+      "publish_time_utc": "2025-12-28T15:28:30.000",
+      "custom_metadata": {
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"19.3\",\"Runs\":\"6\",\"Detail\":\"\",\"Isball\":true,\"Isboundary\":true,\"Bowler\":\"89744\",\"Batsman\":\"74530\",\"Bowler_Name\":\"Kawya Kavindi\",\"Batsman_Name\":\"Richa Ghosh\",\"Commentary\":\"SIX! Richa Ghosh is on fire! She clears the long-on boundary with ease! What a player she is proving to be!\",\"OverNo\":\"20\",\"BallNo\":\"3\",\"Ball_Number\":\"117\",\"This_Over\":\"2,1,6,\",\"Batsman_Details\":{\"name\":\"Richa Ghosh\",\"Runs\":\"39\",\"Balls\":\"15\",\"Fours\":\"4\",\"Sixes\":\"3\",\"id\":\"74530\"},\"Ball_Speed\":\"109.2\",\"Zone\":\"6\",\"Angle\":\"260\",\"Distance\":\"5\"}"
+      },
+      "tags": []
+    },
+    {
+      "id": 50000005,
+      "asset_order": 108,
       "flag": null,
       "type": "Commentary",
       "source": "Commentary",
       "source_id": 2,
       "filter_id": null,
-      "headline": "26.6 Scott Boland to Joe Root,0 Run",
+      "headline": "19.2 Kawya Kavindi to Harmanpreet Kaur,1 Run",
       "body": "",
       "display_pic": null,
       "display_value": null,
-      "publish_time": "2025-12-27T05:52:14.82",
-      "publish_time_utc": "2025-12-27T05:52:14.82",
+      "publish_time": "2025-12-28T15:28:00.000",
+      "publish_time_utc": "2025-12-28T15:28:00.000",
       "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"26.6\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Length-delivery, on off, Joe Root\u00a0lets the ball arrive and calmly taps it out to point.\",\"Over_Summary\":{\"Over\":\"27\",\"Runs\":\"5\",\"Wickets\":\"0\",\"Score\":\"146/4\"},\"OverNo\":\"27\",\"BallNo\":\"6\",\"Ball_Number\":\"162\",\"This_Over\":\"0,4(4B),1,0,0,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"30\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"1\",\"Balls\":\"6\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"8.6\",\"Maidens\":\"0\",\"Runs\":\"29\",\"Wickets\":\"2\",\"Ball_bowled\":\"54\",\"Dot_balls\":\"36\",\"id\":\"61998\"},\"Ball_Speed\":\"135.4\",\"Zone\":\"5\",\"Angle\":\"206\",\"Distance\":\"2\",\"Ball_Line_Length\":\"18,2,10,-1,40,15\",\"is_over_end\":true}"
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"19.2\",\"Runs\":\"1\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"89744\",\"Batsman\":\"59348\",\"Bowler_Name\":\"Kawya Kavindi\",\"Batsman_Name\":\"Harmanpreet Kaur\",\"Commentary\":\"Pushed to long-on for a single.\",\"OverNo\":\"20\",\"BallNo\":\"2\",\"Ball_Number\":\"116\",\"This_Over\":\"2,1,\",\"Batsman_Details\":{\"name\":\"Harmanpreet Kaur\",\"Runs\":\"5\",\"Balls\":\"8\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"59348\"},\"Ball_Speed\":\"111.5\"}"
       },
       "tags": []
     },
     {
-      "id": 40438829,
-      "asset_order": 2470,
+      "id": 50000006,
+      "asset_order": 105,
       "flag": null,
       "type": "Commentary",
       "source": "Commentary",
       "source_id": 2,
       "filter_id": null,
-      "headline": "26.5 Scott Boland to Joe Root,0 Run",
+      "headline": "19.1 Kawya Kavindi to Harmanpreet Kaur,2 Runs",
       "body": "",
       "display_pic": null,
       "display_value": null,
-      "publish_time": "2025-12-27T05:51:32.51",
-      "publish_time_utc": "2025-12-27T05:51:32.51",
+      "publish_time": "2025-12-28T15:27:30.000",
+      "publish_time_utc": "2025-12-28T15:27:30.000",
       "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"26.5\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Angles in and around off, on a fuller length. Root drives it straight, and Boland stops it with his left hand on the follow-through.\",\"OverNo\":\"27\",\"BallNo\":\"5\",\"Ball_Number\":\"161\",\"This_Over\":\"0,4(4B),1,0,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"29\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"1\",\"Balls\":\"6\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"8.5\",\"Maidens\":\"0\",\"Runs\":\"29\",\"Wickets\":\"2\",\"Ball_bowled\":\"53\",\"Dot_balls\":\"35\",\"id\":\"61998\"},\"Ball_Speed\":\"136.8\",\"Zone\":\"6\",\"Angle\":\"241\",\"Distance\":\"1\",\"Ball_Line_Length\":\"16,4,10,5,40,13\"}"
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"19.1\",\"Runs\":\"2\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"89744\",\"Batsman\":\"59348\",\"Bowler_Name\":\"Kawya Kavindi\",\"Batsman_Name\":\"Harmanpreet Kaur\",\"Commentary\":\"Driven through the covers for a couple. India building towards a big total.\",\"OverNo\":\"20\",\"BallNo\":\"1\",\"Ball_Number\":\"115\",\"This_Over\":\"2,\",\"Batsman_Details\":{\"name\":\"Harmanpreet Kaur\",\"Runs\":\"4\",\"Balls\":\"7\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"59348\"},\"Ball_Speed\":\"113.7\"}"
       },
       "tags": []
     },
     {
-      "id": 40438824,
-      "asset_order": 2468,
+      "id": 50000007,
+      "asset_order": 102,
       "flag": null,
       "type": "Commentary",
       "source": "Commentary",
       "source_id": 2,
       "filter_id": null,
-      "headline": "26.4 Scott Boland to Joe Root,0 Run",
+      "headline": "18.6 Kavisha Dilhari to Richa Ghosh,6 Runs",
       "body": "",
       "display_pic": null,
       "display_value": null,
-      "publish_time": "2025-12-27T05:50:52.173",
-      "publish_time_utc": "2025-12-27T05:50:52.173",
+      "publish_time": "2025-12-28T15:27:00.000",
+      "publish_time_utc": "2025-12-28T15:27:00.000",
       "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"26.4\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Just outside off, a fraction short, Joe Root\u00a0waits back and steers it to the cover-point region.\",\"OverNo\":\"27\",\"BallNo\":\"4\",\"Ball_Number\":\"160\",\"This_Over\":\"0,4(4B),1,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"28\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"1\",\"Balls\":\"6\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"8.4\",\"Maidens\":\"0\",\"Runs\":\"29\",\"Wickets\":\"2\",\"Ball_bowled\":\"52\",\"Dot_balls\":\"34\",\"id\":\"61998\"},\"Zone\":\"5\",\"Angle\":\"206\",\"Distance\":\"2\",\"Ball_Line_Length\":\"19,4,10,5,45,15\"}"
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"18.6\",\"Runs\":\"6\",\"Detail\":\"\",\"Isball\":true,\"Isboundary\":true,\"Bowler\":\"69351\",\"Batsman\":\"74530\",\"Bowler_Name\":\"Kavisha Dilhari\",\"Batsman_Name\":\"Richa Ghosh\",\"Commentary\":\"SIX MORE! Richa Ghosh is on an absolute rampage! Over long-on for another maximum!\",\"Over_Summary\":{\"Over\":\"19\",\"Runs\":\"23\",\"Wickets\":\"0\",\"Score\":\"201/2\"},\"OverNo\":\"19\",\"BallNo\":\"6\",\"Ball_Number\":\"114\",\"is_over_end\":true,\"Batsman_Details\":{\"name\":\"Richa Ghosh\",\"Runs\":\"33\",\"Balls\":\"14\",\"Fours\":\"4\",\"Sixes\":\"2\",\"id\":\"74530\"},\"Ball_Speed\":\"85.4\",\"Zone\":\"6\",\"Angle\":\"265\",\"Distance\":\"5\"}"
       },
       "tags": []
     },
     {
-      "id": 40438815,
-      "asset_order": 2464,
+      "id": 50000008,
+      "asset_order": 99,
       "flag": null,
       "type": "Commentary",
       "source": "Commentary",
       "source_id": 2,
       "filter_id": null,
-      "headline": "26.3 Scott Boland to Harry Brook,1 Run",
+      "headline": "18.5 Kavisha Dilhari to Richa Ghosh,6 Runs",
       "body": "",
       "display_pic": null,
       "display_value": null,
-      "publish_time": "2025-12-27T05:50:13.917",
-      "publish_time_utc": "2025-12-27T05:50:13.917",
+      "publish_time": "2025-12-28T15:26:30.000",
+      "publish_time_utc": "2025-12-28T15:26:30.000",
       "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"26.3\",\"Runs\":\"1\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"On a good length, on middle and leg, Harry gets across and clips it off the inner half into the leg side for a quick single.\",\"OverNo\":\"27\",\"BallNo\":\"3\",\"Ball_Number\":\"159\",\"This_Over\":\"0,4(4B),1,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"1\",\"Balls\":\"6\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"27\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"8.3\",\"Maidens\":\"0\",\"Runs\":\"29\",\"Wickets\":\"2\",\"Ball_bowled\":\"51\",\"Dot_balls\":\"33\",\"id\":\"61998\"},\"Ball_Speed\":\"134.8\",\"Zone\":\"1\",\"Angle\":\"41\",\"Distance\":\"3\",\"Ball_Line_Length\":\"17,2,10,10,43,15\"}"
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"18.5\",\"Runs\":\"6\",\"Detail\":\"\",\"Isball\":true,\"Isboundary\":true,\"Bowler\":\"69351\",\"Batsman\":\"74530\",\"Bowler_Name\":\"Kavisha Dilhari\",\"Batsman_Name\":\"Richa Ghosh\",\"Commentary\":\"SIX! What a hit! Richa Ghosh clears the deep mid-wicket boundary with a powerful pull shot!\",\"OverNo\":\"19\",\"BallNo\":\"5\",\"Ball_Number\":\"113\",\"Batsman_Details\":{\"name\":\"Richa Ghosh\",\"Runs\":\"27\",\"Balls\":\"13\",\"Fours\":\"4\",\"Sixes\":\"1\",\"id\":\"74530\"},\"Ball_Speed\":\"88.2\",\"Zone\":\"7\",\"Angle\":\"290\",\"Distance\":\"5\"}"
       },
       "tags": []
     },
     {
-      "id": 40438806,
-      "asset_order": 2461,
+      "id": 50000009,
+      "asset_order": 96,
+      "flag": 1,
+      "type": "Commentary",
+      "source": "Commentary",
+      "source_id": 2,
+      "filter_id": 1,
+      "headline": "18.4 Kavisha Dilhari to Richa Ghosh,4 Runs",
+      "body": "",
+      "display_pic": null,
+      "display_value": null,
+      "publish_time": "2025-12-28T15:26:00.000",
+      "publish_time_utc": "2025-12-28T15:26:00.000",
+      "custom_metadata": {
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"18.4\",\"Runs\":\"4\",\"Detail\":\"\",\"Isball\":true,\"Isboundary\":true,\"Bowler\":\"69351\",\"Batsman\":\"74530\",\"Bowler_Name\":\"Kavisha Dilhari\",\"Batsman_Name\":\"Richa Ghosh\",\"Commentary\":\"FOUR! Ghosh sweeps it fine for a boundary. The fielder at deep backward square leg had no chance.\",\"OverNo\":\"19\",\"BallNo\":\"4\",\"Ball_Number\":\"112\",\"Batsman_Details\":{\"name\":\"Richa Ghosh\",\"Runs\":\"21\",\"Balls\":\"12\",\"Fours\":\"4\",\"Sixes\":\"0\",\"id\":\"74530\"},\"Ball_Speed\":\"86.5\"}"
+      },
+      "tags": []
+    },
+    {
+      "id": 50000010,
+      "asset_order": 93,
       "flag": null,
       "type": "Commentary",
       "source": "Commentary",
       "source_id": 2,
       "filter_id": null,
-      "headline": "26.2 Scott Boland to Harry Brook,b,4 Runs",
+      "headline": "18.3 Kavisha Dilhari to Richa Ghosh,1 Run",
       "body": "",
       "display_pic": null,
       "display_value": null,
-      "publish_time": "2025-12-27T05:49:16.49",
-      "publish_time_utc": "2025-12-27T05:49:16.49",
+      "publish_time": "2025-12-28T15:25:30.000",
+      "publish_time_utc": "2025-12-28T15:25:30.000",
       "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"26.2\",\"Runs\":\"4\",\"Detail\":\"b\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"FOUR BYES! That will help England a lot. Straight down leg, on a length, kicking up a bit from the pitch. Harry Brook\u00a0shuffles across and tries to lap it behind, but the ball beats his bat and with Carey standing up to the wickets, he has very little reaction time to pluck the ball to his left. It races behind to the deep fine leg fence.\",\"OverNo\":\"27\",\"BallNo\":\"2\",\"Ball_Number\":\"158\",\"This_Over\":\"0,4(4B),\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"5\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"27\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"8.2\",\"Maidens\":\"0\",\"Runs\":\"28\",\"Wickets\":\"2\",\"Ball_bowled\":\"50\",\"Dot_balls\":\"33\",\"id\":\"61998\"},\"Ball_Speed\":\"137.0\",\"Ball_Line_Length\":\"26,11,9,3,52,16\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438799,
-      "asset_order": 2458,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "26.1 Scott Boland to Harry Brook,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:48:37.223",
-      "publish_time_utc": "2025-12-27T05:48:37.223",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"26.1\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"JUST SHORT! Too full from Neser, around off, Brook smashes it flatly on the bounce to mid off where Inglis makes a diving stop to his right.\",\"OverNo\":\"27\",\"BallNo\":\"1\",\"Ball_Number\":\"157\",\"This_Over\":\"0,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"4\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"27\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"8.1\",\"Maidens\":\"0\",\"Runs\":\"28\",\"Wickets\":\"2\",\"Ball_bowled\":\"49\",\"Dot_balls\":\"32\",\"id\":\"61998\"},\"Ball_Speed\":\"133.0\",\"Zone\":\"6\",\"Angle\":\"247\",\"Distance\":\"3\",\"Ball_Line_Length\":\"16,1,9,6,39,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438789,
-      "asset_order": 2457,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "DRINKS BREAK. We are down to the final hour of",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:45:47.037",
-      "publish_time_utc": "2025-12-27T05:45:47.037",
-      "custom_metadata": {
-        "asset": "{\"Over\":\"\",\"Runs\":\"\",\"Detail\":\"drinks\",\"Isball\":false,\"Bowler\":\"\",\"Batsman\":\"\",\"Bowler_Name\":\"\",\"Batsman_Name\":\"\",\"Commentary\":\"DRINKS BREAK. We are down to the final hour of play, and England are in touching distance of their first Test win in 14 years on Australian soil. Jacob Bethell\u00a0played a fluent knock, but couldn't finish off for his side. The young lad will be pleased to have some runs behind his name, at least. It's now on England's two best batters to get the job done without any hiccups. As far as Australia are concerned, they will fight till the last drop of blood. A wicket or two here will again make things a bit interesting.\",\"Batsman_Details\":{},\"Non_Striker_Details\":{},\"Bowler_Details\":{}}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438777,
-      "asset_order": 2455,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "25.6 Michael Neser to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:44:14.453",
-      "publish_time_utc": "2025-12-27T05:44:14.453",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"25.6\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Over off, on a hard length, Joe rises with the bounce and dabs it to point.\",\"Over_Summary\":{\"Over\":\"26\",\"Runs\":\"4\",\"Wickets\":\"0\",\"Score\":\"141/4\"},\"OverNo\":\"26\",\"BallNo\":\"6\",\"Ball_Number\":\"156\",\"This_Over\":\"0,0,4(4B),0,0,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"27\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"3\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"6.6\",\"Maidens\":\"1\",\"Runs\":\"46\",\"Wickets\":\"0\",\"Ball_bowled\":\"42\",\"Dot_balls\":\"23\",\"id\":\"39447\"},\"Ball_Speed\":\"129.5\",\"Zone\":\"4\",\"Angle\":\"169\",\"Distance\":\"3\",\"Ball_Line_Length\":\"17,6,10,4,42,14\",\"is_over_end\":true}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438771,
-      "asset_order": 2453,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "25.5 Michael Neser to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:43:37.24",
-      "publish_time_utc": "2025-12-27T05:43:37.24",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"25.5\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Seaming back in, on a good length, on middle. Root is solid in defence.\",\"OverNo\":\"26\",\"BallNo\":\"5\",\"Ball_Number\":\"155\",\"This_Over\":\"0,0,4(4B),0,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"26\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"3\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"6.5\",\"Maidens\":\"0\",\"Runs\":\"46\",\"Wickets\":\"0\",\"Ball_bowled\":\"41\",\"Dot_balls\":\"22\",\"id\":\"39447\"},\"Ball_Speed\":\"130.2\",\"Zone\":\"6\",\"Angle\":\"229\",\"Distance\":\"2\",\"Ball_Line_Length\":\"18,7,9,8,44,15\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438763,
-      "asset_order": 2451,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "25.4 Michael Neser to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:43:05.03",
-      "publish_time_utc": "2025-12-27T05:43:05.03",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"25.4\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Fuller and attacking the stumps, kept out with a straight bat by Joe.\",\"OverNo\":\"26\",\"BallNo\":\"4\",\"Ball_Number\":\"154\",\"This_Over\":\"0,0,4(4B),0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"25\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"3\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"6.4\",\"Maidens\":\"0\",\"Runs\":\"46\",\"Wickets\":\"0\",\"Ball_bowled\":\"40\",\"Dot_balls\":\"21\",\"id\":\"39447\"},\"Ball_Speed\":\"130.7\",\"Zone\":\"6\",\"Angle\":\"267\",\"Distance\":\"1\",\"Ball_Line_Length\":\"18,3,10,8,42,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438755,
-      "asset_order": 2448,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "25.3 Michael Neser to Joe Root,b,4 Runs",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:42:35.853",
-      "publish_time_utc": "2025-12-27T05:42:35.853",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"25.3\",\"Runs\":\"4\",\"Detail\":\"b\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"FOUR BYES! Pushed down leg by Neser with the keeper up to the stumps. Root fails to lay any bat on the tickle. Alex Carey\u00a0gets both gloves to his left to make the stop, but the ball clips him on the fingertips and goes behind into the fence.\",\"OverNo\":\"26\",\"BallNo\":\"3\",\"Ball_Number\":\"153\",\"This_Over\":\"0,0,4(4B),\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"24\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"3\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"6.3\",\"Maidens\":\"0\",\"Runs\":\"46\",\"Wickets\":\"0\",\"Ball_bowled\":\"39\",\"Dot_balls\":\"20\",\"id\":\"39447\"},\"Ball_Line_Length\":\"27,3,10,4,41,21\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438746,
-      "asset_order": 2445,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "25.2 Michael Neser to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:41:52.567",
-      "publish_time_utc": "2025-12-27T05:41:52.567",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"25.2\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Curving back in, on a good length, on off and middle. Root brings his bat out in front to defend.\",\"OverNo\":\"26\",\"BallNo\":\"2\",\"Ball_Number\":\"152\",\"This_Over\":\"0,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"23\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"3\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"6.2\",\"Maidens\":\"0\",\"Runs\":\"46\",\"Wickets\":\"0\",\"Ball_bowled\":\"38\",\"Dot_balls\":\"19\",\"id\":\"39447\"},\"Ball_Speed\":\"130.8\",\"Zone\":\"6\",\"Angle\":\"238\",\"Distance\":\"1\",\"Ball_Line_Length\":\"17,1,10,8,43,13\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438737,
-      "asset_order": 2442,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "25.1 Michael Neser to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:41:16.4",
-      "publish_time_utc": "2025-12-27T05:41:16.4",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"25.1\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"On top of off, on a good length, stabbed down on the off side.\",\"OverNo\":\"26\",\"BallNo\":\"1\",\"Ball_Number\":\"151\",\"This_Over\":\"0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"22\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"3\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"6.1\",\"Maidens\":\"0\",\"Runs\":\"46\",\"Wickets\":\"0\",\"Ball_bowled\":\"37\",\"Dot_balls\":\"18\",\"id\":\"39447\"},\"Ball_Speed\":\"131.1\",\"Zone\":\"4\",\"Angle\":\"168\",\"Distance\":\"3\",\"Ball_Line_Length\":\"16,4,10,12,43,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438732,
-      "asset_order": 2439,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "24.6 Scott Boland to Harry Brook,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:40:24.967",
-      "publish_time_utc": "2025-12-27T05:40:24.967",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"24.6\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Pitched up, outside off, Harry steps out of his crease and pushes out in front. Gets it off the outer half to cover.\",\"Over_Summary\":{\"Over\":\"25\",\"Runs\":\"1\",\"Wickets\":\"1\",\"Score\":\"137/4\"},\"OverNo\":\"25\",\"BallNo\":\"6\",\"Ball_Number\":\"150\",\"This_Over\":\"0,1,0(W),0,0,0,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"3\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"21\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"7.6\",\"Maidens\":\"0\",\"Runs\":\"28\",\"Wickets\":\"2\",\"Ball_bowled\":\"48\",\"Dot_balls\":\"31\",\"id\":\"61998\"},\"Ball_Speed\":\"136.3\",\"Zone\":\"5\",\"Angle\":\"207\",\"Distance\":\"2\",\"Ball_Line_Length\":\"16,4,10,4,41,14\",\"is_over_end\":true}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438723,
-      "asset_order": 2436,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "24.5 Scott Boland to Harry Brook,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:39:36.62",
-      "publish_time_utc": "2025-12-27T05:39:36.62",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"24.5\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"On a good length, on off, Brook stays on the back foot this time to keep it out. The ball nips back and Harry\u00a0wears it high on the back pad.\",\"OverNo\":\"25\",\"BallNo\":\"5\",\"Ball_Number\":\"149\",\"This_Over\":\"0,1,0(W),0,0,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"2\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"21\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"7.5\",\"Maidens\":\"0\",\"Runs\":\"28\",\"Wickets\":\"2\",\"Ball_bowled\":\"47\",\"Dot_balls\":\"30\",\"id\":\"61998\"},\"Ball_Speed\":\"137.4\",\"Ball_Line_Length\":\"17,7,10,6,43,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438716,
-      "asset_order": 2433,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "24.4 Scott Boland to Harry Brook,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:39:03.243",
-      "publish_time_utc": "2025-12-27T05:39:03.243",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"24.4\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"66374\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Harry Brook\",\"Commentary\":\"Goes past the bat! Full and in the channel, Brook walks down the track and across his stumps to cover the line. Gets beaten on the outside edge as the ball leaves him.\",\"OverNo\":\"25\",\"BallNo\":\"4\",\"Ball_Number\":\"148\",\"This_Over\":\"0,1,0(W),0,\",\"Batsman_Details\":{\"name\":\"Harry Brook\",\"Runs\":\"0\",\"Balls\":\"1\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"66374\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"21\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"7.4\",\"Maidens\":\"0\",\"Runs\":\"28\",\"Wickets\":\"2\",\"Ball_bowled\":\"46\",\"Dot_balls\":\"29\",\"id\":\"61998\"},\"Ball_Speed\":\"138.7\",\"Ball_Line_Length\":\"14,7,10,11,43,12\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438708,
-      "asset_order": 2432,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "Out goes Bethell and in walks Harry Brook\u00a0at number 6.",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:38:00.78",
-      "publish_time_utc": "2025-12-27T05:38:00.78",
-      "custom_metadata": {
-        "asset": "{\"Over\":\"\",\"Runs\":\"\",\"Detail\":\"next_batsman_in\",\"Isball\":false,\"Bowler\":\"\",\"Batsman\":\"\",\"Bowler_Name\":\"\",\"Batsman_Name\":\"\",\"Commentary\":\"Out goes Bethell and in walks Harry Brook\u00a0at number 6. He stepped out of the crease on his first ball in the first innings when England were 8/3. Let's see what he does this time around...\",\"Batsman_Details\":{},\"Non_Striker_Details\":{},\"Bowler_Details\":{}}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438703,
-      "asset_order": 2429,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": 3,
-      "headline": "24.3 Scott Boland to Jacob Bethell,w,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:36:55.37",
-      "publish_time_utc": "2025-12-27T05:36:55.37",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"24.3\",\"Iswicket\":true,\"Dismissed\":\"85736\",\"Dismissed_Name\":\"Jacob Bethell\",\"Runs\":\"0\",\"Detail\":\"w\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"85736\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Jacob Bethell\",\"Commentary\":\"OUT! CAUGHT! Jacob Bethell\u00a0admonishes himself\u00a0as he trudges off. On the fuller side, on middle. Bethell backs away to go hard through the off side. He slams it aerially and picks out Usman Khawaja\u00a0at cover, who stays low and holds onto the catch around his right knee. A fine and fluent\u00a040 (46) from Jacob Bethell.\u00a0England are now 4 down, needing 38 more runs.\",\"OverNo\":\"25\",\"BallNo\":\"3\",\"Ball_Number\":\"147\",\"This_Over\":\"0,1,0(W),\",\"Batsman_Details\":{\"name\":\"Jacob Bethell\",\"Runs\":\"40\",\"Balls\":\"46\",\"Fours\":\"5\",\"Sixes\":\"0\",\"id\":\"85736\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"21\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"7.3\",\"Maidens\":\"0\",\"Runs\":\"28\",\"Wickets\":\"2\",\"Ball_bowled\":\"45\",\"Dot_balls\":\"28\",\"id\":\"61998\"},\"Ball_Speed\":\"140.3\",\"Zone\":\"5\",\"Angle\":\"201\",\"Distance\":\"3\",\"Ball_Line_Length\":\"20,2,10,5,42,17\",\"Dismissal_Type\":\"caught\",\"Dismissal_Id\":\"ct\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438694,
-      "asset_order": 2426,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "24.2 Scott Boland to Joe Root,1 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:35:46.873",
-      "publish_time_utc": "2025-12-27T05:35:46.873",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"24.2\",\"Runs\":\"1\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Straightening a bit after pitching, on a back of a length. Joe is squared up in defence and the ball goes off the outside edge down to deep third for a single.\",\"OverNo\":\"25\",\"BallNo\":\"2\",\"Ball_Number\":\"146\",\"This_Over\":\"0,1,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"12\",\"Balls\":\"21\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Jacob Bethell\",\"Runs\":\"40\",\"Balls\":\"45\",\"Fours\":\"5\",\"Sixes\":\"0\",\"id\":\"85736\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"7.2\",\"Maidens\":\"0\",\"Runs\":\"28\",\"Wickets\":\"1\",\"Ball_bowled\":\"44\",\"Dot_balls\":\"27\",\"id\":\"61998\"},\"Ball_Speed\":\"136.6\",\"Zone\":\"3\",\"Angle\":\"114\",\"Distance\":\"4\",\"Ball_Line_Length\":\"16,4,11,10,41,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438675,
-      "asset_order": 2423,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "24.1 Scott Boland to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:35:10.657",
-      "publish_time_utc": "2025-12-27T05:35:10.657",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"24.1\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"61998\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Scott Boland\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"A bit of extra bounce and nibbling away, on a short of a length. Root manages to fend it down.\",\"OverNo\":\"25\",\"BallNo\":\"1\",\"Ball_Number\":\"145\",\"This_Over\":\"0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"11\",\"Balls\":\"20\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Jacob Bethell\",\"Runs\":\"40\",\"Balls\":\"45\",\"Fours\":\"5\",\"Sixes\":\"0\",\"id\":\"85736\"},\"Bowler_Details\":{\"name\":\"Scott Boland\",\"Overs\":\"7.1\",\"Maidens\":\"0\",\"Runs\":\"27\",\"Wickets\":\"1\",\"Ball_bowled\":\"43\",\"Dot_balls\":\"27\",\"id\":\"61998\"},\"Ball_Speed\":\"136.0\",\"Zone\":\"4\",\"Angle\":\"140\",\"Distance\":\"3\",\"Ball_Line_Length\":\"15,6,9,4,46,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438657,
-      "asset_order": 2421,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "23.6 Michael Neser to Jacob Bethell,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:34:08.193",
-      "publish_time_utc": "2025-12-27T05:34:08.193",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"23.6\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"85736\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Jacob Bethell\",\"Commentary\":\"Going away off the deck, on a back of a length. Jacob plays well inside the line and is beaten.\",\"Over_Summary\":{\"Over\":\"24\",\"Runs\":\"3\",\"Wickets\":\"0\",\"Score\":\"136/3\"},\"OverNo\":\"24\",\"BallNo\":\"6\",\"Ball_Number\":\"144\",\"This_Over\":\"1,1,0,0,1,0,\",\"Batsman_Details\":{\"name\":\"Jacob Bethell\",\"Runs\":\"40\",\"Balls\":\"45\",\"Fours\":\"5\",\"Sixes\":\"0\",\"id\":\"85736\"},\"Non_Striker_Details\":{\"name\":\"Joe Root\",\"Runs\":\"11\",\"Balls\":\"19\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"5.6\",\"Maidens\":\"0\",\"Runs\":\"46\",\"Wickets\":\"0\",\"Ball_bowled\":\"36\",\"Dot_balls\":\"17\",\"id\":\"39447\"},\"Ball_Speed\":\"127.0\",\"Ball_Line_Length\":\"25,11,28,5,44,21\",\"is_over_end\":true}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438636,
-      "asset_order": 2419,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "23.5 Michael Neser to Joe Root,1 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:33:23.85",
-      "publish_time_utc": "2025-12-27T05:33:23.85",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"23.5\",\"Runs\":\"1\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"On off, on a good length, Root drops it in front of cover and scampers to the other end.\",\"OverNo\":\"24\",\"BallNo\":\"5\",\"Ball_Number\":\"143\",\"This_Over\":\"1,1,0,0,1,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"11\",\"Balls\":\"19\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Jacob Bethell\",\"Runs\":\"40\",\"Balls\":\"44\",\"Fours\":\"5\",\"Sixes\":\"0\",\"id\":\"85736\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"5.5\",\"Maidens\":\"0\",\"Runs\":\"46\",\"Wickets\":\"0\",\"Ball_bowled\":\"35\",\"Dot_balls\":\"16\",\"id\":\"39447\"},\"Ball_Speed\":\"128.8\",\"Zone\":\"5\",\"Angle\":\"196\",\"Distance\":\"2\",\"Ball_Line_Length\":\"16,7,10,12,44,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438614,
-      "asset_order": 2415,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "23.4 Michael Neser to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:32:44.6",
-      "publish_time_utc": "2025-12-27T05:32:44.6",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"23.4\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Nipping away just enough off the deck, on a back of a length. Root has a waft at it but is lucky not to nick this one behind.\",\"OverNo\":\"24\",\"BallNo\":\"4\",\"Ball_Number\":\"142\",\"This_Over\":\"1,1,0,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"10\",\"Balls\":\"18\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Jacob Bethell\",\"Runs\":\"40\",\"Balls\":\"44\",\"Fours\":\"5\",\"Sixes\":\"0\",\"id\":\"85736\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"5.4\",\"Maidens\":\"0\",\"Runs\":\"45\",\"Wickets\":\"0\",\"Ball_bowled\":\"34\",\"Dot_balls\":\"16\",\"id\":\"39447\"},\"Ball_Speed\":\"131.1\",\"Ball_Line_Length\":\"14,5,10,11,41,14\"}"
-      },
-      "tags": []
-    },
-    {
-      "id": 40438607,
-      "asset_order": 2412,
-      "flag": null,
-      "type": "Commentary",
-      "source": "Commentary",
-      "source_id": 2,
-      "filter_id": null,
-      "headline": "23.3 Michael Neser to Joe Root,0 Run",
-      "body": "",
-      "display_pic": null,
-      "display_value": null,
-      "publish_time": "2025-12-27T05:32:06.283",
-      "publish_time_utc": "2025-12-27T05:32:06.283",
-      "custom_metadata": {
-        "asset": "{\"BattingTeam_Id\":\"3\",\"BowlingTeam_Id\":\"1\",\"Over\":\"23.3\",\"Runs\":\"0\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"39447\",\"Batsman\":\"10129\",\"Bowler_Name\":\"Michael Neser\",\"Batsman_Name\":\"Joe Root\",\"Commentary\":\"Seaming\u00a0back in at the hips, Root is beaten by the\u00a0movement and wears it on the thigh pad.\",\"OverNo\":\"24\",\"BallNo\":\"3\",\"Ball_Number\":\"141\",\"This_Over\":\"1,1,0,\",\"Batsman_Details\":{\"name\":\"Joe Root\",\"Runs\":\"10\",\"Balls\":\"17\",\"Fours\":\"0\",\"Sixes\":\"0\",\"id\":\"10129\"},\"Non_Striker_Details\":{\"name\":\"Jacob Bethell\",\"Runs\":\"40\",\"Balls\":\"44\",\"Fours\":\"5\",\"Sixes\":\"0\",\"id\":\"85736\"},\"Bowler_Details\":{\"name\":\"Michael Neser\",\"Overs\":\"5.3\",\"Maidens\":\"0\",\"Runs\":\"45\",\"Wickets\":\"0\",\"Ball_bowled\":\"33\",\"Dot_balls\":\"15\",\"id\":\"39447\"},\"Ball_Speed\":\"132.8\",\"Ball_Line_Length\":\"24,5,10,12,42,14\"}"
+        "asset": "{\"BattingTeam_Id\":\"1126\",\"BowlingTeam_Id\":\"1133\",\"Over\":\"18.3\",\"Runs\":\"1\",\"Detail\":\"\",\"Isball\":true,\"Bowler\":\"69351\",\"Batsman\":\"74530\",\"Bowler_Name\":\"Kavisha Dilhari\",\"Batsman_Name\":\"Richa Ghosh\",\"Commentary\":\"Worked to mid-on for a single.\",\"OverNo\":\"19\",\"BallNo\":\"3\",\"Ball_Number\":\"111\",\"Batsman_Details\":{\"name\":\"Richa Ghosh\",\"Runs\":\"17\",\"Balls\":\"11\",\"Fours\":\"3\",\"Sixes\":\"0\",\"id\":\"74530\"},\"Ball_Speed\":\"87.1\"}"
       },
       "tags": []
     }
-  ],
-  "deleted_assets": ""
+  ]
 }

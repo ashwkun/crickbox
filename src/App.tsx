@@ -6,6 +6,8 @@ import FloatingHeader from './components/FloatingHeader';
 import useCricketData from './utils/useCricketData';
 import { WallstreamData } from './utils/wallstreamApi';
 import { Match, Scorecard, Series, Tournament } from './types';
+// Stub wallstream data for forceLive testing
+import stubWallstream from '../api_samples/wallstream.json';
 
 export default function App(): React.ReactElement {
     const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream } = useCricketData();
@@ -161,13 +163,21 @@ export default function App(): React.ReactElement {
                 currentInningsCount = sc.Innings.length;
             }
 
-            const ws = isLive
-                ? await fetchWallstream(selectedMatch.game_id, 50, currentInningsCount)
-                : null;
+            // Check for forceLive mode
+            const params = new URLSearchParams(window.location.search);
+            const forceLive = params.get('forceLive') === 'true';
+
+            let ws: WallstreamData | null = null;
+            if (isLive) {
+                ws = await fetchWallstream(selectedMatch.game_id, 50, currentInningsCount);
+            } else if (forceLive) {
+                // Use stub wallstream for testing completed matches
+                ws = stubWallstream as WallstreamData;
+            }
 
             if (isMounted) {
                 setScorecard(sc);
-                setWallstream(isLive ? ws : null);
+                setWallstream(ws);
             }
         };
 
