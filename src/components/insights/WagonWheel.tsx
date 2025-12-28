@@ -3,10 +3,25 @@ import { BatsmanSplitsResponse, BatsmanShot } from '../../utils/h2hApi';
 
 interface WagonWheelProps {
     batsmanSplits: BatsmanSplitsResponse | null;
+    scorecard?: any;
+    selectedInnings?: number;
+    onInningsChange?: (innings: number) => void;
 }
 
-const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits }) => {
+const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selectedInnings = 1, onInningsChange }) => {
     const [selectedPlayer, setSelectedPlayer] = useState<string>('all');
+
+    // Get innings from scorecard
+    const innings = scorecard?.Innings || [];
+    const hasMultipleInnings = innings.length > 1;
+
+    // Get innings label like scorecard
+    const getInningsLabel = (inn: any, idx: number) => {
+        const teamId = inn.Battingteam;
+        const teamName = scorecard?.Teams?.[teamId]?.Name_Short || `Team ${idx + 1}`;
+        const inningsNum = idx < 2 ? '' : ` (${Math.floor(idx / 2) + 1})`;
+        return `${teamName}${inningsNum}`;
+    };
 
     // Get all players with shots
     const playersWithShots = useMemo(() => {
@@ -72,12 +87,52 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits }) => {
         <div style={{
             background: 'var(--bg-card)',
             borderRadius: 16,
-            padding: '16px 20px',
             border: '1px solid var(--border-color)',
+            overflow: 'hidden'
         }}>
-            {/* Header with Dropdown */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Wagon Wheel</div>
+            {/* Header - Centered */}
+            <div style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                textAlign: 'center',
+                padding: '16px 20px 8px'
+            }}>
+                Wagon Wheel
+            </div>
+
+            {/* Innings Tabs - Like Scorecard */}
+            {hasMultipleInnings && (
+                <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    {innings.map((inn: any, idx: number) => (
+                        <button
+                            key={idx}
+                            onClick={() => onInningsChange?.(idx + 1)}
+                            style={{
+                                flex: 1,
+                                minWidth: 70,
+                                padding: '12px 16px',
+                                border: 'none',
+                                background: selectedInnings === idx + 1 ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
+                                borderBottom: selectedInnings === idx + 1 ? '2px solid #22c55e' : '2px solid transparent',
+                                color: selectedInnings === idx + 1 ? '#22c55e' : 'rgba(255,255,255,0.6)',
+                                fontSize: 12,
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
+                            {getInningsLabel(inn, idx)}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {/* Player Dropdown */}
+            <div style={{ padding: '12px 20px', display: 'flex', justifyContent: 'center' }}>
                 <select
                     value={selectedPlayer}
                     onChange={(e) => setSelectedPlayer(e.target.value)}

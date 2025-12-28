@@ -73,7 +73,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
             )}
 
             {/* Wagon Wheel */}
-            <WagonWheel batsmanSplits={batsmanSplits || null} />
+            <WagonWheel batsmanSplits={batsmanSplits || null} scorecard={scorecard} />
 
             {/* Worm Chart */}
             <WormChart
