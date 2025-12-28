@@ -170,24 +170,6 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
     const isT1Redundant = isRedundantCheck(t1Curr, t1All);
     const isT2Redundant = isRedundantCheck(t2Curr, t2All);
 
-    // DEBUG LOGS
-    // DEBUG LOGS
-    console.log(`[RecentForm DEBUG] Format Received: "${currentFormat}"`);
-    console.log(`[RecentForm DEBUG] ${team1.short_name} (ID: ${team1.id})`);
-    console.log(`  - Total Matches Fetched: ${matches1.length}`);
-
-    // Compare IDs one by one
-    const mismatchIndex = t1Curr.findIndex((m, i) => m.id !== t1All[i]?.id);
-    console.log(`  - Mismatch Index: ${mismatchIndex}`);
-    if (mismatchIndex !== -1) {
-        console.log(`    Curr[${mismatchIndex}]: ${t1Curr[mismatchIndex]?.match_type} (${t1Curr[mismatchIndex]?.id})`);
-        console.log(`    All[${mismatchIndex}]: ${t1All[mismatchIndex]?.match_type} (${t1All[mismatchIndex]?.id})`);
-    }
-
-    console.log(`  - Redundant (Calc): ${isT1Redundant}`);
-    console.log(`  - Redundant (Str): "${String(isT1Redundant)}"`);
-    console.log(`  - useCompactMode (Final): ${isT1Redundant && isT2Redundant}`);
-
     // Enforce symmetry: Only compact if BOTH are redundant
     const useCompactMode = isT1Redundant && isT2Redundant;
 
