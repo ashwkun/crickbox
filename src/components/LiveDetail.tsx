@@ -37,6 +37,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     };
 
     const [selectedInningsIdx, setSelectedInningsIdx] = useState(0);
+    const [wagonWheelInnings, setWagonWheelInnings] = useState(1); // Independent of scorecard tabs
     const [commentaryExpanded, setCommentaryExpanded] = useState(false);
     const [h2hData, setH2hData] = useState<H2HData | null>(null);
     const [batsmanSplits, setBatsmanSplits] = useState<BatsmanSplitsResponse | null>(null);
@@ -58,6 +59,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             const currentInnings = scorecard?.Innings?.length || 1;
             fetchBatsmanSplits(match.game_id, currentInnings).then(data => {
                 if (data) setBatsmanSplits(data);
+                if (currentInnings > 0) setWagonWheelInnings(currentInnings);
             });
             fetchOverByOver(match.game_id, currentInnings).then(data => {
                 if (data) setOverByOver(data);
@@ -74,6 +76,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             }
         }
     }, [match?.game_id, scorecard?.Innings?.length, fetchH2H, fetchBatsmanSplits, fetchOverByOver]);
+
+    // Independent handler for Wagon Wheel innings change
+    const handleWagonWheelInningsChange = (innings: number) => {
+        setWagonWheelInnings(innings);
+        fetchBatsmanSplits(match.game_id, innings).then(data => {
+            if (data) setBatsmanSplits(data);
+        });
+    };
 
 
     // Auto-select the latest inning when data loads
@@ -707,6 +717,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     overByOver={overByOver}
                     overByOver1={overByOver1}
                     overByOver2={overByOver2}
+                    wagonWheelInnings={wagonWheelInnings}
+                    onWagonWheelInningsChange={handleWagonWheelInningsChange}
                 />
             )}
 
