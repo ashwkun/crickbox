@@ -50,12 +50,12 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
                                 style={{
                                     flex: 1,
                                     minWidth: 70,
-                                    padding: '12px 16px',
+                                    padding: '10px 12px',
                                     border: 'none',
                                     background: isSelected ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
                                     borderBottom: isSelected ? '2px solid #22c55e' : '2px solid transparent',
                                     color: isSelected ? '#22c55e' : 'rgba(255,255,255,0.6)',
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     fontWeight: 600,
                                     cursor: 'pointer',
                                     transition: 'all 0.2s',
@@ -71,10 +71,10 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
                 </div>
             )}
 
-            {/* Title (Optional, but good for context) */}
-            <h4 style={{ margin: '16px 16px 10px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Partnerships</h4>
+            {/* Title */}
+            <h4 style={{ margin: '12px 16px 8px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Partnerships</h4>
 
-            {/* Partnership List - Compact Premium for Insights */}
+            {/* Partnership List - Compact Vertical Layout */}
             <div style={{ padding: '0 12px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {validPartnerships.map((p: any, idx: number) => {
                     const totalRuns = parseInt(p.Runs) || 1;
@@ -86,7 +86,7 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
                     const bat2Balls = parseInt(bat2?.Balls) || 0;
                     const bat1Pct = totalRuns > 0 ? (bat1Runs / totalRuns) * 100 : 50;
 
-                    // Name handling
+                    // Name handling - use full name but ensure it can wrap if needed, otherwise rely on flex
                     const bat1Name = bat1?.name || scorecard.Teams?.[selectedInn.Battingteam]?.Players?.[bat1?.Batsman]?.Name_Full || 'P1';
                     const bat2Name = bat2?.name || scorecard.Teams?.[selectedInn.Battingteam]?.Players?.[bat2?.Batsman]?.Name_Full || 'P2';
 
@@ -95,45 +95,30 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
 
                     return (
                         <div key={idx} style={{
-                            display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
+                            display: 'flex', alignItems: 'center', gap: 8, padding: '10px',
                             background: isCurrent ? 'rgba(34, 197, 94, 0.08)' : 'rgba(255,255,255,0.02)',
                             borderRadius: 12,
                             border: isCurrent ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(255,255,255,0.04)',
-                            transition: 'all 0.2s hover:bg-white/5'
                         }}>
-                            {/* Wicket # Badge */}
-                            <div style={{
-                                width: 22, height: 22, borderRadius: '50%',
-                                background: isCurrent ? '#22c55e' : 'rgba(255,255,255,0.1)',
-                                color: isCurrent ? '#fff' : 'rgba(255,255,255,0.6)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 10, fontWeight: 700,
-                                flexShrink: 0
-                            }}>
-                                {p.ForWicket}
-                            </div>
-
-                            {/* Player 1 Section */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-end', textAlign: 'right', minWidth: 0 }}>
-                                <div style={{ minWidth: 0 }}>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                        {bat1Name.split(' ').pop()}
-                                    </div>
-                                    <div style={{ fontSize: 11, color: '#60a5fa', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
-                                        <span style={{ fontWeight: 700, fontSize: 12 }}>{bat1Runs}</span>
-                                        <span style={{ opacity: 0.6 }}> ({bat1Balls})</span>
-                                    </div>
+                            {/* Player 1 Section (Stacked) */}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0, textAlign: 'center' }}>
+                                <WikiImage name={bat1Name} id={bat1?.Batsman} type="player" style={{ width: 36, height: 36, border: '1px solid rgba(255,255,255,0.1)', marginBottom: 4 }} circle={true} />
+                                <div style={{ fontSize: 10, fontWeight: 600, color: '#fff', lineHeight: '1.2', marginBottom: 2, width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                                    {bat1Name}
                                 </div>
-                                <WikiImage name={bat1Name} id={bat1?.Batsman} type="player" style={{ width: 36, height: 36, border: '1px solid rgba(255,255,255,0.1)' }} circle={true} />
+                                <div style={{ fontSize: 10, color: '#60a5fa', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                                    <span style={{ fontWeight: 700 }}>{bat1Runs}</span>
+                                    <span style={{ opacity: 0.6 }}> ({bat1Balls})</span>
+                                </div>
                             </div>
 
                             {/* Center Bar */}
-                            <div style={{ flex: '1.2', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 60 }}>
-                                <div style={{ fontSize: 15, fontWeight: 800, color: isCurrent ? '#22c55e' : '#fff', lineHeight: 1 }}>
+                            <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 50 }}>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: isCurrent ? '#22c55e' : '#fff', lineHeight: 1 }}>
                                     {p.Runs}
                                 </div>
 
-                                <div style={{ width: '100%', height: 6, borderRadius: 3, overflow: 'hidden', display: 'flex', background: 'rgba(255,255,255,0.08)' }}>
+                                <div style={{ width: '100%', height: 5, borderRadius: 2.5, overflow: 'hidden', display: 'flex', background: 'rgba(255,255,255,0.08)' }}>
                                     <div style={{ width: `${bat1Pct}%`, background: '#60a5fa', height: '100%' }} />
                                     <div style={{ width: `${100 - bat1Pct}%`, background: '#f97316', height: '100%' }} />
                                 </div>
@@ -143,17 +128,15 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
                                 </div>
                             </div>
 
-                            {/* Player 2 Section */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, justifyContent: 'flex-start', textAlign: 'left', minWidth: 0 }}>
-                                <WikiImage name={bat2Name} id={bat2?.Batsman} type="player" style={{ width: 36, height: 36, border: '1px solid rgba(255,255,255,0.1)' }} circle={true} />
-                                <div style={{ minWidth: 0 }}>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                        {bat2Name.split(' ').pop()}
-                                    </div>
-                                    <div style={{ fontSize: 11, color: '#f97316', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
-                                        <span style={{ fontWeight: 700, fontSize: 12 }}>{bat2Runs}</span>
-                                        <span style={{ opacity: 0.6 }}> ({bat2Balls})</span>
-                                    </div>
+                            {/* Player 2 Section (Stacked) */}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0, textAlign: 'center' }}>
+                                <WikiImage name={bat2Name} id={bat2?.Batsman} type="player" style={{ width: 36, height: 36, border: '1px solid rgba(255,255,255,0.1)', marginBottom: 4 }} circle={true} />
+                                <div style={{ fontSize: 10, fontWeight: 600, color: '#fff', lineHeight: '1.2', marginBottom: 2, width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                                    {bat2Name}
+                                </div>
+                                <div style={{ fontSize: 10, color: '#f97316', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                                    <span style={{ fontWeight: 700 }}>{bat2Runs}</span>
+                                    <span style={{ opacity: 0.6 }}> ({bat2Balls})</span>
                                 </div>
                             </div>
                         </div>
