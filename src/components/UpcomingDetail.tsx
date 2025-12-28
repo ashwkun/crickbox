@@ -460,6 +460,17 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
                 <div className="section-container fade-in">
                     <H2HCard teams={h2hData.team?.head_to_head?.comp_type?.data || []} />
 
+                    {/* Recent Form - Moved ABOVE Venue Card */}
+                    <div className="mt-4">
+                        <RecentForm
+                            matches={h2hData.team?.against_last_n_matches?.result || []}
+                            teamIds={[parseInt(team1?.id || '0'), parseInt(team2?.id || '0')]}
+                            teamNames={[team1?.name || '', team2?.name || '']}
+                            format={match.event_format}
+                            onMatchClick={handleRecentMatchClick}
+                        />
+                    </div>
+
                     {/* Venue Stats Card */}
                     {h2hData.team?.head_to_head?.venue && (
                         <div className="mt-4">
@@ -478,19 +489,6 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
                     <div className="skeleton" style={{ height: '180px', borderRadius: '16px' }}></div>
                     <div className="skeleton" style={{ height: '160px', borderRadius: '16px' }}></div>
                     <div className="skeleton" style={{ height: '100px', borderRadius: '16px' }}></div>
-                </div>
-            )}
-
-            {/* Recent Form - Moved BEFORE Squads */}
-            {!loadingH2H && h2hData && (
-                <div className="section-container fade-in">
-                    <RecentForm
-                        matches={h2hData.team?.against_last_n_matches?.result || []}
-                        teamIds={[parseInt(team1?.id || '0'), parseInt(team2?.id || '0')]}
-                        teamNames={[team1?.name || '', team2?.name || '']}
-                        format={match.event_format}
-                        onMatchClick={handleRecentMatchClick}
-                    />
                 </div>
             )}
 
