@@ -80,17 +80,17 @@ const H2HCard: React.FC<H2HCardProps> = ({ teams, teamIds, title = "Head to Head
                     <span className="h2h-big-number" style={{ color: team2Color }}>{wins2}</span>
                     <span className="h2h-win-pct" style={{ color: team2Color, opacity: 0.8 }}>{t2.win_percentage?.toFixed(1)}%</span>
                 </div>
+            </div>
 
-                {/* Visual Bar - Ensure Bar matches LHS/RHS */}
-                <div className="h2h-bar-container" style={{ marginTop: 12 }}>
-                    <div className="h2h-bar team1" style={{ width: `${pct1}%`, background: team1Color }}></div>
-                    <div className="h2h-bar draw" style={{ width: `${pctDraw}%` }}></div>
-                    <div className="h2h-bar team2" style={{ width: `${pct2}%`, background: team2Color }}></div>
-                </div>
+            {/* Visual Bar - Ensure Bar matches LHS/RHS */}
+            <div className="h2h-bar-container" style={{ marginTop: 12 }}>
+                <div className="h2h-bar team1" style={{ width: `${pct1}%`, background: team1Color }}></div>
+                <div className="h2h-bar draw" style={{ width: `${pctDraw}%` }}></div>
+                <div className="h2h-bar team2" style={{ width: `${pct2}%`, background: team2Color }}></div>
+            </div>
 
-                <div className="h2h-footer">
-                    {t1.matches_played} matches played
-                </div>
+            <div className="h2h-footer">
+                {t1.matches_played} matches played
             </div>
         </div>
     );
