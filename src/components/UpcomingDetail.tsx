@@ -392,18 +392,9 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
                         </span>
                     </div>
 
-                    {/* VS with Time below */}
+                    {/* VS */}
                     <div className="upcoming-vs">
                         <span className="vs-text">VS</span>
-                        <div style={{
-                            fontSize: 12,
-                            color: '#22c55e',
-                            fontWeight: 600,
-                            marginTop: 6,
-                            textAlign: 'center'
-                        }}>
-                            {matchDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
-                        </div>
                     </div>
 
                     {/* Team 2 */}
