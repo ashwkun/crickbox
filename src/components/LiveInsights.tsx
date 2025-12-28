@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BatsmanSplitsResponse, OverByOverResponse } from '../utils/h2hApi';
 import { Match } from '../types';
 import H2HCard from './upcoming/H2HCard';
@@ -7,6 +7,9 @@ import WikiImage from './WikiImage';
 import { getTeamColor } from '../utils/teamColors';
 import DualTeamRecentForm from './upcoming/DualTeamRecentForm';
 import H2HRecentMatches from './upcoming/H2HRecentMatches';
+import WagonWheel from './insights/WagonWheel';
+import WormChart from './insights/WormChart';
+import PartnershipsChart from './insights/PartnershipsChart';
 
 interface LiveInsightsProps {
     match?: Match;
@@ -14,9 +17,13 @@ interface LiveInsightsProps {
     scorecard?: any;
     batsmanSplits?: BatsmanSplitsResponse | null;
     overByOver?: OverByOverResponse | null;
+    overByOver1?: OverByOverResponse | null;
+    overByOver2?: OverByOverResponse | null;
 }
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, overByOver }) => {
+
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, overByOver, overByOver1, overByOver2 }) => {
+    const [manhattanInnings, setManhattanInnings] = useState<1 | 2>(1);
     if (!h2hData) return null;
 
     const team1 = match?.participants?.[0];
@@ -65,7 +72,23 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 </div>
             )}
 
-            {/* 3. Batsman vs Bowler Matchups */}
+            {/* Wagon Wheel */}
+            <WagonWheel batsmanSplits={batsmanSplits || null} />
+
+            {/* Worm Chart */}
+            <WormChart
+                innings1={overByOver1?.Overbyover || null}
+                innings2={overByOver2?.Overbyover || null}
+                team1Name={team1?.name || 'Team 1'}
+                team2Name={team2?.name || 'Team 2'}
+                team1Id={team1?.id}
+                team2Id={team2?.id}
+            />
+
+            {/* Partnerships Chart */}
+            <PartnershipsChart scorecard={scorecard} />
+
+            {/* Batsman vs Bowler Matchups */}
             {batsmanSplits?.Batsmen && Object.keys(batsmanSplits.Batsmen).length > 0 && (
                 <div style={{
                     background: 'var(--bg-card)',
