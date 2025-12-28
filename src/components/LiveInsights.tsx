@@ -10,6 +10,7 @@ import H2HRecentMatches from './upcoming/H2HRecentMatches';
 import WagonWheel from './insights/WagonWheel';
 import WormChart from './insights/WormChart';
 import PartnershipsChart from './insights/PartnershipsChart';
+import BatsmanBowlerMatchups from './insights/BatsmanBowlerMatchups';
 
 interface LiveInsightsProps {
     match?: Match;
@@ -119,107 +120,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
             <PartnershipsChart scorecard={scorecard} />
 
             {/* Batsman vs Bowler Matchups */}
-            {batsmanSplits?.Batsmen && Object.keys(batsmanSplits.Batsmen).length > 0 && (
-                <div style={{
-                    background: 'var(--bg-card)',
-                    borderRadius: 16,
-                    padding: '16px 20px',
-                    border: '1px solid var(--border-color)',
-                    marginBottom: 16
-                }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 12 }}>Batsman vs Bowler</div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        {Object.entries(batsmanSplits.Batsmen).slice(0, 3).map(([playerId, data]) => {
-                            const bowlersList = Object.entries(data.Against || {})
-                                .sort((a, b) => parseInt(b[1].Balls) - parseInt(a[1].Balls))
-                                .filter(b => parseInt(b[1].Balls) > 0)
-                                .slice(0, 3);
-
-                            if (bowlersList.length === 0) return null;
-
-                            return (
-                                <div key={playerId}>
-                                    {/* Batsman Header */}
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                                        <WikiImage
-                                            name={data.Batsman}
-                                            id={playerId}
-                                            type="player"
-                                            className="player-avatar"
-                                            style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.1)' }}
-                                            circle={true}
-                                        />
-                                        <div>
-                                            <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{data.Batsman}</div>
-                                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{data.Style}</div>
-                                        </div>
-                                    </div>
-
-                                    {/* Bowlers Container (Horizontal Scroll) */}
-                                    <div className="hide-scrollbar" style={{
-                                        display: 'flex',
-                                        gap: 10,
-                                        overflowX: 'auto',
-                                        paddingBottom: 4
-                                    }}>
-                                        {bowlersList.map(([bowlerId, vs]) => {
-                                            const sr = parseFloat(vs.Strikerate) || 0;
-                                            // Color code SR
-                                            const srColor = sr > 150 ? '#22c55e' : sr > 100 ? '#facc15' : '#ef4444';
-                                            // Color code dismissals
-                                            const outs = parseInt(vs.Dismissals) || 0;
-
-                                            return (
-                                                <div key={bowlerId} style={{
-                                                    minWidth: 110,
-                                                    background: 'rgba(255,255,255,0.03)',
-                                                    borderRadius: 12,
-                                                    padding: 10,
-                                                    border: outs > 0 ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(255,255,255,0.05)',
-                                                    position: 'relative',
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    alignItems: 'center',
-                                                    textAlign: 'center'
-                                                }}>
-                                                    {outs > 0 && (
-                                                        <div style={{
-                                                            position: 'absolute', top: -6, right: -6,
-                                                            background: '#ef4444', color: '#fff',
-                                                            fontSize: 9, fontWeight: 700,
-                                                            padding: '2px 6px', borderRadius: 8,
-                                                            boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                                                        }}>{outs} Wkt</div>
-                                                    )}
-
-                                                    <WikiImage
-                                                        name={vs.Bowler}
-                                                        id={bowlerId}
-                                                        type="player"
-                                                        style={{ width: 32, height: 32, borderRadius: '50%', marginBottom: 8, border: '1px solid rgba(255,255,255,0.1)' }}
-                                                    />
-
-                                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
-                                                        {vs.Bowler}
-                                                    </div>
-                                                    <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 2 }}>
-                                                        {vs.Runs} <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.4)' }}>off {vs.Balls}</span>
-                                                    </div>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: srColor }} />
-                                                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>SR {vs.Strikerate}</div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
+            <BatsmanBowlerMatchups batsmanSplits={batsmanSplits || null} />
 
 
 
