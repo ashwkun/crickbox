@@ -41,7 +41,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [isWagonWheelLoading, setIsWagonWheelLoading] = useState(false);
     const [commentaryExpanded, setCommentaryExpanded] = useState(false);
     const [h2hData, setH2hData] = useState<H2HData | null>(null);
-    const [batsmanSplits, setBatsmanSplits] = useState<BatsmanSplitsResponse | null>(null);
+    const [batsmanSplits, setBatsmanSplits] = useState<BatsmanSplitsResponse | null>(null); // For Wagon Wheel (legacy name)
+    const [batsmanSplitsMatchups, setBatsmanSplitsMatchups] = useState<BatsmanSplitsResponse | null>(null); // Independent for Matchups
+    const [matchupsInnings, setMatchupsInnings] = useState(1);
+    const [isMatchupsLoading, setIsMatchupsLoading] = useState(false);
     const [overByOver, setOverByOver] = useState<OverByOverResponse | null>(null);
     const [overByOver1, setOverByOver1] = useState<OverByOverResponse | null>(null);
     const [overByOver2, setOverByOver2] = useState<OverByOverResponse | null>(null);
@@ -59,8 +62,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             // Fetch current innings batsman splits and over-by-over
             const currentInnings = scorecard?.Innings?.length || 1;
             fetchBatsmanSplits(match.game_id, currentInnings).then(data => {
-                if (data) setBatsmanSplits(data);
-                if (currentInnings > 0) setWagonWheelInnings(currentInnings);
+                if (data) {
+                    setBatsmanSplits(data);
+                    setBatsmanSplitsMatchups(data); // Initialize Matchups with same data
+                }
+                if (currentInnings > 0) {
+                    setWagonWheelInnings(currentInnings);
+                    setMatchupsInnings(currentInnings);
+                }
             });
             fetchOverByOver(match.game_id, currentInnings).then(data => {
                 if (data) setOverByOver(data);
@@ -85,6 +94,16 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         fetchBatsmanSplits(match.game_id, innings).then(data => {
             if (data) setBatsmanSplits(data);
             setIsWagonWheelLoading(false);
+        });
+    };
+
+    // Independent handler for Matchups innings change
+    const handleMatchupsInningsChange = (innings: number) => {
+        setMatchupsInnings(innings);
+        setIsMatchupsLoading(true);
+        fetchBatsmanSplits(match.game_id, innings).then(data => {
+            if (data) setBatsmanSplitsMatchups(data);
+            setIsMatchupsLoading(false);
         });
     };
 
@@ -723,6 +742,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     wagonWheelInnings={wagonWheelInnings}
                     onWagonWheelInningsChange={handleWagonWheelInningsChange}
                     isWagonWheelLoading={isWagonWheelLoading}
+                    // Matchups Props
+                    batsmanSplitsMatchups={batsmanSplitsMatchups}
+                    matchupsInnings={matchupsInnings}
+                    onMatchupsInningsChange={handleMatchupsInningsChange}
+                    isMatchupsLoading={isMatchupsLoading}
                 />
             )}
 
