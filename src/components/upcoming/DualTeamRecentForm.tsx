@@ -123,29 +123,45 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
         </div>
     );
 
-    const renderTeamRow = (team: TeamInfo, current: Match[], all: Match[]) => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {/* Header: Team Info */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <WikiImage name={team.name} id={team.id} type="team" circle style={{ width: 24, height: 24 }} />
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{team.name}</span>
-            </div>
+    const renderTeamRow = (team: TeamInfo, current: Match[], all: Match[]) => {
+        // Check if "Current" and "All" lists are effectively identical (same matches)
+        const isRedundant = current.length === all.length &&
+            current.every((m, i) => m.game_id === all[i]?.game_id || m.id === all[i]?.id);
 
-            {/* Stats Row */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingLeft: 32 }}>
-                {/* Current Format Form */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Current ({currentFormat || 'Recent'})</span>
-                    {renderPills(current, team.id)}
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {/* Header: Team Info */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <WikiImage name={team.name} id={team.id} type="team" circle style={{ width: 24, height: 24 }} />
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{team.name}</span>
                 </div>
-                {/* All Format Form */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>All Formats</span>
-                    {renderPills(all, team.id)}
+
+                {/* Stats Row */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingLeft: 32 }}>
+
+                    {isRedundant ? (
+                        // SINGLE ROW (Franchise / Single Format Teams)
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Recent Form</span>
+                            {renderPills(all, team.id)}
+                        </div>
+                    ) : (
+                        // DUAL ROWS (Multi-Format International Teams)
+                        <>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Current ({currentFormat || 'Recent'})</span>
+                                {renderPills(current, team.id)}
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>All Formats</span>
+                                {renderPills(all, team.id)}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="h2h-card" style={{ marginTop: 12 }}>
