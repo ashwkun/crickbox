@@ -411,9 +411,8 @@ export default function useCricketData(): UseCricketDataReturn {
         try {
             const matchFile = gameId.replace(/[^a-z0-9]/gi, '');
             const url = `https://www.wisden.com/cricket/live/json/${matchFile}_batsman_splits_${innings}.json`;
-            const response = await fetch(url);
-            if (!response.ok) return null;
-            return await response.json();
+            const data = await proxyFetch(url);
+            return data as BatsmanSplitsResponse;
         } catch (error) {
             console.warn(`Failed to fetch batsman splits for innings ${innings}:`, error);
             return null;
@@ -425,9 +424,8 @@ export default function useCricketData(): UseCricketDataReturn {
         try {
             const matchFile = gameId.replace(/[^a-z0-9]/gi, '');
             const url = `https://www.wisden.com/cricket/live/json/${matchFile}_overbyover_${innings}.json`;
-            const response = await fetch(url);
-            if (!response.ok) return null;
-            return await response.json();
+            const data = await proxyFetch(url);
+            return data as OverByOverResponse;
         } catch (error) {
             console.warn(`Failed to fetch over-by-over for innings ${innings}:`, error);
             return null;
