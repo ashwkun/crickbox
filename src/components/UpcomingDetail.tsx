@@ -10,7 +10,8 @@ import { fetchWeather, WeatherData, getWeatherInfo } from '../utils/weather';
 import { getWeatherIcon, RaindropIcon } from './icons/WeatherIcons';
 import H2HCard from './upcoming/H2HCard';
 import VenueCard from './upcoming/VenueCard';
-import RecentForm from './upcoming/RecentForm';
+import TeamRecentForm from './upcoming/TeamRecentForm';
+// import RecentForm from './upcoming/RecentForm'; // Deprecated
 import TopPlayers from './upcoming/TopPlayers';
 import SquadPreview from './upcoming/SquadPreview';
 import CompletedDetail from './CompletedDetail';
@@ -509,15 +510,24 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                 <div className="section-container fade-in">
                     <H2HCard teams={h2hData.team?.head_to_head?.comp_type?.data || []} />
 
-                    {/* Recent Form - Moved ABOVE Venue Card */}
-                    <div className="mt-4">
-                        <RecentForm
-                            matches={h2hData.team?.against_last_n_matches?.result || []}
-                            teamIds={[parseInt(team1?.id || '0'), parseInt(team2?.id || '0')]}
-                            teamNames={[team1?.name || '', team2?.name || '']}
-                            format={match.event_format}
-                            onMatchClick={handleRecentMatchClick}
-                        />
+                    {/* NEW: Recent Form (Split by Team + Format) */}
+                    <div className="mt-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        {team1?.id && (
+                            <TeamRecentForm
+                                teamId={team1.id}
+                                teamName={team1.name}
+                                currentFormat={match.event_format}
+                                onMatchClick={handleRecentMatchClick} // This works because handleRecentMatchClick fetches card details
+                            />
+                        )}
+                        {team2?.id && (
+                            <TeamRecentForm
+                                teamId={team2.id}
+                                teamName={team2.name}
+                                currentFormat={match.event_format}
+                                onMatchClick={handleRecentMatchClick}
+                            />
+                        )}
                     </div>
 
                     {/* Venue Stats Card */}
@@ -536,7 +546,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
             {loadingH2H && (
                 <div className="section-container" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div className="skeleton" style={{ height: '180px', borderRadius: '16px' }}></div>
-                    <div className="skeleton" style={{ height: '160px', borderRadius: '16px' }}></div>
+                    <div className="skeleton" style={{ height: '260px', borderRadius: '16px' }}></div>
                     <div className="skeleton" style={{ height: '100px', borderRadius: '16px' }}></div>
                 </div>
             )}

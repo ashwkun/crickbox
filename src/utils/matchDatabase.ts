@@ -57,7 +57,7 @@ export async function getTeamForm(teamId: string, count = 5): Promise<FormResult
  * @param teamId Team ID
  * @param limit Number of matches
  */
-export async function getTeamMatches(teamId: string, limit = 10): Promise<Match[]> {
+export async function getTeamMatches(teamId: string, limit = 50): Promise<Match[]> {
     const { data, error } = await supabase
         .from('matches')
         .select('*')
