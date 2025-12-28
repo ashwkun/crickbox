@@ -1,3 +1,5 @@
+import React, { useState, useMemo } from 'react';
+import { BatsmanSplitsResponse, BatsmanShot } from '../../utils/h2hApi';
 import WikiImage from '../WikiImage';
 
 interface WagonWheelProps {
