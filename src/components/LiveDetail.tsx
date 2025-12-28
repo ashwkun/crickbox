@@ -38,6 +38,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
     const [selectedInningsIdx, setSelectedInningsIdx] = useState(0);
     const [wagonWheelInnings, setWagonWheelInnings] = useState(1); // Independent of scorecard tabs
+    const [isWagonWheelLoading, setIsWagonWheelLoading] = useState(false);
     const [commentaryExpanded, setCommentaryExpanded] = useState(false);
     const [h2hData, setH2hData] = useState<H2HData | null>(null);
     const [batsmanSplits, setBatsmanSplits] = useState<BatsmanSplitsResponse | null>(null);
@@ -80,8 +81,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     // Independent handler for Wagon Wheel innings change
     const handleWagonWheelInningsChange = (innings: number) => {
         setWagonWheelInnings(innings);
+        setIsWagonWheelLoading(true);
         fetchBatsmanSplits(match.game_id, innings).then(data => {
             if (data) setBatsmanSplits(data);
+            setIsWagonWheelLoading(false);
         });
     };
 
@@ -719,6 +722,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     overByOver2={overByOver2}
                     wagonWheelInnings={wagonWheelInnings}
                     onWagonWheelInningsChange={handleWagonWheelInningsChange}
+                    isWagonWheelLoading={isWagonWheelLoading}
                 />
             )}
 
