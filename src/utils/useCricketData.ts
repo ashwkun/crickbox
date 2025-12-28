@@ -92,6 +92,21 @@ export default function useCricketData(): UseCricketDataReturn {
             const cleanMatch = sanitizeMatch(m);
             matchesRef.current.set(cleanMatch.game_id, cleanMatch);
         });
+
+        // Cleanup stale 'U' (Upcoming) matches that are > 24h old
+        // This handles cases where the API stops returning a match (because it's done),
+        // but it remains in our local cache as 'U' because we only merge updates.
+        const now = Date.now();
+        matchesRef.current.forEach((m, key) => {
+            if (m.event_state === 'U') {
+                const startTime = new Date(m.start_date).getTime();
+                // 24 hours stale check
+                if (now - startTime > 24 * 60 * 60 * 1000) {
+                    matchesRef.current.delete(key);
+                }
+            }
+        });
+
         const merged = Array.from(matchesRef.current.values());
         setMatches(merged);
         safeSetItem(CACHE_KEY, JSON.stringify(merged));
