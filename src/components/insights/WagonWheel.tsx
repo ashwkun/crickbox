@@ -61,27 +61,19 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
     const nonStrikerY = center + (pitchHeight / 2);
 
     // Calculate distance to boundary from Striker for a given angle
-    // Ray-Circle Intersection logic
+    // Ray-Circle Intersection logic from earlier
     const getBoundaryDistance = (angleRad: number) => {
         const h = pitchHeight / 2;
-
-        // Ray Origin O = (0, -h) relative to Center(0,0).
-        // Ray Direction D = (cos a, -sin a). (Note -sin a because of SVG Y-inversion).
-        // Intersection: |O + tD|^2 = R^2
-        // Quadratic: a=1, b=2h*sin(theta), c=h^2-R^2
-        // sin(theta) in Math corresponds to -Y in SVG.
-        // So dy = -Math.sin(angleRad).
-
         const dx = Math.cos(angleRad);
-        const dy = -Math.sin(angleRad); // Invert Y for SVG
+        const dy = -Math.sin(angleRad); // Invert Y for SVG as Up is -Y
 
-        // Quadratic coeffs
-        const a = 1; // dx^2 + dy^2 = 1
-        const b = 2 * (-h) * dy; // 2 * y0 * dy
+        // Quadratic coeffs for intersection (0,-h) + t(dx, dy) with x^2+y^2=R^2
+        const a = 1;
+        const b = 2 * (-h) * dy;
         const c = Math.pow(-h, 2) - Math.pow(fieldRadius, 2);
 
         const discriminant = Math.pow(b, 2) - 4 * a * c;
-        if (discriminant < 0) return fieldRadius; // Should not happen inside circle
+        if (discriminant < 0) return fieldRadius;
 
         const t = (-b + Math.sqrt(discriminant)) / (2 * a);
         return t;
@@ -89,35 +81,51 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
 
     // Convert shot to SVG coordinates for Lines
     const shotToLineCoords = (shot: BatsmanShot) => {
-        // Angle Mapping:
-        // API Data: 0 = East (Right), 90 = North (Up), 180 = West (Left), 270 = South (Down).
-        // Angles are Standard Math Angle units (degrees, CCW).
-
-        // SVG: Y is inverted (Down is +).
-        // So we use: 
-        // x = x0 + r * cos(theta)
-        // y = y0 - r * sin(theta)  <- Subtract sin to go UP for positive Y-math
+        // Angle Mapping: 0=East (Math Standard), CCW.
+        // SVG Y is Down, so we invert sin component.
 
         const angleRad = parseInt(shot.Angle) * (Math.PI / 180);
-
         const maxDist = getBoundaryDistance(angleRad);
+
         const runs = parseInt(shot.Runs);
+        const rawDist = parseInt(shot.Distance); // 1-5 scale typically
 
-        // Visual Scaling:
-        // 4s and 6s should hit the boundary.
-        // 1s, 2s, 3s should be shorter to avoid clutter.
-        let scaleFactor = 0.4;
+        // Visual Scaling Map based on API Data Analysis:
+        // Dist 5 = Boundary (4s, 6s) -> 100%
+        // Dist 4 = Deep Field (Singles/Doubles vs Deep) -> ~70%
+        // Dist 3 = Mid Field -> ~50%
+        // Dist 2 = Close -> ~35%
 
-        if (runs === 1) scaleFactor = 0.35 + (Math.random() * 0.1);
-        else if (runs === 2) scaleFactor = 0.55 + (Math.random() * 0.1);
-        else if (runs === 3) scaleFactor = 0.75;
-        else if (runs >= 4) scaleFactor = 1.0;
+        let scaleFactor = 0.5; // Default fallback
+
+        if (rawDist >= 5) {
+            scaleFactor = 1.0;
+        } else if (rawDist === 4) {
+            scaleFactor = 0.72; // Deep but distinct from boundary
+        } else if (rawDist === 3) {
+            scaleFactor = 0.55;
+        } else if (rawDist === 2) {
+            scaleFactor = 0.35;
+        } else if (rawDist === 1) {
+            scaleFactor = 0.25;
+        } else {
+            // Fallback for weird data, use runs hint
+            scaleFactor = runs >= 4 ? 1.0 : 0.6;
+        }
+
+        // Slight randomization for aesthetic separation of overlapping lines
+        if (scaleFactor < 1.0) {
+            scaleFactor += (Math.random() * 0.05);
+        }
+
+        // Clamp
+        if (scaleFactor > 1.0) scaleFactor = 1.0;
 
         const actualLength = scaleFactor * maxDist;
 
         return {
             x2: strikerX + actualLength * Math.cos(angleRad),
-            y2: strikerY - actualLength * Math.sin(angleRad), // MINUS sin because SVG Y is down
+            y2: strikerY - actualLength * Math.sin(angleRad), // Invert Y
             runs: runs
         };
     };
