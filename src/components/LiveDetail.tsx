@@ -293,6 +293,43 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         };
     };
 
+    // Helper: Match chip display - "TEST 4/5" for series, "Match 13" for tournaments
+    const getMatchChip = (): string => {
+        const format = match.event_format?.toUpperCase() || '';
+
+        if (!match.event_name) return format;
+
+        // Pattern 1: Ordinal format like "4th Test", "1st ODI"
+        const ordinalMatch = match.event_name.match(/(\d+)(st|nd|rd|th)/i);
+
+        // Pattern 2: Tournament format like "Match 13", "Match 45"
+        const tournamentMatch = match.event_name.match(/Match\s*(\d+)/i);
+
+        if (ordinalMatch) {
+            const matchNum = parseInt(ordinalMatch[1]);
+
+            // Use Series_match_count for series (keep compact style: 4/5)
+            if (scorecard?.Matchdetail?.Series?.Series_match_count) {
+                return `${format} ${matchNum}/${scorecard.Matchdetail.Series.Series_match_count}`;
+            }
+
+            // Fallback: Extract total from series_name
+            const totalMatch = match.series_name?.match(/(\d+)\s*(Test|T20I?|ODI)/i);
+            if (totalMatch) {
+                return `${format} ${matchNum}/${parseInt(totalMatch[1])}`;
+            }
+
+            return format ? `${format} ${matchNum}` : match.event_name;
+        }
+
+        if (tournamentMatch) {
+            // For tournaments, just show "Match 13" (not "Match 13/74")
+            return match.event_name;
+        }
+
+        return format ? `${format}` : match.event_name;
+    };
+
     const team1 = match.participants?.[0];
     const team2 = match.participants?.[1];
     const currentStatus = scorecard?.Matchdetail?.Equation || match.event_sub_status || match.event_status || 'Live';
@@ -563,7 +600,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                             borderRadius: 20,
                             color: '#3b82f6',
                         }}>
-                            {match.event_format?.toUpperCase() || ''} {match.event_name.match(/\d+/)?.[0] || ''}{scorecard?.Series_match_count ? `/${scorecard.Series_match_count}` : ''}
+                            {getMatchChip()}
                         </span>
                     )}
 
