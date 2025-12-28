@@ -1,129 +1,144 @@
-import React, { useState } from 'react';
-
-interface PartnershipData {
-    Runs: string;
-    Balls: string;
-    ForWicket: number;
-    Batsmen: {
-        Batsman: string;
-        Runs: string;
-        Balls: string;
-    }[];
-}
-
-interface InningsData {
-    Partnerships?: PartnershipData[];
-    Battingteam?: string;
-}
+import React, { useState, useEffect } from 'react';
+import WikiImage from '../WikiImage';
 
 interface PartnershipsChartProps {
-    scorecard: {
-        Innings?: InningsData[];
-    } | null;
-    players?: Record<string, { name: string }>;
+    scorecard: any;
 }
 
-const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard, players }) => {
-    const [selectedInnings, setSelectedInnings] = useState<number>(0);
+const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
+    // State for selected innings (0-indexed internally, but buttons use 1-based display)
+    // Initialize to last innings (current)
+    const [selectedInningsIdx, setSelectedInningsIdx] = useState<number>(0);
 
     const innings = scorecard?.Innings || [];
+
+    // Auto-select last innings on load
+    useEffect(() => {
+        if (innings.length > 0) {
+            setSelectedInningsIdx(innings.length - 1);
+        }
+    }, [innings.length]);
+
     if (innings.length === 0) return null;
 
-    const currentInnings = innings[selectedInnings];
-    const partnerships = currentInnings?.Partnerships || [];
+    const selectedInn = innings[selectedInningsIdx];
+    const partnerships = selectedInn?.Partnerships || [];
 
-    if (partnerships.length === 0) return null;
+    // Filter valid partnerships
+    const validPartnerships = partnerships.filter((p: any) => (parseInt(p.Runs) || 0) > 0);
 
-    // Get max runs for bar scaling
-    const maxRuns = Math.max(...partnerships.map(p => parseInt(p.Runs) || 0));
-
-    // Get player name from ID
-    const getPlayerName = (id: string) => {
-        return players?.[id]?.name || `Player ${id}`;
-    };
+    if (validPartnerships.length === 0) return null;
 
     return (
         <div style={{
             background: 'var(--bg-card)',
             borderRadius: 16,
-            padding: '16px 20px',
             border: '1px solid var(--border-color)',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
         }}>
-            {/* Header with Innings Toggle */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Partnerships</div>
-
-                {innings.length > 1 && (
-                    <div style={{ display: 'flex', gap: 4 }}>
-                        {innings.map((_, idx) => (
+            {/* Header / Tabs - Copied from WagonWheel style */}
+            {innings.length > 0 && (
+                <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    {innings.map((inn: any, idx: number) => {
+                        const isSelected = selectedInningsIdx === idx;
+                        return (
                             <button
                                 key={idx}
-                                onClick={() => setSelectedInnings(idx)}
+                                onClick={() => setSelectedInningsIdx(idx)}
                                 style={{
-                                    padding: '4px 10px',
-                                    background: selectedInnings === idx ? 'rgba(255,255,255,0.15)' : 'transparent',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    borderRadius: 6,
-                                    color: selectedInnings === idx ? '#fff' : 'rgba(255,255,255,0.5)',
-                                    fontSize: 11,
+                                    flex: 1,
+                                    minWidth: 70,
+                                    padding: '12px 16px',
+                                    border: 'none',
+                                    background: isSelected ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
+                                    borderBottom: isSelected ? '2px solid #22c55e' : '2px solid transparent',
+                                    color: isSelected ? '#22c55e' : 'rgba(255,255,255,0.6)',
+                                    fontSize: 12,
+                                    fontWeight: 600,
                                     cursor: 'pointer',
-                                    fontWeight: 500
+                                    transition: 'all 0.2s',
+                                    whiteSpace: 'nowrap',
+                                    fontFamily: 'inherit',
+                                    textTransform: 'uppercase'
                                 }}
                             >
-                                Innings {idx + 1}
+                                {scorecard?.Teams?.[inn.Battingteam]?.Name_Short || `INN ${idx + 1}`}
                             </button>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* Partnership Bars */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {partnerships
-                    .filter(p => parseInt(p.Runs) > 0)
-                    .sort((a, b) => parseInt(b.Runs) - parseInt(a.Runs))
-                    .slice(0, 6) // Show top 6 partnerships
-                    .map((p, idx) => {
-                        const runs = parseInt(p.Runs) || 0;
-                        const balls = parseInt(p.Balls) || 0;
-                        const barWidth = maxRuns > 0 ? (runs / maxRuns) * 100 : 0;
-                        const sr = balls > 0 ? ((runs / balls) * 100).toFixed(0) : '-';
-
-                        // Get batsmen names
-                        const batsmenNames = p.Batsmen.map(b => {
-                            const name = getPlayerName(b.Batsman);
-                            // Show abbreviated name
-                            const parts = name.split(' ');
-                            return parts.length > 1 ? `${parts[0][0]}. ${parts[parts.length - 1]}` : name;
-                        }).join(' & ');
-
-                        return (
-                            <div key={idx}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', maxWidth: '65%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        {batsmenNames}
-                                    </div>
-                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
-                                        <span style={{ color: '#fff', fontWeight: 600 }}>{runs}</span> ({balls})
-                                    </div>
-                                </div>
-                                <div style={{
-                                    height: 6,
-                                    background: 'rgba(255,255,255,0.08)',
-                                    borderRadius: 3,
-                                    overflow: 'hidden'
-                                }}>
-                                    <div style={{
-                                        width: `${barWidth}%`,
-                                        height: '100%',
-                                        background: runs >= 50 ? '#22c55e' : runs >= 30 ? '#3b82f6' : 'rgba(255,255,255,0.4)',
-                                        borderRadius: 3,
-                                        transition: 'width 0.3s ease'
-                                    }} />
-                                </div>
-                            </div>
                         );
                     })}
+                </div>
+            )}
+
+            {/* Title (Optional, but good for context) */}
+            <h4 style={{ margin: '16px 16px 10px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Partnerships</h4>
+
+            {/* Partnership List - Copied from LiveDetail */}
+            <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {validPartnerships.map((p: any, idx: number) => {
+                    const totalRuns = parseInt(p.Runs) || 1;
+                    const bat1 = p.Batsmen?.[0];
+                    const bat2 = p.Batsmen?.[1];
+                    const bat1Runs = parseInt(bat1?.Runs) || 0;
+                    const bat2Runs = parseInt(bat2?.Runs) || 0;
+                    const bat1Pct = totalRuns > 0 ? (bat1Runs / totalRuns) * 100 : 50;
+
+                    // Name handling: Try player name directly, or look up in Teams
+                    const bat1Name = bat1?.name || scorecard.Teams?.[selectedInn.Battingteam]?.Players?.[bat1?.Batsman]?.Name_Full || 'P1';
+                    const bat2Name = bat2?.name || scorecard.Teams?.[selectedInn.Battingteam]?.Players?.[bat2?.Batsman]?.Name_Full || 'P2';
+
+                    // Highlight current partnership if it's the latest innings and unbeaten
+                    const isLatestInnings = selectedInningsIdx === innings.length - 1;
+                    const isCurrent = isLatestInnings && (p.Isunbeaten === 'true' || p.Isunbeaten === true);
+
+                    return (
+                        <div key={idx} style={{
+                            display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
+                            background: isCurrent ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255,255,255,0.02)',
+                            borderRadius: 8,
+                            border: isCurrent ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(255,255,255,0.04)'
+                        }}>
+                            {/* Wicket # */}
+                            <div style={{ fontSize: 10, color: isCurrent ? '#22c55e' : 'rgba(255,255,255,0.4)', fontWeight: 700, minWidth: 18 }}>
+                                {p.ForWicket}{isCurrent && '*'}
+                            </div>
+
+                            {/* Player 1 */}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 40 }}>
+                                <WikiImage name={bat1Name} id={bat1?.Batsman} type="player" style={{ width: 24, height: 24 }} circle={true} />
+                                <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.5)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 40 }}>
+                                    {bat1Name.split(' ').pop()}
+                                </div>
+                            </div>
+                            <div style={{ fontSize: 10, color: '#60a5fa', fontWeight: 600, minWidth: 20, textAlign: 'center', fontFamily: 'monospace' }}>
+                                {bat1Runs}
+                            </div>
+
+                            {/* Contribution Bar */}
+                            <div style={{ flex: 1, height: 6, borderRadius: 3, overflow: 'hidden', display: 'flex', background: 'rgba(255,255,255,0.08)' }}>
+                                <div style={{ width: `${bat1Pct}%`, background: '#60a5fa', height: '100%' }} />
+                                <div style={{ width: `${100 - bat1Pct}%`, background: '#f97316', height: '100%' }} />
+                            </div>
+
+                            {/* Player 2 */}
+                            <div style={{ fontSize: 10, color: '#f97316', fontWeight: 600, minWidth: 20, textAlign: 'center', fontFamily: 'monospace' }}>
+                                {bat2Runs}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 40 }}>
+                                <WikiImage name={bat2Name} id={bat2?.Batsman} type="player" style={{ width: 24, height: 24 }} circle={true} />
+                                <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.5)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 40 }}>
+                                    {bat2Name.split(' ').pop()}
+                                </div>
+                            </div>
+
+                            {/* Total */}
+                            <div style={{ fontSize: 12, fontWeight: 700, color: isCurrent ? '#22c55e' : '#fff', fontFamily: 'monospace', minWidth: 40, textAlign: 'right' }}>
+                                {p.Runs}<span style={{ fontSize: 9, fontWeight: 400, color: 'rgba(255,255,255,0.4)' }}>({p.Balls})</span>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
