@@ -5,6 +5,8 @@ import H2HCard from './upcoming/H2HCard';
 import VenueCard from './upcoming/VenueCard';
 import WikiImage from './WikiImage';
 import { getTeamColor } from '../utils/teamColors';
+import DualTeamRecentForm from './upcoming/DualTeamRecentForm';
+import H2HRecentMatches from './upcoming/H2HRecentMatches';
 
 interface LiveInsightsProps {
     match?: Match;
@@ -63,26 +65,22 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 </div>
             )}
 
-            {/* 3. Matchups (Rich UI) */}
+            {/* 3. Batsman vs Bowler Matchups */}
             {batsmanSplits?.Batsmen && Object.keys(batsmanSplits.Batsmen).length > 0 && (
                 <div style={{
                     background: 'var(--bg-card)',
                     borderRadius: 16,
-                    padding: 20,
+                    padding: '16px 20px',
                     border: '1px solid var(--border-color)',
-                    overflow: 'hidden'
+                    marginBottom: 16
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                        <div style={{ width: 4, height: 16, background: '#8b5cf6', borderRadius: 2 }} />
-                        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Key Matchups</div>
-                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 12 }}>Batsman vs Bowler</div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                        {Object.entries(batsmanSplits.Batsmen).slice(0, 5).map(([playerId, data]) => {
-                            // Sort bowlers by balls faced
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                        {Object.entries(batsmanSplits.Batsmen).slice(0, 3).map(([playerId, data]) => {
                             const bowlersList = Object.entries(data.Against || {})
                                 .sort((a, b) => parseInt(b[1].Balls) - parseInt(a[1].Balls))
-                                .filter(b => parseInt(b[1].Balls) > 0) // Only show real matchups
+                                .filter(b => parseInt(b[1].Balls) > 0)
                                 .slice(0, 3);
 
                             if (bowlersList.length === 0) return null;
@@ -159,12 +157,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 </div>
             )}
 
-            import DualTeamRecentForm from './upcoming/DualTeamRecentForm';
-            import H2HRecentMatches from './upcoming/H2HRecentMatches';
 
-            // ... (existing imports)
-
-            // ... inside component ...
 
             {/* 4. Manhattan Chart (Over by Over) */}
             {overByOver?.Overbyover && overByOver.Overbyover.length > 0 && (
