@@ -11,7 +11,8 @@ import { getWeatherIcon, RaindropIcon } from './icons/WeatherIcons';
 import H2HCard from './upcoming/H2HCard';
 import VenueCard from './upcoming/VenueCard';
 import DualTeamRecentForm from './upcoming/DualTeamRecentForm';
-// import RecentForm from './upcoming/RecentForm'; // Deprecated
+import H2HRecentMatches from './upcoming/H2HRecentMatches';
+// import RecentForm from './upcoming/RecentForm'; // Deprecated - Deleting
 import TopPlayers from './upcoming/TopPlayers';
 import SquadPreview from './upcoming/SquadPreview';
 import CompletedDetail from './CompletedDetail';
@@ -509,6 +510,19 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
             {!loadingH2H && h2hData && match.participants && (
                 <div className="section-container fade-in">
                     <H2HCard teams={h2hData.team?.head_to_head?.comp_type?.data || []} />
+
+                    {/* Recent H2H Matches List */}
+                    {h2hData.team?.against_last_n_matches?.result && h2hData.team.against_last_n_matches.result.length > 0 && team1?.id && team2?.id && (
+                        <div className="mt-4">
+                            <H2HRecentMatches
+                                matches={h2hData.team.against_last_n_matches.result}
+                                teamIds={[parseInt(team1.id), parseInt(team2.id)]}
+                                teamNames={[team1.name, team2.name]}
+                                format={match.event_format}
+                                onMatchClick={handleRecentMatchClick}
+                            />
+                        </div>
+                    )}
 
                     {/* NEW: Recent Form (Consolidated Card) */}
                     <div className="mt-4">
