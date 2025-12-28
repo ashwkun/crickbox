@@ -5,6 +5,7 @@ import WikiImage from '../WikiImage';
 interface TeamInfo {
     id: string;
     name: string;
+    short_name?: string;
 }
 
 interface DualTeamRecentFormProps {
@@ -90,84 +91,81 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
     const { allForm: t2All, currentForm: t2Curr } = filterMatches(matches2);
 
     // --- Renderers ---
-    const renderPills = (matches: Match[], tId: string, label?: string) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
-            {label && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>{label}</span>}
-            <div style={{ display: 'flex', gap: 4 }}>
-                {matches.length > 0 ? matches.map(m => {
-                    const res = getResult(m, tId);
-                    return (
-                        <div
-                            key={m.game_id}
-                            onClick={() => onMatchClick?.(m.game_id)}
-                            style={{
-                                width: 22,
-                                height: 22,
-                                borderRadius: 4, // More squared styling
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                background: `rgba(${res === 'W' ? '34, 197, 94' : res === 'L' ? '239, 68, 68' : '148, 163, 184'}, 0.15)`,
-                                color: getResultColor(res),
-                                fontSize: 9,
-                                fontWeight: 700,
-                                cursor: onMatchClick ? 'pointer' : 'default',
-                                border: `1px solid ${getResultColor(res)}30`
-                            }}
-                        >
-                            {res}
+    const renderPills = (matches: Match[], tId: string) => (
+        <div style={{ display: 'flex', gap: 4 }}>
+            {matches.length > 0 ? matches.map(m => {
+                const res = getResult(m, tId);
+                return (
+                    <div
+                        key={m.game_id}
+                        onClick={() => onMatchClick?.(m.game_id)}
+                        style={{
+                            width: 22,
+                            height: 22,
+                            borderRadius: 4,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: `rgba(${res === 'W' ? '34, 197, 94' : res === 'L' ? '239, 68, 68' : '148, 163, 184'}, 0.15)`,
+                            color: getResultColor(res),
+                            fontSize: 9,
+                            fontWeight: 700,
+                            cursor: onMatchClick ? 'pointer' : 'default',
+                            border: `1px solid ${getResultColor(res)}30`
+                        }}
+                    >
+                        {res}
+                    </div>
+                );
+            }) : <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>-</span>}
+        </div>
+    );
+
+    const renderTeamColumn = (team: TeamInfo, current: Match[], all: Match[], isRedundant: boolean) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1, alignItems: 'center' }}>
+            {/* Header: Team Short Name */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', letterSpacing: '0.5px' }}>
+                    {team.short_name || team.name}
+                </span>
+            </div>
+
+            {/* Stats Stack */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', alignItems: 'center' }}>
+                {isRedundant ? (
+                    // SINGLE ROW
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                        {renderPills(all, team.id)}
+                    </div>
+                ) : (
+                    // DUAL ROWS (Stacked)
+                    <>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase' }}>
+                                {(currentFormat || 'Recent').replace(/current\s*|\(|\)/gi, '')}
+                            </span>
+                            {renderPills(current, team.id)}
                         </div>
-                    );
-                }) : <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>-</span>}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase' }}>ALL</span>
+                            {renderPills(all, team.id)}
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
 
-    // Check redundancy for both teams upfront
+    // Check redundancy logic (Symmetric) - Using same logic as before but applied to new layout
     const isT1Redundant = t1Curr.length === t1All.length &&
         t1Curr.every((m, i) => m.game_id === t1All[i]?.game_id || m.id === t1All[i]?.id);
 
     const isT2Redundant = t2Curr.length === t2All.length &&
         t2Curr.every((m, i) => m.game_id === t2All[i]?.game_id || m.id === t2All[i]?.id);
 
-    // Only use compact mode if BOTH teams are redundant (to avoid visual imbalance)
+    // Enforce symmetry: Only compact if BOTH are redundant
     const useCompactMode = isT1Redundant && isT2Redundant;
 
-    const renderTeamRow = (team: TeamInfo, current: Match[], all: Match[]) => {
-        return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {/* Header: Team Info */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <WikiImage name={team.name} id={team.id} type="team" circle style={{ width: 24, height: 24 }} />
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{team.name}</span>
-                </div>
-
-                {/* Stats Row */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingLeft: 32 }}>
-
-                    {useCompactMode ? (
-                        // SINGLE ROW (Both teams allow it)
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Recent Form</span>
-                            {renderPills(all, team.id)}
-                        </div>
-                    ) : (
-                        // DUAL ROWS (At least one team needs it, so we show for both)
-                        <>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Current ({currentFormat || 'Recent'})</span>
-                                {renderPills(current, team.id)}
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>All Formats</span>
-                                {renderPills(all, team.id)}
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-        );
-    };
 
     return (
         <div className="h2h-card" style={{ marginTop: 12 }}>
@@ -175,15 +173,17 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
                 Recent Form
             </div>
 
-            <div className="h2h-content" style={{ flexDirection: 'column', gap: 16, alignItems: 'stretch' }}>
-                {/* Team 1 */}
-                {renderTeamRow(team1, t1Curr, t1All)}
+            <div className="h2h-content" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingTop: 16, paddingBottom: 16 }}>
 
-                {/* Divider */}
-                <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', width: '100%' }}></div>
+                {/* Team 1 Column */}
+                {renderTeamColumn(team1, t1Curr, t1All, useCompactMode)}
 
-                {/* Team 2 */}
-                {renderTeamRow(team2, t2Curr, t2All)}
+                {/* Vertical Divider */}
+                <div style={{ width: 1, background: 'rgba(255,255,255,0.1)', alignSelf: 'stretch', margin: '0 8px' }}></div>
+
+                {/* Team 2 Column */}
+                {renderTeamColumn(team2, t2Curr, t2All, useCompactMode)}
+
             </div>
         </div>
     );
