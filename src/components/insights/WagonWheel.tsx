@@ -49,73 +49,76 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
 
 
     // SVG dimensions
-    const size = 360; // Increased size for better resolution
+    const size = 360;
     const center = size / 2;
     const fieldRadius = 160;
     const pitchWidth = 14;
-    const pitchHeight = 48; // Represents 22 yards roughly scaled
+    const pitchHeight = 48; // Represents 22 yards roughly
 
-    // Origin for shots - Striker at Top of Pitch
+    // Striker position: Top of the pitch relative to center
     const strikerX = center;
     const strikerY = center - (pitchHeight / 2);
     const nonStrikerY = center + (pitchHeight / 2);
 
     // Calculate distance to boundary from Striker for a given angle
-    // Ray-Circle Intersection:
-    // Origin O = (0, -h) relative to Circle Center (0,0)
-    // Ray D = (cos t, sin t)
-    // t = h*sin(theta) + sqrt( R^2 - h^2*cos^2(theta) )
-    // Here h = pitchHeight/2. R = fieldRadius.
+    // Ray-Circle Intersection logic
     const getBoundaryDistance = (angleRad: number) => {
         const h = pitchHeight / 2;
-        // In SVG logic: 0 is Right (x+), 90 is Down (y+)
-        // Striker is at (0, -h) relative to center.
-        // We want |Vector(Strike -> Boundary)|.
-        // Formula derived earlier: distance = h*sin(theta) + sqrt(R^2 - h^2*cos^2(theta))
-        // Is this correct for 0=Right, 90=Down?
-        // sin(90) = 1. formula -> h + sqrt(R^2) = h+R. Striker is at -h. Boundary at +R(relative to center). Total dist = R - (-h) = R+h. Correct.
-        // sin(-90) = -1. formula -> -h + sqrt(R^2) = R-h. Striker at -h. Boundary Top at -R. Dist = -h - (-R) = R-h. Correct.
 
-        const sinT = Math.sin(angleRad);
-        const cosT = Math.cos(angleRad);
-        const term1 = h * sinT;
-        const term2 = Math.sqrt(Math.pow(fieldRadius, 2) - Math.pow(h * cosT, 2));
+        // Ray Origin O = (0, -h) relative to Center(0,0).
+        // Ray Direction D = (cos a, -sin a). (Note -sin a because of SVG Y-inversion).
+        // Intersection: |O + tD|^2 = R^2
+        // Quadratic: a=1, b=2h*sin(theta), c=h^2-R^2
+        // sin(theta) in Math corresponds to -Y in SVG.
+        // So dy = -Math.sin(angleRad).
 
-        return term1 + term2;
+        const dx = Math.cos(angleRad);
+        const dy = -Math.sin(angleRad); // Invert Y for SVG
+
+        // Quadratic coeffs
+        const a = 1; // dx^2 + dy^2 = 1
+        const b = 2 * (-h) * dy; // 2 * y0 * dy
+        const c = Math.pow(-h, 2) - Math.pow(fieldRadius, 2);
+
+        const discriminant = Math.pow(b, 2) - 4 * a * c;
+        if (discriminant < 0) return fieldRadius; // Should not happen inside circle
+
+        const t = (-b + Math.sqrt(discriminant)) / (2 * a);
+        return t;
     };
 
     // Convert shot to SVG coordinates for Lines
     const shotToLineCoords = (shot: BatsmanShot) => {
-        // Angle Mapping
-        // Assuming Standard Compass: 0=N, 90=E, 180=S, 270=W.
-        // Striker at N (Top). Straight Drive -> South (180).
-        // SVG: 0=Right, 90=Down.
-        // We map 180 (South) -> 90 (Down).
-        // Thus Angle - 90.
+        // Angle Mapping:
+        // API Data: 0 = East (Right), 90 = North (Up), 180 = West (Left), 270 = South (Down).
+        // Angles are Standard Math Angle units (degrees, CCW).
 
-        const angleRad = (parseInt(shot.Angle) - 90) * (Math.PI / 180);
+        // SVG: Y is inverted (Down is +).
+        // So we use: 
+        // x = x0 + r * cos(theta)
+        // y = y0 - r * sin(theta)  <- Subtract sin to go UP for positive Y-math
 
-        // Calculate max possible distance (Boundary) at this angle
+        const angleRad = parseInt(shot.Angle) * (Math.PI / 180);
+
         const maxDist = getBoundaryDistance(angleRad);
+        const runs = parseInt(shot.Runs);
 
-        const rawDist = parseInt(shot.Distance);
+        // Visual Scaling:
+        // 4s and 6s should hit the boundary.
+        // 1s, 2s, 3s should be shorter to avoid clutter.
+        let scaleFactor = 0.4;
 
-        // Accurate Scaling
-        // 5 or 6 means Boundary.
-        // 1-4 are intermediate.
-        // Let's assume '5.5' is the boundary threshold for "MAX" hit.
-        let scaleFactor = rawDist / 5.5;
-
-        // Clamp boundaries to exactly touch the edge if >= 5
-        if (rawDist >= 5) scaleFactor = 1.0;
-        if (scaleFactor > 1) scaleFactor = 1;
+        if (runs === 1) scaleFactor = 0.35 + (Math.random() * 0.1);
+        else if (runs === 2) scaleFactor = 0.55 + (Math.random() * 0.1);
+        else if (runs === 3) scaleFactor = 0.75;
+        else if (runs >= 4) scaleFactor = 1.0;
 
         const actualLength = scaleFactor * maxDist;
 
         return {
             x2: strikerX + actualLength * Math.cos(angleRad),
-            y2: strikerY + actualLength * Math.sin(angleRad),
-            runs: parseInt(shot.Runs)
+            y2: strikerY - actualLength * Math.sin(angleRad), // MINUS sin because SVG Y is down
+            runs: runs
         };
     };
 
