@@ -35,15 +35,19 @@ export default function App(): React.ReactElement {
 
     // Once matches are loaded, restore the pending match
     useEffect(() => {
-        if (pendingMatchId && matches.length > 0) {
-            const params = new URLSearchParams(window.location.search);
-            const forceLive = params.get('forceLive') === 'true';
+        const params = new URLSearchParams(window.location.search);
+        const forceLive = params.get('forceLive') === 'true';
 
+        // For forceLive, allow stub creation even before matches load
+        if (pendingMatchId && (matches.length > 0 || forceLive)) {
             const match = matches.find(m => m.game_id === pendingMatchId);
+            console.log('[ForceLive] pendingMatchId:', pendingMatchId, 'forceLive:', forceLive, 'matchFound:', !!match);
+
             if (match) {
                 setSelectedMatch(match);
             } else if (forceLive) {
                 // Create stub match for forceLive testing (India W vs Sri Lanka W)
+                console.log('[ForceLive] Creating stub match for:', pendingMatchId);
                 setSelectedMatch({
                     game_id: pendingMatchId,
                     event_state: 'L', // Force as live
