@@ -113,18 +113,14 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
                             </div>
 
                             {/* Center Bar */}
-                            <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, minWidth: 50 }}>
-                                <div style={{ fontSize: 14, fontWeight: 800, color: isCurrent ? '#22c55e' : '#fff', lineHeight: 1 }}>
-                                    {p.Runs}
+                            <div style={{ flex: '1.5', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 50 }}>
+                                <div style={{ fontSize: 13, fontWeight: 800, color: isCurrent ? '#22c55e' : '#fff', lineHeight: 1, whiteSpace: 'nowrap' }}>
+                                    {p.Runs} <span style={{ fontSize: 11, opacity: 0.6, fontWeight: 600, color: isCurrent ? '#fff' : 'rgba(255,255,255,0.5)' }}>({p.Balls})</span>
                                 </div>
 
                                 <div style={{ width: '100%', height: 5, borderRadius: 2.5, overflow: 'hidden', display: 'flex', background: 'rgba(255,255,255,0.08)' }}>
                                     <div style={{ width: `${bat1Pct}%`, background: '#60a5fa', height: '100%' }} />
                                     <div style={{ width: `${100 - bat1Pct}%`, background: '#f97316', height: '100%' }} />
-                                </div>
-
-                                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)' }}>
-                                    {p.Balls}b
                                 </div>
                             </div>
 
