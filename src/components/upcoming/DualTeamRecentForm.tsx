@@ -142,10 +142,12 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
     );
 
     return (
-        <div className="section-container " style={{ padding: '16px' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 16 }}>Recent Form</div>
+        <div className="h2h-card" style={{ marginTop: 12 }}>
+            <div className="h2h-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                Recent Form
+            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="h2h-content" style={{ flexDirection: 'column', gap: 16, alignItems: 'stretch' }}>
                 {/* Team 1 */}
                 {renderTeamRow(team1, t1Curr, t1All)}
 
