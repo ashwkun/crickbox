@@ -1154,8 +1154,12 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             const oversFloat = targetBall.bowlerOvers ? parseFloat(targetBall.bowlerOvers) : 0;
                                             const hasBowled = oversFloat > 0.1;
 
+                                            // Only show bowling change card for FIRST spell (genuine new bowler)
+                                            // Don't show for bowlers returning for second/third spell
+                                            if (hasBowled) return null;
+
                                             const bowlerId = ball.bowlerId || findPlayerIdByName(newBowlerName);
-                                            const h2hPlayer = !hasBowled ? findPlayerInH2H(newBowlerName, 'bowler', bowlerId) : null;
+                                            const h2hPlayer = findPlayerInH2H(newBowlerName, 'bowler', bowlerId);
                                             const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'bowler') : null;
 
                                             return (
