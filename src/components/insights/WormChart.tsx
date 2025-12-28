@@ -9,6 +9,7 @@ interface WormChartProps {
     team2Name: string;
     team1ShortName: string;
     team2ShortName: string;
+    matchFormat?: string;
     team1Id?: string;
     team2Id?: string;
 }
@@ -20,6 +21,7 @@ const WormChart: React.FC<WormChartProps> = ({
     team2Name,
     team1ShortName,
     team2ShortName,
+    matchFormat,
     team1Id,
     team2Id
 }) => {
@@ -59,17 +61,36 @@ const WormChart: React.FC<WormChartProps> = ({
     const chartHeight = height - padding.top - padding.bottom;
 
     // Calculate scales
-    // Default to at least 20 overs (T20 format) or max played, handles start of innings clearly
-    const maxOvers = Math.max(
-        cumulative1.length > 0 ? cumulative1[cumulative1.length - 1].over : 0,
-        cumulative2.length > 0 ? cumulative2[cumulative2.length - 1].over : 0,
-        20
-    );
-    const maxRuns = Math.max(
-        cumulative1.length > 0 ? cumulative1[cumulative1.length - 1].total : 0,
-        cumulative2.length > 0 ? cumulative2[cumulative2.length - 1].total : 0,
-        100 // Minimum runs to avoid flat line
-    ) * 1.1; // Add 10% headroom
+    // Calculate scales
+    const max1 = cumulative1.length > 0 ? cumulative1[cumulative1.length - 1] : { over: 0, total: 0 };
+    const max2 = cumulative2.length > 0 ? cumulative2[cumulative2.length - 1] : { over: 0, total: 0 };
+
+    let maxOvers = 20;
+    let maxRuns = 100;
+
+    // Logic: Adaptive Scaling (User Request)
+    if (cumulative2.length === 0) {
+        // INNINGS 1: Zoom In Mode (Start 5ov/50runs, grow as needed)
+        // This prevents "invisible worm" in early ODI/Test overs
+        maxOvers = Math.max(max1.over, 5);
+        maxRuns = Math.max(max1.total, 50) * 1.1; // +10% headroom
+    } else {
+        // INNINGS 2: Chase Perspective
+        // Keep scale of First Innings to show target context, but expand if 2nd innings exceeds it
+        // Ensure we respect match format minimums (e.g. don't shrink below 20 for T20 if 1st innings collapsed in 10)
+        let formatBaseOvers = 0;
+        if (matchFormat?.toLowerCase().includes('t20') || matchFormat?.toLowerCase().includes('hundred')) {
+            formatBaseOvers = 20;
+        } else if (matchFormat?.toLowerCase().includes('odi') || matchFormat?.toLowerCase().includes('one day')) {
+            formatBaseOvers = 50;
+        }
+
+        // Max overs is greater of: Innings 1 duration, Innings 2 duration, or Format Base (if valid)
+        // User request: "keep scale of first inning" -> usually means Target Overs.
+        // We use Math.max to ensure nothing is clipped.
+        maxOvers = Math.max(max1.over, max2.over, formatBaseOvers);
+        maxRuns = Math.max(max1.total, max2.total, 100) * 1.1;
+    }
 
     // Generate SVG polyline points
     const generatePolyline = (data: { over: number; total: number }[]) => {
