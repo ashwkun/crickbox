@@ -32,6 +32,24 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
     const team1 = match?.participants?.[0];
     const team2 = match?.participants?.[1];
 
+    // Helper to get definitive short name (matches WagonWheel logic)
+    const getShortName = (team: any) => {
+        if (!team?.id) return 'T1';
+        // 1. Try Scorecard Data (most accurate, used in WagonWheel)
+        if (scorecard?.Teams?.[team.id]?.Name_Short) {
+            return scorecard.Teams[team.id].Name_Short;
+        }
+        // 2. Try Match Participant Data
+        if (team.short_name) return team.short_name;
+        // 3. Try "Value" field
+        if (team.value && team.value.length >= 2 && team.value.length <= 4) return team.value;
+        // 4. Fallback
+        return team.name?.substring(0, 3).toUpperCase() || 'TM';
+    };
+
+    const t1Short = getShortName(team1);
+    const t2Short = getShortName(team2);
+
     const t1Id = team1?.id ? parseInt(team1.id) : undefined;
     const t2Id = team2?.id ? parseInt(team2.id) : undefined;
     const teamIds: [number, number] | undefined = t1Id && t2Id ? [t1Id, t2Id] : undefined;
