@@ -17,12 +17,17 @@ interface MatchDetailProps {
  * based on match state (Upcoming, Live, or Completed)
  */
 const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick }) => {
+    // Check for forceLive URL parameter (for testing)
+    const params = new URLSearchParams(window.location.search);
+    const forceLive = params.get('forceLive') === 'true';
+
     // Route to appropriate component based on match state
     if (match.event_state === 'U') {
         return <UpcomingDetail match={match} onClose={onClose} onSeriesClick={onSeriesClick} />;
     }
 
-    if (match.event_state === 'L') {
+    // Force LiveDetail for completed matches if forceLive=true
+    if (match.event_state === 'L' || forceLive) {
         return (
             <LiveDetail
                 match={match}
