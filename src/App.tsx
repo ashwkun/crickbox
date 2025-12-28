@@ -43,15 +43,20 @@ export default function App(): React.ReactElement {
             if (match) {
                 setSelectedMatch(match);
             } else if (forceLive) {
-                // Create stub match for forceLive testing (allows data loading even if match not in list)
+                // Create stub match for forceLive testing (India W vs Sri Lanka W)
                 setSelectedMatch({
                     game_id: pendingMatchId,
                     event_state: 'L', // Force as live
-                    participants: [],
-                    series_id: '',
-                    series_name: 'Testing Match',
-                    short_status: 'Testing',
-                    event_format: 'T20I'
+                    event_format: 't20',
+                    series_id: '13512',
+                    series_name: 'Sri Lanka Women in India, 5 T20I Series, 2025',
+                    event_name: '5th T20I',
+                    short_status: 'Test Mode',
+                    venue_name: 'Greenfield International Stadium',
+                    participants: [
+                        { id: '1126', name: 'India Women', short_name: 'IND-W', value: '221/2' },
+                        { id: '1133', name: 'Sri Lanka Women', short_name: 'SL-W', value: '191/5' }
+                    ]
                 } as Match);
             }
             setPendingMatchId(null);
