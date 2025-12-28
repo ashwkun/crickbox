@@ -16,7 +16,6 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
 
     // Get innings from scorecard
     const innings = scorecard?.Innings || [];
-    const hasMultipleInnings = innings.length > 1;
 
     // Get innings label like scorecard
     const getInningsLabel = (inn: any, idx: number) => {
@@ -50,38 +49,55 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
 
 
     // SVG dimensions
-    const size = 280;
+    const size = 320; // Slightly larger for better detail
     const center = size / 2;
-    const fieldRadius = 115;
-    const pitchWidth = 12;
-    const pitchHeight = 40;
+    const fieldRadius = 140;
+    const pitchWidth = 16;
+    const pitchHeight = 44;
 
-    // Convert shot to SVG coordinates
-    const shotToCoords = (shot: BatsmanShot) => {
-        const angle = (parseInt(shot.Angle) - 90) * (Math.PI / 180); // -90 to make 0 degrees point up
+    // Striker position: Top of the pitch (as requested)
+    const strikerX = center;
+    const strikerY = center - (pitchHeight / 2);
+    const nonStrikerY = center + (pitchHeight / 2);
+
+    // Convert shot to SVG coordinates for Lines
+    const shotToLineCoords = (shot: BatsmanShot) => {
+        // Angle Handling:
+        // Data usually has 0 around North/East. 
+        // We want shots to emanate from Striker (Top) downwards potentially.
+        // If we keep the same angular logic but just change the Origin to the Striker's position,
+        // it should look correct relative to the wicket.
+
+        const angleRad = (parseInt(shot.Angle) - 90) * (Math.PI / 180);
         const distance = parseInt(shot.Distance);
-        // Map distance 1-5 to field radius (20-100% of field)
-        const r = (distance / 5) * fieldRadius * 0.85 + fieldRadius * 0.15;
+
+        // Scale distance to field radius
+        // Shots go from Striker Position outward
+        // We scale based on assumption that Max distance (6) hits boundary from center.
+        // Since we are off-center (at top of pitch), length might need adjustment to stay in circle,
+        // but for visual simplicity we scale to field radius.
+        const length = (distance / 5.5) * fieldRadius;
+
         return {
-            x: center + r * Math.cos(angle),
-            y: center + r * Math.sin(angle),
+            x2: strikerX + length * Math.cos(angleRad),
+            y2: strikerY + length * Math.sin(angleRad),
             runs: parseInt(shot.Runs)
         };
     };
 
     // Color based on runs
     const getRunColor = (runs: number) => {
-        if (runs >= 6) return '#ef4444'; // Red for 6
-        if (runs >= 4) return '#facc15'; // Yellow for 4
-        if (runs >= 1) return '#22c55e'; // Green for 1-3
-        return 'rgba(255,255,255,0.3)'; // Dot ball
+        if (runs >= 6) return '#ef4444'; // Red
+        if (runs >= 4) return '#fbbf24'; // Amber
+        if (runs >= 3) return '#84cc16'; // Lime
+        if (runs >= 1) return '#22c55e'; // Green
+        return 'rgba(255,255,255,0.25)'; // Dot - faint line
     };
 
-    // Get dot size based on runs
-    const getDotSize = (runs: number) => {
-        if (runs >= 6) return 8;
-        if (runs >= 4) return 6;
-        return 4;
+    const getStrokeWidth = (runs: number) => {
+        if (runs >= 6) return 2.5;
+        if (runs >= 4) return 2;
+        return 1.5;
     };
 
     const selectedPlayerData = playersWithShots.find(p => p.id === selectedPlayer);
@@ -93,7 +109,9 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
             border: '1px solid var(--border-color)',
             overflow: 'hidden',
             position: 'relative', // For loading overlay
-            minHeight: 300 // Prevent collapse during loading if data is missing
+            minHeight: 380, // Taller for better view
+            display: 'flex',
+            flexDirection: 'column'
         }}>
             {/* Loading Overlay */}
             {isLoading && (
@@ -122,77 +140,80 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                 </div>
             )}
 
-            {/* Header - Centered */}
+            {/* Header & Innings Tabs Container */}
             <div style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: 'var(--text-muted)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                textAlign: 'center',
-                padding: '16px 20px 8px'
+                background: 'rgba(255,255,255,0.02)',
+                borderBottom: '1px solid rgba(255,255,255,0.05)'
             }}>
-                Wagon Wheel
+                <div style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: 'var(--text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    textAlign: 'center',
+                    padding: '16px 0 12px'
+                }}>
+                    Wagon Wheel
+                </div>
+
+                {/* Innings Tabs */}
+                {innings.length > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: 8, paddingBottom: 12 }}>
+                        {innings.map((inn: any, idx: number) => (
+                            <button
+                                key={idx}
+                                onClick={() => onInningsChange?.(idx + 1)}
+                                style={{
+                                    padding: '6px 14px',
+                                    border: selectedInnings === idx + 1 ? '1px solid rgba(34, 197, 94, 0.4)' : '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: 20,
+                                    background: selectedInnings === idx + 1 ? 'rgba(34, 197, 94, 0.1)' : 'transparent',
+                                    color: selectedInnings === idx + 1 ? '#22c55e' : 'rgba(255,255,255,0.6)',
+                                    fontSize: 11,
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                }}
+                            >
+                                {getInningsLabel(inn, idx)}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
-            {/* Innings Tabs - Like Scorecard */}
-            {innings.length > 0 && (
-                <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    {innings.map((inn: any, idx: number) => (
-                        <button
-                            key={idx}
-                            onClick={() => onInningsChange?.(idx + 1)}
-                            style={{
-                                flex: 1,
-                                minWidth: 70,
-                                padding: '12px 16px',
-                                border: 'none',
-                                background: selectedInnings === idx + 1 ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
-                                borderBottom: selectedInnings === idx + 1 ? '2px solid #22c55e' : '2px solid transparent',
-                                color: selectedInnings === idx + 1 ? '#22c55e' : 'rgba(255,255,255,0.6)',
-                                fontSize: 12,
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                whiteSpace: 'nowrap',
-                            }}
-                        >
-                            {getInningsLabel(inn, idx)}
-                        </button>
-                    ))}
-                </div>
-            )}
-
-            {/* Content (Dropdown + SVG) - Show only if data exists or loading */}
+            {/* Content  */}
             {(!batsmanSplits?.Batsmen) && !isLoading ? (
-                <div style={{ padding: 40, textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>
-                    No data available for this innings
+                <div style={{ padding: 60, textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+                    No shot data available
                 </div>
             ) : (
-                <>
-                    {/* Player Selector Trigger */}
-                    <div style={{ padding: '12px 20px', display: 'flex', justifyContent: 'center' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+
+                    {/* Floating Player Selector (Top Right) */}
+                    <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10 }}>
                         <button
                             onClick={() => setShowSelector(true)}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 10,
-                                background: 'rgba(255,255,255,0.05)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: 30, // Pill shape
-                                padding: '6px 16px 6px 6px',
+                                gap: 6,
+                                background: 'rgba(0,0,0,0.6)',
+                                backdropFilter: 'blur(4px)',
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                borderRadius: 30,
+                                padding: '4px 12px 4px 4px',
                                 color: '#fff',
-                                fontSize: 13,
+                                fontSize: 11,
+                                fontWeight: 600,
                                 cursor: 'pointer',
-                                transition: 'all 0.2s',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
                             }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                         >
                             {selectedPlayer === 'all' ? (
-                                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <span style={{ fontSize: 10, fontWeight: 700 }}>ALL</span>
+                                <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <span style={{ fontSize: 9 }}>ALL</span>
                                 </div>
                             ) : (
                                 <WikiImage
@@ -200,16 +221,11 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                     id={selectedPlayerData?.id}
                                     type="player"
                                     circle
-                                    style={{ width: 28, height: 28 }}
+                                    style={{ width: 24, height: 24, border: '1px solid rgba(255,255,255,0.2)' }}
                                 />
                             )}
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-                                <span style={{ fontWeight: 600 }}>{selectedPlayer === 'all' ? 'All Batsmen' : selectedPlayerData?.name}</span>
-                                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>
-                                    {selectedPlayer === 'all' ? `${displayShots.length} shots` : `${selectedPlayerData?.runs} runs • ${selectedPlayerData?.shots.length} shots`}
-                                </span>
-                            </div>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, marginLeft: 4 }}>
+                            <span>{selectedPlayer === 'all' ? 'All Batters' : selectedPlayerData?.name?.split(' ').pop()}</span>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6 }}>
                                 <path d="M6 9l6 6 6-6" />
                             </svg>
                         </button>
@@ -223,9 +239,9 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                             left: 0,
                             right: 0,
                             bottom: 0,
-                            background: 'rgba(10,10,10,0.95)',
-                            backdropFilter: 'blur(8px)',
-                            zIndex: 15,
+                            background: 'rgba(5,5,5,0.95)',
+                            backdropFilter: 'blur(10px)',
+                            zIndex: 30,
                             padding: 20,
                             display: 'flex',
                             flexDirection: 'column',
@@ -253,17 +269,17 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                     style={{
                                         background: selectedPlayer === 'all' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255,255,255,0.05)',
                                         border: selectedPlayer === 'all' ? '1px solid #22c55e' : '1px solid rgba(255,255,255,0.1)',
-                                        borderRadius: 12,
-                                        padding: 12,
+                                        borderRadius: 16,
+                                        padding: 16,
                                         display: 'flex',
                                         flexDirection: 'column',
                                         alignItems: 'center',
-                                        gap: 8,
+                                        gap: 10,
                                         cursor: 'pointer',
                                     }}
                                 >
-                                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <span style={{ fontSize: 12, fontWeight: 700 }}>ALL</span>
+                                    <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <span style={{ fontSize: 14, fontWeight: 700, color: '#aaa' }}>ALL</span>
                                     </div>
                                     <div style={{ textAlign: 'center' }}>
                                         <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 2 }}>All Batsmen</div>
@@ -279,14 +295,13 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                         style={{
                                             background: selectedPlayer === p.id ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255,255,255,0.05)',
                                             border: selectedPlayer === p.id ? '1px solid #22c55e' : '1px solid rgba(255,255,255,0.1)',
-                                            borderRadius: 12,
-                                            padding: 12,
+                                            borderRadius: 16,
+                                            padding: 16,
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
-                                            gap: 8,
+                                            gap: 10,
                                             cursor: 'pointer',
-                                            transition: 'transform 0.1s',
                                         }}
                                     >
                                         <WikiImage
@@ -294,10 +309,10 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                             id={p.id}
                                             type="player"
                                             circle
-                                            style={{ width: 48, height: 48, border: '2px solid rgba(255,255,255,0.1)' }}
+                                            style={{ width: 56, height: 56, border: '2px solid rgba(255,255,255,0.1)' }}
                                         />
                                         <div style={{ textAlign: 'center', width: '100%' }}>
-                                            <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                 {p.name.split(' ').pop()}
                                             </div>
                                             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
@@ -310,31 +325,31 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                         </div>
                     )}
 
-                    {/* SVG Field */}
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-                            {/* Field Circle (Main) */}
+                    {/* SVG Visualization */}
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0 10px', flex: 1, alignItems: 'center' }}>
+                        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))' }}>
+                            {/* Field Background */}
                             <circle
                                 cx={center}
                                 cy={center}
                                 r={fieldRadius}
-                                fill="rgba(34, 197, 94, 0.15)"
-                                stroke="rgba(34, 197, 94, 0.4)"
-                                strokeWidth={2}
+                                fill="rgba(255,255,255,0.02)"
+                                stroke="rgba(255,255,255,0.2)" // Standard Boundary
+                                strokeWidth={1}
                             />
 
-                            {/* Inner Circle (30 yard) */}
+                            {/* Inner Circle (30 yard) - Dashed */}
                             <circle
                                 cx={center}
                                 cy={center}
                                 r={fieldRadius * 0.45}
                                 fill="none"
-                                stroke="rgba(255,255,255,0.15)"
+                                stroke="rgba(255,255,255,0.1)"
                                 strokeWidth={1}
-                                strokeDasharray="4,4"
+                                strokeDasharray="6,4"
                             />
 
-                            {/* Zone Lines (8 zones) */}
+                            {/* Zone Spokes */}
                             {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => {
                                 const rad = (angle - 90) * (Math.PI / 180);
                                 const x2 = center + fieldRadius * Math.cos(rad);
@@ -346,70 +361,86 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                         y1={center}
                                         x2={x2}
                                         y2={y2}
-                                        stroke="rgba(255,255,255,0.08)"
+                                        stroke="rgba(255,255,255,0.05)"
                                         strokeWidth={1}
                                     />
                                 );
                             })}
 
-                            {/* Pitch Rectangle */}
+                            {/* Pitch Area */}
                             <rect
                                 x={center - pitchWidth / 2}
                                 y={center - pitchHeight / 2}
                                 width={pitchWidth}
                                 height={pitchHeight}
-                                fill="rgba(194, 178, 128, 0.6)"
+                                fill="rgba(200, 180, 140, 0.3)" // Faint pitch
                                 rx={2}
                             />
 
-                            {/* Shot Dots */}
-                            {displayShots.map((shot, idx) => {
-                                const { x, y, runs } = shotToCoords(shot);
-                                return (
-                                    <circle
-                                        key={idx}
-                                        cx={x}
-                                        cy={y}
-                                        r={getDotSize(runs)}
-                                        fill={getRunColor(runs)}
-                                        opacity={0.85}
-                                    />
-                                );
-                            })}
+                            {/* Wickets */}
+                            {/* Striker End (Top) */}
+                            <rect x={center - 3} y={strikerY - 2} width={6} height={2} fill="#fff" />
+                            {/* Non-Striker End (Bottom) */}
+                            <rect x={center - 3} y={nonStrikerY} width={6} height={2} fill="rgba(255,255,255,0.5)" />
 
-                            {/* Batsman Indicator */}
-                            <circle
-                                cx={center}
-                                cy={center + pitchHeight / 2 - 4}
-                                r={4}
-                                fill="#fff"
-                            />
+
+                            {/* SHOT LINES */}
+                            <g>
+                                {displayShots.map((shot, idx) => {
+                                    const { x2, y2, runs } = shotToLineCoords(shot);
+                                    const color = getRunColor(runs);
+                                    return (
+                                        <g key={idx}>
+                                            <line
+                                                x1={strikerX}
+                                                y1={strikerY}
+                                                x2={x2}
+                                                y2={y2}
+                                                stroke={color}
+                                                strokeWidth={getStrokeWidth(runs)}
+                                                strokeLinecap="round"
+                                                opacity={0.8}
+                                            />
+                                            {/* Dot at end for boundary shots */}
+                                            {runs >= 4 && (
+                                                <circle cx={x2} cy={y2} r={runs >= 6 ? 3 : 2} fill={color} />
+                                            )}
+                                        </g>
+                                    );
+                                })}
+                            </g>
+
+                            {/* Striker Dot (Origin) */}
+                            <circle cx={strikerX} cy={strikerY} r={3} fill="#fff" stroke="var(--bg-card)" strokeWidth={1} />
+
                         </svg>
                     </div>
 
-                    {/* Legend */}
+                    {/* Legend Footer */}
                     <div style={{
                         display: 'flex',
                         justifyContent: 'center',
                         gap: 16,
-                        marginTop: 12,
+                        padding: '0 0 16px',
                         fontSize: 10,
-                        color: 'rgba(255,255,255,0.5)'
+                        color: 'rgba(255,255,255,0.5)',
+                        borderTop: '1px solid rgba(255,255,255,0.03)',
+                        paddingTop: 12
                     }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 16, height: 2, background: '#22c55e' }} />
                             <span>1-3</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#facc15' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 16, height: 3, background: '#fbbf24' }} />
                             <span>4</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ef4444' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 16, height: 3, background: '#ef4444' }} />
                             <span>6</span>
                         </div>
                     </div>
-                </>
+                </div>
             )}
         </div>
     );
