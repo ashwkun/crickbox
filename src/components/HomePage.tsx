@@ -162,17 +162,6 @@ export default function HomePage({
     const upcomingMatches = useMemo(() =>
         matches
             .filter(m => m.event_state === 'U')
-            .filter(m => {
-                // Conservative Stale Filter:
-                // Remove matches that started > 24 hours ago (definitely completed for limited overs)
-                // BUT keep Test/First-class matches as they last multiple days
-                const startTime = new Date(m.start_date).getTime();
-                const now = Date.now();
-                const isTest = m.event_format?.toLowerCase().includes('test') || m.event_format?.toLowerCase().includes('first');
-                const isStale = !isTest && (now - startTime > 24 * 60 * 60 * 1000);
-
-                return !isStale;
-            })
             .filter(isInternationalMens)
             .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()),
         [matches]
