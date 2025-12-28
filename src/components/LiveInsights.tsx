@@ -159,6 +159,13 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 </div>
             )}
 
+            import DualTeamRecentForm from './upcoming/DualTeamRecentForm';
+            import H2HRecentMatches from './upcoming/H2HRecentMatches';
+
+            // ... (existing imports)
+
+            // ... inside component ...
+
             {/* 4. Manhattan Chart (Over by Over) */}
             {overByOver?.Overbyover && overByOver.Overbyover.length > 0 && (
                 <div style={{
@@ -190,8 +197,8 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                             const runs = parseInt(over.Runs) || 0;
                             const wickets = parseInt(over.Wickets) || 0;
                             // Normalize height: Max expected runs per over ~25
-                            const heightPct = Math.min((runs / 25) * 100, 100);
-                            const barHeight = Math.max((runs / 25) * 100, 4); // Min 4px
+                            // Max it at 100%
+                            const barHeight = Math.min(Math.max((runs / 25) * 100, 4), 100);
 
                             return (
                                 <div key={idx} style={{
@@ -243,7 +250,19 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 </div>
             )}
 
-            {/* 5. Head to Head (Premium Card) */}
+            {/* 5. Recent Form (Dual Team) */}
+            {team1?.id && team2?.id && (
+                <div style={{ padding: '0 0px' }}>
+                    <DualTeamRecentForm
+                        team1={{ id: team1.id, name: team1.name, short_name: team1.short_name }}
+                        team2={{ id: team2.id, name: team2.name, short_name: team2.short_name }}
+                        currentFormat={match?.event_format || match?.match_type}
+                    // onMatchClick not provided here as we might not want navigation inside live tab yet
+                    />
+                </div>
+            )}
+
+            {/* 6. Head to Head (Premium Card) */}
             {h2hData.team?.head_to_head?.comp_type?.data && (
                 <div style={{ padding: '0 0px' }}>
                     <H2HCard
@@ -254,7 +273,17 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 </div>
             )}
 
-            {/* 6. Venue Stats (Premium Card) */}
+            {/* 7. Recent H2H Matches */}
+            {h2hData.team?.against_last_n_matches?.result && h2hData.team.against_last_n_matches.result.length > 0 && teamIds && (
+                <H2HRecentMatches
+                    matches={h2hData.team.against_last_n_matches.result}
+                    teamIds={teamIds}
+                    teamNames={[team1?.name || '', team2?.name || '']}
+                    format={match?.event_format}
+                />
+            )}
+
+            {/* 8. Venue Stats (Premium Card) */}
             {h2hData.team?.head_to_head?.venue && (
                 <VenueCard
                     venue={h2hData.team.head_to_head.venue}
