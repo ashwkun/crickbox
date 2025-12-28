@@ -1054,7 +1054,15 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
                                 // --- INFERENCE LOGIC ---
                                 // Note: 'wallstream.balls' is descending (latest first). 'prevBall' is at idx + 1.
-                                const prevBall = wallstream?.balls?.[idx + 1];
+
+                                // Find the previous ACTUAL BALL (skip non-ball events like drinks, timeouts)
+                                const findPreviousBall = () => {
+                                    for (let i = idx + 1; i < wallstream.balls.length; i++) {
+                                        if (wallstream.balls[i].isball) return wallstream.balls[i];
+                                    }
+                                    return null;
+                                };
+                                const prevBall = findPreviousBall();
 
                                 // New Bowler: Change in ID or Name (fallback if ID missing)
                                 const isBowlerChangeCard = prevBall && (
