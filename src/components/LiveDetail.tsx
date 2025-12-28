@@ -1093,6 +1093,12 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 const isRedundantBody = ball.commentary && /^(no run|dot ball|\d+\s*runs?|wide|bye|leg\s*bye|four|six|wicket)[!.]*$/i.test(ball.commentary.trim());
                                 const showBody = ball.commentary && !isRedundantBody;
 
+                                // Skip rendering explicit change_of_bowler API events - these have no data
+                                // Our inferred bowling change card will handle them with proper bowler stats
+                                if (!ball.isball && ball.detail?.toLowerCase() === 'change_of_bowler') {
+                                    return null;
+                                }
+
                                 return (
                                     <React.Fragment key={idx}>
 
@@ -1154,12 +1160,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                             const oversFloat = targetBall.bowlerOvers ? parseFloat(targetBall.bowlerOvers) : 0;
                                             const hasBowled = oversFloat > 0.1;
 
-                                            // Only show bowling change card for FIRST spell (genuine new bowler)
-                                            // Don't show for bowlers returning for second/third spell
-                                            if (hasBowled) return null;
-
                                             const bowlerId = ball.bowlerId || findPlayerIdByName(newBowlerName);
-                                            const h2hPlayer = findPlayerInH2H(newBowlerName, 'bowler', bowlerId);
+                                            const h2hPlayer = !hasBowled ? findPlayerInH2H(newBowlerName, 'bowler', bowlerId) : null;
                                             const recentForm = h2hPlayer ? getRecentForm(h2hPlayer, 'bowler') : null;
 
                                             return (
