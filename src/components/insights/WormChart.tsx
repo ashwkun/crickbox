@@ -19,24 +19,26 @@ const WormChart: React.FC<WormChartProps> = ({
     team1Id,
     team2Id
 }) => {
-    // Calculate cumulative runs for each innings
-    const cumulative1 = useMemo(() => {
-        if (!innings1) return [];
+    // Calculate cumulative runs and wickets for each innings
+    const processInnings = (data: OverByOverEntry[] | null) => {
+        if (!data) return { points: [], wickets: [] };
         let total = 0;
-        return innings1.map(over => {
-            total += parseInt(over.Runs) || 0;
-            return { over: over.Over, total };
-        });
-    }, [innings1]);
+        const pts: { over: number; total: number }[] = [];
+        const wkts: { over: number; total: number; count: number }[] = [];
 
-    const cumulative2 = useMemo(() => {
-        if (!innings2) return [];
-        let total = 0;
-        return innings2.map(over => {
+        data.forEach(over => {
             total += parseInt(over.Runs) || 0;
-            return { over: over.Over, total };
+            const w = parseInt(over.Wickets) || 0;
+            pts.push({ over: over.Over, total });
+            if (w > 0) {
+                wkts.push({ over: over.Over, total, count: w });
+            }
         });
-    }, [innings2]);
+        return { points: pts, wickets: wkts };
+    };
+
+    const { points: cumulative1, wickets: wickets1 } = useMemo(() => processInnings(innings1), [innings1]);
+    const { points: cumulative2, wickets: wickets2 } = useMemo(() => processInnings(innings2), [innings2]);
 
     // If no data, don't render
     if (cumulative1.length === 0 && cumulative2.length === 0) {
@@ -44,24 +46,27 @@ const WormChart: React.FC<WormChartProps> = ({
     }
 
     // Chart dimensions
-    const width = 320;
-    const height = 160;
-    const padding = { top: 20, right: 16, bottom: 30, left: 36 };
+    const width = 340; // Increased width slightly
+    const height = 180; // Increased height
+    const padding = { top: 20, right: 20, bottom: 25, left: 30 }; // Adjusted padding
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
     // Calculate scales
+    // Default to at least 20 overs (T20 format) or max played, handles start of innings clearly
     const maxOvers = Math.max(
         cumulative1.length > 0 ? cumulative1[cumulative1.length - 1].over : 0,
-        cumulative2.length > 0 ? cumulative2[cumulative2.length - 1].over : 0
+        cumulative2.length > 0 ? cumulative2[cumulative2.length - 1].over : 0,
+        20
     );
     const maxRuns = Math.max(
         cumulative1.length > 0 ? cumulative1[cumulative1.length - 1].total : 0,
-        cumulative2.length > 0 ? cumulative2[cumulative2.length - 1].total : 0
-    );
+        cumulative2.length > 0 ? cumulative2[cumulative2.length - 1].total : 0,
+        100 // Minimum runs to avoid flat line
+    ) * 1.1; // Add 10% headroom
 
     // Generate SVG polyline points
-    const generatePoints = (data: { over: number; total: number }[]) => {
+    const generatePolyline = (data: { over: number; total: number }[]) => {
         if (data.length === 0) return '';
         return data.map(d => {
             const x = padding.left + (d.over / maxOvers) * chartWidth;
@@ -70,125 +75,143 @@ const WormChart: React.FC<WormChartProps> = ({
         }).join(' ');
     };
 
-    const points1 = generatePoints(cumulative1);
-    const points2 = generatePoints(cumulative2);
+    const polyPoints1 = generatePolyline(cumulative1);
+    const polyPoints2 = generatePolyline(cumulative2);
 
-    // Team colors - use team name, not ID
+    // Helper to get coordinates for a specific point (for wickets)
+    const getPointCoords = (over: number, total: number) => {
+        const x = padding.left + (over / maxOvers) * chartWidth;
+        const y = padding.top + chartHeight - (total / maxRuns) * chartHeight;
+        return { x, y };
+    };
+
+    // Team colors
     const color1 = getTeamColor(team1Name) || '#3b82f6';
     const color2 = getTeamColor(team2Name) || '#ef4444';
 
-    // Y-axis ticks
-    const yTicks = [0, Math.round(maxRuns / 2), maxRuns];
-
-    // X-axis ticks (every 5 overs)
+    // Grid config
+    const yTicks = [0, Math.round(maxRuns / 2), Math.round(maxRuns)];
     const xTicks: number[] = [];
-    for (let i = 5; i <= maxOvers; i += 5) {
-        xTicks.push(i);
-    }
+    for (let i = 5; i <= maxOvers; i += 5) xTicks.push(i);
 
     return (
         <div style={{
             background: 'var(--bg-card)',
             borderRadius: 16,
-            padding: '16px 20px',
+            padding: '16px 12px',
             border: '1px solid var(--border-color)',
+            position: 'relative',
+            overflow: 'hidden'
         }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 12 }}>
-                Run Comparison
-            </div>
+            {/* Chart Area */}
+            <div style={{ position: 'relative', width: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+                <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: 'block' }}>
 
-            <svg width={width} height={height} style={{ display: 'block', margin: '0 auto' }}>
-                {/* Grid lines */}
-                {yTicks.map(tick => {
-                    const y = padding.top + chartHeight - (tick / maxRuns) * chartHeight;
-                    return (
-                        <g key={tick}>
-                            <line
-                                x1={padding.left}
-                                y1={y}
-                                x2={width - padding.right}
-                                y2={y}
-                                stroke="rgba(255,255,255,0.1)"
-                                strokeWidth={1}
-                            />
+                    {/* Grid lines */}
+                    {yTicks.map((tick, i) => {
+                        const y = padding.top + chartHeight - (tick / maxRuns) * chartHeight;
+                        if (isNaN(y)) return null;
+                        return (
+                            <g key={`y-${tick}-${i}`}>
+                                <line
+                                    x1={padding.left} y1={y}
+                                    x2={width - padding.right} y2={y}
+                                    stroke="rgba(255,255,255,0.05)"
+                                    strokeWidth={1}
+                                    strokeDasharray="4,4"
+                                />
+                                <text
+                                    x={padding.left - 8} y={y + 3}
+                                    fill="rgba(255,255,255,0.3)"
+                                    fontSize={9} fontWeight={600}
+                                    textAnchor="end"
+                                >
+                                    {tick}
+                                </text>
+                            </g>
+                        );
+                    })}
+
+                    {/* X-axis ticks */}
+                    {xTicks.map(tick => {
+                        const x = padding.left + (tick / maxOvers) * chartWidth;
+                        return (
                             <text
-                                x={padding.left - 8}
-                                y={y + 4}
-                                fill="rgba(255,255,255,0.4)"
-                                fontSize={9}
-                                textAnchor="end"
+                                key={`x-${tick}`}
+                                x={x} y={height - 8}
+                                fill="rgba(255,255,255,0.3)"
+                                fontSize={9} fontWeight={600}
+                                textAnchor="middle"
                             >
                                 {tick}
                             </text>
-                        </g>
-                    );
-                })}
+                        );
+                    })}
 
-                {/* X-axis ticks */}
-                {xTicks.map(tick => {
-                    const x = padding.left + (tick / maxOvers) * chartWidth;
-                    return (
-                        <text
-                            key={tick}
-                            x={x}
-                            y={height - 8}
-                            fill="rgba(255,255,255,0.4)"
-                            fontSize={9}
-                            textAnchor="middle"
-                        >
-                            {tick}
-                        </text>
-                    );
-                })}
+                    {/* Innings 1 Line */}
+                    {polyPoints1 && (
+                        <polyline
+                            points={polyPoints1}
+                            fill="none"
+                            stroke={color1}
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    )}
 
-                {/* Innings 1 Line (Team batting first) */}
-                {points1 && (
-                    <polyline
-                        points={points1}
-                        fill="none"
-                        stroke={color1}
-                        strokeWidth={2.5}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                )}
+                    {/* Innings 2 Line */}
+                    {polyPoints2 && (
+                        <polyline
+                            points={polyPoints2}
+                            fill="none"
+                            stroke={color2}
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeDasharray="4,3"
+                        />
+                    )}
 
-                {/* Innings 2 Line (Team batting second) */}
-                {points2 && (
-                    <polyline
-                        points={points2}
-                        fill="none"
-                        stroke={color2}
-                        strokeWidth={2.5}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeDasharray="4,3"
-                    />
-                )}
-            </svg>
+                    {/* Wickets 1 */}
+                    {wickets1.map((w, i) => {
+                        const { x, y } = getPointCoords(w.over, w.total);
+                        return (
+                            <circle key={`w1-${i}`} cx={x} cy={y} r={3} fill={color1} stroke="var(--bg-card)" strokeWidth={1} />
+                        );
+                    })}
 
-            {/* Legend */}
+                    {/* Wickets 2 */}
+                    {wickets2.map((w, i) => {
+                        const { x, y } = getPointCoords(w.over, w.total);
+                        return (
+                            <circle key={`w2-${i}`} cx={x} cy={y} r={3} fill={color2} stroke="var(--bg-card)" strokeWidth={1} />
+                        );
+                    })}
+                </svg>
+            </div>
+
+            {/* Compact Legend */}
             <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 20,
-                marginTop: 8,
-                fontSize: 11,
+                display: 'flex', justifyContent: 'center', gap: 16,
+                marginTop: 4, fontSize: 11, fontWeight: 500
             }}>
                 {cumulative1.length > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{ width: 16, height: 3, background: color1, borderRadius: 2 }} />
-                        <span style={{ color: 'rgba(255,255,255,0.7)' }}>
-                            {team1Name.split(' ').slice(0, 2).join(' ')} ({cumulative1[cumulative1.length - 1]?.total || 0})
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: color1 }} />
+                        <span style={{ color: 'rgba(255,255,255,0.8)' }}>
+                            {team1Name.split(' ').pop()}
                         </span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{cumulative1[cumulative1.length - 1]?.total}</span>
                     </div>
                 )}
                 {cumulative2.length > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{ width: 16, height: 3, background: color2, borderRadius: 2, backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 3px, var(--bg-card) 3px, var(--bg-card) 5px)' }} />
-                        <span style={{ color: 'rgba(255,255,255,0.7)' }}>
-                            {team2Name.split(' ').slice(0, 2).join(' ')} ({cumulative2[cumulative2.length - 1]?.total || 0})
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: color2, border: '1px dashed rgba(255,255,255,0.5)' }} />
+                        <span style={{ color: 'rgba(255,255,255,0.8)' }}>
+                            {team2Name.split(' ').pop()}
                         </span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{cumulative2[cumulative2.length - 1]?.total}</span>
                     </div>
                 )}
             </div>
