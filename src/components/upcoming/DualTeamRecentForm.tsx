@@ -70,7 +70,8 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
 
         const currentForm = matches.filter(m => {
             if (!currentFormat) return true;
-            const mFormat = m.event_format?.toLowerCase() || '';
+            // Check match_type (DB) or event_format (API)
+            const mFormat = (m.match_type || m.event_format || '').toLowerCase();
             const targetFormat = currentFormat.toLowerCase();
 
             // Common variations

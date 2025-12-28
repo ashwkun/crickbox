@@ -22,6 +22,8 @@ export interface Match {
     result: string;
     league: string;
     series_id: string;
+    match_type?: string;
+    event_format?: string; // Optional, for API compatibility
 }
 
 export type FormResult = 'W' | 'L' | 'D';
