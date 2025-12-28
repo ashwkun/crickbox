@@ -13,7 +13,7 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
 
     // Get innings from scorecard
     const innings = scorecard?.Innings || [];
-    const hasMultipleInnings = innings.length > 1;
+    const hasInnings = innings.length > 0;
 
     // Get innings label like scorecard
     const getInningsLabel = (inn: any, idx: number) => {
@@ -104,7 +104,7 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
             </div>
 
             {/* Innings Tabs - Like Scorecard */}
-            {hasMultipleInnings && (
+            {hasInnings && (
                 <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                     {innings.map((inn: any, idx: number) => (
                         <button
