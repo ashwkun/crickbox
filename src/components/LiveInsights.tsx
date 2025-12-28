@@ -21,10 +21,11 @@ interface LiveInsightsProps {
     overByOver2?: OverByOverResponse | null;
     wagonWheelInnings?: number;
     onWagonWheelInningsChange?: (innings: number) => void;
+    isWagonWheelLoading?: boolean;
 }
 
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, overByOver, overByOver1, overByOver2, wagonWheelInnings, onWagonWheelInningsChange }) => {
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, overByOver, overByOver1, overByOver2, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading }) => {
     const [manhattanInnings, setManhattanInnings] = useState<1 | 2>(1);
     if (!h2hData) return null;
 
@@ -80,6 +81,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 scorecard={scorecard}
                 selectedInnings={wagonWheelInnings}
                 onInningsChange={onWagonWheelInningsChange}
+                isLoading={isWagonWheelLoading}
             />
 
             {/* Worm Chart */}
