@@ -991,12 +991,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 const nextOverNum = nextActualBall && nextActualBall.over ? Math.floor(parseFloat(nextActualBall.over)) : -1;
                                 const showOverSeparator = ball.isball && nextActualBall && currentOverNum !== nextOverNum && nextOverNum !== -1;
 
-                                // Detect bowler change - when next ball has a different bowler
-                                // AND the immediate next event is NOT an explicit 'change_of_bowler' (to avoid double cards)
-                                const isBowlerChange = ball.isball && nextActualBall &&
-                                    ball.bowlerName && nextActualBall.bowlerName &&
-                                    ball.bowlerName !== nextActualBall.bowlerName &&
-                                    wallstream.balls[idx + 1]?.detail !== 'change_of_bowler';
+                                // Note: Bowler change detection moved to inference logic below (isBowlerChangeCard)
 
                                 // Visual Config based on Event Type
                                 let markerColor = '#3f3f46'; // default grey

@@ -43,12 +43,12 @@ https://www.wisden.com/default.aspx?methodtype=3&client={CLIENT_MATCHES}&sport=1
 ```
 - `gamestate=1`: Live Matches
 - `gamestate=2`: Upcoming Matches
-- `gamestate=4`: Recent Completed Matches (Last few days)
+- `gamestate=4`: Recent Completed Matches (Last 2 days)
 - `gamestate=3`: Archived Matches (Older, e.g., 2023 - *Avoid*)
 
 ---
 
-### B. Results (Historical Data)
+### B. Results (Prefer for results)
 Fetches past match results using a date range filter.
 
 | Feature | Details |
@@ -120,6 +120,174 @@ https://www.wisden.com/cricket/v1/game/head-to-head?client_id={CLIENT_SCORECARD}
 
 ---
 
+### F. Team Profile
+Provides comprehensive team information including coach details, social media, trophy cabinet, and team history.
+
+| Feature | Details |
+| :--- | :--- |
+| **Method** | `GET` |
+| **Sample Data** | [team_profile.json](api_samples/new_apis/team_profile.json) |
+
+**URL Structure:**
+```text
+https://www.wisden.com/cricket/v1/team?team_id={TEAM_ID}&lang=en&feed_format=json&client_id={CLIENT_SCORECARD}
+```
+
+**Key Data:**
+- Team names (full, short, display)
+- Gender, nationality, home venue
+- Coach/staff role details
+- Social media links
+- Trophy cabinet and achievements
+- Team writeup/history
+
+---
+
+### G. Team Schedule (Recent/Upcoming)
+Fetches recent or upcoming matches for a specific team. **This is used to calculate the Form Guide** (W/L/D indicators).
+
+| Feature | Details |
+| :--- | :--- |
+| **Method** | `GET` |
+| **Sample Data** | [team_schedule.json](api_samples/new_apis/team_schedule.json) |
+
+**URL Structure:**
+```text
+https://www.wisden.com/cricket/v1/schedule?is_recent={BOOL}&team_id={TEAM_ID}&page_size={SIZE}&lang=en&feed_format=json&client_id={CLIENT_SCORECARD}
+```
+
+**Parameters:**
+- `is_recent`: `true` for recent matches, `false` for upcoming
+- `team_id`: Team identifier (e.g., `1126` for India Women)
+- `page_size`: Number of matches to fetch (e.g., `5` for last 5 matches)
+
+**Form Guide Implementation:**
+```typescript
+// Get last 5 matches for team
+const response = await fetch(schedule_api + "?is_recent=true&team_id=1126&page_size=5");
+const form = response.data.matches.map(match => {
+  if (match.winning_team_id === teamId) return 'W';
+  if (match.match_status.includes('Tied')) return 'T';
+  if (match.match_status.includes('Draw')) return 'D';
+  return 'L';
+});
+// Result: ['W', 'W', 'L', 'W', 'D']
+```
+
+> [!NOTE]
+> The `/cricket/v1/team/form` endpoint exists but returns 404/empty for most teams. Use this schedule approach instead.
+
+---
+
+### H. Rankings (ICC)
+Fetches ICC rankings for teams or players across all formats.
+
+| Feature | Details |
+| :--- | :--- |
+| **Method** | `GET` |
+| **Sample Data** | [rankings_t20i.json](api_samples/new_apis/rankings_t20i.json), [rankings_t20i_batting.json](api_samples/new_apis/rankings_t20i_batting.json) |
+
+**URL Structure:**
+```text
+https://www.wisden.com/cricket/v1/ranking?comp_type={COMP}&gender={GENDER}&type={TYPE}&lang=en&feed_format=json&client_id={CLIENT_SCORECARD}
+```
+
+**Parameters:**
+- `comp_type`: `1` = Test, `2` = ODI, `3` = T20I
+- `gender`: `1` = Men, `2` = Women
+- `type`: `1` = Team, `2` = Batting, `3` = Bowling, `4` = All-rounder
+
+**Examples:**
+```bash
+# Men's T20I Team Rankings
+comp_type=3&gender=1&type=1
+
+# Women's T20I Batting Rankings
+comp_type=3&gender=2&type=2
+```
+
+**Key Data:**
+- Current ranking position and points
+- Rank change indicator
+- Career best ranking
+- Player/team details
+
+---
+
+### I. Player Profile
+Comprehensive player information including biography, career statistics, and social media.
+
+| Feature | Details |
+| :--- | :--- |
+| **Method** | `GET` |
+| **Sample Data** | [player_profile.json](api_samples/new_apis/player_profile.json) |
+
+**URL Structure:**
+```text
+https://www.wisden.com/cricket/v1/player?player_id={PLAYER_ID}&lang=en&feed_format=json&client_id={CLIENT_SCORECARD}
+```
+
+**Key Data:**
+- Full name, DOB, nationality, place of birth
+- Playing role, batting style, bowling style
+- Detailed biography/writeup (HTML formatted)
+- Social media links (Facebook, Twitter, Instagram, etc.)
+- Career statistics across all formats
+- Records and achievements
+
+---
+
+### J. Venue Information
+Detailed venue information including history, statistics, and records across all formats.
+
+| Feature | Details |
+| :--- | :--- |
+| **Method** | `GET` |
+| **Sample Data** | [venue.json](api_samples/new_apis/venue.json) |
+
+**URL Structure:**
+```text
+https://www.wisden.com/cricket/v1/venue?venue_id={VENUE_ID}&lang=en&feed_format=json&client_id={CLIENT_SCORECARD}
+```
+
+**Key Data:**
+- Venue name, city, country
+- Capacity, floodlights, established date
+- Venue ends, coordinates (lat/long)
+- Detailed history/writeup
+- Format-wise statistics (Tests, ODIs, T20Is):
+  - Average scores per innings
+  - Highest/lowest totals
+  - Win percentages batting first/second
+  - Most successful teams/players
+  - Records (highest individual score, best bowling, etc.)
+
+---
+
+### K. Series Information
+Series details including participating teams, results, and tour information.
+
+| Feature | Details |
+| :--- | :--- |
+| **Method** | `GET` |
+| **Sample Data** | [series.json](api_samples/new_apis/series.json) |
+
+**URL Structure:**
+```text
+https://www.wisden.com/cricket/v1/series?series_id={SERIES_ID}&lang=en&feed_format=json&client_id={CLIENT_SCORECARD}
+```
+
+**Key Data:**
+- Series name, start/end dates
+- Competition type (Test/ODI/T20I)
+- Tour information
+- Participating teams with match statistics (wins/losses/draws/tied)
+- Series result/status
+- Whether teams have squads available
+- Coverage level
+
+---
+
 ## 4. Client Identifiers & Config
 
 **Source of Truth:** `src/utils/wisdenConfig.ts`
@@ -129,7 +297,7 @@ This file contains the hardcoded Client IDs required for API access. If APIs sto
 | Key | Value (Current) | Purpose |
 | :--- | :--- | :--- |
 | `CLIENT_MATCHES` | `e656463796` | Matches List & Results API |
-| `CLIENT_SCORECARD` | `430fdd0d` | Scorecard & H2H APIs |
+| `CLIENT_SCORECARD` | `430fdd0d` | Scorecard, H2H, Team, Rankings, Player, Venue, Series, Schedule APIs |
 | `WALLSTREAM_CLIENT` | `lx/QMpdauKZQKYaddAs76w==` | Wallstream Auth (URL Encode this!) |
 
 > [!TIP]
