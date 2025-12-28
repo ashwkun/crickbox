@@ -836,12 +836,12 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     {/* Bowler Details - Centered below Last Ball */}
                                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 6, marginTop: 4, width: '100%' }}>
                                         <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 2 }}>Bowler</div>
-                                        <div style={{ fontSize: 11, color: '#fff', fontWeight: 700, marginBottom: 2, letterSpacing: 0.5 }}>{activeBowler?.name || latestBall?.bowlerName}</div>
+                                        <div style={{ fontSize: 11, color: '#fff', fontWeight: 700, marginBottom: 2, letterSpacing: 0.5 }}>{activeBowler?.name || latestBall?.bowlerName || '-'}</div>
                                         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>
                                             {activeBowler ? `${activeBowler.wickets}-${activeBowler.runs}` :
-                                                `${latestBall?.bowlerWickets}-${latestBall?.bowlerRuns}`}
+                                                latestBall?.bowlerWickets !== undefined ? `${latestBall.bowlerWickets}-${latestBall.bowlerRuns}` : '-'}
                                             <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginLeft: 4 }}>
-                                                ({activeBowler ? activeBowler.overs : latestBall?.bowlerOvers})
+                                                ({activeBowler ? activeBowler.overs : latestBall?.bowlerOvers || '-'})
                                             </span>
                                         </div>
                                     </div>
