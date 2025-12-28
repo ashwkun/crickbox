@@ -123,11 +123,17 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
         </div>
     );
 
-    const renderTeamRow = (team: TeamInfo, current: Match[], all: Match[]) => {
-        // Check if "Current" and "All" lists are effectively identical (same matches)
-        const isRedundant = current.length === all.length &&
-            current.every((m, i) => m.game_id === all[i]?.game_id || m.id === all[i]?.id);
+    // Check redundancy for both teams upfront
+    const isT1Redundant = t1Curr.length === t1All.length &&
+        t1Curr.every((m, i) => m.game_id === t1All[i]?.game_id || m.id === t1All[i]?.id);
 
+    const isT2Redundant = t2Curr.length === t2All.length &&
+        t2Curr.every((m, i) => m.game_id === t2All[i]?.game_id || m.id === t2All[i]?.id);
+
+    // Only use compact mode if BOTH teams are redundant (to avoid visual imbalance)
+    const useCompactMode = isT1Redundant && isT2Redundant;
+
+    const renderTeamRow = (team: TeamInfo, current: Match[], all: Match[]) => {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {/* Header: Team Info */}
@@ -139,14 +145,14 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
                 {/* Stats Row */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingLeft: 32 }}>
 
-                    {isRedundant ? (
-                        // SINGLE ROW (Franchise / Single Format Teams)
+                    {useCompactMode ? (
+                        // SINGLE ROW (Both teams allow it)
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Recent Form</span>
                             {renderPills(all, team.id)}
                         </div>
                     ) : (
-                        // DUAL ROWS (Multi-Format International Teams)
+                        // DUAL ROWS (At least one team needs it, so we show for both)
                         <>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Current ({currentFormat || 'Recent'})</span>
