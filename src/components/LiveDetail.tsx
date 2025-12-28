@@ -293,7 +293,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         };
     };
 
-    // Helper: Match chip display - "TEST 4/5" for series, "Match 13" for tournaments
+    // Helper: Match chip display - "TEST 4 of 5" for series, "Match 13" for tournaments
     const getMatchChip = (): string => {
         const format = match.event_format?.toUpperCase() || '';
 
@@ -308,22 +308,22 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         if (ordinalMatch) {
             const matchNum = parseInt(ordinalMatch[1]);
 
-            // Use Series_match_count for series (keep compact style: 4/5)
+            // Use Series_match_count for series (consistent "of" style)
             if (scorecard?.Matchdetail?.Series?.Series_match_count) {
-                return `${format} ${matchNum}/${scorecard.Matchdetail.Series.Series_match_count}`;
+                return `${format} ${matchNum} of ${scorecard.Matchdetail.Series.Series_match_count}`;
             }
 
             // Fallback: Extract total from series_name
             const totalMatch = match.series_name?.match(/(\d+)\s*(Test|T20I?|ODI)/i);
             if (totalMatch) {
-                return `${format} ${matchNum}/${parseInt(totalMatch[1])}`;
+                return `${format} ${matchNum} of ${parseInt(totalMatch[1])}`;
             }
 
             return format ? `${format} ${matchNum}` : match.event_name;
         }
 
         if (tournamentMatch) {
-            // For tournaments, just show "Match 13" (not "Match 13/74")
+            // For tournaments, just show "Match 13" (not "Match 13 of 74")
             return match.event_name;
         }
 
