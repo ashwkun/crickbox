@@ -123,14 +123,25 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
             <PartnershipsChart scorecard={scorecard} />
 
             {/* Batsman vs Bowler Matchups */}
-            <BatsmanBowlerMatchups
-                batsmanSplits={batsmanSplitsMatchups || batsmanSplits || null}
-                overByOver={overByOverMatchups || null} // Strict: Do not fallback to main overByOver as it might be wrong innings
-                scorecard={scorecard}
-                selectedInnings={matchupsInnings}
-                onInningsChange={onMatchupsInningsChange}
-                isLoading={isMatchupsLoading}
-            />
+            {(() => {
+                // Ensure data sources are synchronized to prevent mismatches
+                // If using independent matchups data, use independent OBO.
+                // If falling back to main splits, fallback to main OBO.
+                const useIndependent = !!batsmanSplitsMatchups;
+                const activeSplits = useIndependent ? batsmanSplitsMatchups : (batsmanSplits || null);
+                const activeOBO = useIndependent ? overByOverMatchups : (overByOver || null);
+
+                return (
+                    <BatsmanBowlerMatchups
+                        batsmanSplits={activeSplits}
+                        overByOver={activeOBO}
+                        scorecard={scorecard}
+                        selectedInnings={matchupsInnings}
+                        onInningsChange={onMatchupsInningsChange}
+                        isLoading={isMatchupsLoading}
+                    />
+                );
+            })()}
 
             {/* 4. Manhattan Chart (Over by Over) */}
             {overByOver?.Overbyover && overByOver.Overbyover.length > 0 && (
