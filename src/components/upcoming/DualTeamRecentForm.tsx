@@ -163,10 +163,6 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
     const isT2Redundant = t2Curr.length === t2All.length &&
         t2Curr.every((m, i) => m.game_id === t2All[i]?.game_id || m.id === t2All[i]?.id);
 
-    console.log(`[RecentForm] ${team1.short_name}: Curr=${t1Curr.length}, All=${t1All.length}, Redundant=${isT1Redundant}`);
-    console.log(`[RecentForm] ${team2.short_name}: Curr=${t2Curr.length}, All=${t2All.length}, Redundant=${isT2Redundant}`);
-    console.log(`[RecentForm] Compact Mode: ${isT1Redundant && isT2Redundant}`);
-
     // Enforce symmetry: Only compact if BOTH are redundant
     const useCompactMode = isT1Redundant && isT2Redundant;
 
