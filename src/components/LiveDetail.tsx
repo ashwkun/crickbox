@@ -1511,63 +1511,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     </table>
                                 </div>
 
-                                {/* Partnerships Section - Inside Scorecard */}
-                                {selectedInn.Partnerships?.length > 0 && (
-                                    <>
-                                        <h4 style={{ margin: '16px 16px 10px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Partnerships</h4>
-                                        <div style={{ padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                            {selectedInn.Partnerships.map((p: any, idx: number) => {
-                                                const totalRuns = parseInt(p.Runs) || 1;
-                                                const bat1 = p.Batsmen?.[0];
-                                                const bat2 = p.Batsmen?.[1];
-                                                const bat1Runs = parseInt(bat1?.Runs) || 0;
-                                                const bat2Runs = parseInt(bat2?.Runs) || 0;
-                                                const bat1Pct = totalRuns > 0 ? (bat1Runs / totalRuns) * 100 : 50;
-                                                const bat1Name = bat1?.name || scorecard.Teams?.[selectedInn.Battingteam]?.Players?.[bat1?.Batsman]?.Name_Full || 'P1';
-                                                const bat2Name = bat2?.name || scorecard.Teams?.[selectedInn.Battingteam]?.Players?.[bat2?.Batsman]?.Name_Full || 'P2';
-                                                const isLatestInnings = selectedInningsIdx === scorecard.Innings.length - 1;
-                                                const isCurrent = isLatestInnings && (p.Isunbeaten === 'true' || p.Isunbeaten === true);
 
-                                                return (
-                                                    <div key={idx} style={{
-                                                        display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
-                                                        background: isCurrent ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255,255,255,0.02)',
-                                                        borderRadius: 8,
-                                                        border: isCurrent ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(255,255,255,0.04)'
-                                                    }}>
-                                                        {/* Wicket # */}
-                                                        <div style={{ fontSize: 10, color: isCurrent ? '#22c55e' : 'rgba(255,255,255,0.4)', fontWeight: 700, minWidth: 18 }}>{p.ForWicket}{isCurrent && '*'}</div>
-
-                                                        {/* Player 1 */}
-                                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 40 }}>
-                                                            <WikiImage name={bat1Name} id={bat1?.Batsman} type="player" style={{ width: 24, height: 24 }} circle={true} />
-                                                            <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.5)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 40 }}>{bat1Name.split(' ').pop()}</div>
-                                                        </div>
-                                                        <div style={{ fontSize: 10, color: '#60a5fa', fontWeight: 600, minWidth: 20, textAlign: 'center', fontFamily: 'monospace' }}>{bat1Runs}</div>
-
-                                                        {/* Contribution Bar */}
-                                                        <div style={{ flex: 1, height: 6, borderRadius: 3, overflow: 'hidden', display: 'flex', background: 'rgba(255,255,255,0.08)' }}>
-                                                            <div style={{ width: `${bat1Pct}%`, background: '#60a5fa', height: '100%' }} />
-                                                            <div style={{ width: `${100 - bat1Pct}%`, background: '#f97316', height: '100%' }} />
-                                                        </div>
-
-                                                        {/* Player 2 */}
-                                                        <div style={{ fontSize: 10, color: '#f97316', fontWeight: 600, minWidth: 20, textAlign: 'center', fontFamily: 'monospace' }}>{bat2Runs}</div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 40 }}>
-                                                            <WikiImage name={bat2Name} id={bat2?.Batsman} type="player" style={{ width: 24, height: 24 }} circle={true} />
-                                                            <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.5)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 40 }}>{bat2Name.split(' ').pop()}</div>
-                                                        </div>
-
-                                                        {/* Total */}
-                                                        <div style={{ fontSize: 12, fontWeight: 700, color: isCurrent ? '#22c55e' : '#fff', fontFamily: 'monospace', minWidth: 40, textAlign: 'right' }}>
-                                                            {p.Runs}<span style={{ fontSize: 9, fontWeight: 400, color: 'rgba(255,255,255,0.4)' }}>({p.Balls})</span>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </>
-                                )}
 
                             </div>
                         );
