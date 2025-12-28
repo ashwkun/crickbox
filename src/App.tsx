@@ -128,6 +128,7 @@ export default function App(): React.ReactElement {
     // Fetch scorecard and wallstream together for live/completed matches
     // For live matches, refresh every 10 seconds - SYNCHRONIZED
     useEffect(() => {
+        console.log('[PWA] selectedMatch changed:', selectedMatch?.game_id, 'state:', selectedMatch?.event_state);
         if (!selectedMatch) {
             setScorecard(null);
             setWallstream(null);
@@ -137,6 +138,7 @@ export default function App(): React.ReactElement {
 
         const isLive = selectedMatch.event_state === 'L';
         const isCompleted = selectedMatch.event_state === 'C';
+        console.log('[PWA] isLive:', isLive, 'isCompleted:', isCompleted);
 
         if (!isLive && !isCompleted) {
             setScorecard(null);
