@@ -177,6 +177,7 @@ export interface BatsmanVsBowler {
     Dots: string;
     Strikerate: string;
     Scoringshots: string;
+    Dismissals?: string;
 }
 
 export interface BatsmanSplitsData {

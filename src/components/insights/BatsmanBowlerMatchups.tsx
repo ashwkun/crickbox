@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BatsmanSplitsResponse } from '../../utils/h2hApi';
 import WikiImage from '../WikiImage';
+import { IoInformationCircleOutline, IoClose } from 'react-icons/io5';
 
 interface BatsmanBowlerMatchupsProps {
     batsmanSplits: BatsmanSplitsResponse | null;
@@ -12,6 +13,7 @@ interface BatsmanBowlerMatchupsProps {
 
 const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSplits, scorecard, selectedInnings = 1, onInningsChange, isLoading = false }) => {
     const [selectedBatterId, setSelectedBatterId] = useState<string | null>(null);
+    const [showInfo, setShowInfo] = useState(false);
 
     const batsmen = batsmanSplits?.Batsmen || {};
     const batterIds = Object.keys(batsmen);
@@ -26,21 +28,17 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
         } else {
             setSelectedBatterId(null);
         }
-    }, [batterIds, selectedBatterId]); // Note: batterIds is a new array reference every render if derived from props, but React might handle it. better to use length or join.
-    // Actually, simple efficiency:
-    useEffect(() => {
-        if (batterIds.length > 0) setSelectedBatterId(batterIds[0]);
-    }, [selectedInnings]); // Reset when innings changes
+    }, [batterIds.length, selectedInnings]);
 
     const selectedBatterData = selectedBatterId ? batsmen[selectedBatterId] : null;
 
-    // Helper to determine Verdict Badge
+    // Helper to determine Verdict Badge - with clearer labels
     const getVerdict = (runs: number, balls: number, dots: number, wickets: number, sr: number) => {
-        if (wickets > 0) return { label: 'TROUBLE', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' };
-        if (sr > 175 || (runs > 20 && sr > 150)) return { label: 'DOMINATED', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)' };
-        if (dots > 3 && (dots / balls) > 0.6) return { label: 'PINNED', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)' }; // High dot %
-        if (sr < 100 && balls > 6) return { label: 'SLOW', color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)' };
-        return { label: 'NEUTRAL', color: 'rgba(255,255,255,0.4)', bg: 'rgba(255,255,255,0.05)' };
+        if (wickets > 0) return { label: 'BOWLER WON', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', description: 'Batter was dismissed' };
+        if (sr > 175 || (runs > 20 && sr > 150)) return { label: 'BATTER DOMINATED', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', description: 'High Strike Rate or Aggressive Scoring' };
+        if (dots > 3 && (dots / balls) > 0.6) return { label: 'PINNED DOWN', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)', description: 'Struggling to rotate strike (>60% Dots)' };
+        if (sr < 100 && balls > 6) return { label: 'SLOW GOING', color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', description: 'Scoring below a run-a-ball' };
+        return { label: 'NEUTRAL BATTLE', color: 'rgba(255,255,255,0.4)', bg: 'rgba(255,255,255,0.05)', description: 'Balanced contest so far' };
     };
 
     const innings = scorecard?.Innings || [];
@@ -51,13 +49,44 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
             borderRadius: 16,
             border: '1px solid var(--border-color)',
             overflow: 'hidden',
+            position: 'relative'
         }}>
-            {/* Header / Tabs - Copied from WagonWheel style */}
+            {/* Legend / Info Modal */}
+            {showInfo && (
+                <div style={{
+                    position: 'absolute', inset: 0, zIndex: 10,
+                    background: 'rgba(0,0,0,0.95)',
+                    padding: 20,
+                    display: 'flex', flexDirection: 'column', gap: 12,
+                    backdropFilter: 'blur(4px)'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>Verdict Guide</div>
+                        <IoClose onClick={() => setShowInfo(false)} style={{ fontSize: 20, color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }} />
+                    </div>
+                    {[
+                        { label: 'BATTER DOMINATED', color: '#22c55e', desc: 'Strike Rate 175+ or 20+ runs at quick pace' },
+                        { label: 'BOWLER WON', color: '#ef4444', desc: 'Bowler took the wicket' },
+                        { label: 'PINNED DOWN', color: '#eab308', desc: 'More than 60% dot balls faced' },
+                        { label: 'SLOW GOING', color: '#f97316', desc: 'Scoring rate is low (<100 SR)' },
+                        { label: 'NEUTRAL BATTLE', color: 'rgba(255,255,255,0.5)', desc: 'Standard play without one-sided dominance' },
+                    ].map((item, idx) => (
+                        <div key={idx} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                            <div style={{
+                                fontSize: 9, fontWeight: 800, padding: '4px 8px', borderRadius: 4,
+                                color: item.color, background: 'rgba(255,255,255,0.05)',
+                                minWidth: 110, textAlign: 'center'
+                            }}>{item.label}</div>
+                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', flex: 1 }}>{item.desc}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Innings Tabs */}
             {innings.length > 0 && onInningsChange && (
                 <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                     {innings.map((inn: any, idx: number) => {
-                        // Innings coming from API are usually 1-indexed in display but array is 0-indexed
-                        // selectedInnings prop is expected to be 1-based (from WagonWheel convention)
                         const inningsNum = idx + 1;
                         const isSelected = selectedInnings === inningsNum;
                         return (
@@ -75,7 +104,6 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                                     fontSize: 11,
                                     fontWeight: 600,
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s',
                                     whiteSpace: 'nowrap',
                                     fontFamily: 'inherit',
                                     textTransform: 'uppercase'
@@ -88,20 +116,30 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                 </div>
             )}
 
-            {/* Centered Heading */}
-            <div style={{ padding: '16px 16px 12px', textAlign: 'center' }}>
+            {/* Heading & Info */}
+            <div style={{ padding: '16px 16px 12px', textAlign: 'center', position: 'relative' }}>
+                <div
+                    onClick={() => setShowInfo(true)}
+                    style={{ position: 'absolute', right: 16, top: 16, cursor: 'pointer', opacity: 0.7 }}
+                >
+                    <IoInformationCircleOutline size={18} color="#fff" />
+                </div>
                 <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#fff', textTransform: 'uppercase' }}>
                     Batter vs Bowler
                 </h4>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
-                    Live Matchups & Verdicts
+                    Matchup Verdicts
                 </div>
             </div>
 
-            {/* Loading Overlay */}
-            <div style={{ position: 'relative', opacity: isLoading ? 0.5 : 1, pointerEvents: isLoading ? 'none' : 'auto', transition: 'opacity 0.2s' }}>
+            {/* Loading / Content */}
+            <div style={{ position: 'relative', opacity: isLoading ? 0.5 : 1, transition: 'opacity 0.2s' }}>
 
-                {/* 1. Batter Tabs (Focus Mode) */}
+                {/* 1. BATTER SELECTION */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 16px 8px', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+                    <span>Select Batter</span>
+                </div>
+
                 <div className="hide-scrollbar" style={{
                     display: 'flex',
                     gap: 12,
@@ -123,7 +161,6 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                                     gap: 6,
                                     cursor: 'pointer',
                                     opacity: isSelected ? 1 : 0.5,
-                                    transition: 'all 0.2s',
                                     minWidth: 50
                                 }}
                             >
@@ -156,30 +193,44 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                         );
                     }) : (
                         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', padding: 10, width: '100%', textAlign: 'center' }}>
-                            {isLoading ? 'Loading...' : 'No data for this innings'}
+                            {isLoading ? 'Loading...' : 'No data'}
                         </div>
                     )}
                 </div>
 
-                {/* 2. Matchup List for Selected Batter */}
+                {/* 2. MATCHUP LIST */}
                 <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {selectedBatterData && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+                                Vs Bowler
+                            </div>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+                                Outcome
+                            </div>
+                        </div>
+                    )}
+
                     {selectedBatterData && Object.entries(selectedBatterData.Against || {})
-                        .sort((a, b) => parseInt(b[1].Balls) - parseInt(a[1].Balls)) // Sort by balls faced
-                        .filter(([_, vs]) => parseInt(vs.Balls) > 0) // Hide empty matchups
+                        .sort((a, b) => parseInt(b[1].Balls) - parseInt(a[1].Balls))
+                        .filter(([_, vs]) => parseInt(vs.Balls) > 0)
                         .map(([bowlerId, vs]) => {
                             const runs = parseInt(vs.Runs) || 0;
                             const balls = parseInt(vs.Balls) || 0;
                             const dots = parseInt(vs.Dots) || 0;
                             const fours = parseInt(vs.Fours) || 0;
                             const sixes = parseInt(vs.Sixes) || 0;
-                            const wickets = parseInt(vs.Dismissals) || 0;
+                            // Check both Dismissals (if exists from API update) or fallback logic?
+                            // Safely handle Dismissals if API returns nothing (undefined) => 0
+                            const wickets = parseInt(vs.Dismissals || '0') || 0;
                             const sr = parseFloat(vs.Strikerate) || 0;
 
                             const verdict = getVerdict(runs, balls, dots, wickets, sr);
 
                             // Dynamic Highlight Text
                             let highlightText = '';
-                            if (wickets > 0) highlightText = 'Wicket';
+                            if (wickets > 0) highlightText = 'WICKET';
+                            else if (runs === 0 && balls > 0) highlightText = `${dots} Dots`; // Duck logic fix
                             else if (fours > 0 || sixes > 0) highlightText = `${fours > 0 ? `${fours}x4 ` : ''}${sixes > 0 ? `${sixes}x6` : ''}`;
                             else if (dots > 2) highlightText = `${dots} Dots`;
                             else highlightText = `SR ${vs.Strikerate}`;
@@ -192,7 +243,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                                     padding: '12px',
                                     background: 'rgba(255,255,255,0.02)',
                                     borderRadius: 12,
-                                    border: '1px solid rgba(255,255,255,0.05)'
+                                    border: wickets > 0 ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(255,255,255,0.05)'
                                 }}>
                                     {/* Bowler Avatar */}
                                     <WikiImage
@@ -209,15 +260,16 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                                             <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>
                                                 {vs.Bowler}
                                             </div>
-                                            {/* Verdict Badge - No Emojis */}
+                                            {/* Verdict Badge */}
                                             <div style={{
-                                                fontSize: 9,
+                                                fontSize: 8,
                                                 fontWeight: 800,
-                                                padding: '2px 6px',
+                                                padding: '3px 6px',
                                                 borderRadius: 4,
                                                 background: verdict.bg,
                                                 color: verdict.color,
-                                                letterSpacing: 0.5
+                                                letterSpacing: 0.5,
+                                                textTransform: 'uppercase'
                                             }}>
                                                 {verdict.label}
                                             </div>
@@ -240,7 +292,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
 
                     {(!selectedBatterData || Object.keys(selectedBatterData.Against || {}).length === 0) && (
                         <div style={{ textAlign: 'center', padding: 20, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-                            {batterIds.length > 0 ? 'No matchups available yet' : ''}
+                            No matchups available
                         </div>
                     )}
                 </div>
