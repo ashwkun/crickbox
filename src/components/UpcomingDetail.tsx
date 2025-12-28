@@ -522,7 +522,10 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                     </div>
 
                     <div className="mt-4">
-                        <H2HCard teams={h2hData.team?.head_to_head?.comp_type?.data || []} />
+                        <H2HCard
+                            teams={h2hData.team?.head_to_head?.comp_type?.data || []}
+                            teamIds={team1?.id && team2?.id ? [parseInt(team1.id), parseInt(team2.id)] : undefined}
+                        />
                     </div>
 
                     {/* Recent H2H Matches List */}
