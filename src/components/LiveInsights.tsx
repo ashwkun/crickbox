@@ -31,21 +31,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
     return (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            {/* 1. Win Predictor / Equation (if live) */}
-            {matchDetails?.Equation && (
-                <div style={{
-                    background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%)',
-                    borderRadius: 16,
-                    padding: '20px',
-                    border: '1px solid rgba(34, 197, 94, 0.2)',
-                    textAlign: 'center'
-                }}>
-                    <div style={{ fontSize: 11, color: '#4ade80', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 700, marginBottom: 8 }}>Match Equation</div>
-                    <div style={{ fontSize: 16, fontWeight: 600, color: '#fff', lineHeight: 1.4 }}>
-                        {matchDetails.Equation}
-                    </div>
-                </div>
-            )}
+
 
             {/* 2. Pitch Report */}
             {(pitchDetail?.Pitch_Suited_For || pitchDetail?.Pitch_Surface) && (
@@ -107,6 +93,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                                         <WikiImage
                                             name={data.Batsman}
+                                            id={playerId}
                                             type="player"
                                             className="player-avatar"
                                             style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.1)' }}
