@@ -36,9 +36,23 @@ export default function App(): React.ReactElement {
     // Once matches are loaded, restore the pending match
     useEffect(() => {
         if (pendingMatchId && matches.length > 0) {
+            const params = new URLSearchParams(window.location.search);
+            const forceLive = params.get('forceLive') === 'true';
+
             const match = matches.find(m => m.game_id === pendingMatchId);
             if (match) {
                 setSelectedMatch(match);
+            } else if (forceLive) {
+                // Create stub match for forceLive testing (allows data loading even if match not in list)
+                setSelectedMatch({
+                    game_id: pendingMatchId,
+                    event_state: 'L', // Force as live
+                    participants: [],
+                    series_id: '',
+                    series_name: 'Testing Match',
+                    short_status: 'Testing',
+                    event_format: 'T20I'
+                } as Match);
             }
             setPendingMatchId(null);
         }
