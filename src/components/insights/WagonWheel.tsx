@@ -14,6 +14,14 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
     const [selectedPlayer, setSelectedPlayer] = useState<string>('all');
     const [showSelector, setShowSelector] = useState(false);
 
+    // Interactive Legend State - Default: 4s and 6s only
+    const [visibleTypes, setVisibleTypes] = useState<Set<string>>(new Set(['4', '6']));
+
+    // Auto-reset player selector when innings changes
+    React.useEffect(() => {
+        setSelectedPlayer('all');
+    }, [selectedInnings]);
+
     // Get innings from scorecard
     const innings = scorecard?.Innings || [];
 
@@ -24,20 +32,62 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
             .filter(([_, data]) => data.Shots && data.Shots.length > 0)
             .map(([id, data]) => ({
                 id,
-                name: data.Batsman,
+                name: data.Batsman, // This is usually full name from API
+                fullName: scorecard?.Teams?.[scorecard?.Innings?.[selectedInnings - 1]?.Battingteam]?.Players?.[id]?.Name_Full || data.Batsman,
                 shots: data.Shots,
                 runs: data.Shots.reduce((acc, shot) => acc + parseInt(shot.Runs), 0)
             }));
     }, [batsmanSplits]);
 
-    // Get shots to display (all or specific player)
+    // Get shots to display (filtered by player AND visibility)
     const displayShots = useMemo(() => {
+        let shots = [];
         if (selectedPlayer === 'all') {
-            return playersWithShots.flatMap(p => p.shots);
+            shots = playersWithShots.flatMap(p => p.shots);
+        } else {
+            const player = playersWithShots.find(p => p.id === selectedPlayer);
+            shots = player?.shots || [];
         }
-        const player = playersWithShots.find(p => p.id === selectedPlayer);
-        return player?.shots || [];
+
+        // Apply Legend Visibility Filters
+        return shots.filter(shot => {
+            const runs = parseInt(shot.Runs);
+            if (runs >= 6) return visibleTypes.has('6');
+            if (runs === 4) return visibleTypes.has('4');
+            if (runs === 3) return visibleTypes.has('3');
+            return visibleTypes.has('1'); // 1s and 2s group
+        });
+    }, [selectedPlayer, playersWithShots, visibleTypes]);
+
+    // Counts for Legend
+    const typeCounts = useMemo(() => {
+        let allRelevantShots = [];
+        if (selectedPlayer === 'all') {
+            allRelevantShots = playersWithShots.flatMap(p => p.shots);
+        } else {
+            allRelevantShots = playersWithShots.find(p => p.id === selectedPlayer)?.shots || [];
+        }
+
+        const counts = { '1': 0, '3': 0, '4': 0, '6': 0 };
+        allRelevantShots.forEach(s => {
+            const r = parseInt(s.Runs);
+            if (r >= 6) counts['6']++;
+            else if (r === 4) counts['4']++;
+            else if (r === 3) counts['3']++;
+            else counts['1']++; // 1s and 2s
+        });
+        return counts;
     }, [selectedPlayer, playersWithShots]);
+
+    const toggleType = (type: string) => {
+        const newSet = new Set(visibleTypes);
+        if (newSet.has(type)) {
+            newSet.delete(type);
+        } else {
+            newSet.add(type);
+        }
+        setVisibleTypes(newSet);
+    };
 
 
     // SVG dimensions
@@ -224,8 +274,10 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
             ) : (
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
 
-                    {/* Floating Player Selector Pill - Simplified */}
-                    <div style={{ position: 'absolute', top: 0, right: 16, zIndex: 10 }}>
+                    {/* Floating Player Selector Pill - Adjusted Position to NOT overlap Tabs */}
+                    <div style={{
+                        display: 'flex', justifyContent: 'flex-end', padding: '0 16px', marginTop: 16, marginBottom: -10, zIndex: 10
+                    }}>
                         <button
                             onClick={() => setShowSelector(true)}
                             style={{
@@ -235,7 +287,8 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                 borderRadius: 100,
                                 padding: '6px 12px 6px 6px',
                                 color: '#fff',
-                                transition: 'background 0.2s'
+                                transition: 'background 0.2s',
+                                cursor: 'pointer'
                             }}
                         >
                             {selectedPlayer === 'all' ? (
@@ -252,7 +305,7 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                 />
                             )}
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-                                <span style={{ fontSize: 13, fontWeight: 600 }}>{selectedPlayer === 'all' ? 'All Batters' : selectedPlayerData?.name?.split(' ').pop()}</span>
+                                <span style={{ fontSize: 13, fontWeight: 600 }}>{selectedPlayer === 'all' ? 'All Batters' : selectedPlayerData?.fullName || selectedPlayerData?.name}</span>
                             </div>
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, marginLeft: 4 }}>
                                 <path d="M6 9l6 6 6-6" />
@@ -327,7 +380,7 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                         />
                                         <div style={{ textAlign: 'center', width: '100%' }}>
                                             <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                {p.name.split(' ').pop()}
+                                                {p.fullName || p.name}
                                             </div>
                                             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
                                                 {p.runs} ({p.shots.length})
@@ -373,6 +426,18 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                             <rect x={center - 3} y={nonStrikerY} width={6} height={2} fill="rgba(255,255,255,0.5)" />
 
 
+                            <style>
+                                {`
+                                    @keyframes drawLine {
+                                        from { stroke-dashoffset: 1000; opacity: 0; }
+                                        to { stroke-dashoffset: 0; opacity: 1; }
+                                    }
+                                    @keyframes fadeIn {
+                                        from { opacity: 0; }
+                                        to { opacity: 1; }
+                                    }
+                                `}
+                            </style>
                             {/* SHOT LINES */}
                             <g>
                                 {displayShots.map((shot, idx) => {
@@ -380,6 +445,9 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                     const color = getRunColor(runs);
                                     const width = getStrokeWidth(runs);
                                     const opacity = getOpacity(runs);
+
+                                    // Animation delay based on index (cap at 1s total spread)
+                                    const delay = Math.min(idx * 5, 1000);
 
                                     return (
                                         <g key={idx}>
@@ -390,6 +458,11 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                                 strokeWidth={width}
                                                 strokeLinecap="round"
                                                 opacity={opacity}
+                                                strokeDasharray="1000"
+                                                strokeDashoffset="0"
+                                                style={{
+                                                    animation: `drawLine 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards ${delay}ms`
+                                                }}
                                             />
                                             {/* Flat Dot for boundary */}
                                             {runs >= 4 && (
@@ -397,8 +470,13 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                                     cx={x2} cy={y2}
                                                     r={runs >= 6 ? 2.5 : 2}
                                                     fill={color}
+                                                    style={{
+                                                        opacity: 0,
+                                                        animation: `fadeIn 0.3s ease-out forwards ${600 + delay}ms`
+                                                    }}
                                                 />
                                             )}
+
                                         </g>
                                     );
                                 })}
@@ -410,28 +488,71 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                         </svg>
                     </div>
 
-                    {/* Legend Footer - Clean */}
+                    {/* Legend Footer - interactive Filters with COUNTS */}
                     <div style={{
-                        display: 'flex', justifyContent: 'center', gap: 24,
+                        display: 'flex', justifyContent: 'center', gap: 12,
                         padding: '0 0 20px', fontSize: 11, color: 'rgba(255,255,255,0.5)',
-                        fontWeight: 500
+                        fontWeight: 600, flexWrap: 'wrap'
                     }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <button
+                            onClick={() => toggleType('1')}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 6,
+                                background: visibleTypes.has('1') ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                                border: `1px solid ${visibleTypes.has('1') ? '#10b981' : 'rgba(255,255,255,0.1)'}`,
+                                padding: '6px 10px', borderRadius: 20, cursor: 'pointer',
+                                color: visibleTypes.has('1') ? '#10b981' : 'rgba(255,255,255,0.4)',
+                                transition: 'all 0.2s',
+                                opacity: visibleTypes.has('1') ? 1 : 0.6
+                            }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
-                            <span>1s & 2s</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span>1s & 2s ({typeCounts['1']})</span>
+                        </button>
+
+                        <button
+                            onClick={() => toggleType('3')}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 6,
+                                background: visibleTypes.has('3') ? 'rgba(132, 204, 22, 0.15)' : 'transparent',
+                                border: `1px solid ${visibleTypes.has('3') ? '#84cc16' : 'rgba(255,255,255,0.1)'}`,
+                                padding: '6px 10px', borderRadius: 20, cursor: 'pointer',
+                                color: visibleTypes.has('3') ? '#84cc16' : 'rgba(255,255,255,0.4)',
+                                transition: 'all 0.2s',
+                                opacity: visibleTypes.has('3') ? 1 : 0.6
+                            }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#84cc16' }} />
-                            <span>3s</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span>3s ({typeCounts['3']})</span>
+                        </button>
+
+                        <button
+                            onClick={() => toggleType('4')}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 6,
+                                background: visibleTypes.has('4') ? 'rgba(251, 191, 36, 0.15)' : 'transparent',
+                                border: `1px solid ${visibleTypes.has('4') ? '#fbbf24' : 'rgba(255,255,255,0.1)'}`,
+                                padding: '6px 10px', borderRadius: 20, cursor: 'pointer',
+                                color: visibleTypes.has('4') ? '#fbbf24' : 'rgba(255,255,255,0.4)',
+                                transition: 'all 0.2s',
+                                opacity: visibleTypes.has('4') ? 1 : 0.6
+                            }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fbbf24' }} />
-                            <span>4s</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span>4s ({typeCounts['4']})</span>
+                        </button>
+
+                        <button
+                            onClick={() => toggleType('6')}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 6,
+                                background: visibleTypes.has('6') ? 'rgba(239, 68, 68, 0.15)' : 'transparent',
+                                border: `1px solid ${visibleTypes.has('6') ? '#ef4444' : 'rgba(255,255,255,0.1)'}`,
+                                padding: '6px 10px', borderRadius: 20, cursor: 'pointer',
+                                color: visibleTypes.has('6') ? '#ef4444' : 'rgba(255,255,255,0.4)',
+                                transition: 'all 0.2s',
+                                opacity: visibleTypes.has('6') ? 1 : 0.6
+                            }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
-                            <span>6s</span>
-                        </div>
+                            <span>6s ({typeCounts['6']})</span>
+                        </button>
                     </div>
                 </div>
             )}
