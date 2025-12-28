@@ -19,7 +19,7 @@ interface MatchDetailProps {
 const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick }) => {
     // Route to appropriate component based on match state
     if (match.event_state === 'U') {
-        return <UpcomingDetail match={match} onClose={onClose} />;
+        return <UpcomingDetail match={match} onClose={onClose} onSeriesClick={onSeriesClick} />;
     }
 
     if (match.event_state === 'L') {
