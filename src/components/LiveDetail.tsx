@@ -41,6 +41,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [h2hData, setH2hData] = useState<H2HData | null>(null);
     const [batsmanSplits, setBatsmanSplits] = useState<BatsmanSplitsResponse | null>(null);
     const [overByOver, setOverByOver] = useState<OverByOverResponse | null>(null);
+    const [overByOver1, setOverByOver1] = useState<OverByOverResponse | null>(null);
+    const [overByOver2, setOverByOver2] = useState<OverByOverResponse | null>(null);
     const [activeTab, setActiveTab] = useState<'live' | 'insights'>('live');
     const hasSetInitialTab = React.useRef(false);
 
@@ -60,8 +62,19 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             fetchOverByOver(match.game_id, currentInnings).then(data => {
                 if (data) setOverByOver(data);
             });
+
+            // Fetch both innings for Worm Chart
+            fetchOverByOver(match.game_id, 1).then(data => {
+                if (data) setOverByOver1(data);
+            });
+            if (currentInnings >= 2) {
+                fetchOverByOver(match.game_id, 2).then(data => {
+                    if (data) setOverByOver2(data);
+                });
+            }
         }
     }, [match?.game_id, scorecard?.Innings?.length, fetchH2H, fetchBatsmanSplits, fetchOverByOver]);
+
 
     // Auto-select the latest inning when data loads
     React.useEffect(() => {
@@ -692,6 +705,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     scorecard={scorecard}
                     batsmanSplits={batsmanSplits}
                     overByOver={overByOver}
+                    overByOver1={overByOver1}
+                    overByOver2={overByOver2}
                 />
             )}
 
