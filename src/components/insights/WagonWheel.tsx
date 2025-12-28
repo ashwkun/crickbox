@@ -178,40 +178,38 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                 </div>
             )}
 
-            {/* Header Area - Simplified */}
-            <div style={{ padding: '16px 16px 0' }}>
-                {/* Standard Tab Switcher */}
-                {innings.length > 0 && (
-                    <div style={{
-                        display: 'flex',
-                        gap: 24,
-                        borderBottom: '1px solid rgba(255,255,255,0.1)',
-                        paddingBottom: 0,
-                        marginBottom: 16
-                    }}>
-                        {innings.map((inn: any, idx: number) => (
+            {/* Header Area - LiveDetail Match */}
+            {innings.length > 0 && (
+                <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    {innings.map((inn: any, idx: number) => {
+                        const isSelected = selectedInnings === idx + 1;
+                        return (
                             <button
                                 key={idx}
                                 onClick={() => onInningsChange?.(idx + 1)}
                                 style={{
-                                    padding: '8px 4px',
-                                    borderBottom: selectedInnings === idx + 1 ? '3px solid #E5E5E5' : '3px solid transparent',
-                                    background: 'transparent',
-                                    color: selectedInnings === idx + 1 ? '#fff' : 'rgba(255,255,255,0.5)',
-                                    fontSize: 14,
-                                    fontWeight: 700,
+                                    flex: 1,
+                                    minWidth: 70,
+                                    padding: '12px 16px',
+                                    border: 'none',
+                                    background: isSelected ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
+                                    borderBottom: isSelected ? '2px solid #22c55e' : '2px solid transparent',
+                                    color: isSelected ? '#22c55e' : 'rgba(255,255,255,0.6)',
+                                    fontSize: 12,
+                                    fontWeight: 600,
                                     cursor: 'pointer',
-                                    transition: 'color 0.2s',
+                                    transition: 'all 0.2s',
+                                    whiteSpace: 'nowrap',
                                     fontFamily: 'inherit',
                                     textTransform: 'uppercase'
                                 }}
                             >
                                 {scorecard?.Teams?.[inn.Battingteam]?.Name_Short || `INN ${idx + 1}`}
                             </button>
-                        ))}
-                    </div>
-                )}
-            </div>
+                        );
+                    })}
+                </div>
+            )}
 
             {/* Content  */}
             {(!batsmanSplits?.Batsmen) && !isLoading ? (
