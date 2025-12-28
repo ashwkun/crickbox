@@ -83,53 +83,64 @@ interface UseCricketDataReturn {
 export default function useCricketData(): UseCricketDataReturn {
     const [matches, setMatches] = useState<Match[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const matchesRef = useRef<Map<string, Match>>(new Map());
+
+    // BUCKETS STATE: Store data in separate silos to prevent "ghost" records
+    const bucketsRef = useRef({
+        live: [] as Match[],
+        upcoming: [] as Match[],
+        completed: new Map<string, Match>() // Map to support deduping and pagination
+    });
+
     const initialLoadComplete = useRef<boolean>(false);
 
-    const updateState = (newMatches: Match[], forceLoadingOff: boolean = false): void => {
-        // Sanitize incoming matches
-        newMatches.forEach(m => {
-            const cleanMatch = sanitizeMatch(m);
-            matchesRef.current.set(cleanMatch.game_id, cleanMatch);
-        });
+    // Re-combine all buckets into a single list
+    const recomputeMatches = () => {
+        const { live, upcoming, completed } = bucketsRef.current;
+        // Start with Completed as base (lowest priority)
+        const merged = new Map<string, Match>(completed);
 
-        // Cleanup stale 'U' (Upcoming) matches
-        // This handles cases where the API stops returning a match, but it remains in cache.
-        const now = Date.now();
-        matchesRef.current.forEach((m, key) => {
-            if (m.event_state === 'U') {
-                const startTime = new Date(m.start_date).getTime();
-                const isTest = m.event_format?.toLowerCase().includes('test') || m.event_format?.toLowerCase().includes('first');
+        // Priority 2: Upcoming matches (Overwrites Completed if collision)
+        upcoming.forEach(m => merged.set(m.game_id, m));
 
-                // Aggressive cleanup for limited overs: 4 hours after start time
-                // (Most T20s/ODIs are well underway or done by then)
-                // For Tests: Keep for 5 days (120 hours)
-                const threshold = isTest ? 120 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
+        // Priority 1: Live matches (Overwrites Upcoming/Completed - Source of Truth)
+        live.forEach(m => merged.set(m.game_id, m));
 
-                if (now - startTime > threshold) {
-                    matchesRef.current.delete(key);
-                }
-            }
-        });
+        const finalArray = Array.from(merged.values());
+        setMatches(finalArray);
+        safeSetItem(CACHE_KEY, JSON.stringify(finalArray));
+    };
 
-        const merged = Array.from(matchesRef.current.values());
-        setMatches(merged);
-        safeSetItem(CACHE_KEY, JSON.stringify(merged));
+    const updateBucket = (type: 'live' | 'upcoming' | 'completed', newMatches: Match[]) => {
+        // Sanitize first
+        const sanitized = newMatches.map(sanitizeMatch);
 
-        if (merged.length > 0 || forceLoadingOff) {
+        if (type === 'live') {
+            bucketsRef.current.live = sanitized;
+        } else if (type === 'upcoming') {
+            bucketsRef.current.upcoming = sanitized;
+        } else if (type === 'completed') {
+            // For completed, we MERGE because of pagination/history
+            sanitized.forEach(m => bucketsRef.current.completed.set(m.game_id, m));
+        }
+
+        recomputeMatches();
+
+        if (loading) {
             setLoading(false);
             initialLoadComplete.current = true;
         }
     };
 
-    // Fast fetch for LIVE matches only - always bypass cache
+    // Fast fetch for LIVE matches only - REPLACES Live Bucket
     const fetchLive = async (): Promise<void> => {
         try {
             const data = await fetchWithRetry(`${WISDEN_MATCHES}&gamestate=1`, 0, true);
             if (data?.matches) {
-                updateState(data.matches, false);
+                updateBucket('live', data.matches);
             }
-        } catch (e) { console.error('Live fetch error', e); }
+        } catch (e) {
+            console.error('Live fetch error', e);
+        }
     };
 
     // Heavy fetch for Schedule and Results
@@ -145,17 +156,17 @@ export default function useCricketData(): UseCricketDataReturn {
                 fetchWithRetry(`${WISDEN_MATCHES}&daterange=${dateRange}`)
             ]);
 
-            const newItems: Match[] = [];
             if (upcoming.status === 'fulfilled' && upcoming.value?.matches) {
-                newItems.push(...upcoming.value.matches);
-            }
-            if (results.status === 'fulfilled' && results.value?.matches) {
-                newItems.push(...results.value.matches);
+                // Completely REPLACE upcoming bucket (removes ghost matches)
+                updateBucket('upcoming', upcoming.value.matches);
             }
 
-            if (newItems.length > 0) {
-                updateState(newItems, isInitial);
-            } else if (isInitial) {
+            if (results.status === 'fulfilled' && results.value?.matches) {
+                // Merge into completed bucket
+                updateBucket('completed', results.value.matches);
+            }
+
+            if (isInitial) {
                 setLoading(false);
                 initialLoadComplete.current = true;
             }
@@ -179,15 +190,11 @@ export default function useCricketData(): UseCricketDataReturn {
                 preload.results
             ]);
 
-            const newItems: Match[] = [];
-            if (live?.matches) newItems.push(...live.matches);
-            if (upcoming?.matches) newItems.push(...upcoming.matches);
-            if (results?.matches) newItems.push(...results.matches);
+            if (live?.matches) updateBucket('live', live.matches);
+            if (upcoming?.matches) updateBucket('upcoming', upcoming.matches);
+            if (results?.matches) updateBucket('completed', results.matches);
 
-            if (newItems.length > 0) {
-                updateState(newItems, true);
-                return true;
-            }
+            return true;
         } catch (e) {
             console.error('Preload error', e);
         }
@@ -201,7 +208,13 @@ export default function useCricketData(): UseCricketDataReturn {
             try {
                 const parsed: Match[] = JSON.parse(cached);
                 if (parsed.length > 0) {
-                    parsed.forEach(m => matchesRef.current.set(m.game_id, m));
+                    // Populate buckets heuristically from flat cache?
+                    // Better to just set Matches directly for instant load, then let API update buckets.
+                    // But we need bucketsRef to be populated to support future merges.
+
+                    // Simple strategy: Put everything in Completed for now, then let Live/Upcoming overwrite.
+                    parsed.forEach(m => bucketsRef.current.completed.set(m.game_id, m));
+
                     setMatches(parsed);
                     setLoading(false);
                     initialLoadComplete.current = true;
@@ -287,16 +300,12 @@ export default function useCricketData(): UseCricketDataReturn {
         results.forEach(matches => allMatches.push(...matches));
 
         // Dedupe by game_id and merge with existing
-        const merged = new Map(matchesRef.current);
-        allMatches.forEach(m => merged.set(m.game_id, m));
-        const mergedArray = Array.from(merged.values());
+        // For extended results, we just update the completed bucket
+        updateBucket('completed', allMatches);
 
-        // Update state with merged data
-        matchesRef.current = merged;
-        setMatches(mergedArray);
-        safeSetItem(CACHE_KEY, JSON.stringify(mergedArray));
-
-        return mergedArray;
+        // Return full list
+        const { live, upcoming, completed } = bucketsRef.current;
+        return Array.from(completed.values());
     };
 
     // ============ CENTRALIZED FETCH FUNCTIONS ============
