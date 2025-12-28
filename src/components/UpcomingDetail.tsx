@@ -10,7 +10,7 @@ import { fetchWeather, WeatherData, getWeatherInfo } from '../utils/weather';
 import { getWeatherIcon, RaindropIcon } from './icons/WeatherIcons';
 import H2HCard from './upcoming/H2HCard';
 import VenueCard from './upcoming/VenueCard';
-import TeamRecentForm from './upcoming/TeamRecentForm';
+import DualTeamRecentForm from './upcoming/DualTeamRecentForm';
 // import RecentForm from './upcoming/RecentForm'; // Deprecated
 import TopPlayers from './upcoming/TopPlayers';
 import SquadPreview from './upcoming/SquadPreview';
@@ -510,20 +510,12 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                 <div className="section-container fade-in">
                     <H2HCard teams={h2hData.team?.head_to_head?.comp_type?.data || []} />
 
-                    {/* NEW: Recent Form (Split by Team + Format) */}
-                    <div className="mt-4" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                        {team1?.id && (
-                            <TeamRecentForm
-                                teamId={team1.id}
-                                teamName={team1.name}
-                                currentFormat={match.event_format}
-                                onMatchClick={handleRecentMatchClick} // This works because handleRecentMatchClick fetches card details
-                            />
-                        )}
-                        {team2?.id && (
-                            <TeamRecentForm
-                                teamId={team2.id}
-                                teamName={team2.name}
+                    {/* NEW: Recent Form (Consolidated Card) */}
+                    <div className="mt-4">
+                        {team1?.id && team2?.id && (
+                            <DualTeamRecentForm
+                                team1={{ id: team1.id, name: team1.name }}
+                                team2={{ id: team2.id, name: team2.name }}
                                 currentFormat={match.event_format}
                                 onMatchClick={handleRecentMatchClick}
                             />
