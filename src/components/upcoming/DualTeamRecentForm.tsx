@@ -163,6 +163,22 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
     const isT2Redundant = t2Curr.length === t2All.length &&
         t2Curr.every((m, i) => m.game_id === t2All[i]?.game_id || m.id === t2All[i]?.id);
 
+    // Check redundancy logic (Symmetric) - Using same logic as before but applied to new layout
+    const isT1Redundant = t1Curr.length === t1All.length &&
+        t1Curr.every((m, i) => m.game_id === t1All[i]?.game_id || m.id === t1All[i]?.id);
+
+    const isT2Redundant = t2Curr.length === t2All.length &&
+        t2Curr.every((m, i) => m.game_id === t2All[i]?.game_id || m.id === t2All[i]?.id);
+
+    // DEBUG LOGS
+    console.log(`[RecentForm DEBUG] Format Received: "${currentFormat}"`);
+    console.log(`[RecentForm DEBUG] ${team1.short_name} (ID: ${team1.id})`);
+    console.log(`  - Total Matches Fetched: ${matches1.length}`);
+    console.log(`  - First 3 DB Types: ${matches1.slice(0, 3).map(m => m.match_type).join(', ')}`);
+    console.log(`  - Filtered Current (${t1Curr.length}): ${t1Curr.map(m => m.match_type).join(', ')}`);
+    console.log(`  - All (${t1All.length}): ${t1All.map(m => m.match_type).join(', ')}`);
+    console.log(`  - Redundant: ${isT1Redundant}`);
+
     // Enforce symmetry: Only compact if BOTH are redundant
     const useCompactMode = isT1Redundant && isT2Redundant;
 
