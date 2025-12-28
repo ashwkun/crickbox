@@ -1,58 +1,36 @@
 const https = require('https');
 
 const gameId = 'inwslw12282025268163';
-const innings = 2; // Sri Lanka likely chasing
 
-// Clean ID logic from useCricketData
-const matchFile = gameId.replace(/[^a-z0-9]/gi, '');
-const url = `https://www.wisden.com/cricket/live/json/${matchFile}_batsman_splits_${innings}.json`;
+const fetchInnings = (inn) => {
+    const matchFile = gameId.replace(/[^a-z0-9]/gi, '');
+    const url = `https://www.wisden.com/cricket/live/json/${matchFile}_batsman_splits_${inn}.json`;
 
-console.log(`Fetching: ${url}`);
+    console.log(`Fetching Innings ${inn}: ${url}`);
 
-https.get(url, (res) => {
-    let data = '';
+    https.get(url, (res) => {
+        let data = '';
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => {
+            try {
+                const json = JSON.parse(data);
+                if (!json.Batsmen) return;
 
-    res.on('data', (chunk) => {
-        data += chunk;
-    });
+                console.log(`\n--- INNINGS ${inn} DATA ---`);
+                console.log('Player | Runs | Dist | Angle | Zone');
 
-    res.on('end', () => {
-        try {
-            const json = JSON.parse(data);
-
-            if (!json.Batsmen) {
-                console.log('No Batsmen data found in Innings 2');
-                return;
-            }
-
-            const batsmen = Object.values(json.Batsmen);
-            // Find Kaushini Nuthyangana - trying parts of name
-            const targetName = "Nuthyangana";
-            const batsman = batsmen.find(b => b.Batsman.includes(targetName) || b.Batsman.includes("Kaushini") || b.Batsman.includes("Nuthy"));
-
-            if (!batsman) {
-                console.log(`Batsman ${targetName} not found in Innings 2. All Batsmen:`);
-                batsmen.forEach(b => console.log(b.Batsman));
-                return;
-            }
-
-            console.log(`\n--- Batsman: ${batsman.Batsman} ---`);
-            console.log(`Total Shots: ${batsman.Shots ? batsman.Shots.length : 0}`);
-
-            if (batsman.Shots) {
-                console.log('\nAll Shots:');
-                console.log('Runs | Angle | Distance | Zone');
-                console.log('--------------------------------');
-                batsman.Shots.forEach(shot => {
-                    console.log(`${shot.Runs.padStart(4)} | ${shot.Angle.padStart(5)} | ${shot.Distance.padStart(8)} | ${shot.Zone}`);
+                Object.values(json.Batsmen).forEach(b => {
+                    if (b.Shots && b.Shots.length > 0) {
+                        b.Shots.forEach(s => {
+                            // Only print varying distances to see range
+                            console.log(`${b.Batsman.padEnd(15).slice(0, 15)} | ${s.Runs.padStart(4)} | ${s.Distance.padStart(4)} | ${s.Angle.padStart(5)} | ${s.Zone}`);
+                        });
+                    }
                 });
-            }
-
-        } catch (e) {
-            console.error('Error parsing JSON:', e.message);
-        }
+            } catch (e) { console.error(e); }
+        });
     });
+};
 
-}).on('error', (err) => {
-    console.error('Error fetching data:', err.message);
-});
+fetchInnings(1);
+fetchInnings(2);
