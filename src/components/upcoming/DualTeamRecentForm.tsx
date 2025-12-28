@@ -156,12 +156,6 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
         </div>
     );
 
-    // Check redundancy logic (Symmetric) - Using same logic as before but applied to new layout
-    const isT1Redundant = t1Curr.length === t1All.length &&
-        t1Curr.every((m, i) => m.game_id === t1All[i]?.game_id || m.id === t1All[i]?.id);
-
-    const isT2Redundant = t2Curr.length === t2All.length &&
-        t2Curr.every((m, i) => m.game_id === t2All[i]?.game_id || m.id === t2All[i]?.id);
 
     // Check redundancy logic (Symmetric) - Using same logic as before but applied to new layout
     const isT1Redundant = t1Curr.length === t1All.length &&
