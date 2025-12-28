@@ -325,3 +325,176 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 
 > [!TIP]
 > Always check `game_id` from the **Matches List** first. It changes for every match. Do not hardcode `game_id` in production.
+
+---
+
+## 6. Supabase Match Database
+
+A custom database for team-based match filtering that Wisden APIs don't support natively.
+
+### Overview
+
+| Feature | Details |
+| :--- | :--- |
+| **Provider** | Supabase (PostgreSQL) |
+| **Project ID** | `ycumznofytwntinxlxkc` |
+| **URL** | `https://ycumznofytwntinxlxkc.supabase.co` |
+| **Total Matches** | 15,209+ (auto-synced every 12h) |
+| **Sync Script** | `scripts/sync_supabase.js` |
+| **GitHub Action** | `.github/workflows/sync-supabase.yml` |
+
+---
+
+### Table Schema: `matches`
+
+```sql
+CREATE TABLE matches (
+  id TEXT PRIMARY KEY,              -- Match ID (e.g., "inwslw12262025268162")
+  match_date DATE NOT NULL,         -- Match date (YYYY-MM-DD)
+  teama_id TEXT NOT NULL,           -- Team A ID (e.g., "1126")
+  teamb_id TEXT NOT NULL,           -- Team B ID (e.g., "1133")
+  teama TEXT,                       -- Team A name (e.g., "India Women")
+  teamb TEXT,                       -- Team B name (e.g., "Sri Lanka Women")
+  winner_id TEXT,                   -- Winner team ID (null if draw/no result)
+  result TEXT,                      -- Result text (e.g., "India Women beat Sri Lanka Women by 8 wickets")
+  league TEXT,                      -- League code (e.g., "icc", "ipl", "indian_domestic")
+  series_id TEXT,                   -- Series ID
+  series_name TEXT,                 -- Series name
+  venue TEXT,                       -- Venue name
+  match_type TEXT,                  -- Format (e.g., "test", "odi", "t20")
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ
+);
+
+-- Indexes for fast querying
+CREATE INDEX idx_matches_teama ON matches(teama_id);
+CREATE INDEX idx_matches_teamb ON matches(teamb_id);
+CREATE INDEX idx_matches_date ON matches(match_date DESC);
+CREATE INDEX idx_matches_league ON matches(league);
+```
+
+---
+
+### Available League Codes
+
+| League Code | Description | Count |
+| :--- | :--- | :--- |
+| `icc` | International Cricket | ~4,500 |
+| `indian_domestic` | Indian Domestic | ~2,800 |
+| `english_domestic` | English Domestic | ~2,300 |
+| `womens_international` | Women's International | ~2,350 |
+| `australian_domestic` | Australian Domestic | ~1,250 |
+| `ipl` | Indian Premier League | ~620 |
+| `youth_international` | Youth International | ~580 |
+
+---
+
+### API Usage (Client Utility)
+
+**Source:** `src/utils/matchDatabase.ts`
+
+```typescript
+import { getTeamForm, getTeamMatches, getH2HMatches, getMatchesByLeague } from './utils/matchDatabase';
+
+// Get team's recent form (last 5 matches)
+const form = await getTeamForm('1126', 5);
+// Returns: ['W', 'W', 'W', 'L', 'W']
+
+// Get team's recent matches
+const matches = await getTeamMatches('1126', 10);
+
+// Get head-to-head matches between two teams
+const h2h = await getH2HMatches('1126', '1133', 10);
+
+// Get recent IPL matches
+const iplMatches = await getMatchesByLeague('ipl', 50);
+```
+
+---
+
+### Direct Supabase Queries
+
+For advanced filtering, query Supabase directly:
+
+```typescript
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  'https://ycumznofytwntinxlxkc.supabase.co',
+  '***REMOVED***'
+);
+
+// Get all matches for a team (either home or away)
+const { data } = await supabase
+  .from('matches')
+  .select('*')
+  .or(`teama_id.eq.1126,teamb_id.eq.1126`)
+  .order('match_date', { ascending: false })
+  .limit(10);
+
+// Get IPL matches in 2025
+const { data } = await supabase
+  .from('matches')
+  .select('*')
+  .eq('league', 'ipl')
+  .gte('match_date', '2025-01-01')
+  .order('match_date', { ascending: false });
+
+// Get matches at a specific venue
+const { data } = await supabase
+  .from('matches')
+  .select('*')
+  .ilike('venue', '%Wankhede%');
+
+// Count wins for a team
+const { count } = await supabase
+  .from('matches')
+  .select('*', { count: 'exact', head: true })
+  .eq('winner_id', '1126');
+```
+
+---
+
+### Filter Operators
+
+| Operator | Example | Description |
+| :--- | :--- | :--- |
+| `.eq()` | `.eq('league', 'ipl')` | Equals |
+| `.neq()` | `.neq('winner_id', null)` | Not equals |
+| `.gt()` / `.gte()` | `.gte('match_date', '2024-01-01')` | Greater than (or equal) |
+| `.lt()` / `.lte()` | `.lte('match_date', '2024-12-31')` | Less than (or equal) |
+| `.like()` / `.ilike()` | `.ilike('teama', '%India%')` | Pattern match (case-insensitive) |
+| `.in()` | `.in('league', ['ipl', 'icc'])` | In array |
+| `.or()` | `.or('teama_id.eq.1126,teamb_id.eq.1126')` | OR condition |
+| `.is()` | `.is('winner_id', null)` | IS NULL check |
+
+---
+
+### Common Team IDs
+
+| Team | ID | Type |
+| :--- | :--- | :--- |
+| India | `4` | International |
+| India Women | `1126` | International |
+| Mumbai Indians | `1111` | IPL |
+| Chennai Super Kings | `1108` | IPL |
+| Royal Challengers Bengaluru | `1105` | IPL |
+| Kolkata Knight Riders | `1106` | IPL |
+
+> [!TIP]
+> For a full list of IPL team IDs, see `api_samples/ipl/README.md`
+
+---
+
+### GitHub Secrets Required
+
+| Secret | Value |
+| :--- | :--- |
+| `SUPABASE_URL` | `https://ycumznofytwntinxlxkc.supabase.co` |
+| `SUPABASE_SERVICE_KEY` | Service role key (for write access) |
+
+---
+
+### Dashboard
+
+**View/Edit Data:** https://supabase.com/dashboard/project/ycumznofytwntinxlxkc/editor
