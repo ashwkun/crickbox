@@ -609,21 +609,15 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         onClick={() => setActiveTab(activeTab === 'live' ? 'insights' : 'live')}
                         style={{
                             fontSize: 10,
-                            fontWeight: 700,
+                            fontWeight: 600, // Match other chips (600)
                             padding: '4px 10px',
-                            background: activeTab === 'insights' ? '#a855f7' : 'rgba(168, 85, 247, 0.15)',
+                            background: 'rgba(168, 85, 247, 0.15)', // Consistent pill style
                             borderRadius: 20,
-                            color: activeTab === 'insights' ? '#fff' : '#c084fc',
+                            color: '#a855f7',
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            border: activeTab === 'insights' ? '1px solid #a855f7' : '1px solid rgba(168, 85, 247, 0.3)',
-                            boxShadow: activeTab === 'insights' ? '0 2px 8px rgba(168, 85, 247, 0.4)' : 'none',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4
                         }}
                     >
-                        {activeTab === 'live' ? 'View Insights' : 'Back to Live'}
+                        {activeTab === 'live' ? 'Insights >' : '< Back to Live'}
                     </span>
                 </div>
 
@@ -954,34 +948,49 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                     }}>
                                         <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 4, letterSpacing: 0.5 }}>This Over</div>
 
-                                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                        <div className="hide-scrollbar" style={{
+                                            display: 'flex', gap: 6, alignItems: 'center',
+                                            flexWrap: 'nowrap',
+                                            overflowX: 'auto',
+                                            width: '100%',
+                                            scrollbarWidth: 'none',
+                                            msOverflowStyle: 'none'
+                                        }}>
                                             {(() => {
                                                 const scLimit = getScorecardThisOver();
                                                 const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                                return thisOverBalls.map((ball: any, idx: number) => (
-                                                    <div key={idx} style={{
-                                                        width: 24, height: 24, borderRadius: '50%',
-                                                        background: getBallColor(ball),
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        fontSize: 9, fontWeight: 700, color: '#fff',
-                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                                // Dynamic justification inside the IIFE or via parent style?
+                                                // We can use margin: auto on the content wrapper if we want centering + scroll
+
+                                                return (
+                                                    <div style={{
+                                                        display: 'flex', gap: 6,
+                                                        margin: thisOverBalls.length > 7 ? '0' : '0 auto', // Center if few balls, left align if many
+                                                        flexShrink: 0
                                                     }}>
-                                                        {getBallDisplay(ball)}
+                                                        {thisOverBalls.map((ball: any, idx: number) => (
+                                                            <div key={idx} style={{
+                                                                width: 24, height: 24, borderRadius: '50%',
+                                                                background: getBallColor(ball),
+                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                fontSize: 9, fontWeight: 700, color: '#fff',
+                                                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                                                flexShrink: 0
+                                                            }}>
+                                                                {getBallDisplay(ball)}
+                                                            </div>
+                                                        ))}
+                                                        {/* Placeholders */}
+                                                        {Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
+                                                            <div key={`e-${idx}`} style={{
+                                                                width: 6, height: 6, borderRadius: '50%',
+                                                                background: 'rgba(255,255,255,0.08)',
+                                                                margin: '9px 9px',
+                                                                flexShrink: 0
+                                                            }} />
+                                                        ))}
                                                     </div>
-                                                ));
-                                            })()}
-                                            {(() => {
-                                                const scLimit = getScorecardThisOver();
-                                                const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                                // Show empty slots only if we have few balls to maintain min height look
-                                                // If we have > 6 balls, don't show dots, just show balls
-                                                return Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
-                                                    <div key={`e-${idx}`} style={{
-                                                        width: 6, height: 6, borderRadius: '50%',
-                                                        background: 'rgba(255,255,255,0.08)',
-                                                        margin: '9px 9px'
-                                                    }} />
-                                                ));
+                                                );
                                             })()}
                                         </div>
                                     </div>
