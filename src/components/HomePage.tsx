@@ -150,52 +150,18 @@ export default function HomePage({
         onCloseTournament();
     };
 
-    // Helper to check if match should appear in live section
-    const shouldShowInLive = (match: Match): boolean => {
-        const startTime = new Date(match.start_date).getTime();
-        const now = Date.now();
-        const thirtyMins = 30 * 60 * 1000;
-        const startsWithin30Mins = startTime - now <= thirtyMins && startTime - now > -60 * 60 * 1000;
-
-        // Also include delayed matches (they already started but are interrupted)
-        // BUT expire them after 12 hours if they haven't transitioned to Live
-        const isDelayed = match.short_event_status?.toLowerCase().includes('delayed') ||
-            match.event_status?.toLowerCase().includes('delayed');
-
-        const isExpired = now - startTime > 12 * 60 * 60 * 1000; // 12 hours
-
-        return startsWithin30Mins || (isDelayed && startTime < now && !isExpired);
-    };
-
-    // Memoized computations to prevent recalculation on every render
+    // Memoized computations - purely API-driven by event_state
     const liveMatches = useMemo(() =>
         matches
-            .filter(m => m.event_state === 'L' || (m.event_state === 'U' && shouldShowInLive(m)))
+            .filter(m => m.event_state === 'L')
             .filter(isInternationalMens)
-            .sort((a, b) => {
-                // Live matches first, then by start time
-                if (a.event_state === 'L' && b.event_state !== 'L') return -1;
-                if (b.event_state === 'L' && a.event_state !== 'L') return 1;
-                return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
-            }),
+            .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()),
         [matches]
     );
 
     const upcomingMatches = useMemo(() =>
         matches
             .filter(m => m.event_state === 'U')
-            .filter(m => !shouldShowInLive(m)) // Exclude pre-live matches
-            .filter(m => {
-                // Filter out matches that started more than 12 hours ago (stale)
-                // BUT keep Test matches as they last multiple days
-                const startTime = new Date(m.start_date).getTime();
-                const now = Date.now();
-                const isTest = m.event_format?.toLowerCase().includes('test');
-                const isStale = !isTest && (now - startTime > 12 * 60 * 60 * 1000);
-
-                return !isStale;
-            })
-            .filter(m => !m.event_status?.toLowerCase().includes('cancel') && !m.event_status?.toLowerCase().includes('abandon'))
             .filter(isInternationalMens)
             .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()),
         [matches]
@@ -203,14 +169,7 @@ export default function HomePage({
 
     const completedMatches = useMemo(() =>
         matches
-            .filter(m => {
-                if (m.event_state === 'L') return false;
-                if (m.event_state === 'U') {
-                    const s = (m.event_status || '') + (m.event_sub_status || '');
-                    return s.toLowerCase().includes('cancel') || s.toLowerCase().includes('abandon');
-                }
-                return true;
-            })
+            .filter(m => m.event_state !== 'L' && m.event_state !== 'U')
             .filter(isInternationalMens)
             .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())
             .slice(0, 50),
