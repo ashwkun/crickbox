@@ -18,6 +18,7 @@ interface LiveInsightsProps {
     scorecard?: any;
     batsmanSplits?: BatsmanSplitsResponse | null;
     batsmanSplitsMatchups?: BatsmanSplitsResponse | null; // Independent data for Matchups
+    overByOverMatchups?: OverByOverResponse | null; // Independent data for Matchups Wickets
     overByOver?: OverByOverResponse | null;
     overByOver1?: OverByOverResponse | null;
     overByOver2?: OverByOverResponse | null;
@@ -30,7 +31,7 @@ interface LiveInsightsProps {
 }
 
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOver, overByOver1, overByOver2, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading }) => {
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, overByOver1, overByOver2, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading }) => {
     const [manhattanInnings, setManhattanInnings] = useState<1 | 2>(1);
     if (!h2hData) return null;
 
