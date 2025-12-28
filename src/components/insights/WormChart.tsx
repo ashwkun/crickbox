@@ -73,9 +73,9 @@ const WormChart: React.FC<WormChartProps> = ({
     const points1 = generatePoints(cumulative1);
     const points2 = generatePoints(cumulative2);
 
-    // Team colors
-    const color1 = team1Id ? getTeamColor(parseInt(team1Id)) : '#3b82f6';
-    const color2 = team2Id ? getTeamColor(parseInt(team2Id)) : '#ef4444';
+    // Team colors - use team name, not ID
+    const color1 = getTeamColor(team1Name) || '#3b82f6';
+    const color2 = getTeamColor(team2Name) || '#ef4444';
 
     // Y-axis ticks
     const yTicks = [0, Math.round(maxRuns / 2), maxRuns];
