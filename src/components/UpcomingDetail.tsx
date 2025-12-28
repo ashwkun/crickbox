@@ -509,7 +509,21 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
             {/* H2H Section */}
             {!loadingH2H && h2hData && match.participants && (
                 <div className="section-container fade-in">
-                    <H2HCard teams={h2hData.team?.head_to_head?.comp_type?.data || []} />
+                    {/* NEW: Recent Form (Consolidated Card) */}
+                    <div>
+                        {team1?.id && team2?.id && (
+                            <DualTeamRecentForm
+                                team1={{ id: team1.id, name: team1.name, short_name: team1.short_name }}
+                                team2={{ id: team2.id, name: team2.name, short_name: team2.short_name }}
+                                currentFormat={match.event_format || match.match_type}
+                                onMatchClick={handleRecentMatchClick}
+                            />
+                        )}
+                    </div>
+
+                    <div className="mt-4">
+                        <H2HCard teams={h2hData.team?.head_to_head?.comp_type?.data || []} />
+                    </div>
 
                     {/* Recent H2H Matches List */}
                     {h2hData.team?.against_last_n_matches?.result && h2hData.team.against_last_n_matches.result.length > 0 && team1?.id && team2?.id && (
@@ -523,18 +537,6 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                             />
                         </div>
                     )}
-
-                    {/* NEW: Recent Form (Consolidated Card) */}
-                    <div className="mt-4">
-                        {team1?.id && team2?.id && (
-                            <DualTeamRecentForm
-                                team1={{ id: team1.id, name: team1.name, short_name: team1.short_name }}
-                                team2={{ id: team2.id, name: team2.name, short_name: team2.short_name }}
-                                currentFormat={match.event_format || match.match_type}
-                                onMatchClick={handleRecentMatchClick}
-                            />
-                        )}
-                    </div>
 
                     {/* Venue Stats Card */}
                     {h2hData.team?.head_to_head?.venue && (
