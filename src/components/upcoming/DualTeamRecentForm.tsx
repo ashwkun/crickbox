@@ -71,10 +71,15 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
         const currentForm = matches.filter(m => {
             if (!currentFormat) return true;
             const mFormat = m.event_format?.toLowerCase() || '';
+            const targetFormat = currentFormat.toLowerCase();
+
+            // Common variations
             if (isTest) return mFormat.includes('test');
-            if (isOdi) return mFormat.includes('odi');
-            if (isT20) return mFormat.includes('t20');
-            return mFormat === formatKey;
+            if (isOdi) return mFormat.includes('odi') || mFormat.includes('one day');
+            if (isT20) return mFormat.includes('t20') || mFormat.includes('twenty20');
+
+            // Fallback: Check if either string allows the other
+            return mFormat.includes(targetFormat) || targetFormat.includes(mFormat);
         }).slice(0, 5);
 
         return { allForm, currentForm };
