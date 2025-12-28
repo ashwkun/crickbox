@@ -156,7 +156,11 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                                                     borderRadius: 12,
                                                     padding: 10,
                                                     border: outs > 0 ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(255,255,255,0.05)',
-                                                    position: 'relative'
+                                                    position: 'relative',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    textAlign: 'center'
                                                 }}>
                                                     {outs > 0 && (
                                                         <div style={{
@@ -168,10 +172,17 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                                                         }}>{outs} Wkt</div>
                                                     )}
 
-                                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginBottom: 6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    <WikiImage
+                                                        name={vs.Bowler}
+                                                        id={bowlerId}
+                                                        type="player"
+                                                        style={{ width: 32, height: 32, borderRadius: '50%', marginBottom: 8, border: '1px solid rgba(255,255,255,0.1)' }}
+                                                    />
+
+                                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
                                                         {vs.Bowler}
                                                     </div>
-                                                    <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 2 }}>
+                                                    <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 2 }}>
                                                         {vs.Runs} <span style={{ fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.4)' }}>off {vs.Balls}</span>
                                                     </div>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
