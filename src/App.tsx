@@ -137,7 +137,7 @@ export default function App(): React.ReactElement {
         }
 
         const isLive = selectedMatch.event_state === 'L';
-        const isCompleted = selectedMatch.event_state === 'C';
+        const isCompleted = selectedMatch.event_state === 'C' || selectedMatch.event_state === 'R';
         console.log('[PWA] isLive:', isLive, 'isCompleted:', isCompleted);
 
         if (!isLive && !isCompleted) {
