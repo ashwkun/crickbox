@@ -27,9 +27,10 @@ interface ScorecardData {
 interface UpcomingDetailProps {
     match: Match;
     onClose: () => void;
+    onSeriesClick?: (seriesId: string, seriesMatches?: any[]) => void;
 }
 
-const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
+const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSeriesClick }) => {
     const { fetchH2H, fetchSquad } = useCricketData();
     const [h2hData, setH2hData] = useState<H2HData | null>(null);
     const [squad1, setSquad1] = useState<SquadData | null>(null);
@@ -333,14 +334,20 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
         <div className="upcoming-detail">
             {/* Full Width Hero Card - Matching LiveDetail style */}
             <div className="upcoming-hero" style={heroStyle}>
-                {/* Row 1: Series/Tour name - centered */}
+                {/* Row 1: Series/Tour name - centered, clickable */}
                 <div
+                    onClick={() => {
+                        if (onSeriesClick) {
+                            onSeriesClick(match.series_id, undefined);
+                        }
+                    }}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: 8,
                         marginBottom: 12,
+                        cursor: onSeriesClick ? 'pointer' : 'default',
                     }}
                 >
                     <span style={{
@@ -351,6 +358,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
                     }}>
                         {match.series_name}
                     </span>
+                    {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)' }}>›</span>}
                 </div>
 
                 {/* Row 2: Chips - Match format only */}
