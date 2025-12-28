@@ -17,16 +17,20 @@ interface LiveInsightsProps {
     h2hData: any;
     scorecard?: any;
     batsmanSplits?: BatsmanSplitsResponse | null;
+    batsmanSplitsMatchups?: BatsmanSplitsResponse | null; // Independent data for Matchups
     overByOver?: OverByOverResponse | null;
     overByOver1?: OverByOverResponse | null;
     overByOver2?: OverByOverResponse | null;
     wagonWheelInnings?: number;
     onWagonWheelInningsChange?: (innings: number) => void;
     isWagonWheelLoading?: boolean;
+    matchupsInnings?: number;
+    onMatchupsInningsChange?: (innings: number) => void;
+    isMatchupsLoading?: boolean;
 }
 
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, overByOver, overByOver1, overByOver2, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading }) => {
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOver, overByOver1, overByOver2, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading }) => {
     const [manhattanInnings, setManhattanInnings] = useState<1 | 2>(1);
     if (!h2hData) return null;
 
@@ -61,8 +65,6 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
 
     return (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-
 
             {/* 2. Pitch Report */}
             {(pitchDetail?.Pitch_Suited_For || pitchDetail?.Pitch_Surface) && (
@@ -120,9 +122,13 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
             <PartnershipsChart scorecard={scorecard} />
 
             {/* Batsman vs Bowler Matchups */}
-            <BatsmanBowlerMatchups batsmanSplits={batsmanSplits || null} />
-
-
+            <BatsmanBowlerMatchups
+                batsmanSplits={batsmanSplitsMatchups || batsmanSplits || null}
+                scorecard={scorecard}
+                selectedInnings={matchupsInnings}
+                onInningsChange={onMatchupsInningsChange}
+                isLoading={isMatchupsLoading}
+            />
 
             {/* 4. Manhattan Chart (Over by Over) */}
             {overByOver?.Overbyover && overByOver.Overbyover.length > 0 && (
