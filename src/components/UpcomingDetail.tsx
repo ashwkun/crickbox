@@ -292,30 +292,41 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
         );
     }
 
-    // Helper: "TEST 4 of 5" format - uses Scorecard API Series_match_count
+    // Helper: "TEST 4 of 5" or "Match 13" format - uses Scorecard API Series_match_count
     const getMatchOfSeries = () => {
         const format = match.event_format?.toUpperCase() || '';
 
         if (!match.event_name) return format;
 
-        // Extract current match number from event_name (e.g., "4th Test" → 4)
-        const currentMatch = match.event_name.match(/(\d+)(st|nd|rd|th)/i);
-        if (!currentMatch) return format ? `${format}` : match.event_name;
+        // Pattern 1: Ordinal format like "4th Test", "1st ODI"
+        const ordinalMatch = match.event_name.match(/(\d+)(st|nd|rd|th)/i);
 
-        const matchNum = parseInt(currentMatch[1]);
+        // Pattern 2: Tournament format like "Match 13", "Match 45"
+        const tournamentMatch = match.event_name.match(/Match\s*(\d+)/i);
 
-        // Priority 1: Use Scorecard API's Series_match_count
-        if (scorecardData?.Series_match_count) {
-            return `${format} ${matchNum} of ${scorecardData.Series_match_count}`;
+        if (ordinalMatch) {
+            const matchNum = parseInt(ordinalMatch[1]);
+
+            // Priority 1: Use Scorecard API's Series_match_count for series
+            if (scorecardData?.Series_match_count) {
+                return `${format} ${matchNum} of ${scorecardData.Series_match_count}`;
+            }
+
+            // Priority 2: Extract total from series_name (e.g., "5 Test Series")
+            const totalMatch = match.series_name?.match(/(\d+)\s*(Test|T20I?|ODI)/i);
+            if (totalMatch) {
+                return `${format} ${matchNum} of ${parseInt(totalMatch[1])}`;
+            }
+
+            return format ? `${format} ${matchNum}` : match.event_name;
         }
 
-        // Priority 2: Extract total from series_name (e.g., "5 Test Series")
-        const totalMatch = match.series_name?.match(/(\d+)\s*(Test|T20I?|ODI)/i);
-        if (totalMatch) {
-            return `${format} ${matchNum} of ${parseInt(totalMatch[1])}`;
+        if (tournamentMatch) {
+            // For tournaments, just show "Match 13" (not "Match 13 of 74")
+            return match.event_name;
         }
 
-        return format ? `${format} ${matchNum}` : match.event_name;
+        return format ? `${format}` : match.event_name;
     };
 
     return (
