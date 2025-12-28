@@ -546,6 +546,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                         <div className="mt-4">
                             <VenueCard
                                 venue={h2hData.team.head_to_head.venue}
+                                teamIds={team1?.id && team2?.id ? [parseInt(team1.id), parseInt(team2.id)] : undefined}
                                 pitchDetails={scorecardData?.Venue as { Pitch_Suited_For?: string; Pitch_Surface?: string } | undefined}
                             />
                         </div>

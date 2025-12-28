@@ -27,14 +27,23 @@ interface PitchDetails {
 
 interface VenueCardProps {
     venue: VenueData;
+    teamIds?: [number, number]; // [id1, id2] to enforce order
     pitchDetails?: PitchDetails;
 }
 
-const VenueCard: React.FC<VenueCardProps> = ({ venue, pitchDetails }) => {
+const VenueCard: React.FC<VenueCardProps> = ({ venue, teamIds, pitchDetails }) => {
     if (!venue || !venue.data || venue.data.length < 2) return null;
 
-    const team1 = venue.data[0];
-    const team2 = venue.data[1];
+    // Default to array order
+    let team1 = venue.data[0];
+    let team2 = venue.data[1];
+
+    // Enforce Strict Order if IDs provided
+    if (teamIds) {
+        const [id1, id2] = teamIds;
+        team1 = venue.data.find(t => t.id === id1) || venue.data[0];
+        team2 = venue.data.find(t => t.id === id2) || venue.data.find(t => t.id !== team1.id) || venue.data[1];
+    }
 
     // Calculate totals for comparison
     const wins1 = team1?.won || 0;
