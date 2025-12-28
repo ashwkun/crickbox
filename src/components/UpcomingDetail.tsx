@@ -516,7 +516,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                             <DualTeamRecentForm
                                 team1={{ id: team1.id, name: team1.name, short_name: team1.short_name }}
                                 team2={{ id: team2.id, name: team2.name, short_name: team2.short_name }}
-                                currentFormat={match.event_format}
+                                currentFormat={match.event_format || match.match_type}
                                 onMatchClick={handleRecentMatchClick}
                             />
                         )}
