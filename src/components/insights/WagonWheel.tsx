@@ -17,14 +17,6 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
     // Get innings from scorecard
     const innings = scorecard?.Innings || [];
 
-    // Get innings label like scorecard
-    const getInningsLabel = (inn: any, idx: number) => {
-        const teamId = inn.Battingteam;
-        const teamName = scorecard?.Teams?.[teamId]?.Name_Short || `Team ${idx + 1}`;
-        const inningsNum = idx < 2 ? '' : ` (${Math.floor(idx / 2) + 1})`;
-        return `${teamName}${inningsNum}`;
-    };
-
     // Get all players with shots
     const playersWithShots = useMemo(() => {
         if (!batsmanSplits?.Batsmen) return [];
@@ -140,16 +132,17 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
         return 'rgba(255,255,255,0.15)'; // Dot runs
     };
 
+    // Increased stroke width for better visibility without glow
     const getStrokeWidth = (runs: number) => {
-        if (runs >= 6) return 2.5;
-        if (runs === 4) return 2;
+        if (runs >= 6) return 3;
+        if (runs === 4) return 2.5;
         return 1.5;
     };
 
     const getOpacity = (runs: number) => {
         if (runs >= 4) return 1;
         if (runs >= 1) return 0.8;
-        return 0.4;
+        return 0.5; // Slightly higher for 1s since glow is gone
     };
 
     const selectedPlayerData = playersWithShots.find(p => p.id === selectedPlayer);
@@ -157,21 +150,20 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
     return (
         <div style={{
             background: 'var(--bg-card)',
-            borderRadius: 24, // Softer corners
-            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 16,
+            border: '1px solid rgba(255,255,255,0.05)',
             overflow: 'hidden',
             position: 'relative',
-            minHeight: 460, // Taller
+            minHeight: 460,
             display: 'flex',
-            flexDirection: 'column',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
+            flexDirection: 'column'
         }}>
             {/* Loading Overlay */}
             {isLoading && (
                 <div style={{
                     position: 'absolute', inset: 0,
                     background: 'rgba(0,0,0,0.6)',
-                    backdropFilter: 'blur(8px)',
+                    backdropFilter: 'blur(4px)',
                     zIndex: 20,
                     display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
@@ -186,36 +178,32 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                 </div>
             )}
 
-            {/* Header Area */}
-            <div style={{
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0.03), transparent)',
-                padding: '16px 0 0'
-            }}>
-                <div style={{
-                    fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.6)',
-                    textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'center',
-                    marginBottom: 16
-                }}>
-                    Wagon Wheel
-                </div>
-
-                {/* Innings Tabs */}
+            {/* Header Area - Simplified */}
+            <div style={{ padding: '16px 16px 0' }}>
+                {/* Standard Tab Switcher */}
                 {innings.length > 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: 6, paddingBottom: 0 }}>
+                    <div style={{
+                        display: 'flex',
+                        gap: 24,
+                        borderBottom: '1px solid rgba(255,255,255,0.1)',
+                        paddingBottom: 0,
+                        marginBottom: 16
+                    }}>
                         {innings.map((inn: any, idx: number) => (
                             <button
                                 key={idx}
                                 onClick={() => onInningsChange?.(idx + 1)}
                                 style={{
-                                    padding: '6px 16px',
-                                    borderBottom: selectedInnings === idx + 1 ? '2px solid #fff' : '2px solid transparent',
+                                    padding: '8px 4px',
+                                    borderBottom: selectedInnings === idx + 1 ? '3px solid #E5E5E5' : '3px solid transparent',
                                     background: 'transparent',
-                                    color: selectedInnings === idx + 1 ? '#fff' : 'rgba(255,255,255,0.4)',
-                                    fontSize: 13,
+                                    color: selectedInnings === idx + 1 ? '#fff' : 'rgba(255,255,255,0.5)',
+                                    fontSize: 14,
                                     fontWeight: 700,
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    fontFamily: 'inherit'
+                                    transition: 'color 0.2s',
+                                    fontFamily: 'inherit',
+                                    textTransform: 'uppercase'
                                 }}
                             >
                                 {scorecard?.Teams?.[inn.Battingteam]?.Name_Short || `INN ${idx + 1}`}
@@ -223,8 +211,6 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                         ))}
                     </div>
                 )}
-
-                <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', marginTop: 0 }} />
             </div>
 
             {/* Content  */}
@@ -240,24 +226,22 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
             ) : (
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
 
-                    {/* Floating Player Selector Pill */}
-                    <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 10 }}>
+                    {/* Floating Player Selector Pill - Simplified */}
+                    <div style={{ position: 'absolute', top: 0, right: 16, zIndex: 10 }}>
                         <button
                             onClick={() => setShowSelector(true)}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: 8,
-                                background: 'rgba(20,20,20,0.8)',
-                                backdropFilter: 'blur(12px)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: 30,
-                                padding: '6px 14px 6px 6px',
+                                background: 'rgba(30,30,30,0.9)',
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                borderRadius: 100,
+                                padding: '6px 12px 6px 6px',
                                 color: '#fff',
-                                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                                transition: 'transform 0.1s'
+                                transition: 'background 0.2s'
                             }}
                         >
                             {selectedPlayer === 'all' ? (
-                                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg, #333, #111)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                                 </div>
                             ) : (
@@ -266,13 +250,13 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                     id={selectedPlayerData?.id}
                                     type="player"
                                     circle
-                                    style={{ width: 28, height: 28, border: '1px solid rgba(255,255,255,0.2)' }}
+                                    style={{ width: 24, height: 24, border: '1px solid rgba(255,255,255,0.2)' }}
                                 />
                             )}
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-                                <span style={{ fontSize: 12, fontWeight: 700 }}>{selectedPlayer === 'all' ? 'All Batters' : selectedPlayerData?.name?.split(' ').pop()}</span>
+                                <span style={{ fontSize: 13, fontWeight: 600 }}>{selectedPlayer === 'all' ? 'All Batters' : selectedPlayerData?.name?.split(' ').pop()}</span>
                             </div>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, marginLeft: 2 }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5, marginLeft: 4 }}>
                                 <path d="M6 9l6 6 6-6" />
                             </svg>
                         </button>
@@ -282,45 +266,44 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                     {showSelector && (
                         <div style={{
                             position: 'absolute', inset: 0,
-                            background: 'rgba(5,5,5,0.98)',
-                            backdropFilter: 'blur(16px)',
+                            background: 'rgba(10,10,10,0.98)', // Darker flat BG
                             zIndex: 30,
-                            padding: 24,
+                            padding: 20,
                             display: 'flex', flexDirection: 'column',
-                            animation: 'fadeIn 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)'
+                            animation: 'fadeIn 0.2s ease-out'
                         }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                                <span style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>Select Batter</span>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                                <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Select Batter</span>
                                 <button
                                     onClick={() => setShowSelector(false)}
                                     style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', padding: 8, background: 'rgba(255,255,255,0.1)', borderRadius: '50%' }}
                                 >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <line x1="18" y1="6" x2="6" y2="18"></line>
                                         <line x1="6" y1="6" x2="18" y2="18"></line>
                                     </svg>
                                 </button>
                             </div>
 
-                            <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+                            <style>{`@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
 
-                            <div className="hide-scrollbar" style={{ overflowY: 'auto', flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 12, paddingBottom: 20 }}>
+                            <div className="hide-scrollbar" style={{ overflowY: 'auto', flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 12, paddingBottom: 20 }}>
                                 {/* All Option */}
                                 <button
                                     onClick={() => { setSelectedPlayer('all'); setShowSelector(false); }}
                                     style={{
-                                        background: selectedPlayer === 'all' ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05))' : 'rgba(255,255,255,0.03)',
-                                        border: selectedPlayer === 'all' ? '1px solid rgba(34, 197, 94, 0.5)' : '1px solid rgba(255,255,255,0.08)',
-                                        borderRadius: 20, padding: 16,
-                                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+                                        background: selectedPlayer === 'all' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255,255,255,0.05)',
+                                        border: selectedPlayer === 'all' ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid transparent',
+                                        borderRadius: 12, padding: 12,
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                                         cursor: 'pointer',
                                     }}
                                 >
-                                    <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <span style={{ fontSize: 14, fontWeight: 800, color: '#666' }}>ALL</span>
+                                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <span style={{ fontSize: 12, fontWeight: 700, color: '#666' }}>ALL</span>
                                     </div>
                                     <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Combined</div>
+                                        <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>Combined</div>
                                     </div>
                                 </button>
 
@@ -330,10 +313,10 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                         key={p.id}
                                         onClick={() => { setSelectedPlayer(p.id); setShowSelector(false); }}
                                         style={{
-                                            background: selectedPlayer === p.id ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05))' : 'rgba(255,255,255,0.03)',
-                                            border: selectedPlayer === p.id ? '1px solid rgba(34, 197, 94, 0.5)' : '1px solid rgba(255,255,255,0.08)',
-                                            borderRadius: 20, padding: 16,
-                                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+                                            background: selectedPlayer === p.id ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255,255,255,0.05)',
+                                            border: selectedPlayer === p.id ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid transparent',
+                                            borderRadius: 12, padding: 12,
+                                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                                             cursor: 'pointer',
                                         }}
                                     >
@@ -342,13 +325,13 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                             id={p.id}
                                             type="player"
                                             circle
-                                            style={{ width: 64, height: 64, border: '2px solid rgba(255,255,255,0.1)' }}
+                                            style={{ width: 48, height: 48, border: '1px solid rgba(255,255,255,0.1)' }}
                                         />
                                         <div style={{ textAlign: 'center', width: '100%' }}>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                 {p.name.split(' ').pop()}
                                             </div>
-                                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+                                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
                                                 {p.runs} ({p.shots.length})
                                             </div>
                                         </div>
@@ -359,54 +342,37 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                     )}
 
                     {/* SVG Visualization */}
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '30px 0 20px', flex: 1, alignItems: 'center' }}>
-                        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.4))' }}>
-                            {/* Field Background - Gradient */}
-                            <defs>
-                                <radialGradient id="fieldGradient" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
-                                    <stop offset="0%" stopColor="rgba(34, 197, 94, 0.08)" />
-                                    <stop offset="100%" stopColor="rgba(34, 197, 94, 0.02)" />
-                                </radialGradient>
-                            </defs>
-                            <circle
-                                cx={center} cy={center} r={fieldRadius}
-                                fill="url(#fieldGradient)"
-                                stroke="rgba(255,255,255,0.1)" strokeWidth={1}
-                            />
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px 0', flex: 1, alignItems: 'center' }}>
+                        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+                            {/* Field Background - Solid Flat Color */}
+                            <circle cx={center} cy={center} r={fieldRadius} fill="#1a1a1a" stroke="none" />
 
-                            {/* Inner Circle (30 yard) - Subtle */}
+                            {/* Inner Circle (30 yard) - Simple Line */}
                             <circle
                                 cx={center} cy={center} r={fieldRadius * 0.45}
                                 fill="none"
-                                stroke="rgba(255,255,255,0.05)" strokeWidth={1}
+                                stroke="rgba(255,255,255,0.1)" strokeWidth={1}
                                 strokeDasharray="4,4"
                             />
 
-                            {/* Zone Spokes - Very Subtle */}
-                            {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => {
-                                const rad = (angle - 90) * (Math.PI / 180);
-                                const x2 = center + fieldRadius * Math.cos(rad);
-                                const y2 = center + fieldRadius * Math.sin(rad);
-                                return (
-                                    <line
-                                        key={angle}
-                                        x1={center} y1={center} x2={x2} y2={y2}
-                                        stroke="rgba(255,255,255,0.03)" strokeWidth={1}
-                                    />
-                                );
-                            })}
+                            {/* Boundary Rope */}
+                            <circle
+                                cx={center} cy={center} r={fieldRadius}
+                                fill="none"
+                                stroke="rgba(255,255,255,0.2)" strokeWidth={1.5}
+                            />
 
-                            {/* Pitch Area */}
+                            {/* Pitch Area - Flat */}
                             <rect
                                 x={center - pitchWidth / 2} y={center - pitchHeight / 2}
                                 width={pitchWidth} height={pitchHeight}
-                                fill="rgba(255, 255, 255, 0.08)"
-                                rx={2}
+                                fill="rgba(255, 255, 255, 0.1)"
+                                rx={1}
                             />
 
                             {/* Wickets */}
-                            <rect x={center - 4} y={strikerY - 2} width={8} height={2} fill="#fff" rx={1} />
-                            <rect x={center - 4} y={nonStrikerY} width={8} height={2} fill="rgba(255,255,255,0.3)" rx={1} />
+                            <rect x={center - 3} y={strikerY - 2} width={6} height={2} fill="#fff" />
+                            <rect x={center - 3} y={nonStrikerY} width={6} height={2} fill="rgba(255,255,255,0.5)" />
 
 
                             {/* SHOT LINES */}
@@ -427,13 +393,12 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                                 strokeLinecap="round"
                                                 opacity={opacity}
                                             />
-                                            {/* Minimal Dot only for boundary to show impact point */}
+                                            {/* Flat Dot for boundary */}
                                             {runs >= 4 && (
                                                 <circle
                                                     cx={x2} cy={y2}
-                                                    r={runs >= 6 ? 2.5 : 1.5}
+                                                    r={runs >= 6 ? 2.5 : 2}
                                                     fill={color}
-                                                    style={{ filter: `drop-shadow(0 0 4px ${color})` }}
                                                 />
                                             )}
                                         </g>
@@ -442,7 +407,7 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                             </g>
 
                             {/* Striker Dot (Origin) */}
-                            <circle cx={strikerX} cy={strikerY} r={3} fill="#fff" stroke="var(--bg-card)" strokeWidth={1.5} />
+                            <circle cx={strikerX} cy={strikerY} r={2.5} fill="#fff" />
 
                         </svg>
                     </div>
@@ -450,20 +415,24 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                     {/* Legend Footer - Clean */}
                     <div style={{
                         display: 'flex', justifyContent: 'center', gap: 24,
-                        padding: '0 0 20px', fontSize: 11, color: 'rgba(255,255,255,0.4)',
+                        padding: '0 0 20px', fontSize: 11, color: 'rgba(255,255,255,0.5)',
                         fontWeight: 500
                     }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
                             <span>1s & 2s</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fbbf24', boxShadow: '0 0 6px rgba(251, 191, 36, 0.4)' }} />
-                            <span style={{ color: '#fbbf24' }}>4s</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#84cc16' }} />
+                            <span>3s</span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444', boxShadow: '0 0 6px rgba(239, 68, 68, 0.4)' }} />
-                            <span style={{ color: '#ef4444' }}>6s</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fbbf24' }} />
+                            <span>4s</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
+                            <span>6s</span>
                         </div>
                     </div>
                 </div>
