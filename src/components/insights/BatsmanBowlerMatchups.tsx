@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { BatsmanSplitsResponse } from '../../utils/h2hApi';
+import React, { useState, useEffect, useMemo } from 'react';
+import { BatsmanSplitsResponse, OverByOverResponse } from '../../utils/h2hApi';
 import WikiImage from '../WikiImage';
 import { IoInformationCircleOutline, IoClose } from 'react-icons/io5';
 
 interface BatsmanBowlerMatchupsProps {
     batsmanSplits: BatsmanSplitsResponse | null;
+    overByOver?: OverByOverResponse | null;
     scorecard?: any;
     selectedInnings?: number;
     onInningsChange?: (innings: number) => void;
     isLoading?: boolean;
 }
 
-const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSplits, scorecard, selectedInnings = 1, onInningsChange, isLoading = false }) => {
+const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSplits, overByOver, scorecard, selectedInnings = 1, onInningsChange, isLoading = false }) => {
     const [selectedBatterId, setSelectedBatterId] = useState<string | null>(null);
     const [showInfo, setShowInfo] = useState(false);
 
@@ -32,9 +33,38 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
 
     const selectedBatterData = selectedBatterId ? batsmen[selectedBatterId] : null;
 
+    // Derived Wicket Map: [BatterID][BowlerID] = count
+    // Uses OverByOver data since BatsmanSplits API lacks Dismissals field
+    const wicketMap = useMemo(() => {
+        const map: Record<string, Record<string, number>> = {};
+        if (!overByOver?.Overbyover) return map;
+
+        overByOver.Overbyover.forEach(over => {
+            if (parseInt(over.Wickets || '0') > 0 && over.Batsmen && over.Bowlers) {
+                // Find Bowler ID (Top bowler in over usually, or just iterate)
+                // In OverByOver, Bowlers is a map. Usually only 1 bowler per over.
+                const bowlerIds = Object.keys(over.Bowlers);
+                const bowlerId = bowlerIds.length > 0 ? bowlerIds[0] : null;
+
+                if (bowlerId) {
+                    // Check for Out Batsman
+                    Object.entries(over.Batsmen).forEach(([batterId, stats]) => {
+                        if (stats.Isout) {
+                            if (!map[batterId]) map[batterId] = {};
+                            if (!map[batterId][bowlerId]) map[batterId][bowlerId] = 0;
+                            map[batterId][bowlerId]++;
+                        }
+                    });
+                }
+            }
+        });
+        return map;
+    }, [overByOver]);
+
+
     // Helper to determine Verdict Badge - with clearer labels
     const getVerdict = (runs: number, balls: number, dots: number, wickets: number, sr: number) => {
-        if (wickets > 0) return { label: 'BOWLER WON', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', description: 'Batter was dismissed' };
+        if (wickets > 0) return { label: 'BOWLER WON', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', description: 'Bowler took the wicket' };
         if (sr > 175 || (runs > 20 && sr > 150)) return { label: 'BATTER DOMINATED', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', description: 'High Strike Rate or Aggressive Scoring' };
         if (dots > 3 && (dots / balls) > 0.6) return { label: 'PINNED DOWN', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)', description: 'Struggling to rotate strike (>60% Dots)' };
         if (sr < 100 && balls > 6) return { label: 'SLOW GOING', color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', description: 'Scoring below a run-a-ball' };
@@ -220,9 +250,12 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                             const dots = parseInt(vs.Dots) || 0;
                             const fours = parseInt(vs.Fours) || 0;
                             const sixes = parseInt(vs.Sixes) || 0;
-                            // Check both Dismissals (if exists from API update) or fallback logic?
-                            // Safely handle Dismissals if API returns nothing (undefined) => 0
-                            const wickets = parseInt(vs.Dismissals || '0') || 0;
+
+                            // Get derived wickets from map + API fallback if ever added
+                            const derivedWickets = wicketMap[selectedBatterId!]?.[bowlerId] || 0;
+                            const apiWickets = parseInt(vs.Dismissals || '0') || 0;
+                            const wickets = Math.max(derivedWickets, apiWickets);
+
                             const sr = parseFloat(vs.Strikerate) || 0;
 
                             const verdict = getVerdict(runs, balls, dots, wickets, sr);

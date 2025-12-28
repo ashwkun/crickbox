@@ -43,6 +43,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [h2hData, setH2hData] = useState<H2HData | null>(null);
     const [batsmanSplits, setBatsmanSplits] = useState<BatsmanSplitsResponse | null>(null); // For Wagon Wheel (legacy name)
     const [batsmanSplitsMatchups, setBatsmanSplitsMatchups] = useState<BatsmanSplitsResponse | null>(null); // Independent for Matchups
+    const [overByOverMatchups, setOverByOverMatchups] = useState<OverByOverResponse | null>(null); // Independent for Matchups Wickets
     const [matchupsInnings, setMatchupsInnings] = useState(1);
     const [isMatchupsLoading, setIsMatchupsLoading] = useState(false);
     const [overByOver, setOverByOver] = useState<OverByOverResponse | null>(null);
@@ -72,7 +73,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 }
             });
             fetchOverByOver(match.game_id, currentInnings).then(data => {
-                if (data) setOverByOver(data);
+                if (data) {
+                    setOverByOver(data);
+                    setOverByOverMatchups(data); // Initialize Matchups with same data
+                }
             });
 
             // Fetch both innings for Worm Chart
@@ -101,8 +105,12 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const handleMatchupsInningsChange = (innings: number) => {
         setMatchupsInnings(innings);
         setIsMatchupsLoading(true);
-        fetchBatsmanSplits(match.game_id, innings).then(data => {
-            if (data) setBatsmanSplitsMatchups(data);
+        Promise.all([
+            fetchBatsmanSplits(match.game_id, innings),
+            fetchOverByOver(match.game_id, innings)
+        ]).then(([splits, obo]) => {
+            if (splits) setBatsmanSplitsMatchups(splits);
+            if (obo) setOverByOverMatchups(obo);
             setIsMatchupsLoading(false);
         });
     };
