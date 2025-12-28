@@ -6,6 +6,9 @@ import {
     LANGUAGE
 } from './wisdenConfig';
 
+// Re-export for use in other modules
+export { CLIENT_SCORECARD };
+
 // CORS Proxy (Cloudflare Worker)
 export const CORS_PROXY = "https://cricket-proxy.boxboxcric.workers.dev/?url=";
 

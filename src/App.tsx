@@ -4,11 +4,11 @@ import InstallPrompt from './components/InstallPrompt';
 import MatchDetail from './components/MatchDetail';
 import FloatingHeader from './components/FloatingHeader';
 import useCricketData from './utils/useCricketData';
-import { fetchWallstream, WallstreamData } from './utils/wallstreamApi';
+import { WallstreamData } from './utils/wallstreamApi';
 import { Match, Scorecard, Series, Tournament } from './types';
 
 export default function App(): React.ReactElement {
-    const { matches, loading, fetchScorecard, fetchExtendedResults } = useCricketData();
+    const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream } = useCricketData();
     const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
     const [scorecard, setScorecard] = useState<Scorecard | null>(null);
     const [wallstream, setWallstream] = useState<WallstreamData | null>(null);

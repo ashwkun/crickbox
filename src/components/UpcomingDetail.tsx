@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import WikiImage, { getFlagUrl } from './WikiImage';
 import { Match, Participant } from '../types';
-import { fetchHeadToHead, fetchSquad, H2HData, SquadData, RecentMatch } from '../utils/h2hApi';
+import { H2HData, SquadData } from '../utils/h2hApi';
+import useCricketData from '../utils/useCricketData';
 import { getTeamColor } from '../utils/teamColors';
 import { useImageColor } from '../hooks/useImageColor';
 import { proxyFetch, WISDEN_SCORECARD } from '../utils/api';
@@ -29,6 +30,7 @@ interface UpcomingDetailProps {
 }
 
 const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
+    const { fetchH2H, fetchSquad } = useCricketData();
     const [h2hData, setH2hData] = useState<H2HData | null>(null);
     const [squad1, setSquad1] = useState<SquadData | null>(null);
     const [squad2, setSquad2] = useState<SquadData | null>(null);
@@ -91,7 +93,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
 
             // Fetch H2H and Scorecard in PARALLEL for faster loading
             const [h2hResult, scorecardResult] = await Promise.allSettled([
-                fetchHeadToHead(match.game_id),
+                fetchH2H(match.game_id),
                 proxyFetch(`${WISDEN_SCORECARD}${match.game_id}`)
             ]);
 

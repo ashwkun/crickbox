@@ -6,7 +6,8 @@ import { getTeamColor } from '../utils/teamColors';
 import { getMatchStatusConfig } from '../utils/matchStatus';
 import { GiCricketBat } from 'react-icons/gi';
 import { IoBaseball } from 'react-icons/io5';
-import { fetchHeadToHead, H2HData } from '../utils/h2hApi';
+import useCricketData from '../utils/useCricketData';
+import { H2HData, BatsmanSplitsResponse, OverByOverResponse } from '../utils/h2hApi';
 
 interface LiveDetailProps {
     match: any;
@@ -17,6 +18,7 @@ interface LiveDetailProps {
 }
 
 const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick }) => {
+    const { fetchH2H, fetchBatsmanSplits, fetchOverByOver } = useCricketData();
     const [selectedSquadIdx, setSelectedSquadIdx] = React.useState(0);
 
     // Score Tracking for Animations (State & Ref)
@@ -37,17 +39,29 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [selectedInningsIdx, setSelectedInningsIdx] = useState(0);
     const [commentaryExpanded, setCommentaryExpanded] = useState(false);
     const [h2hData, setH2hData] = useState<H2HData | null>(null);
+    const [batsmanSplits, setBatsmanSplits] = useState<BatsmanSplitsResponse | null>(null);
+    const [overByOver, setOverByOver] = useState<OverByOverResponse | null>(null);
     const [activeTab, setActiveTab] = useState<'live' | 'insights'>('live');
     const hasSetInitialTab = React.useRef(false);
 
-    // Fetch H2H data for player stats
+    // Centralized data fetch for insights (uses hook functions)
     useEffect(() => {
         if (match?.game_id) {
-            fetchHeadToHead(match.game_id).then(data => {
+            // Fetch H2H data
+            fetchH2H(match.game_id).then(data => {
                 if (data) setH2hData(data);
             });
+
+            // Fetch current innings batsman splits and over-by-over
+            const currentInnings = scorecard?.Innings?.length || 1;
+            fetchBatsmanSplits(match.game_id, currentInnings).then(data => {
+                if (data) setBatsmanSplits(data);
+            });
+            fetchOverByOver(match.game_id, currentInnings).then(data => {
+                if (data) setOverByOver(data);
+            });
         }
-    }, [match?.game_id]);
+    }, [match?.game_id, scorecard?.Innings?.length, fetchH2H, fetchBatsmanSplits, fetchOverByOver]);
 
     // Auto-select the latest inning when data loads
     React.useEffect(() => {
@@ -641,7 +655,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
             {/* === INSIGHTS VIEW === */}
             {activeTab === 'insights' && h2hData && (
-                <LiveInsights h2hData={h2hData} />
+                <LiveInsights h2hData={h2hData} scorecard={scorecard} batsmanSplits={batsmanSplits} overByOver={overByOver} />
             )}
 
             {/* === LIVE VIEW === */}

@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import { WISDEN_MATCHES, WISDEN_SCORECARD, proxyFetch } from './api';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { WISDEN_MATCHES, WISDEN_SCORECARD, proxyFetch, CLIENT_SCORECARD } from './api';
 import { safeSetItem } from './storage';
 import { Match, Scorecard, MatchesResponse } from '../types';
+import { H2HData, BatsmanSplitsResponse, OverByOverResponse, SquadData } from './h2hApi';
+import { WallstreamData, BallData, extractMatchId } from './wallstreamApi';
 
 const CACHE_KEY = 'wisden_matches_v5';
 const LIVE_INTERVAL = 15000; // 15 seconds for live scores
@@ -70,6 +72,12 @@ interface UseCricketDataReturn {
     loading: boolean;
     fetchScorecard: (gameId: string) => Promise<Scorecard | null>;
     fetchExtendedResults: (chunks?: number) => Promise<Match[]>;
+    // Centralized fetch functions
+    fetchWallstream: (gameId: string, pageSize?: number, innings?: number) => Promise<WallstreamData>;
+    fetchH2H: (gameId: string) => Promise<H2HData | null>;
+    fetchSquad: (teamId: string, seriesId: string) => Promise<SquadData | null>;
+    fetchBatsmanSplits: (gameId: string, innings: number) => Promise<BatsmanSplitsResponse | null>;
+    fetchOverByOver: (gameId: string, innings: number) => Promise<OverByOverResponse | null>;
 }
 
 export default function useCricketData(): UseCricketDataReturn {
@@ -271,5 +279,176 @@ export default function useCricketData(): UseCricketDataReturn {
         return mergedArray;
     };
 
-    return { matches, loading, fetchScorecard, fetchExtendedResults };
+    // ============ CENTRALIZED FETCH FUNCTIONS ============
+
+    // Wallstream - moved from wallstreamApi.ts
+    const WALLSTREAM_CLIENT = 'lx/QMpdauKZQKYaddAs76w==';
+
+    const parseBallValue = (ball: string): string => {
+        if (!ball) return '';
+        const match = ball.match(/\d*\((.+)\)/);
+        if (match) return match[1];
+        return ball;
+    };
+
+    const fetchWallstream = useCallback(async (gameId: string, pageSize = 10, innings = 1): Promise<WallstreamData> => {
+        try {
+            const matchId = extractMatchId(gameId);
+            const url = `https://www.wisden.com/functions/wallstream/?sport_id=1&client_id=${encodeURIComponent(WALLSTREAM_CLIENT)}&match_id=${matchId}&page_size=${pageSize}&page_no=1&session=${innings}`;
+            const data = await proxyFetch(url, true);
+
+            if (!data?.assets || !Array.isArray(data.assets)) {
+                return { balls: [], latestBall: null };
+            }
+
+            const balls: BallData[] = data.assets
+                .filter((a: any) => a.type === 'Commentary' && a.custom_metadata?.asset)
+                .map((a: any) => {
+                    try {
+                        const asset = JSON.parse(a.custom_metadata.asset);
+                        const thisOverStr = asset.This_Over || '';
+                        const thisOverBalls = thisOverStr.split(',').filter((b: string) => b !== '').map(parseBallValue);
+                        const detail = (asset.Detail || '').toLowerCase();
+                        const runs = asset.Runs || '0';
+
+                        return {
+                            over: asset.Over || '',
+                            runs,
+                            detail,
+                            commentary: asset.Commentary || '',
+                            batsmanName: asset.Batsman_Details?.name || asset.Batsman_Name || '',
+                            batsmanRuns: asset.Batsman_Details?.Runs || '0',
+                            batsmanBalls: asset.Batsman_Details?.Balls || '0',
+                            batsmanFours: asset.Batsman_Details?.Fours || '0',
+                            batsmanSixes: asset.Batsman_Details?.Sixes || '0',
+                            nonStrikerName: asset.Non_Striker_Details?.name || '',
+                            nonStrikerRuns: asset.Non_Striker_Details?.Runs || '0',
+                            nonStrikerBalls: asset.Non_Striker_Details?.Balls || '0',
+                            bowlerName: asset.Bowler_Details?.name || asset.Bowler_Name || '',
+                            bowlerOvers: asset.Bowler_Details?.Overs || '0',
+                            bowlerRuns: asset.Bowler_Details?.Runs || '0',
+                            bowlerWickets: asset.Bowler_Details?.Wickets || '0',
+                            bowlerMaidens: asset.Bowler_Details?.Maidens || '0',
+                            thisOver: thisOverBalls,
+                            currentScore: asset.Over_Summary?.Score?.split('/')[0] || '',
+                            currentWickets: asset.Over_Summary?.Score?.split('/')[1] || '',
+                            isWicket: detail === 'w',
+                            isFour: runs === '4' || asset.Isboundary === true,
+                            isSix: runs === '6',
+                            isball: asset.Isball === true,
+                            batsmanId: asset.Batsman_Details?.id || asset.Batsman || '',
+                            nonStrikerId: asset.Non_Striker_Details?.id || '',
+                            bowlerId: asset.Bowler_Details?.id || asset.Bowler || '',
+                        };
+                    } catch { return null; }
+                })
+                .filter((b: BallData | null) => b !== null) as BallData[];
+
+            return { balls, latestBall: balls.find(b => b.isball) || null };
+        } catch (error) {
+            console.error('Wallstream fetch error:', error);
+            return { balls: [], latestBall: null };
+        }
+    }, []);
+
+    // H2H - moved from h2hApi.ts
+    const fetchH2H = useCallback(async (gameId: string): Promise<H2HData | null> => {
+        try {
+            const url = `https://www.wisden.com/cricket/v1/game/head-to-head?client_id=${CLIENT_SCORECARD}&feed_format=json&game_id=${gameId}&lang=en`;
+            const response = await proxyFetch(url);
+            if (!response?.data) return null;
+
+            // Sanitize team names in H2H data
+            const h2h = response.data as H2HData;
+            if (h2h.team?.head_to_head?.comp_type?.data) {
+                h2h.team.head_to_head.comp_type.data.forEach((t: any) => {
+                    if (t.name) t.name = sanitizeTeamName(t.name);
+                });
+            }
+            if (h2h.team?.head_to_head?.venue?.data) {
+                h2h.team.head_to_head.venue.data.forEach((t: any) => {
+                    if (t.name) t.name = sanitizeTeamName(t.name);
+                });
+            }
+            return h2h;
+        } catch (error) {
+            console.error('H2H fetch error:', error);
+            return null;
+        }
+    }, []);
+
+    // Batsman Splits - for wagon wheel and matchups
+    const fetchBatsmanSplits = useCallback(async (gameId: string, innings: number): Promise<BatsmanSplitsResponse | null> => {
+        try {
+            const matchFile = gameId.replace(/[^a-z0-9]/gi, '');
+            const url = `https://www.wisden.com/cricket/live/json/${matchFile}_batsman_splits_${innings}.json`;
+            const response = await fetch(url);
+            if (!response.ok) return null;
+            return await response.json();
+        } catch (error) {
+            console.warn(`Failed to fetch batsman splits for innings ${innings}:`, error);
+            return null;
+        }
+    }, []);
+
+    // Over-by-Over - for innings progression
+    const fetchOverByOver = useCallback(async (gameId: string, innings: number): Promise<OverByOverResponse | null> => {
+        try {
+            const matchFile = gameId.replace(/[^a-z0-9]/gi, '');
+            const url = `https://www.wisden.com/cricket/live/json/${matchFile}_overbyover_${innings}.json`;
+            const response = await fetch(url);
+            if (!response.ok) return null;
+            return await response.json();
+        } catch (error) {
+            console.warn(`Failed to fetch over-by-over for innings ${innings}:`, error);
+            return null;
+        }
+    }, []);
+
+    // Squad - for team lineups
+    const fetchSquad = useCallback(async (teamId: string, seriesId: string): Promise<SquadData | null> => {
+        try {
+            const url = `https://www.wisden.com/cricket/v1/series/squad?team_id=${teamId}&series_id=${seriesId}&lang=en&feed_format=json&client_id=${CLIENT_SCORECARD}`;
+            const response = await proxyFetch(url);
+
+            if (!response?.data?.squads?.teams?.team) return null;
+
+            const teamData = response.data.squads.teams.team[0];
+            if (!teamData) return null;
+
+            const players = teamData.players?.player || [];
+
+            return {
+                team_id: parseInt(teamId),
+                team_name: sanitizeTeamName(teamData.name || ''),
+                team_short_name: teamData.short_name || '',
+                players: players.map((p: any) => ({
+                    player_id: parseInt(p.id) || 0,
+                    player_name: p.name || p.full_display_name,
+                    short_name: p.short_name || p.name,
+                    role: p.role || p.skill_name,
+                    skill: p.skill_name,
+                    batting_style: p.sport_specific_keys?.batting_style,
+                    bowling_style: p.sport_specific_keys?.bowling_style,
+                    is_captain: p.sport_specific_keys?.is_captain === 'true',
+                    is_keeper: p.sport_specific_keys?.is_wicket_keeper === 'true'
+                }))
+            };
+        } catch (error) {
+            console.error('Failed to fetch squad data:', error);
+            return null;
+        }
+    }, []);
+
+    return {
+        matches,
+        loading,
+        fetchScorecard,
+        fetchExtendedResults,
+        fetchWallstream,
+        fetchH2H,
+        fetchSquad,
+        fetchBatsmanSplits,
+        fetchOverByOver
+    };
 }
