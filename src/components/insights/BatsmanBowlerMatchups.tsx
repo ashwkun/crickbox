@@ -17,9 +17,25 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
     const [showInfo, setShowInfo] = useState(false);
 
     const batsmen = batsmanSplits?.Batsmen || {};
-    const batterIds = Object.keys(batsmen);
 
-    // Auto-select first batter on load or when innings changes
+    // Filter and Sort Batters
+    const batterIds = useMemo(() => {
+        return Object.keys(batsmen)
+            .filter(id => {
+                // Filter out batters with no matchups (didn't bat or no data)
+                const data = batsmen[id];
+                return data.Against && Object.keys(data.Against).length > 0;
+            })
+            .sort((a, b) => {
+                // Sort by Total Runs (Calculated)
+                const getRuns = (id: string) => {
+                    return Object.values(batsmen[id].Against || {}).reduce((sum, vs) => sum + (parseInt(vs.Runs) || 0), 0);
+                };
+                return getRuns(b) - getRuns(a);
+            });
+    }, [batsmen]);
+
+    // Auto-select first batter on load or when list changes
     useEffect(() => {
         if (batterIds.length > 0) {
             // If currently selected batter is not in the new list, reset to first
@@ -29,7 +45,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
         } else {
             setSelectedBatterId(null);
         }
-    }, [batterIds.length, selectedInnings]);
+    }, [batterIds, selectedInnings]);
 
     const selectedBatterData = selectedBatterId ? batsmen[selectedBatterId] : null;
 
