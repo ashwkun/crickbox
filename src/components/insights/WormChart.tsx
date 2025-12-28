@@ -7,6 +7,8 @@ interface WormChartProps {
     innings2: OverByOverEntry[] | null;
     team1Name: string;
     team2Name: string;
+    team1ShortName: string;
+    team2ShortName: string;
     team1Id?: string;
     team2Id?: string;
 }
@@ -16,29 +18,33 @@ const WormChart: React.FC<WormChartProps> = ({
     innings2,
     team1Name,
     team2Name,
+    team1ShortName,
+    team2ShortName,
     team1Id,
     team2Id
 }) => {
     // Calculate cumulative runs and wickets for each innings
     const processInnings = (data: OverByOverEntry[] | null) => {
-        if (!data) return { points: [], wickets: [] };
+        if (!data) return { points: [], wickets: [], totalWickets: 0 };
         let total = 0;
+        let totalWickets = 0;
         const pts: { over: number; total: number }[] = [];
         const wkts: { over: number; total: number; count: number }[] = [];
 
         data.forEach(over => {
             total += parseInt(over.Runs) || 0;
             const w = parseInt(over.Wickets) || 0;
+            totalWickets += w;
             pts.push({ over: over.Over, total });
             if (w > 0) {
                 wkts.push({ over: over.Over, total, count: w });
             }
         });
-        return { points: pts, wickets: wkts };
+        return { points: pts, wickets: wkts, totalWickets };
     };
 
-    const { points: cumulative1, wickets: wickets1 } = useMemo(() => processInnings(innings1), [innings1]);
-    const { points: cumulative2, wickets: wickets2 } = useMemo(() => processInnings(innings2), [innings2]);
+    const { points: cumulative1, wickets: wickets1, totalWickets: wkts1 } = useMemo(() => processInnings(innings1), [innings1]);
+    const { points: cumulative2, wickets: wickets2, totalWickets: wkts2 } = useMemo(() => processInnings(innings2), [innings2]);
 
     // If no data, don't render
     if (cumulative1.length === 0 && cumulative2.length === 0) {
@@ -198,20 +204,20 @@ const WormChart: React.FC<WormChartProps> = ({
             }}>
                 {cumulative1.length > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: color1 }} />
+                        <div style={{ width: 16, height: 2, background: color1, borderRadius: 1 }} />
                         <span style={{ color: 'rgba(255,255,255,0.8)' }}>
-                            {team1Name.split(' ').pop()}
+                            {team1ShortName}
                         </span>
-                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{cumulative1[cumulative1.length - 1]?.total}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{cumulative1[cumulative1.length - 1]?.total}/{wkts1}</span>
                     </div>
                 )}
                 {cumulative2.length > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: color2, border: '1px dashed rgba(255,255,255,0.5)' }} />
+                        <div style={{ width: 16, height: 2, background: color2, borderRadius: 1, backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 3px, var(--bg-card) 3px, var(--bg-card) 5px)' }} />
                         <span style={{ color: 'rgba(255,255,255,0.8)' }}>
-                            {team2Name.split(' ').pop()}
+                            {team2ShortName}
                         </span>
-                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{cumulative2[cumulative2.length - 1]?.total}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{cumulative2[cumulative2.length - 1]?.total}/{wkts2}</span>
                     </div>
                 )}
             </div>

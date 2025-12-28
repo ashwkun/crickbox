@@ -90,6 +90,8 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 innings2={overByOver2?.Overbyover || null}
                 team1Name={team1?.name || 'Team 1'}
                 team2Name={team2?.name || 'Team 2'}
+                team1ShortName={team1?.short_name || team1?.name || 'T1'}
+                team2ShortName={team2?.short_name || team2?.name || 'T2'}
                 team1Id={team1?.id}
                 team2Id={team2?.id}
             />
