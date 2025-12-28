@@ -144,38 +144,37 @@
 }
 
 .h2h-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
     margin-bottom: 16px;
+    width: 100%;
 }
 
 .h2h-section {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    flex: 1;
-    /* Changed from width: 33% to flex: 1 for equal distribution */
 }
 
 .h2h-section.align-left {
     align-items: flex-start;
     text-align: left;
+    justify-self: start;
 }
 
 .h2h-section.align-center {
     align-items: center;
     text-align: center;
     padding-bottom: 5px;
-    flex: 0 0 auto;
-    /* Don't stretch, just take needed space */
     min-width: 80px;
-    /* Ensure space for "Draws" text */
+    justify-self: center;
 }
 
 .h2h-section.align-right {
     align-items: flex-end;
     text-align: right;
+    justify-self: end;
 }
 
 .h2h-team-name {
