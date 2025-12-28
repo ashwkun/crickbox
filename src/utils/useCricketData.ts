@@ -452,3 +452,6 @@ export default function useCricketData(): UseCricketDataReturn {
         fetchOverByOver
     };
 }
+
+// Re-export Supabase match database functions for convenience
+export { getTeamForm, getTeamMatches, getH2HMatches, getMatchesByLeague } from './matchDatabase';
