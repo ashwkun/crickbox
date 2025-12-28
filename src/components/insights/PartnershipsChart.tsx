@@ -72,7 +72,7 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
             )}
 
             {/* Title */}
-            <h4 style={{ margin: '12px 16px 8px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Partnerships</h4>
+            <h4 style={{ margin: '12px 16px 8px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', textAlign: 'center' }}>Partnerships</h4>
 
             {/* Partnership List - Compact Vertical Layout */}
             <div style={{ padding: '0 12px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
