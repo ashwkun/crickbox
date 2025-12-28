@@ -125,7 +125,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
             {/* Batsman vs Bowler Matchups */}
             <BatsmanBowlerMatchups
                 batsmanSplits={batsmanSplitsMatchups || batsmanSplits || null}
-                overByOver={overByOverMatchups || overByOver || null}
+                overByOver={overByOverMatchups || null} // Strict: Do not fallback to main overByOver as it might be wrong innings
                 scorecard={scorecard}
                 selectedInnings={matchupsInnings}
                 onInningsChange={onMatchupsInningsChange}
