@@ -331,20 +331,50 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
 
     return (
         <div className="upcoming-detail">
-            {/* Full Width Hero Card */}
+            {/* Full Width Hero Card - Matching LiveDetail style */}
             <div className="upcoming-hero" style={heroStyle}>
-                {/* Header: Series name + Match chip */}
-                <div className="upcoming-hero-header">
-                    <span className="upcoming-series-name">{match.series_name}</span>
+                {/* Row 1: Series/Tour name - centered */}
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        marginBottom: 12,
+                    }}
+                >
                     <span style={{
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        padding: '5px 12px',
-                        background: 'rgba(255, 255, 255, 0.12)',
-                        borderRadius: '6px',
-                        color: 'rgba(255, 255, 255, 0.9)',
-                        letterSpacing: '0.5px'
-                    }}>{getMatchOfSeries()}</span>
+                        fontSize: 13,
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        fontWeight: 500,
+                        textAlign: 'center',
+                    }}>
+                        {match.series_name}
+                    </span>
+                </div>
+
+                {/* Row 2: Chips - Match format only */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    marginBottom: 16,
+                    flexWrap: 'wrap',
+                }}>
+                    {/* Match format chip (pill-shaped like LiveDetail) */}
+                    {match.event_name && (
+                        <span style={{
+                            fontSize: 10,
+                            fontWeight: 600,
+                            padding: '4px 10px',
+                            background: 'rgba(59, 130, 246, 0.15)',
+                            borderRadius: 20,
+                            color: '#3b82f6',
+                        }}>
+                            {getMatchOfSeries()}
+                        </span>
+                    )}
                 </div>
 
                 <div className="upcoming-teams">
@@ -362,9 +392,18 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose }) => {
                         </span>
                     </div>
 
-                    {/* VS - No Countdown here */}
+                    {/* VS with Time below */}
                     <div className="upcoming-vs">
                         <span className="vs-text">VS</span>
+                        <div style={{
+                            fontSize: 12,
+                            color: '#22c55e',
+                            fontWeight: 600,
+                            marginTop: 6,
+                            textAlign: 'center'
+                        }}>
+                            {matchDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                        </div>
                     </div>
 
                     {/* Team 2 */}
