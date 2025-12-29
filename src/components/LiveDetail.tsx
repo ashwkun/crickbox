@@ -1487,7 +1487,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                                         fontSize: 9, fontWeight: 700, color: '#fff',
                                                                         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
                                                                         animation: isNewBall ? 'popReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards' : 'none',
-                                                                        zIndex: 1
+                                                                        zIndex: isNewBall ? 101 : 1
                                                                     }}>
                                                                         {getBallDisplay(ball)}
                                                                     </div>
