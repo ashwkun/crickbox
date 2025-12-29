@@ -261,7 +261,7 @@ export const getTeamStrengthFromH2H = (
 
 /**
  * Get team strength from actual playing XI (scorecard) cross-referenced with H2H ICC rankings
- * This is more accurate for live matches as it uses the confirmed playing 11
+ * Prefers scorecard if both teams have confirmed players, fallback to H2H otherwise
  */
 export const getPlayingXIStrength = (
     scorecard: any,
@@ -275,8 +275,8 @@ export const getPlayingXIStrength = (
     // Get playing XI from scorecard Teams
     const teams = scorecard?.Teams;
     if (!teams) {
-        logDetails.push('No scorecard Teams data');
-        return { battingStrength, bowlingStrength, logDetails };
+        logDetails.push('No scorecard Teams - using H2H fallback');
+        return getTeamStrengthFromH2H(h2hPlayerData, teamId);
     }
 
     // Find the team's players
@@ -285,8 +285,8 @@ export const getPlayingXIStrength = (
     );
 
     if (!teamEntry) {
-        logDetails.push(`Team ${teamId} not found in scorecard`);
-        return { battingStrength, bowlingStrength, logDetails };
+        logDetails.push(`Team ${teamId} not found - using H2H fallback`);
+        return getTeamStrengthFromH2H(h2hPlayerData, teamId);
     }
 
     const teamData: any = teamEntry[1];
@@ -304,8 +304,8 @@ export const getPlayingXIStrength = (
         }));
 
     if (playingXI.length === 0) {
-        logDetails.push('No confirmed playing XI found');
-        return { battingStrength, bowlingStrength, logDetails };
+        logDetails.push('No confirmed playing XI - using H2H fallback');
+        return getTeamStrengthFromH2H(h2hPlayerData, teamId);
     }
 
     logDetails.push(`Playing XI: ${playingXI.length} players`);
