@@ -34,11 +34,19 @@ export type FormResult = 'W' | 'L' | 'D';
  * @param count Number of recent matches (default 5)
  * @returns Array of W/L/D results, most recent first
  */
-export async function getTeamForm(teamId: string, count = 5): Promise<FormResult[]> {
-    const { data, error } = await supabase
+export async function getTeamForm(teamId: string, count = 5, matchType?: string): Promise<FormResult[]> {
+    let query = supabase
         .from('matches')
         .select('winner_id, teama_id, teamb_id')
-        .or(`teama_id.eq.${teamId},teamb_id.eq.${teamId}`)
+        .or(`teama_id.eq.${teamId},teamb_id.eq.${teamId}`);
+
+    if (matchType) {
+        // Normalize format (e.g. 't20' -> 't20')
+        // Our DB likely stores 't20', 'odi', 'test' lowercase
+        query = query.eq('match_type', matchType.toLowerCase());
+    }
+
+    const { data, error } = await query
         .order('match_date', { ascending: false })
         .limit(count);
 
