@@ -11,7 +11,7 @@
     overflow-y: auto;
     background: var(--bg-primary);
     /* Match homepage background #0f0f0f */
-    z-index: 9000;
+    z-index: 2000;
     padding: 20px;
     padding-top: 85px;
     /* Clear the floating header */
