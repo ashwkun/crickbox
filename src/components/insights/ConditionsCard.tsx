@@ -1,6 +1,22 @@
 import React from 'react';
 import { WeatherIcon } from '../icons/WeatherIcons';
 
+// Humidity icon
+const HumidityIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2">
+        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+    </svg>
+);
+
+// Rain probability icon (umbrella)
+const RainIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2">
+        <path d="M18 19a3 3 0 0 1-3 3c-1.657 0-3-1.343-3-3V10" />
+        <path d="M12 10c0-4.418-4.5-8-4.5-8S3 5.582 3 10a4.5 4.5 0 0 0 9 0z" />
+        <path d="M12 10c0-4.418 4.5-8 4.5-8S21 5.582 21 10a4.5 4.5 0 0 1-9 0z" />
+    </svg>
+);
+
 interface ConditionsCardProps {
     venueName?: string;
     weather?: {
@@ -9,6 +25,7 @@ interface ConditionsCardProps {
         Temperature?: string;
         Humidity?: string;
         Wind_Speed?: string;
+        Rain?: string;
     };
     pitchDetail?: {
         Pitch_Suited_For?: string;
@@ -124,18 +141,27 @@ const ConditionsCard: React.FC<ConditionsCardProps> = ({ venueName, weather, pit
                             </div>
                         )}
                     </div>
-                    <div style={{ display: 'flex', gap: 16, fontSize: 12 }}>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        {/* Temperature */}
                         {weather.Temperature && (
                             <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>
+                                <div style={{ fontSize: 22, fontWeight: 700, color: '#fff' }}>
                                     {weather.Temperature.replace('C', '°')}
                                 </div>
                             </div>
                         )}
+                        {/* Humidity with icon */}
                         {weather.Humidity && (
-                            <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
-                                <div style={{ fontSize: 10, marginBottom: 2, opacity: 0.7 }}>Humidity</div>
-                                <div style={{ fontSize: 12, fontWeight: 600 }}>{weather.Humidity}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#60a5fa' }}>
+                                <HumidityIcon size={16} />
+                                <span style={{ fontSize: 12, fontWeight: 600 }}>{weather.Humidity}</span>
+                            </div>
+                        )}
+                        {/* Rain probability with icon */}
+                        {weather.Rain && weather.Rain.trim() !== '' && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#60a5fa' }}>
+                                <RainIcon size={16} />
+                                <span style={{ fontSize: 12, fontWeight: 600 }}>{weather.Rain}</span>
                             </div>
                         )}
                     </div>
