@@ -57,15 +57,14 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
 
         overByOver.Overbyover.forEach(over => {
             if (parseInt(over.Wickets || '0') > 0 && over.Batsmen && over.Bowlers) {
-                // Find Bowler ID (Top bowler in over usually, or just iterate)
-                // In OverByOver, Bowlers is a map. Usually only 1 bowler per over.
                 const bowlerIds = Object.keys(over.Bowlers);
                 const bowlerId = bowlerIds.length > 0 ? bowlerIds[0] : null;
 
                 if (bowlerId) {
-                    // Check for Out Batsman
                     Object.entries(over.Batsmen).forEach(([batterId, stats]) => {
-                        if (stats.Isout) {
+                        // Robust check for Isout (boolean, string 'true', or '1')
+                        const isOut = stats.Isout === true || stats.Isout === 'true' || stats.Isout === '1' || stats.Isout === 1;
+                        if (isOut) {
                             if (!map[batterId]) map[batterId] = {};
                             if (!map[batterId][bowlerId]) map[batterId][bowlerId] = 0;
                             map[batterId][bowlerId]++;
@@ -80,11 +79,11 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
 
     // Helper to determine Verdict Badge - with clearer labels
     const getVerdict = (runs: number, balls: number, dots: number, wickets: number, sr: number) => {
-        if (wickets > 0) return { label: 'BOWLER WON', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', description: 'Bowler took the wicket' };
+        if (wickets > 0) return { label: 'WICKET', color: '#fff', bg: '#ef4444', description: 'Bowler took the wicket' };
         if (sr > 175 || (runs > 20 && sr > 150)) return { label: 'BATTER DOMINATED', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', description: 'High Strike Rate or Aggressive Scoring' };
         if (dots > 3 && (dots / balls) > 0.6) return { label: 'PINNED DOWN', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)', description: 'Struggling to rotate strike (>60% Dots)' };
         if (sr < 100 && balls > 6) return { label: 'SLOW GOING', color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', description: 'Scoring below a run-a-ball' };
-        return { label: 'NEUTRAL BATTLE', color: 'rgba(255,255,255,0.4)', bg: 'rgba(255,255,255,0.05)', description: 'Balanced contest so far' };
+        return { label: 'NEUTRAL', color: 'rgba(255,255,255,0.4)', bg: 'rgba(255,255,255,0.05)', description: 'Balanced contest so far' };
     };
 
     const innings = scorecard?.Innings || [];
@@ -112,10 +111,10 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                     </div>
                     {[
                         { label: 'BATTER DOMINATED', color: '#22c55e', desc: 'Strike Rate 175+ or 20+ runs at quick pace' },
-                        { label: 'BOWLER WON', color: '#ef4444', desc: 'Bowler took the wicket' },
+                        { label: 'WICKET', color: '#ef4444', desc: 'Bowler took the wicket' },
                         { label: 'PINNED DOWN', color: '#eab308', desc: 'More than 60% dot balls faced' },
                         { label: 'SLOW GOING', color: '#f97316', desc: 'Scoring rate is low (<100 SR)' },
-                        { label: 'NEUTRAL BATTLE', color: 'rgba(255,255,255,0.5)', desc: 'Standard play without one-sided dominance' },
+                        { label: 'NEUTRAL', color: 'rgba(255,255,255,0.5)', desc: 'Standard play without one-sided dominance' },
                     ].map((item, idx) => (
                         <div key={idx} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                             <div style={{
@@ -277,12 +276,24 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                             const verdict = getVerdict(runs, balls, dots, wickets, sr);
 
                             // Dynamic Highlight Text
-                            let highlightText = '';
-                            if (wickets > 0) highlightText = 'WICKET';
-                            else if (runs === 0 && balls > 0) highlightText = `${dots} Dots`; // Duck logic fix
-                            else if (fours > 0 || sixes > 0) highlightText = `${fours > 0 ? `${fours}x4 ` : ''}${sixes > 0 ? `${sixes}x6` : ''}`;
-                            else if (dots > 2) highlightText = `${dots} Dots`;
-                            else highlightText = `SR ${vs.Strikerate}`;
+                            let highlightContent: React.ReactNode = `SR ${vs.Strikerate}`;
+                            if (wickets > 0) {
+                                highlightContent = (
+                                    <span style={{
+                                        padding: '4px 8px',
+                                        borderRadius: 4,
+                                        background: '#ef4444',
+                                        color: '#fff',
+                                        fontSize: 9,
+                                        fontWeight: 800
+                                    }}>
+                                        {wickets > 1 ? `${wickets} WKTS` : 'WICKET'}
+                                    </span>
+                                );
+                            }
+                            else if (runs === 0 && balls > 0) highlightContent = `${dots} Dots`;
+                            else if (fours > 0 || sixes > 0) highlightContent = `${fours > 0 ? `${fours}x4 ` : ''}${sixes > 0 ? `${sixes}x6` : ''}`;
+                            else if (dots > 2) highlightContent = `${dots} Dots`;
 
                             return (
                                 <div key={bowlerId} style={{
@@ -330,8 +341,8 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                                                 <span style={{ fontSize: 11, opacity: 0.6 }}> ({balls})</span>
                                             </div>
 
-                                            <div style={{ fontSize: 10, color: verdict.color === '#ef4444' ? '#ef4444' : 'rgba(255,255,255,0.5)', fontWeight: 600 }}>
-                                                {highlightText}
+                                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>
+                                                {highlightContent}
                                             </div>
                                         </div>
                                     </div>
