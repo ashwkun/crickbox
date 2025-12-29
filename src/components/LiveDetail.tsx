@@ -9,7 +9,8 @@ import { GiCricketBat } from 'react-icons/gi';
 import { IoBaseball } from 'react-icons/io5';
 import useCricketData from '../utils/useCricketData';
 import { H2HData, BatsmanSplitsResponse, OverByOverResponse } from '../utils/h2hApi';
-import { Match, Participant } from '../types';
+import { Match, Scorecard, WallstreamData, Participant } from '../types';
+import { HeaderDisplayData } from './FloatingHeader';
 import { proxyFetch, WISDEN_SCORECARD } from '../utils/api';
 
 interface LiveDetailProps {
@@ -18,11 +19,10 @@ interface LiveDetailProps {
     wallstream?: WallstreamData | null;
     onClose: () => void;
     onSeriesClick?: (seriesId: string, seriesMatches?: any[]) => void;
-    setHeaderContent: (content: React.ReactNode) => void;
-    setHeaderColor: (color: string | undefined) => void;
+    setHeaderData: (data: HeaderDisplayData | null) => void;
 }
 
-const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderContent, setHeaderColor }) => {
+const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderData }) => {
     const { fetchH2H, fetchBatsmanSplits, fetchOverByOver } = useCricketData();
     const [selectedSquadIdx, setSelectedSquadIdx] = React.useState(0);
 
@@ -772,8 +772,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     // Sticky Header Effect
     useEffect(() => {
         if (!showStickyHeader) {
-            setHeaderContent(null);
-            setHeaderColor(undefined);
+            setHeaderData(null);
             return;
         }
 
@@ -804,33 +803,20 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
         const lastBall = thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null;
 
-        const content = (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, height: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>{cleanName}</span>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{scoreStr}</span>
-                </div>
-                <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 600 }}>LB</span>
-                    {lastBall ? (
-                        <div style={{
-                            width: 20, height: 20, borderRadius: '50%',
-                            background: getBallColor(lastBall),
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 9, fontWeight: 700, color: '#fff'
-                        }}>{getBallDisplay(lastBall)}</div>
-                    ) : <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>-</span>}
-                </div>
-            </div>
-        );
+        const ballData = lastBall ? {
+            id: lastBall.comm_id || lastBall.event_id || `${Date.now()}`,
+            text: getBallDisplay(lastBall),
+            color: getBallColor(lastBall)
+        } : undefined;
 
-        setHeaderContent(content);
-        setHeaderColor(color);
+        setHeaderData({
+            mainText: `${cleanName} ${scoreStr}`,
+            teamColor: color,
+            ball: ballData
+        });
 
         return () => {
-            setHeaderContent(null);
-            setHeaderColor(undefined);
+            setHeaderData(null);
         };
     }, [showStickyHeader, team1Score, team2Score, isTeam1Batting, isTeam2Batting, team1, team2, latestBall]);
 
