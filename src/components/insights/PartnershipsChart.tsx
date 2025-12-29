@@ -8,7 +8,7 @@ interface PartnershipsChartProps {
 const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
     // State for selected innings (0-indexed internally, but buttons use 1-based display)
     // Initialize to last innings (current)
-    const [selectedInningsIdx, setSelectedInningsIdx] = useState<number>(0);
+    const [selectedInningsIdx, setSelectedInningsIdx] = useState<number>(scorecard?.Innings?.length ? scorecard.Innings.length - 1 : 0);
 
     const innings = scorecard?.Innings || [];
 
