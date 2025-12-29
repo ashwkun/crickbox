@@ -96,46 +96,55 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
             overflow: 'hidden',
             boxShadow: '0 4px 24px rgba(0,0,0,0.1)'
         }}>
-            {/* Header: Title & Filter/Legend */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
+            {/* Header: Title */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 0 // Spacing handled by gap in parent
+            }}>
                 <div style={{
-                    fontSize: 13, fontWeight: 700, color: 'var(--text)',
-                    textTransform: 'uppercase', letterSpacing: 0.5
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: 'rgba(255,255,255,0.4)',
+                    textTransform: 'uppercase',
+                    letterSpacing: 1
                 }}>
                     Innings Progression
                 </div>
-
-                {/* Legend / Filter Row - Styled as Premium Pills */}
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-                    {inningsTabs.map((tab: any) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => onInningsToggle(tab.id)}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: 8,
-                                padding: '6px 14px',
-                                borderRadius: 20,
-                                background: tab.isActive ? `rgba(255,255,255,0.08)` : 'transparent',
-                                border: `1px solid ${tab.isActive ? tab.color : 'rgba(255,255,255,0.1)'}`,
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                opacity: tab.isActive ? 1 : 0.5
-                            }}
-                        >
-                            <div style={{
-                                width: 8, height: 8,
-                                borderRadius: '50%',
-                                background: tab.color,
-                                boxShadow: tab.isActive ? `0 0 8px ${tab.color}40` : 'none'
-                            }} />
-
-                            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
-                                {tab.label}
-                            </span>
-                        </button>
-                    ))}
-                </div>
             </div>
+
+            {/* Legend / Filter Row - Styled as Premium Pills */}
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+                {inningsTabs.map((tab: any) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => onInningsToggle(tab.id)}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: 8,
+                            padding: '6px 14px',
+                            borderRadius: 20,
+                            background: tab.isActive ? `rgba(255,255,255,0.08)` : 'transparent',
+                            border: `1px solid ${tab.isActive ? tab.color : 'rgba(255,255,255,0.1)'}`,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            opacity: tab.isActive ? 1 : 0.5
+                        }}
+                    >
+                        <div style={{
+                            width: 8, height: 8,
+                            borderRadius: '50%',
+                            background: tab.color,
+                            boxShadow: tab.isActive ? `0 0 8px ${tab.color}40` : 'none'
+                        }} />
+
+                        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
+                            {tab.label}
+                        </span>
+                    </button>
+                ))}
+            </div>
+
 
             {/* Chart Area */}
             <div style={{ position: 'relative', height: chartHeight }}>
@@ -276,7 +285,7 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
                     <div style={{ flex: '0 0 20px' }} />
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

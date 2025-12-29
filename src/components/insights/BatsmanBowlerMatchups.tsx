@@ -124,6 +124,41 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
             overflow: 'hidden',
             position: 'relative'
         }}>
+            {/* Header: Title */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '20px 20px 0 20px',
+                marginBottom: 16
+            }}>
+                <div style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: 'rgba(255,255,255,0.4)',
+                    textTransform: 'uppercase',
+                    letterSpacing: 1
+                }}>
+                    Batter vs Bowler Matchups
+                </div>
+
+                {/* Info Icon */}
+                <button
+                    onClick={() => setShowInfo(true)}
+                    style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: 28, height: 28,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer',
+                        color: 'rgba(255,255,255,0.6)'
+                    }}
+                >
+                    <IoInformationCircleOutline size={18} />
+                </button>
+            </div>
+
             {/* Legend / Info Modal */}
             {showInfo && (
                 <div style={{
