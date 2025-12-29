@@ -93,7 +93,7 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
                         color: '#fff',
                         textAlign: 'center'
                     }}>
-                        WIN PROB
+                        WIN PROBABILITY
                     </span>
                     {data.phase && (
                         <span style={{
