@@ -254,21 +254,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                 </div>
             )}
 
-            {/* Heading & Info */}
-            <div style={{ padding: '16px 16px 12px', textAlign: 'center', position: 'relative' }}>
-                <div
-                    onClick={() => setShowInfo(true)}
-                    style={{ position: 'absolute', right: 16, top: 16, cursor: 'pointer', opacity: 0.7 }}
-                >
-                    <IoInformationCircleOutline size={18} color="#fff" />
-                </div>
-                <h4 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#fff', textTransform: 'uppercase' }}>
-                    Batter vs Bowler
-                </h4>
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
-                    Matchup Verdicts ({matchType})
-                </div>
-            </div>
+
 
             {/* Loading / Content */}
             <div style={{ position: 'relative', opacity: isLoading ? 0.5 : 1, transition: 'opacity 0.2s' }}>
