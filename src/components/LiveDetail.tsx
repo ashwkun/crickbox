@@ -784,7 +784,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             .replace(/U19/g, '')
             .replace(/-U19/g, '')
             .trim();
-        const scoreStr = score ? score.split('(')[0].trim() : '0/0';
+        const scoreStr = score || '0/0';
 
         const scLimit = getScorecardThisOver ? getScorecardThisOver() : [];
         const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);

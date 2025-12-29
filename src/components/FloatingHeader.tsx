@@ -45,7 +45,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         width: '200px', // Increased width for breathing room
         borderRadius: '100px', // Full pill shape
         padding: 0,
-        background: centerContent ? 'rgba(0, 0, 0, 0.85)' : 'rgba(20, 20, 20, 0.65)',
+        background: 'rgba(20, 20, 20, 0.65)',
     };
 
     const contentKey = centerContent ? 'score' : 'logo';
