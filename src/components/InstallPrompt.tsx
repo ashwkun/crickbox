@@ -277,10 +277,10 @@ const InstallPrompt: React.FC<InstallPromptProps> = ({ forceShow = false, onClos
                         color: '#fff',
                         fontFamily: 'monospace',
                         letterSpacing: '0.5px'
-                    }}>boxboxcric.web.app</span>
+                    }}>theboxcric.web.app</span>
                     <div
                         onClick={() => {
-                            navigator.clipboard.writeText('https://boxboxcric.web.app');
+                            navigator.clipboard.writeText('https://theboxcric.web.app');
                             const icon = document.getElementById('copy-icon');
                             const check = document.getElementById('check-icon');
                             if (icon && check) {
