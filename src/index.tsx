@@ -11,11 +11,43 @@ if (container) {
 }
 
 // Register Service Worker for PWA
+// Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
+    window.addEventListener('load', async () => {
+        // --- CACHE NUKE LOGIC ---
+        const CURRENT_VERSION = '3.1'; // Bump this to force clear
+        const storedVersion = localStorage.getItem('sw_version');
+
+        if (storedVersion !== CURRENT_VERSION) {
+            console.log('New version detected. Nuking cache...', CURRENT_VERSION);
+
+            // 1. Unregister all SWs
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let registration of registrations) {
+                await registration.unregister();
+            }
+
+            // 2. Clear all Caches
+            const cacheNames = await caches.keys();
+            for (let name of cacheNames) {
+                await caches.delete(name);
+            }
+
+            // 3. Update Version & Reload
+            localStorage.setItem('sw_version', CURRENT_VERSION);
+            console.log('Cache cleared. Reloading...');
+            window.location.reload();
+            return;
+        }
+        // ------------------------
+
         const swUrl = '/sw.js';
         navigator.serviceWorker.register(swUrl)
-            .then((reg) => console.log('Service Worker registered'))
+            .then((reg) => {
+                console.log('Service Worker registered');
+                // Force update check
+                reg.update();
+            })
             .catch((err) => console.log('SW registration failed:', err));
     });
 }
