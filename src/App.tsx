@@ -12,6 +12,7 @@ import stubWallstream from '../api_samples/core/wallstream.json';
 export default function App(): React.ReactElement {
     const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream } = useCricketData();
     const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+    const [headerContent, setHeaderContent] = useState<React.ReactNode>(null);
     const [scorecard, setScorecard] = useState<Scorecard | null>(null);
     const [wallstream, setWallstream] = useState<WallstreamData | null>(null);
     const [pendingMatchId, setPendingMatchId] = useState<string | null>(null);
@@ -331,6 +332,7 @@ export default function App(): React.ReactElement {
                     else if (selectedTournament) handleCloseTournament();
                 }}
                 onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
+                centerContent={headerContent}
             />
 
             {/* Main Content */}
@@ -359,6 +361,7 @@ export default function App(): React.ReactElement {
                     wallstream={wallstream}
                     onClose={handleCloseMatch}
                     onSeriesClick={handleOpenSeries}
+                    setHeaderContent={setHeaderContent}
                 />
             )}
 
