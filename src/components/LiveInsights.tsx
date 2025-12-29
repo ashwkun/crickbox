@@ -12,7 +12,7 @@ import WormChart from './insights/WormChart';
 import PartnershipsChart from './insights/PartnershipsChart';
 import ManhattanChart from './insights/ManhattanChart';
 import BatsmanBowlerMatchups from './insights/BatsmanBowlerMatchups';
-import { WeatherIcon } from './icons/WeatherIcons';
+import ConditionsCard from './insights/ConditionsCard';
 
 interface LiveInsightsProps {
     match?: Match;
@@ -75,22 +75,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
     const pitchDetail = venue?.Pitch_Detail;
     const weather = venue?.Venue_Weather;
     const officials = matchDetails?.Officials;
-
-    // Helper to map API weather to icon key
-    const getWeatherKey = (weatherName: string | undefined): string => {
-        if (!weatherName) return 'cloud';
-        const lower = weatherName.toLowerCase();
-        if (lower.includes('clear') || lower.includes('sun')) return 'clear';
-        if (lower.includes('partly') || lower.includes('cloud')) return 'partly-cloudy';
-        if (lower.includes('overcast')) return 'overcast';
-        if (lower.includes('rain') || lower.includes('shower')) return 'rain';
-        if (lower.includes('drizzle')) return 'drizzle';
-        if (lower.includes('storm') || lower.includes('thunder')) return 'storm';
-        if (lower.includes('fog')) return 'fog';
-        if (lower.includes('mist')) return 'mist';
-        if (lower.includes('haze')) return 'haze';
-        return 'cloud';
-    };
+    const venueName = venue?.Name;
 
     console.log('LiveInsights Render Debug:', { manhattanData });
 
@@ -163,99 +148,13 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
 
             {/* === SECTION 2: MATCH DEEP DIVE === */}
 
-            {/* 6. Conditions & Info Card */}
-            {(pitchDetail?.Pitch_Suited_For || pitchDetail?.Pitch_Surface || weather || officials) && (
-                <div style={{
-                    background: 'var(--bg-card)',
-                    borderRadius: 16,
-                    padding: 20,
-                    border: '1px solid var(--border-color)',
-                }}>
-                    {/* Weather Row - Icon focused */}
-                    {weather && (
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 16,
-                            marginBottom: pitchDetail || officials ? 16 : 0,
-                            padding: 12,
-                            background: 'rgba(255,255,255,0.03)',
-                            borderRadius: 12
-                        }}>
-                            <WeatherIcon icon={getWeatherKey(weather.Weather)} size={40} />
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 16, fontWeight: 600, color: '#fff' }}>
-                                    {weather.Weather}
-                                </div>
-                                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
-                                    {weather.Description}
-                                </div>
-                            </div>
-                            <div style={{ display: 'flex', gap: 16, fontSize: 12 }}>
-                                {weather.Temperature && (
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>
-                                            {weather.Temperature.replace('C', '°')}
-                                        </div>
-                                    </div>
-                                )}
-                                {weather.Humidity && (
-                                    <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
-                                        <div style={{ fontSize: 11, marginBottom: 2 }}>💧</div>
-                                        <div style={{ fontSize: 10 }}>{weather.Humidity}</div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Pitch Row */}
-                    {(pitchDetail?.Pitch_Suited_For || pitchDetail?.Pitch_Surface) && (
-                        <div style={{
-                            display: 'flex',
-                            gap: 12,
-                            marginBottom: officials ? 16 : 0
-                        }}>
-                            {pitchDetail?.Pitch_Suited_For && (
-                                <div style={{ flex: 1, padding: 12, background: 'rgba(245, 158, 11, 0.1)', borderRadius: 10, border: '1px solid rgba(245, 158, 11, 0.2)' }}>
-                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>Pitch</div>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#f59e0b' }}>{pitchDetail.Pitch_Suited_For}</div>
-                                </div>
-                            )}
-                            {pitchDetail?.Pitch_Surface && (
-                                <div style={{ flex: 1, padding: 12, background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>Surface</div>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{pitchDetail.Pitch_Surface}</div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Officials Row - Minimal */}
-                    {officials && (officials.Umpire1_Name || officials.Referee) && (
-                        <div style={{
-                            display: 'flex',
-                            gap: 16,
-                            fontSize: 11,
-                            color: 'rgba(255,255,255,0.4)',
-                            paddingTop: (pitchDetail || weather) ? 12 : 0,
-                            borderTop: (pitchDetail || weather) ? '1px solid rgba(255,255,255,0.05)' : 'none',
-                            flexWrap: 'wrap',
-                            justifyContent: 'center'
-                        }}>
-                            {officials.Umpire1_Name && (
-                                <span>🧑‍⚖️ {officials.Umpire1_Name.replace(/\s*\([^)]*\)/g, '')}</span>
-                            )}
-                            {officials.Umpire2_Name && (
-                                <span>🧑‍⚖️ {officials.Umpire2_Name.replace(/\s*\([^)]*\)/g, '')}</span>
-                            )}
-                            {officials.Referee && (
-                                <span>📋 {officials.Referee.replace(/\s*\([^)]*\)/g, '')}</span>
-                            )}
-                        </div>
-                    )}
-                </div>
-            )}
+            {/* 6. Conditions Card */}
+            <ConditionsCard
+                venueName={venueName}
+                weather={weather}
+                pitchDetail={pitchDetail}
+                officials={officials}
+            />
 
             {/* === SECTION 3: TEAM CONTEXT === */}
 
