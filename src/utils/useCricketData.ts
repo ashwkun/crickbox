@@ -424,7 +424,7 @@ export default function useCricketData(): UseCricketDataReturn {
         const matchFile = gameId.replace(/[^a-z0-9]/gi, '');
         const url = `https://www.wisden.com/cricket/live/json/${matchFile}_overbyover_${innings}.json`;
 
-        console.log(`[OBO_DEBUG] Fetching: ${url}`);
+        // console.log(`[OBO_DEBUG] Fetching: ${url}`);
 
         try {
             const data = await proxyFetch(url);
