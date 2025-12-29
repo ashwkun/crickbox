@@ -4,16 +4,16 @@ const TEAM_COLORS: Record<string, string> = {
     // International
     'India': '#3388FF', // Brighter Blue
     'Australia': '#FFCD00', // Gold (Good)
-    'England': '#EF4444', // Red (Tailwind Red-500 for pop)
-    'South Africa': '#00C853', // Brighter Green
-    'New Zealand': '#A6A6A6', // Silver (Official secondary, visible on dark)
-    'Pakistan': '#00CC66', // Brighter Green
-    'West Indies': '#D32F2F', // Brighter Maroon
-    'Sri Lanka': '#4B63CF', // Brighter Blue
-    'Bangladesh': '#00B36B', // Brighter Green
-    'Afghanistan': '#2196F3', // Brighter Blue
-    'Ireland': '#76D74F', // Brighter Green
-    'Zimbabwe': '#FF3333', // Brighter Red
+    'England': '#EF4444', // Pop Red
+    'South Africa': '#00C853', // Vibrant Green
+    'New Zealand': '#A6A6A6', // Silver
+    'Pakistan': '#01A354', // Distinct "Pak Green" (Deeper but bright)
+    'West Indies': '#D32F2F', // Maroon
+    'Sri Lanka': '#4B63CF', // Royal Blue
+    'Bangladesh': '#00B36B', // Teal Green
+    'Afghanistan': '#0066D6', // Deeper Blue
+    'Ireland': '#76D74F', // Lime Green
+    'Zimbabwe': '#E0291D', // Distinct Red
     // Associates & Others
     'Scotland': '#FFD700', // Gold (User Request)
     'Nepal': '#003DA5',
@@ -22,7 +22,7 @@ const TEAM_COLORS: Record<string, string> = {
     'Namibia': '#003580',
     'Oman': '#D61921',
     'Papua New Guinea': '#E31837',
-    'Canada': '#FF0000',
+    'Canada': '#D80000', // Deep Red
     'Hong Kong': '#D60C18',
     'Jersey': '#E30613',
     'Uganda': '#FCDD09',

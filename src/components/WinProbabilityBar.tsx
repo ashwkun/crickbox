@@ -55,7 +55,17 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
 
     // Dynamic Colors
     const color1 = getTeamColor(data.team1.name) || '#3b82f6';
-    const color2 = getTeamColor(data.team2.name) || '#ef4444';
+    let color2 = getTeamColor(data.team2.name) || '#ef4444';
+
+    // Prevent clashes: If colors are identical/too similar, shift Team 2
+    if (color1 === color2) {
+        // Fallback or shift hue? Simple fallback for now.
+        // If both are Blue (Ind/SL), make Team 2 Red/Orange or a generic dark grey?
+        // User asked for team colors, so maybe use a secondary color if available? 
+        // For now, hardcode a distinct fallback if collision occurs.
+        color2 = '#ef4444'; // Red conflict fallback
+        if (color1 === '#ef4444') color2 = '#3b82f6'; // Blue fallback if both red
+    }
 
     // Phase formatting
     const getPhaseText = () => {
