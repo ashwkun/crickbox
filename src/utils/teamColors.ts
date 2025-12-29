@@ -2,18 +2,18 @@
 // Official Brand Colors for Major Cricket Teams
 const TEAM_COLORS: Record<string, string> = {
     // International
-    'India': '#0055D4', // Bleed Blue
-    'Australia': '#FFCD00', // Gold
-    'England': '#E30A17', // ECB Red/Blue
-    'South Africa': '#007A4D', // Proteas Green
-    'New Zealand': '#000000', // Black Caps
-    'Pakistan': '#01411C', // Pak Green
-    'West Indies': '#7B0029', // Maroon
-    'Sri Lanka': '#1E226C', // Dark Blue
-    'Bangladesh': '#006A4E', // Green
-    'Afghanistan': '#0066CC', // Blue
-    'Ireland': '#53AA30', // Green
-    'Zimbabwe': '#E51937', // Red
+    'India': '#3388FF', // Brighter Blue
+    'Australia': '#FFCD00', // Gold (Good)
+    'England': '#EF4444', // Red (Tailwind Red-500 for pop)
+    'South Africa': '#00C853', // Brighter Green
+    'New Zealand': '#A6A6A6', // Silver (Official secondary, visible on dark)
+    'Pakistan': '#00CC66', // Brighter Green
+    'West Indies': '#D32F2F', // Brighter Maroon
+    'Sri Lanka': '#4B63CF', // Brighter Blue
+    'Bangladesh': '#00B36B', // Brighter Green
+    'Afghanistan': '#2196F3', // Brighter Blue
+    'Ireland': '#76D74F', // Brighter Green
+    'Zimbabwe': '#FF3333', // Brighter Red
     // Associates & Others
     'Scotland': '#002C5B',
     'Nepal': '#003DA5',
@@ -29,18 +29,18 @@ const TEAM_COLORS: Record<string, string> = {
     'Italy': '#0058A7',
 
     // IPL
-    'Chennai Super Kings': '#F9CD05',
-    'Mumbai Indians': '#004BA0',
-    'Royal Challengers': '#EC1C24', // For sanitized name matches
-    'Royal Challengers Bangalore': '#EC1C24',
-    'Royal Challengers Bengaluru': '#EC1C24',
-    'Kolkata Knight Riders': '#3A225D',
-    'Delhi Capitals': '#0078BC',
-    'Punjab Kings': '#DD1F2D',
-    'Rajasthan Royals': '#EA1A85',
-    'Sunrisers Hyderabad': '#F7A721',
-    'Lucknow Super Giants': '#3CF5F9',
-    'Gujarat Titans': '#1B2133',
+    'Chennai Super Kings': '#FFD700', // Gold
+    'Mumbai Indians': '#2F80ED', // Brighter MI Blue
+    'Royal Challengers': '#FF3333', // Brighter Red
+    'Royal Challengers Bangalore': '#FF3333',
+    'Royal Challengers Bengaluru': '#FF3333',
+    'Kolkata Knight Riders': '#8A2BE2', // Blue Violet (Bright Purple)
+    'Delhi Capitals': '#2596BE', // Brighter Blue
+    'Punjab Kings': '#FF3333', // Brighter Red
+    'Rajasthan Royals': '#FF69B4', // Hot Pink
+    'Sunrisers Hyderabad': '#FFA500', // Orange
+    'Lucknow Super Giants': '#00FFFF', // Cyan (Pop)
+    'Gujarat Titans': '#5D6D7E', // Grey Blue
 
     // Indian Domestic (Ranji / Vijay Hazare / SMAT)
     'Mumbai': '#004BA0', // MI Blueish
