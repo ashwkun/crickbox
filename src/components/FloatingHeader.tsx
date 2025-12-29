@@ -15,9 +15,10 @@ interface FloatingHeaderProps {
     onBack: () => void;
     onLogoClick?: () => void;
     data?: HeaderDisplayData | null;
+    isLive?: boolean;
 }
 
-const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data }) => {
+const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive }) => {
     const [celebrating, setCelebrating] = React.useState(false);
     const prevBallId = React.useRef<string | undefined>(undefined);
 
@@ -206,7 +207,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                     ) : (
                         <>
                             <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: '#fff' }}>BOX</span>
-                            <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
+                            <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: isLive ? '#c53030' : 'var(--accent-primary)' }}>{isLive ? '.LIVE' : '.CRIC'}</span>
                         </>
                     )}
                 </div>
