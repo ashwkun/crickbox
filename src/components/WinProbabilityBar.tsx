@@ -16,11 +16,24 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
         }
     }, [data]);
 
+    // Loading Skeleton
     if (isLoading) {
         return (
-            <div className="w-full bg-white/5 rounded-xl p-4 animate-pulse">
-                <div className="h-4 bg-white/10 rounded w-1/3 mb-4"></div>
-                <div className="h-6 bg-white/10 rounded-full w-full"></div>
+            <div style={{
+                width: '100%',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '12px',
+                padding: '16px',
+                animation: 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+            }}>
+                <div style={{ height: '16px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px', width: '33%', marginBottom: '16px' }}></div>
+                <div style={{ height: '24px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '9999px', width: '100%' }}></div>
+                <style>{`
+                    @keyframes pulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: .5; }
+                    }
+                `}</style>
             </div>
         );
     }
@@ -28,44 +41,116 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
     if (!data) return null;
 
     return (
-        <div className="w-full bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl p-4 my-2">
-            <div className="flex justify-between items-center mb-2">
-                <h3 className="text-white/80 text-xs font-medium uppercase tracking-wider">
+        <div style={{
+            width: '100%',
+            background: 'rgba(0, 0, 0, 0.2)',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '16px',
+            padding: '16px 20px',
+            marginTop: '8px',
+            marginBottom: '8px',
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }}>
+            {/* Header Row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3 style={{
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    margin: 0
+                }}>
                     Win Probability
                 </h3>
                 {data.message && (
-                    <span className="text-[10px] text-white/40 bg-white/5 px-2 py-0.5 rounded">
+                    <span style={{
+                        fontSize: '10px',
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontWeight: 500,
+                        textTransform: 'uppercase'
+                    }}>
                         {data.message}
                     </span>
                 )}
             </div>
 
             {/* Bar Container */}
-            <div className="relative h-6 w-full rounded-full overflow-hidden bg-gray-800 flex">
-                {/* Team 1 Bar */}
-                <div
-                    className="h-full bg-gradient-to-r from-[#e87070] to-[#c53030] flex items-center justify-start pl-3 transition-all duration-1000 ease-out relative"
-                    style={{ width: `${animatedProb}%` }}
-                >
-                    <span className="text-[10px] font-bold text-white whitespace-nowrap z-10 drop-shadow-md">
+            <div style={{
+                position: 'relative',
+                height: '24px',
+                width: '100%',
+                borderRadius: '9999px',
+                overflow: 'hidden',
+                background: 'rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.3)'
+            }}>
+                {/* Team 1 Bar - Gradient Red/Pink */}
+                <div style={{
+                    width: `${animatedProb}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #c53030 0%, #ef4444 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    paddingLeft: '12px',
+                    transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', zIndex: 10, textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
                         {data.team1.name} {Math.round(animatedProb)}%
                     </span>
-                    {/* Skewed shine effect */}
-                    <div className="absolute top-0 right-0 w-8 h-full bg-white/20 skew-x-[-20deg] translate-x-4 blur-sm transform"></div>
+
+                    {/* Skewed Shine Effect */}
+                    <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        width: '30px',
+                        height: '100%',
+                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                        transform: 'skewX(-20deg) translateX(10px)',
+                        filter: 'blur(2px)'
+                    }}></div>
                 </div>
 
-                {/* Team 2 Bar (Remaining width) */}
-                <div className="flex-1 bg-gray-700/50 flex items-center justify-end pr-3 transition-all duration-1000 relative">
-                    <span className="text-[10px] font-bold text-white/80 whitespace-nowrap z-10">
+                {/* Team 2 Bar - Greyish (Filling remaining space) */}
+                <div style={{
+                    flex: 1,
+                    background: 'rgba(55, 65, 81, 0.6)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    paddingRight: '12px',
+                    transition: 'all 1s ease',
+                    position: 'relative'
+                }}>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(255, 255, 255, 0.8)', whiteSpace: 'nowrap', zIndex: 10 }}>
                         {Math.round(100 - animatedProb)}% {data.team2.name}
                     </span>
                 </div>
             </div>
 
-            {/* Factors (Optional / Advanced) */}
+            {/* Footer / Phase Info */}
             {data.phase && (
-                <div className="mt-2 flex justify-between text-[9px] text-white/30">
-                    <span>{data.phase.replace('-', ' ').toUpperCase()} MODEL</span>
+                <div style={{
+                    marginTop: '8px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontSize: '9px',
+                    color: 'rgba(255, 255, 255, 0.3)',
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                }}>
+                    <span>{data.phase.replace('-', ' ')} MODEL</span>
                     <span>UPDATED LIVE</span>
                 </div>
             )}
