@@ -5,19 +5,17 @@ import { getTeamColor } from '../utils/teamColors';
 interface WinProbabilityBarProps {
     data: WinProbabilityResult | null;
     isLoading?: boolean;
+    expanded?: boolean; // New prop for LiveInsights view
 }
 
-const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }) => {
+const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading, expanded = false }) => {
     // Animation state
     const [animatedProb, setAnimatedProb] = useState(50);
     const [isCalculating, setIsCalculating] = useState(true);
 
     useEffect(() => {
         if (data?.team1.probability) {
-            // Reset to 50 when data changes drastically? No, just when loading completes initially.
-            // If we were loading, now animate from 50 to target
             if (isCalculating) {
-                // Small delay to show "50-50" starting point
                 setTimeout(() => {
                     setAnimatedProb(data.team1.probability);
                     setIsCalculating(false);
