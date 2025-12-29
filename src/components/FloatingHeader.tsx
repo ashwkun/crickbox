@@ -54,9 +54,13 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         <div style={containerStyle}>
             <style>
                 {`
-                    @keyframes slideInBlob {
-                        0% { opacity: 0; transform: translateY(20px) scale(0.9); filter: blur(8px); }
-                        100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+                    @keyframes glitchAppear {
+                        0% { opacity: 0; transform: scale(0.8); filter: blur(4px); }
+                        20% { opacity: 1; transform: scale(1.05) skewX(-15deg); filter: brightness(2) contrast(2); }
+                        40% { transform: scale(0.95) skewX(10deg); filter: brightness(1.2); }
+                        60% { transform: scale(1.02) skewX(-5deg); filter: none; }
+                        80% { transform: scale(0.99) skewX(2deg); }
+                        100% { transform: scale(1) skewX(0); opacity: 1; }
                     }
                 `}
             </style>
@@ -98,7 +102,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        animation: 'slideInBlob 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                        animation: 'glitchAppear 0.35s cubic-bezier(0.1, 0.9, 0.2, 1)',
                         whiteSpace: 'nowrap'
                     }}
                 >
