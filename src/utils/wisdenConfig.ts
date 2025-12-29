@@ -44,3 +44,9 @@ export const TIMEZONE = '0530';
 
 // Default language
 export const LANGUAGE = 'en';
+
+// --- CONFIGURATION FLAGS ---
+
+// Enable Simulation Mode for Testing
+// When true, forceLive mode will simulate ball-by-ball updates every 3 seconds.
+export const ENABLE_SIMULATION_MODE = true;

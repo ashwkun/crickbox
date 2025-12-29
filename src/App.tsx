@@ -3,6 +3,7 @@ import HomePage from './components/HomePage';
 import InstallPrompt from './components/InstallPrompt';
 import MatchDetail from './components/MatchDetail';
 import FloatingHeader, { HeaderDisplayData } from './components/FloatingHeader';
+import { ENABLE_SIMULATION_MODE } from './utils/wisdenConfig';
 import useCricketData from './utils/useCricketData';
 import { WallstreamData } from './utils/wallstreamApi';
 import { Match, Scorecard, Series, Tournament } from './types';
