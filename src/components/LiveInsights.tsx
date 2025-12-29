@@ -72,6 +72,8 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
     const matchDetails = scorecard?.Matchdetail || scorecard?.Match_Details;
     const pitchDetail = matchDetails?.Pitch_Detail;
 
+    console.log('LiveInsights Render Debug:', { manhattanData });
+
     return (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
