@@ -212,7 +212,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                                     textTransform: 'uppercase'
                                 }}
                             >
-                                {scorecard?.Teams?.[inn.Battingteam]?.Name_Short || `INN ${inningsNum}`}
+                                {scorecard?.Teams?.[inn.Battingteam]?.Name_Short} {Math.floor(idx / 2) + 1}
                             </button>
                         );
                     })}

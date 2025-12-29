@@ -20,18 +20,22 @@ interface LiveInsightsProps {
     batsmanSplitsMatchups?: BatsmanSplitsResponse | null; // Independent data for Matchups
     overByOverMatchups?: OverByOverResponse | null; // Independent data for Matchups Wickets
     overByOver?: OverByOverResponse | null;
-    overByOver1?: OverByOverResponse | null;
-    overByOver2?: OverByOverResponse | null;
+    overByOverMatchups?: OverByOverResponse | null; // Independent data for Matchups Wickets
+    overByOver?: OverByOverResponse | null;
+    wormPrimary?: { data: OverByOverResponse | null, label: string, color: string } | null;
+    wormSecondary?: { data: OverByOverResponse | null, label: string, color: string } | null;
     wagonWheelInnings?: number;
     onWagonWheelInningsChange?: (innings: number) => void;
     isWagonWheelLoading?: boolean;
     matchupsInnings?: number;
     onMatchupsInningsChange?: (innings: number) => void;
     isMatchupsLoading?: boolean;
+    partnershipsInnings?: number;
+    onPartnershipsInningsChange?: (innings: number) => void;
 }
 
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, overByOver1, overByOver2, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading }) => {
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange }) => {
     const [manhattanInnings, setManhattanInnings] = useState<1 | 2>(1);
     // if (!h2hData) return null; // Removed to allow Matchups to show even if H2H fails
 
@@ -108,19 +112,17 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
 
             {/* Worm Chart */}
             <WormChart
-                innings1={overByOver1?.Overbyover || null}
-                innings2={overByOver2?.Overbyover || null}
-                team1Name={team1?.name || 'Team 1'}
-                team2Name={team2?.name || 'Team 2'}
-                team1ShortName={t1Short}
-                team2ShortName={t2Short}
+                primary={wormPrimary}
+                secondary={wormSecondary}
                 matchFormat={match?.event_format}
-                team1Id={team1?.id}
-                team2Id={team2?.id}
             />
 
             {/* Partnerships Chart */}
-            <PartnershipsChart scorecard={scorecard} />
+            <PartnershipsChart
+                scorecard={scorecard}
+                selectedInnings={partnershipsInnings}
+                onInningsChange={onPartnershipsInningsChange}
+            />
 
             {/* Batsman vs Bowler Matchups */}
             <BatsmanBowlerMatchups

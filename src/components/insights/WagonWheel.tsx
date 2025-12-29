@@ -254,7 +254,7 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
                                     textTransform: 'uppercase'
                                 }}
                             >
-                                {scorecard?.Teams?.[inn.Battingteam]?.Name_Short || `INN ${idx + 1}`}
+                                {scorecard?.Teams?.[inn.Battingteam]?.Name_Short} {Math.floor(idx / 2) + 1}
                             </button>
                         );
                     })}

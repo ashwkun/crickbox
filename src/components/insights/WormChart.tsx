@@ -1,39 +1,32 @@
 import React, { useMemo } from 'react';
-import { OverByOverEntry } from '../../utils/h2hApi';
-import { getTeamColor } from '../../utils/teamColors';
+import { OverByOverResponse } from '../../utils/h2hApi';
+
+interface WormData {
+    data: OverByOverResponse | null;
+    label: string;
+    color: string;
+}
 
 interface WormChartProps {
-    innings1: OverByOverEntry[] | null;
-    innings2: OverByOverEntry[] | null;
-    team1Name: string;
-    team2Name: string;
-    team1ShortName: string;
-    team2ShortName: string;
+    primary?: WormData | null;
+    secondary?: WormData | null;
     matchFormat?: string;
-    team1Id?: string;
-    team2Id?: string;
 }
 
 const WormChart: React.FC<WormChartProps> = ({
-    innings1,
-    innings2,
-    team1Name,
-    team2Name,
-    team1ShortName,
-    team2ShortName,
-    matchFormat,
-    team1Id,
-    team2Id
+    primary,
+    secondary,
+    matchFormat
 }) => {
-    // Calculate cumulative runs and wickets for each innings
-    const processInnings = (data: OverByOverEntry[] | null) => {
-        if (!data) return { points: [], wickets: [], totalWickets: 0 };
+    // Helper to process data
+    const processInnings = (data: OverByOverResponse | null) => {
+        if (!data?.Overbyover) return { points: [], wickets: [], totalWickets: 0 };
         let total = 0;
         let totalWickets = 0;
         const pts: { over: number; total: number }[] = [];
         const wkts: { over: number; total: number; count: number }[] = [];
 
-        data.forEach(over => {
+        data.Overbyover.forEach(over => {
             total += parseInt(over.Runs) || 0;
             const w = parseInt(over.Wickets) || 0;
             totalWickets += w;
@@ -45,51 +38,50 @@ const WormChart: React.FC<WormChartProps> = ({
         return { points: pts, wickets: wkts, totalWickets };
     };
 
-    const { points: cumulative1, wickets: wickets1, totalWickets: wkts1 } = useMemo(() => processInnings(innings1), [innings1]);
-    const { points: cumulative2, wickets: wickets2, totalWickets: wkts2 } = useMemo(() => processInnings(innings2), [innings2]);
+    const { points: ptsPrimary, wickets: wktsPrimary, totalWickets: totalWktsPrimary } = useMemo(() => processInnings(primary?.data || null), [primary?.data]);
+    const { points: ptsSecondary, wickets: wktsSecondary, totalWickets: totalWktsSecondary } = useMemo(() => processInnings(secondary?.data || null), [secondary?.data]);
 
     // If no data, don't render
-    if (cumulative1.length === 0 && cumulative2.length === 0) {
+    if (ptsPrimary.length === 0 && ptsSecondary.length === 0) {
         return null;
     }
 
     // Chart dimensions
-    const width = 340; // Increased width slightly
-    const height = 180; // Increased height
-    const padding = { top: 20, right: 20, bottom: 25, left: 30 }; // Adjusted padding
+    const width = 340;
+    const height = 180;
+    const padding = { top: 20, right: 20, bottom: 25, left: 30 };
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
     // Calculate scales
-    // Calculate scales
-    const max1 = cumulative1.length > 0 ? cumulative1[cumulative1.length - 1] : { over: 0, total: 0 };
-    const max2 = cumulative2.length > 0 ? cumulative2[cumulative2.length - 1] : { over: 0, total: 0 };
+    const maxPrimary = ptsPrimary.length > 0 ? ptsPrimary[ptsPrimary.length - 1] : { over: 0, total: 0 };
+    const maxSecondary = ptsSecondary.length > 0 ? ptsSecondary[ptsSecondary.length - 1] : { over: 0, total: 0 };
 
     let maxOvers = 20;
     let maxRuns = 100;
 
-    // Logic: Adaptive Scaling (User Request)
-    if (cumulative2.length === 0) {
-        // INNINGS 1: Zoom In Mode (Start 5ov/50runs, grow as needed)
-        // This prevents "invisible worm" in early ODI/Test overs
-        maxOvers = Math.max(max1.over, 5);
-        maxRuns = Math.max(max1.total, 50) * 1.1; // +10% headroom
+    // SCALING LOGIC
+    // Primary is Current, Secondary is Target/Past
+    if (ptsSecondary.length === 0) {
+        // Mode: Setting Target (1st Innings) -> Zoom to fit Current
+        maxOvers = Math.max(maxPrimary.over, 5);
+        maxRuns = Math.max(maxPrimary.total, 50) * 1.1;
     } else {
-        // INNINGS 2: Chase Perspective
-        // Keep scale of First Innings to show target context, but expand if 2nd innings exceeds it
-        // Ensure we respect match format minimums (e.g. don't shrink below 20 for T20 if 1st innings collapsed in 10)
+        // Mode: Chasing / Comparing -> Fit Both
+        // Base overs based on format
         let formatBaseOvers = 0;
         if (matchFormat?.toLowerCase().includes('t20') || matchFormat?.toLowerCase().includes('hundred')) {
             formatBaseOvers = 20;
         } else if (matchFormat?.toLowerCase().includes('odi') || matchFormat?.toLowerCase().includes('one day')) {
             formatBaseOvers = 50;
+        } else if (matchFormat?.toLowerCase().includes('test')) {
+            // Test matches grow indefinitely, default small until data exists
+            formatBaseOvers = 20;
         }
 
-        // Max overs is greater of: Innings 1 duration, Innings 2 duration, or Format Base (if valid)
-        // User request: "keep scale of first inning" -> usually means Target Overs.
-        // We use Math.max to ensure nothing is clipped.
-        maxOvers = Math.max(max1.over, max2.over, formatBaseOvers);
-        maxRuns = Math.max(max1.total, max2.total, 100) * 1.1;
+        // Scale to the larger of the two (Target vs Current)
+        maxOvers = Math.max(maxPrimary.over, maxSecondary.over, formatBaseOvers);
+        maxRuns = Math.max(maxPrimary.total, maxSecondary.total, 100) * 1.1;
     }
 
     // Generate SVG polyline points
@@ -102,24 +94,25 @@ const WormChart: React.FC<WormChartProps> = ({
         }).join(' ');
     };
 
-    const polyPoints1 = generatePolyline(cumulative1);
-    const polyPoints2 = generatePolyline(cumulative2);
+    const polyPrimary = generatePolyline(ptsPrimary);
+    const polySecondary = generatePolyline(ptsSecondary);
 
-    // Helper to get coordinates for a specific point (for wickets)
     const getPointCoords = (over: number, total: number) => {
         const x = padding.left + (over / maxOvers) * chartWidth;
         const y = padding.top + chartHeight - (total / maxRuns) * chartHeight;
         return { x, y };
     };
 
-    // Team colors
-    const color1 = getTeamColor(team1Name) || '#3b82f6';
-    const color2 = getTeamColor(team2Name) || '#ef4444';
+    // Colors
+    const colorPrimary = primary?.color || '#3b82f6';
+    const colorSecondary = secondary?.color || '#9ca3af'; // Grey default for secondary if missing
 
     // Grid config
     const yTicks = [0, Math.round(maxRuns / 2), Math.round(maxRuns)];
     const xTicks: number[] = [];
-    for (let i = 5; i <= maxOvers; i += 5) xTicks.push(i);
+    // Dynamic X-ticks based on length
+    const step = maxOvers > 50 ? 10 : 5;
+    for (let i = step; i <= maxOvers; i += step) xTicks.push(i);
 
     return (
         <div style={{
@@ -175,44 +168,45 @@ const WormChart: React.FC<WormChartProps> = ({
                         );
                     })}
 
-                    {/* Innings 1 Line */}
-                    {polyPoints1 && (
+                    {/* Secondary Line (Dashed) - Render first to be behind */}
+                    {polySecondary && (
                         <polyline
-                            points={polyPoints1}
+                            points={polySecondary}
                             fill="none"
-                            stroke={color1}
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    )}
-
-                    {/* Innings 2 Line */}
-                    {polyPoints2 && (
-                        <polyline
-                            points={polyPoints2}
-                            fill="none"
-                            stroke={color2}
+                            stroke={colorSecondary}
                             strokeWidth={2}
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeDasharray="4,3"
+                            opacity={0.6}
                         />
                     )}
 
-                    {/* Wickets 1 */}
-                    {wickets1.map((w, i) => {
+                    {/* Primary Line (Solid) */}
+                    {polyPrimary && (
+                        <polyline
+                            points={polyPrimary}
+                            fill="none"
+                            stroke={colorPrimary}
+                            strokeWidth={3}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        />
+                    )}
+
+                    {/* Wickets Secondary */}
+                    {wktsSecondary.map((w, i) => {
                         const { x, y } = getPointCoords(w.over, w.total);
                         return (
-                            <circle key={`w1-${i}`} cx={x} cy={y} r={3} fill={color1} stroke="var(--bg-card)" strokeWidth={1} />
+                            <circle key={`w2-${i}`} cx={x} cy={y} r={2.5} fill={colorSecondary} stroke="var(--bg-card)" strokeWidth={1} />
                         );
                     })}
 
-                    {/* Wickets 2 */}
-                    {wickets2.map((w, i) => {
+                    {/* Wickets Primary */}
+                    {wktsPrimary.map((w, i) => {
                         const { x, y } = getPointCoords(w.over, w.total);
                         return (
-                            <circle key={`w2-${i}`} cx={x} cy={y} r={3} fill={color2} stroke="var(--bg-card)" strokeWidth={1} />
+                            <circle key={`w1-${i}`} cx={x} cy={y} r={3} fill={colorPrimary} stroke="var(--bg-card)" strokeWidth={1} />
                         );
                     })}
                 </svg>
@@ -223,22 +217,22 @@ const WormChart: React.FC<WormChartProps> = ({
                 display: 'flex', justifyContent: 'center', gap: 16,
                 marginTop: 4, fontSize: 11, fontWeight: 500
             }}>
-                {cumulative1.length > 0 && (
+                {ptsPrimary.length > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{ width: 16, height: 2, background: color1, borderRadius: 1 }} />
-                        <span style={{ color: 'rgba(255,255,255,0.8)' }}>
-                            {team1ShortName}
+                        <div style={{ width: 16, height: 3, background: colorPrimary, borderRadius: 1.5 }} />
+                        <span style={{ color: 'rgba(255,255,255,0.9)' }}>
+                            {primary?.label} (Curr)
                         </span>
-                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{cumulative1[cumulative1.length - 1]?.total}/{wkts1}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{maxPrimary.total}/{totalWktsPrimary}</span>
                     </div>
                 )}
-                {cumulative2.length > 0 && (
+                {ptsSecondary.length > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{ width: 16, height: 2, background: color2, borderRadius: 1, backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 3px, var(--bg-card) 3px, var(--bg-card) 5px)' }} />
-                        <span style={{ color: 'rgba(255,255,255,0.8)' }}>
-                            {team2ShortName}
+                        <div style={{ width: 16, height: 2, background: colorSecondary, borderRadius: 1, backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 3px, var(--bg-card) 3px, var(--bg-card) 5px)' }} />
+                        <span style={{ color: 'rgba(255,255,255,0.7)' }}>
+                            {secondary?.label}
                         </span>
-                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{cumulative2[cumulative2.length - 1]?.total}/{wkts2}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>{maxSecondary.total}/{totalWktsSecondary}</span>
                     </div>
                 )}
             </div>
