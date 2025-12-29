@@ -34,12 +34,13 @@ interface LiveInsightsProps {
     manhattanData?: { data: OverByOverResponse, label: string, color: string, id: number }[];
     manhattanInnings?: number[];
     onManhattanInningsChange?: (innings: number) => void;
+    isManhattanLoading?: boolean; // Manhattan chart specific loading
     isLoading?: boolean; // Global loading state for initial data
     isWormLoading?: boolean; // Worm chart specific loading
 }
 
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange, manhattanData = [], manhattanInnings = [], onManhattanInningsChange = () => { }, isLoading = false, isWormLoading = false }) => {
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange, manhattanData = [], manhattanInnings = [], onManhattanInningsChange = () => { }, isManhattanLoading = false, isLoading = false, isWormLoading = false }) => {
     // if (!h2hData) return null; // Removed to allow Matchups to show even if H2H fails
 
     const team1 = match?.participants?.[0];
@@ -165,6 +166,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 scorecard={scorecard}
                 selectedInnings={manhattanInnings}
                 onInningsToggle={onManhattanInningsChange}
+                isLoading={isManhattanLoading}
             />
 
             {/* 5. Recent Form (Dual Team) */}
