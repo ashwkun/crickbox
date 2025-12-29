@@ -68,7 +68,6 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                         const isOut = stats.Isout === true || stats.Isout === 'true' || stats.Isout === '1' || stats.Isout === 1;
 
                         if (isOut) {
-                            console.log(`[Matchups] WICKET DETECTED! Over: ${over.Over}, Batter: ${batterId}, Bowler: ${bowlerId}, Isout: ${stats.Isout}`);
                             if (!map[batterId]) map[batterId] = {};
                             if (!map[batterId][bowlerId]) map[batterId][bowlerId] = 0;
                             map[batterId][bowlerId]++;
@@ -77,7 +76,6 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                 }
             }
         });
-        console.log('[Matchups] Final Wicket Map:', JSON.stringify(map));
         return map;
     }, [overByOver]);
 
