@@ -104,30 +104,60 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                 <div style={{
                     position: 'absolute', inset: 0, zIndex: 10,
                     background: 'rgba(0,0,0,0.95)',
-                    padding: 20,
-                    display: 'flex', flexDirection: 'column', gap: 12,
-                    backdropFilter: 'blur(4px)'
+                    padding: 24,
+                    display: 'flex', flexDirection: 'column', gap: 20,
+                    backdropFilter: 'blur(8px)',
+                    overflowY: 'auto'
                 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>Verdict Guide</div>
-                        <IoClose onClick={() => setShowInfo(false)} style={{ fontSize: 20, color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }} />
-                    </div>
-                    {[
-                        { label: 'BATTER DOMINATED', color: '#22c55e', desc: 'Strike Rate 175+ or 20+ runs at quick pace' },
-                        { label: 'WICKET', color: '#ef4444', desc: 'Bowler took the wicket' },
-                        { label: 'PINNED DOWN', color: '#eab308', desc: 'More than 60% dot balls faced' },
-                        { label: 'SLOW GOING', color: '#f97316', desc: 'Scoring rate is low (<100 SR)' },
-                        { label: 'NEUTRAL', color: 'rgba(255,255,255,0.5)', desc: 'Standard play without one-sided dominance' },
-                    ].map((item, idx) => (
-                        <div key={idx} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                            <div style={{
-                                fontSize: 9, fontWeight: 800, padding: '4px 8px', borderRadius: 4,
-                                color: item.color, background: 'rgba(255,255,255,0.05)',
-                                minWidth: 110, textAlign: 'center'
-                            }}>{item.label}</div>
-                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', flex: 1 }}>{item.desc}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', textTransform: 'uppercase', borderBottom: '2px solid #22c55e', paddingBottom: 4 }}>
+                            Reading the Matchups
                         </div>
-                    ))}
+                        <IoClose onClick={() => setShowInfo(false)} style={{ fontSize: 24, color: 'rgba(255,255,255,0.8)', cursor: 'pointer' }} />
+                    </div>
+
+                    {/* Section 1: The Basics */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase' }}>
+                            1. The Basics
+                        </div>
+                        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '10px 12px', borderRadius: 8, fontSize: 13, color: '#fff', fontFamily: 'monospace' }}>
+                            <span style={{ fontWeight: 700 }}>12</span> <span style={{ opacity: 0.6 }}>(8)</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', lineHeight: '1.4' }}>
+                            This means the batter scored <strong style={{ color: '#fff' }}>12 runs</strong> off <strong style={{ color: '#fff' }}>8 balls</strong> faced from this specific bowler.
+                        </div>
+                    </div>
+
+                    {/* Section 2: Decoding the Battle */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#f97316', textTransform: 'uppercase' }}>
+                            2. Who is Winning?
+                        </div>
+                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginBottom: 4 }}>
+                            We analyze every ball to judge the contest:
+                        </div>
+
+                        {[
+                            { label: 'PINNED DOWN', color: '#eab308', desc: 'Running high dots (>60%). Pressure is building.' },
+                            { label: 'SLOW GOING', color: '#f97316', desc: 'Scoring <100 SR. The bowler is in control.' },
+                            { label: 'BATTER DOMINATED', color: '#22c55e', desc: 'Aggressive scoring. The batter is on top.' },
+                            { label: 'WICKET', color: '#ef4444', desc: 'The bowler won the ultimate contest.' },
+                        ].map((item, idx) => (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                                <div style={{
+                                    fontSize: 8, fontWeight: 800, padding: '3px 6px',
+                                    color: item.color, background: 'rgba(255,255,255,0.05)',
+                                    borderRadius: 4, minWidth: 90, textAlign: 'center', marginTop: 2
+                                }}>{item.label}</div>
+                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', flex: 1, lineHeight: '1.3' }}>{item.desc}</div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: 10, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', textAlign: 'center' }}>
+                        Tap anywhere to close
+                    </div>
                 </div>
             )}
 
