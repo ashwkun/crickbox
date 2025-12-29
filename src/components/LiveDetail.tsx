@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LiveInsights from './LiveInsights';
+import FloatingHeader from './FloatingHeader';
 import CompletedDetail from './CompletedDetail';
 import WikiImage, { getFlagUrl } from './WikiImage';
 import { WallstreamData } from '../utils/wallstreamApi';
@@ -70,6 +71,13 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [selectedRecentMatch, setSelectedRecentMatch] = useState<Match | null>(null);
     const [selectedRecentScorecard, setSelectedRecentScorecard] = useState<any>(null);
     const [isLoadingRecentMatch, setIsLoadingRecentMatch] = useState(false);
+
+    // Sticky Header Logic
+    const [showStickyHeader, setShowStickyHeader] = useState(false);
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const scrollTop = e.currentTarget.scrollTop;
+        setShowStickyHeader(scrollTop > 280); // Trigger after scrolling past hero
+    };
 
     // Helper to get Label/Color (Reused)
     const getInningsMeta = (inningIdx: number) => { // 0-based index input
@@ -757,8 +765,72 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         marginBottom: '20px',
     };
 
+    // Sticky Header Content
+    const stickyContent = showStickyHeader ? (
+        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 6, paddingTop: 4 }}>
+            {/* Toggle */}
+            <div style={{
+                display: 'flex',
+                background: 'rgba(255,255,255,0.08)',
+                borderRadius: 100,
+                padding: 2,
+                border: '1px solid rgba(255,255,255,0.05)'
+            }}>
+                {['live', 'insights'].map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={(e) => { e.stopPropagation(); setActiveTab(tab as any); }}
+                        style={{
+                            padding: '4px 14px',
+                            borderRadius: 100,
+                            border: 'none',
+                            background: activeTab === tab ? 'rgba(255,255,255,0.15)' : 'transparent',
+                            color: activeTab === tab ? '#fff' : 'rgba(255,255,255,0.5)',
+                            fontSize: 10,
+                            fontWeight: activeTab === tab ? 700 : 600,
+                            cursor: 'pointer',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.2s',
+                            letterSpacing: 0.5
+                        }}
+                    >
+                        {tab}
+                    </button>
+                ))}
+            </div>
+
+            {/* Score Row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', justifyContent: 'center' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', letterSpacing: 0.5 }}>
+                    {(() => {
+                        // Extract just the main score (first part) to keep it crisp
+                        const t1S = team1Score ? (team1Score.includes('&') ? team1Score.split('&')[1] : team1Score).split('(')[0] : '';
+                        const t2S = team2Score ? (team2Score.includes('&') ? team2Score.split('&')[1] : team2Score).split('(')[0] : '';
+                        return `${team1?.short_name || 'T1'} ${t1S} vs ${team2?.short_name || 'T2'} ${t2S}`;
+                    })()}
+                </div>
+                {/* Status Box (Mini) */}
+                <div style={{
+                    fontSize: 10, fontWeight: 600,
+                    color: getMatchStatusConfig(match.short_event_status, match.event_status).color,
+                    background: 'rgba(255,255,255,0.05)',
+                    padding: '2px 6px', borderRadius: 4,
+                    maxWidth: 140, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                }}>
+                    {currentStatus}
+                </div>
+            </div>
+        </div>
+    ) : undefined;
+
     return (
-        <div className="upcoming-detail">
+        <div className="upcoming-detail" onScroll={handleScroll}>
+            <FloatingHeader
+                showBack={true}
+                onBack={onClose}
+                stickyContent={stickyContent}
+            />
+
             {/* Hero Card - Same structure as UpcomingDetail */}
             <div className="upcoming-hero" style={heroStyle}>
                 {/* Row 1: Series/Tour name - centered, clickable */}

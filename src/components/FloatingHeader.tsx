@@ -4,28 +4,39 @@ interface FloatingHeaderProps {
     showBack: boolean;
     onBack: () => void;
     onLogoClick?: () => void;
+    stickyContent?: React.ReactNode; // New prop for sticky content
 }
 
-const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick }) => {
+const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, stickyContent }) => {
     // Styles for the floating container
+    const isSticky = !!stickyContent;
+
     const containerStyle: React.CSSProperties = {
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
-        padding: '20px',
+        padding: isSticky ? '12px 16px' : '20px', // Smaller padding when sticky
         display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr', // Left, Center, Right (empty)
+        gridTemplateColumns: 'auto 1fr', // Back Btn | Content
         alignItems: 'center',
-        pointerEvents: 'none', // Allow clicking through empty space
+        pointerEvents: isSticky ? 'auto' : 'none', // Block clicks when full bar
         zIndex: 3000,
+        // Transition props
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        background: isSticky ? 'rgba(15, 15, 15, 0.85)' : 'transparent',
+        backdropFilter: isSticky ? 'blur(16px)' : 'none',
+        WebkitBackdropFilter: isSticky ? 'blur(16px)' : 'none',
+        borderBottom: isSticky ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+        maxHeight: isSticky ? '80px' : 'auto', // Constraint height
+        gap: 16
     };
 
     const btnStyle: React.CSSProperties = {
-        width: '44px',
-        height: '44px',
+        width: isSticky ? '36px' : '44px', // Smaller in sticky mode
+        height: isSticky ? '36px' : '44px',
         borderRadius: '50%',
-        background: 'rgba(20, 20, 20, 0.4)', // Darker glass
+        background: isSticky ? 'rgba(255,255,255,0.08)' : 'rgba(20, 20, 20, 0.4)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -33,57 +44,74 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
-        pointerEvents: 'auto', // Re-enable clicks
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+        pointerEvents: 'auto',
+        boxShadow: isSticky ? 'none' : '0 4px 12px rgba(0, 0, 0, 0.2)',
         color: '#fff',
         transition: 'all 0.2s ease',
+        flexShrink: 0
     };
 
     const logoStyle: React.CSSProperties = {
         ...btnStyle,
         width: 'auto',
         padding: '0 16px',
-        borderRadius: '24px', // Pill shape for logo? Or circle? User said circle.
-        userSelect: 'none', // Prevent text selection
-        // If logo is text "BOX.CRIC", it needs width.
-        // User said "one for the app logo".
-        // If I make it a circle, I can put an icon?
-        // Or I can make it a specific width for the text logo.
+        borderRadius: '24px',
+        userSelect: 'none',
+        opacity: isSticky ? 0 : 1, // Hide logo when sticky
+        pointerEvents: isSticky ? 'none' : 'auto',
+        visibility: isSticky ? 'hidden' : 'visible', // Ensure it doesn't take space/clicks
+        position: isSticky ? 'absolute' : 'relative', // Remove from flow
     };
-    // Re-reading: "two circular glassmorphiic continers one for the app logo"
-    // Does 'logo' imply the BRAND text or just an icon?
-    // Current logo has text. I'll stick to a Pill for text logo, or just use the icon if available.
-    // I'll keep the text LOGO but inside a glass container.
 
     return (
         <div style={containerStyle}>
-            {/* Left: Back Button (Conditional) */}
-            <div style={{ justifySelf: 'start', pointerEvents: 'auto' }}>
+            {/* Left: Back Button */}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
                 {showBack && (
                     <button
                         style={btnStyle}
                         onClick={onBack}
                         className="floating-back"
                     >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width={isSticky ? "20" : "24"} height={isSticky ? "20" : "24"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M15 18l-6-6 6-6" />
                         </svg>
                     </button>
                 )}
             </div>
 
-            {/* Center: App Logo - clickable to trigger install prompt */}
-            <div
-                style={{ ...logoStyle, justifySelf: 'center', pointerEvents: 'auto', cursor: onLogoClick ? 'pointer' : 'default' }}
-                className="floating-logo"
-                onClick={onLogoClick}
-            >
-                <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: '#fff' }}>BOX</span>
-                <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
-            </div>
+            {/* Sticky Content Area */}
+            {isSticky ? (
+                <div style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center', // Center content
+                    animation: 'fadeIn 0.3s ease',
+                    minWidth: 0 // Allow text truncation
+                }}>
+                    {stickyContent}
+                </div>
+            ) : (
+                /* Original Logo Area (Centered via Grid/Flex fallback) */
+                <div style={{
+                    position: 'absolute', left: '50%', transform: 'translateX(-50%)',
+                    pointerEvents: 'auto'
+                }}>
+                    <div
+                        style={{ ...logoStyle, cursor: onLogoClick ? 'pointer' : 'default' }}
+                        className="floating-logo"
+                        onClick={onLogoClick}
+                    >
+                        <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: '#fff' }}>BOX</span>
+                        <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
+                    </div>
+                </div>
+            )}
 
-            {/* Right: Empty spacer */}
-            <div />
+            <style>{`
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+            `}</style>
         </div>
     );
 };
