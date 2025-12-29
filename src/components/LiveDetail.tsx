@@ -1387,39 +1387,25 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                         overflow: 'hidden',
                                         borderRadius: 8
                                     }}>
-                                        {/* Circular Ripple Overlay */}
-                                        {thisOverRipple && (
-                                            <div key={thisOverRipple.key} style={{
-                                                position: 'absolute',
-                                                top: '50%', right: 12,
-                                                width: 24, height: 24,
-                                                borderRadius: '50%',
-                                                background: thisOverRipple.color,
-                                                transform: 'translate(50%, -50%)',
-                                                animation: 'circularWipe 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                                                pointerEvents: 'none',
-                                                zIndex: 0
-                                            }} />
-                                        )}
-
                                         <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 4, letterSpacing: 0.5, zIndex: 1 }}>This Over</div>
                                         <style>
                                             {`
                                                 @keyframes popReveal {
-                                                    0% { transform: scale(0) translateY(-15px); opacity: 0; }
-                                                    50% { transform: scale(1.5) translateY(0); opacity: 1; }
-                                                    100% { transform: scale(1) translateY(0); opacity: 1; }
+                                                    0% { transform: scale(0); opacity: 0; }
+                                                    60% { transform: scale(1.3); opacity: 1; }
+                                                    100% { transform: scale(1); opacity: 1; }
+                                                }
+                                                @keyframes bgExpand {
+                                                    0% { transform: scale(0); opacity: 0.8; }
+                                                    30% { transform: scale(12); opacity: 0.5; }
+                                                    60% { transform: scale(1); opacity: 1; }
+                                                    100% { transform: scale(1); opacity: 1; }
                                                 }
                                                 @keyframes heroTickerPop {
                                                     0% { transform: scale(0) translateY(-20px); opacity: 0; }
                                                     40% { transform: scale(1.5) translateY(3px); opacity: 1; }
                                                     70% { transform: scale(0.95) translateY(-1px); }
                                                     100% { transform: scale(1) translateY(0); opacity: 1; }
-                                                }
-                                                @keyframes circularWipe {
-                                                    0% { transform: translate(50%, -50%) scale(1); opacity: 0.6; }
-                                                    50% { transform: translate(50%, -50%) scale(15); opacity: 0.3; }
-                                                    100% { transform: translate(50%, -50%) scale(20); opacity: 0; }
                                                 }
                                             `}
                                         </style>
@@ -1447,15 +1433,33 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                         {thisOverBalls.map((ball: any, idx: number) => (
                                                             <div key={idx} style={{
                                                                 width: 24, height: 24, borderRadius: '50%',
-                                                                background: getBallColor(ball),
+                                                                position: 'relative',
                                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                                fontSize: 9, fontWeight: 700, color: '#fff',
-                                                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
                                                                 flexShrink: 0,
-                                                                animation: 'popReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards',
-                                                                animationDelay: `${idx * 0.05}s` // Stagger slightly if loading all
                                                             }}>
-                                                                {getBallDisplay(ball)}
+                                                                {/* Background layer - scales very large, clipped by container */}
+                                                                <div style={{
+                                                                    position: 'absolute',
+                                                                    width: 24, height: 24, borderRadius: '50%',
+                                                                    background: getBallColor(ball),
+                                                                    animation: 'bgExpand 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                                                                    animationDelay: `${idx * 0.05}s`,
+                                                                    transformOrigin: 'center center'
+                                                                }} />
+                                                                {/* Number layer - normal pop scale */}
+                                                                <div style={{
+                                                                    position: 'relative',
+                                                                    width: 24, height: 24, borderRadius: '50%',
+                                                                    background: getBallColor(ball),
+                                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                    fontSize: 9, fontWeight: 700, color: '#fff',
+                                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                                                    animation: 'popReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards',
+                                                                    animationDelay: `${idx * 0.05}s`,
+                                                                    zIndex: 1
+                                                                }}>
+                                                                    {getBallDisplay(ball)}
+                                                                </div>
                                                             </div>
                                                         ))}
                                                         {/* Placeholders */}
