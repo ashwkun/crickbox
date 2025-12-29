@@ -465,8 +465,8 @@ export const calculateLiveProbability = (
     const progress = Math.min(1, oversBowled / totalOvers);
     const phase = progress < 0.3 ? 'EARLY' : progress < 0.8 ? 'MID' : 'DEATH';
 
-    // Weight shifts from 0.4 (start) to 0.95 (end)
-    const liveWeight = 0.4 + (0.55 * progress);
+    // Weight shifts from 0.4 (start) to 1.0 (death phase = 100% live, 0% pre-match)
+    const liveWeight = Math.min(1, 0.4 + (0.6 * progress));
 
     console.log(`\n⚡ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
     console.log(`📺 LIVE PROBABILITY UPDATE: ${battingTeam} batting`);
