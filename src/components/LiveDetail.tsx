@@ -105,10 +105,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             const team2 = match.participants?.[1];
             if (!team1?.id || !team2?.id) return;
 
-            const [h2hRes, form1, form2] = await Promise.allSettled([
-                fetchH2H(match.game_id),
-                getTeamForm(team1.id),
-                getTeamForm(team2.id)
+            const [h2hRes] = await Promise.allSettled([
+                fetchH2H(match.game_id)
             ]);
 
             let h2hStats = { matches_played: '0', won: '0', lost: '0' };

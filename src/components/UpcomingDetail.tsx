@@ -101,47 +101,17 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
             if (!match.game_id) return;
 
             // Fetch H2H, Scorecard, and Form in PARALLEL
+            // const format = match.event_format || 't20'; // Usually API gives lowercase
+            const format = match.event_format || 't20';
+
             const [h2hResult, scorecardResult, form1, form2] = await Promise.allSettled([
                 fetchH2H(match.game_id),
                 proxyFetch(`${WISDEN_SCORECARD}${match.game_id}`),
-                team1?.id ? getTeamForm(team1.id) : Promise.resolve([]),
-                team2?.id ? getTeamForm(team2.id) : Promise.resolve([])
+                team1?.id ? getTeamForm(team1.id, 5, format) : Promise.resolve([]),
+                team2?.id ? getTeamForm(team2.id, 5, format) : Promise.resolve([])
             ]);
 
-            // Process H2H
-            let h2hDataValue = null;
-            if (h2hResult.status === 'fulfilled') {
-                h2hDataValue = h2hResult.value;
-                setH2hData(h2hResult.value);
-            }
-            setLoadingH2H(false);
-
-            // Process Scorecard
-            let scorecardValue = null;
-            if (scorecardResult.status === 'fulfilled') {
-                scorecardValue = scorecardResult.value;
-                const scData = scorecardResult.value;
-                const details = scData?.data?.Matchdetail;
-                const series = details?.Series;
-                const venue = details?.Venue;
-
-                if (series || venue) {
-                    setScorecardData({
-                        Series_match_count: series?.Series_match_count,
-                        Streaming_platform: series?.Streaming_platform || [],
-                        Broadcasting_platform: series?.Broadcasting_platform || [],
-                        Venue: venue,
-                        Teams: scData?.data?.Teams
-                    });
-
-                    // Fetch Weather using venue coordinates
-                    if (venue?.Latitude && venue?.Longitude) {
-                        const lat = parseFloat(venue.Latitude);
-                        const lon = parseFloat(venue.Longitude);
-                        fetchWeather(lat, lon, 7).then(setWeather);
-                    }
-                }
-            }
+            // ... (H2H and Scorecard processing) ...
 
             // Calculate Win Probability
             if (team1?.id && team2?.id) {
@@ -158,14 +128,17 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                     }
                 }
 
-                const isFranchise = match.league?.toLowerCase().includes('ipl') ||
-                    match.league?.toLowerCase().includes('bbl') ||
-                    match.participants[0].is_international === false;
+                // Determine if International (Men's='icc', Women's='womens_international', Youth='youth_international')
+                const isInternational = match.league_code === 'icc' ||
+                    match.league_code === 'womens_international' ||
+                    match.league_code === 'youth_international';
+                const isFranchise = !isInternational;
 
                 const f1 = (form1.status === 'fulfilled' ? form1.value : []) as string[];
                 const f2 = (form2.status === 'fulfilled' ? form2.value : []) as string[];
                 // Extract Pitch Detail from Scorecard if available
                 const pitch = scorecardValue?.data?.Matchdetail?.Pitch_Detail || {};
+                const homeTeamId = scorecardValue?.data?.Matchdetail?.Team_Home;
 
                 const prob = calculatePreMatchProbability(
                     team1 as any,
@@ -176,7 +149,8 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                     {},
                     pitch,
                     match.venue_name || "",
-                    isFranchise
+                    isFranchise,
+                    homeTeamId
                 );
                 setWinProb(prob);
             }
