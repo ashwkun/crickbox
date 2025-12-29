@@ -73,6 +73,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 }
             });
             fetchOverByOver(match.game_id, currentInnings).then(data => {
+                console.log(`[LiveDetail] Initial OBO Fetch. Data: ${!!data}, Keys: ${Object.keys(data || {}).length}`);
                 if (data) {
                     setOverByOver(data);
                     setOverByOverMatchups(data); // Initialize Matchups with same data
