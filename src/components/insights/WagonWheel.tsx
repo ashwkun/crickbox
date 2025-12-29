@@ -262,7 +262,7 @@ const WagonWheel: React.FC<WagonWheelProps> = ({ batsmanSplits, scorecard, selec
             )}
 
             {/* Content  */}
-            {(!batsmanSplits?.Batsmen) && !isLoading ? (
+            {(!batsmanSplits?.Batsmen || Object.keys(batsmanSplits.Batsmen).length === 0 || playersWithShots.length === 0) && !isLoading ? (
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 12, color: 'rgba(255,255,255,0.3)' }}>
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                         <circle cx="12" cy="12" r="10" />
