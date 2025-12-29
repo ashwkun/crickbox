@@ -779,16 +779,24 @@ export const calculateLiveProbability = (
             liveProbBat = 0;
             console.log(`   ❌ ${battingTeam} ${wickets >= 10 ? 'all out' : 'out of overs'}.`);
         } else {
-            // Base Calculation (RRR Pressure)
-            if (rrr > 13) liveProbBat = 5;
-            else if (rrr > 12) liveProbBat = 10;
-            else if (rrr > 10) liveProbBat = 20;
-            else if (rrr > 9) liveProbBat = 35;
-            else if (rrr > 8) liveProbBat = 45;
-            else if (rrr < 6) liveProbBat = 80;
+            // Base Calculation (RRR Pressure) - Format-aware thresholds
+            // T20: RRR 13+ is near impossible, ODI: 8+ is very hard, Test: 5+ is high
+            const rrrImpossible = format === 'T20' ? 13 : (format === 'ODI' ? 9 : 6);
+            const rrrVeryHard = format === 'T20' ? 12 : (format === 'ODI' ? 8 : 5);
+            const rrrHard = format === 'T20' ? 10 : (format === 'ODI' ? 7 : 4.5);
+            const rrrDifficult = format === 'T20' ? 9 : (format === 'ODI' ? 6.5 : 4);
+            const rrrChallenging = format === 'T20' ? 8 : (format === 'ODI' ? 6 : 3.5);
+            const rrrEasy = format === 'T20' ? 6 : (format === 'ODI' ? 4 : 2.5);
+
+            if (rrr > rrrImpossible) liveProbBat = 5;
+            else if (rrr > rrrVeryHard) liveProbBat = 10;
+            else if (rrr > rrrHard) liveProbBat = 20;
+            else if (rrr > rrrDifficult) liveProbBat = 35;
+            else if (rrr > rrrChallenging) liveProbBat = 45;
+            else if (rrr < rrrEasy) liveProbBat = 80;
             else liveProbBat = 60;
 
-            console.log(`   Base prob (from RRR): ${liveProbBat.toFixed(0)}%`);
+            console.log(`   Base prob (from RRR ${rrr.toFixed(1)}, ${format} thresholds): ${liveProbBat.toFixed(0)}%`);
 
             // Wicket Penalty
             if (wicketsLeft < 3) {
@@ -873,7 +881,8 @@ export const calculateLiveProbability = (
         const oversLeft = Math.max(0, totalOvers - oversBowled);
         const resourceFactor = Math.max(0.1, 1 - (wickets * (wickets > 5 ? 0.12 : 0.08)));
         const projected = Math.floor(runs + (crr * oversLeft * resourceFactor));
-        const parScore = totalOvers === 20 ? 170 : 280;
+        // Format-aware par score for details
+        const parScore = format === 'T20' ? 170 : (format === 'ODI' ? 280 : 350);
 
         details = {
             projectedScore: projected,
