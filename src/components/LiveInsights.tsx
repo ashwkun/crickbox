@@ -182,7 +182,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
             )}
 
             {/* 8. Venue Stats (Premium Card) */}
-            {h2hData.team?.head_to_head?.venue && (
+            {h2hData?.team?.head_to_head?.venue && (
                 <VenueCard
                     venue={h2hData.team.head_to_head.venue}
                     teamIds={teamIds}
