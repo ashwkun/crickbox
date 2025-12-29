@@ -40,7 +40,7 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         }
     }, [maxOvers, datasets.length]); // Trigger on structure change
 
-    const chartHeight = 180; // Increased for better resolution
+    const chartHeight = 200; // Increased for better resolution and spacing
 
     // Helper to get tab label (standardized)
     const getTabLabel = (idx: number, teamId: string) => {
@@ -87,13 +87,14 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         <div style={{
             background: 'var(--bg-card)',
             borderRadius: 16,
-            padding: '20px 20px 24px 20px', // Extra bottom padding
+            padding: '24px 20px',
             border: '1px solid var(--border-color)',
             display: 'flex',
             flexDirection: 'column',
             gap: 24,
             position: 'relative',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.1)'
         }}>
             {/* Header: Title & Filter/Legend */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -102,47 +103,39 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
                 }}>
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: 8,
-                        fontSize: 12, fontWeight: 700, color: 'var(--text-muted)',
-                        textTransform: 'uppercase', letterSpacing: 1.2
+                        fontSize: 13, fontWeight: 700, color: 'var(--text)',
+                        textTransform: 'uppercase', letterSpacing: 0.5
                     }}>
-                        <div style={{ width: 4, height: 14, background: '#3b82f6', borderRadius: 2 }} />
+                        <div style={{ width: 4, height: 16, background: '#3b82f6', borderRadius: 2 }} />
                         Runs per Over
                     </div>
                 </div>
 
-                {/* Legend / Filter Row - Styled as Checkboxes */}
-                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                {/* Legend / Filter Row - Styled as Premium Pills */}
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                     {inningsTabs.map((tab: any) => (
                         <button
                             key={tab.id}
                             onClick={() => onInningsToggle(tab.id)}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: 8,
-                                padding: '8px 12px',
-                                borderRadius: 8,
-                                background: 'rgba(255,255,255,0.03)',
+                                padding: '6px 14px',
+                                borderRadius: 20,
+                                background: tab.isActive ? `rgba(255,255,255,0.08)` : 'transparent',
                                 border: `1px solid ${tab.isActive ? tab.color : 'rgba(255,255,255,0.1)'}`,
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',
-                                opacity: tab.isActive ? 1 : 0.6
+                                opacity: tab.isActive ? 1 : 0.5
                             }}
                         >
-                            {/* Checkbox Visual */}
                             <div style={{
-                                width: 14, height: 14,
-                                borderRadius: 3,
-                                background: tab.isActive ? tab.color : 'transparent',
-                                border: `1px solid ${tab.isActive ? tab.color : 'rgba(255,255,255,0.3)'}`,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }}>
-                                {tab.isActive && (
-                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                        <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                )}
-                            </div>
+                                width: 8, height: 8,
+                                borderRadius: '50%',
+                                background: tab.color,
+                                boxShadow: tab.isActive ? `0 0 8px ${tab.color}40` : 'none'
+                            }} />
 
-                            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
                                 {tab.label}
                             </span>
                         </button>
@@ -155,7 +148,7 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
 
                 {/* 1. Y-Axis Grid Lines (Background) */}
                 <div style={{
-                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 20,
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 24,
                     pointerEvents: 'none', zIndex: 0
                 }}>
                     {[0, 6, 12, 18, 24].map((val) => {
@@ -167,13 +160,14 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
                                 left: 0, right: 0,
                                 bottom: `${bottomPct}%`,
                                 height: 1,
-                                background: val === 0 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)',
-                                display: 'flex', alignItems: 'flex-end' // align label
+                                borderTop: val === 0 ? '1px solid rgba(255,255,255,0.1)' : '1px dashed rgba(255,255,255,0.05)',
+                                display: 'flex', alignItems: 'flex-end'
                             }}>
                                 {val > 0 && (
                                     <span style={{
-                                        position: 'absolute', left: 0, bottom: 2,
-                                        fontSize: 9, color: 'rgba(255,255,255,0.2)', fontWeight: 500
+                                        position: 'absolute', left: 0, bottom: 4,
+                                        fontSize: 10, color: 'rgba(255,255,255,0.3)', fontWeight: 500,
+                                        fontFeatureSettings: '"tnum"'
                                     }}>
                                         {val}
                                     </span>
@@ -193,8 +187,7 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
                         overflowX: 'auto',
                         display: 'flex',
                         height: '100%',
-                        paddingLeft: 20, // Space for grid labels
-                        paddingTop: 10,
+                        paddingLeft: 24, // Space for Y-axis labels
                         alignItems: 'flex-end',
                         scrollBehavior: 'smooth'
                     }}
@@ -202,10 +195,11 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
                     {Array.from({ length: maxOvers }).map((_, i) => {
                         const overNum = i + 1;
                         const items = overMap[overNum] || [];
-                        const groupWidth = 24; // Standard width per over
+                        const groupWidth = 28; // Slightly wider for better separation
 
-                        // Maintain spacing for missing items (alignment)
-                        const barWidth = items.length > 1 ? (Math.floor(groupWidth / items.length) - 2) : 12;
+                        // Determine bar width based on number of innings per over
+                        const barWidth = items.length > 1 ? (Math.floor((groupWidth - 4) / items.length)) : 16;
+                        const gapBetweenBars = 2;
 
                         return (
                             <div key={overNum} style={{
@@ -215,60 +209,73 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
                                 alignItems: 'flex-end',
                                 justifyContent: 'center',
                                 position: 'relative',
-                                marginLeft: 8 // Gap between groups
+                                marginRight: 4, // Spacing between over groups
+                                paddingBottom: 24 // Space for X-axis labels
                             }}>
-                                {/* Bars */}
-                                <div style={{ display: 'flex', gap: 1, alignItems: 'flex-end', height: '100%', paddingBottom: 20 }}>
+                                {/* Bars Group */}
+                                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: gapBetweenBars, height: '100%' }}>
                                     {items.map((item, idx) => {
                                         // Height capped at 100% (25 runs)
                                         const rawHeight = (item.runs / 25) * 100;
-                                        const safeHeight = Math.min(Math.max(rawHeight, 2), 100);
+                                        // Ensure a minimum height so 0 runs is still faintly visible or just defined by base
+                                        const safeHeight = Math.max(rawHeight, 2);
+                                        const finalHeight = Math.min(safeHeight, 100);
 
                                         const isWicket = item.wickets > 0;
-                                        const isHighScore = item.runs >= 10;
-
-                                        // Gradient Logic
-                                        const baseColor = isWicket ? '#ef4444' : isHighScore ? '#22c55e' : item.color;
-                                        // Darken slightly for bottom of gradient
-                                        // We can just use an overlay gradient
 
                                         return (
                                             <div key={idx} style={{
                                                 width: barWidth,
-                                                height: `${safeHeight}%`,
-                                                background: `linear-gradient(180deg, ${baseColor} 0%, ${baseColor}90 100%)`,
-                                                borderRadius: '2px 2px 0 0',
-                                                position: 'relative',
-                                                transition: 'height 0.3s ease'
+                                                height: '100%', // Container is full height for vertical alignment
+                                                display: 'flex',
+                                                alignItems: 'flex-end',
+                                                position: 'relative'
                                             }}>
-                                                {/* Wicket Indicator */}
-                                                {isWicket && (
-                                                    <div style={{
-                                                        position: 'absolute',
-                                                        top: -8, left: '50%', transform: 'translateX(-50%)',
-                                                        width: 6, height: 6, borderRadius: '50%',
-                                                        background: '#ef4444',
-                                                        border: '1px solid var(--bg-card)',
-                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.5)'
-                                                    }} />
-                                                )}
+                                                {/* The Actual Bar */}
+                                                <div style={{
+                                                    width: '100%',
+                                                    height: `${finalHeight}%`,
+                                                    background: item.color,
+                                                    borderRadius: '4px 4px 1px 1px',
+                                                    opacity: 0.9,
+                                                    position: 'relative',
+                                                    transition: 'height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                                                }}>
+                                                    {/* Wicket Marker - Placed on top of bar */}
+                                                    {isWicket && (
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            top: -10, // Float above bar
+                                                            left: '50%',
+                                                            transform: 'translateX(-50%)',
+                                                            width: 8,
+                                                            height: 8,
+                                                            borderRadius: '50%',
+                                                            background: '#ef4444',
+                                                            border: '2px solid var(--bg-card)',
+                                                            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                                            zIndex: 2
+                                                        }} />
+                                                    )}
+                                                </div>
                                             </div>
                                         );
                                     })}
                                 </div>
 
                                 {/* X-Axis Label */}
-                                {(overNum % 5 === 0 || overNum === 1) && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        fontSize: 10,
-                                        fontWeight: 600,
-                                        color: 'rgba(255,255,255,0.4)'
-                                    }}>
-                                        {overNum}
-                                    </div>
-                                )}
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    fontSize: 10,
+                                    fontWeight: (overNum % 5 === 0) ? 600 : 400,
+                                    color: (overNum % 5 === 0) ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)',
+                                    textAlign: 'center',
+                                    width: '100%',
+                                    marginTop: 6
+                                }}>
+                                    {overNum}
+                                </div>
                             </div>
                         );
                     })}
