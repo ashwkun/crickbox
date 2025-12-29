@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LiveInsights from './LiveInsights';
+import CompletedDetail from './CompletedDetail';
 import WikiImage, { getFlagUrl } from './WikiImage';
 import { WallstreamData } from '../utils/wallstreamApi';
 import { getTeamColor } from '../utils/teamColors';
@@ -8,6 +9,8 @@ import { GiCricketBat } from 'react-icons/gi';
 import { IoBaseball } from 'react-icons/io5';
 import useCricketData from '../utils/useCricketData';
 import { H2HData, BatsmanSplitsResponse, OverByOverResponse } from '../utils/h2hApi';
+import { Match, Participant } from '../types';
+import { proxyFetch, WISDEN_SCORECARD } from '../utils/api';
 
 interface LiveDetailProps {
     match: any;
@@ -62,6 +65,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
     const [activeTab, setActiveTab] = useState<'live' | 'insights'>('live');
     const hasSetInitialTab = React.useRef(false);
+
+    // Drill-down state for Recent H2H Match click
+    const [selectedRecentMatch, setSelectedRecentMatch] = useState<Match | null>(null);
+    const [selectedRecentScorecard, setSelectedRecentScorecard] = useState<any>(null);
+    const [isLoadingRecentMatch, setIsLoadingRecentMatch] = useState(false);
 
     // Helper to get Label/Color (Reused)
     const getInningsMeta = (inningIdx: number) => { // 0-based index input
@@ -244,6 +252,59 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
     const handlePartnershipsInningsChange = (innings: number) => {
         setPartnershipsInnings(innings);
+    };
+
+    // Handle clicking a recent H2H match
+    const handleRecentMatchClick = async (gameId: string) => {
+        setIsLoadingRecentMatch(true);
+        try {
+            // 1. Find the match in H2H list to build the hero object
+            const recentMatches = h2hData?.team?.against_last_n_matches?.result || [];
+            const rMatch = recentMatches.find((m: any) => m.file_name === gameId);
+
+            if (rMatch) {
+                // Construct a Match object compatible with CompletedDetail
+                const participants: Participant[] = [
+                    {
+                        id: (rMatch.winner_team_id || rMatch.home_team_id || 0).toString(),
+                        name: rMatch.winner_team_name || rMatch.home_team_name || 'Team 1',
+                        short_name: rMatch.winner_team_name?.slice(0, 3).toUpperCase() || 'T1',
+                        value: ''
+                    },
+                    {
+                        id: (rMatch.loser_team_id || rMatch.away_team_id || 0).toString(),
+                        name: rMatch.loser_team_name || rMatch.away_team_name || 'Team 2',
+                        short_name: rMatch.loser_team_name?.slice(0, 3).toUpperCase() || 'T2',
+                        value: ''
+                    }
+                ];
+
+                const constructedMatch: Match = {
+                    game_id: rMatch.file_name,
+                    sport: match.sport,
+                    series_id: '',
+                    series_name: rMatch.match_number ? `Match ${rMatch.match_number}` : 'Recent Result',
+                    start_date: rMatch.match_start_date,
+                    event_state: 'C',
+                    event_status: 'Completed',
+                    event_format: match.event_format,
+                    result: rMatch.result,
+                    venue: rMatch.venue_name,
+                    participants: participants
+                };
+
+                setSelectedRecentMatch(constructedMatch);
+
+                // 2. Fetch Scorecard
+                const scUrl = `${WISDEN_SCORECARD}${gameId}`;
+                const scData = await proxyFetch(scUrl);
+                setSelectedRecentScorecard(scData);
+            }
+        } catch (e) {
+            console.error("Error loading recent match details", e);
+        } finally {
+            setIsLoadingRecentMatch(false);
+        }
     };
 
 
@@ -898,6 +959,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     // Initial loading state - show skeleton when no data yet
                     isLoading={!scorecard && !h2hData && !batsmanSplits}
                     isWormLoading={isWormLoading}
+                    onH2HMatchClick={handleRecentMatchClick}
                 />
             )}
 
@@ -1762,6 +1824,53 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     })()
                 }
             </div >
+
+            {/* Drill-down Overlay for Recent Match */}
+            {
+                selectedRecentMatch && selectedRecentScorecard && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 2200,
+                        background: 'var(--bg-app)'
+                    }}>
+                        <CompletedDetail
+                            match={selectedRecentMatch}
+                            scorecard={selectedRecentScorecard}
+                            onClose={() => {
+                                setSelectedRecentMatch(null);
+                                setSelectedRecentScorecard(null);
+                            }}
+                        />
+                    </div>
+                )
+            }
+
+            {/* Loading Overlay */}
+            {
+                isLoadingRecentMatch && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0,0,0,0.8)',
+                        zIndex: 2300,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexDirection: 'column',
+                        backdropFilter: 'blur(4px)'
+                    }}>
+                        <div className="spinner" style={{ width: 40, height: 40, border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#f59e0b', borderRadius: '50%', marginBottom: 16 }}></div>
+                        <div style={{ color: '#fff', fontSize: 14, fontWeight: 500 }}>Loading Match...</div>
+                    </div>
+                )
+            }
         </div >
     );
 };
