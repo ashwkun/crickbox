@@ -44,6 +44,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         width: 'auto',
         padding: '0 16px',
         borderRadius: '24px', // Pill shape for logo? Or circle? User said circle.
+        userSelect: 'none', // Prevent text selection
         // If logo is text "BOX.CRIC", it needs width.
         // User said "one for the app logo".
         // If I make it a circle, I can put an icon?
