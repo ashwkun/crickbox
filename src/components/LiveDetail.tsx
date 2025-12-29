@@ -687,13 +687,17 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             return;
         }
 
-        // New ball added after initial load
-        if (currentCount > prevBallCount.current) {
+        // New ball added (normal case: 0→1, 1→2, etc.)
+        // OR new over started (reset case: 6→1, 5→1, etc. where count decreased but there's a ball)
+        const isNewBall = currentCount > prevBallCount.current;
+        const isNewOver = currentCount > 0 && currentCount < prevBallCount.current;
+
+        if (isNewBall || isNewOver) {
             const newIdx = currentCount - 1;
             setNewBallIndex(newIdx);
 
-            // Clear after animation completes
-            setTimeout(() => setNewBallIndex(null), 700);
+            // Clear after animation completes (1s for slower animation)
+            setTimeout(() => setNewBallIndex(null), 1100);
         }
 
         prevBallCount.current = currentCount;
