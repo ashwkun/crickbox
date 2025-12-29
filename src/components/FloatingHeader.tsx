@@ -21,20 +21,20 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         gridTemplateColumns: 'auto 1fr', // Back Btn | Content
         alignItems: 'center',
         pointerEvents: isSticky ? 'auto' : 'none', // Block clicks when full bar
-        zIndex: 3000,
+        zIndex: 4000,
         // Transition props
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        background: isSticky ? 'rgba(15, 15, 15, 0.85)' : 'transparent',
-        backdropFilter: isSticky ? 'blur(16px)' : 'none',
-        WebkitBackdropFilter: isSticky ? 'blur(16px)' : 'none',
-        borderBottom: isSticky ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
-        maxHeight: isSticky ? '80px' : 'auto', // Constraint height
-        gap: 16
+        background: isSticky ? 'rgba(11, 11, 13, 0.95)' : 'transparent', // Darker background
+        backdropFilter: isSticky ? 'blur(20px)' : 'none',
+        WebkitBackdropFilter: isSticky ? 'blur(20px)' : 'none',
+        borderBottom: isSticky ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
+        maxHeight: isSticky ? '64px' : 'auto', // Constraint height (64px is standard header)
+        gap: 12
     };
 
     const btnStyle: React.CSSProperties = {
-        width: isSticky ? '36px' : '44px', // Smaller in sticky mode
-        height: isSticky ? '36px' : '44px',
+        width: isSticky ? '32px' : '40px', // Smaller in sticky mode
+        height: isSticky ? '32px' : '40px',
         borderRadius: '50%',
         background: isSticky ? 'rgba(255,255,255,0.08)' : 'rgba(20, 20, 20, 0.4)',
         backdropFilter: 'blur(12px)',
@@ -73,7 +73,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                         onClick={onBack}
                         className="floating-back"
                     >
-                        <svg width={isSticky ? "20" : "24"} height={isSticky ? "20" : "24"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width={isSticky ? "18" : "24"} height={isSticky ? "18" : "24"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M15 18l-6-6 6-6" />
                         </svg>
                     </button>
@@ -86,9 +86,10 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                     flex: 1,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center', // Center content
+                    // justifyContent: 'center', // REMOVED to allow child to control layout
                     animation: 'fadeIn 0.3s ease',
-                    minWidth: 0 // Allow text truncation
+                    minWidth: 0, // Allow text truncation
+                    height: '100%'
                 }}>
                     {stickyContent}
                 </div>
