@@ -19,7 +19,7 @@ if ('serviceWorker' in navigator) {
         const storedVersion = localStorage.getItem('sw_version');
 
         if (storedVersion !== CURRENT_VERSION) {
-            console.log('New version detected. Nuking cache...', CURRENT_VERSION);
+            // New version detected, nuking cache
 
             // 1. Unregister all SWs
             const registrations = await navigator.serviceWorker.getRegistrations();
@@ -35,7 +35,7 @@ if ('serviceWorker' in navigator) {
 
             // 3. Update Version & Reload
             localStorage.setItem('sw_version', CURRENT_VERSION);
-            console.log('Cache cleared. Reloading...');
+            // Cache cleared, reloading
             window.location.reload();
             return;
         }
@@ -44,10 +44,10 @@ if ('serviceWorker' in navigator) {
         const swUrl = '/sw.js';
         navigator.serviceWorker.register(swUrl)
             .then((reg) => {
-                console.log('Service Worker registered');
+                // SW registered
                 // Force update check
                 reg.update();
             })
-            .catch((err) => console.log('SW registration failed:', err));
+            .catch(() => { /* SW registration failed */ });
     });
 }

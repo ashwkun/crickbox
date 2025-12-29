@@ -238,14 +238,14 @@ export default function useCricketData(): UseCricketDataReturn {
         // VISIBILITY HANDLER: Refresh match list when app returns from background
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-                console.log('[PWA] useCricketData: App visible, refreshing match list...');
+                // PWA visibility refresh
                 fetchLive();
             }
         };
 
         const handlePageShow = (event: PageTransitionEvent) => {
             if (event.persisted) {
-                console.log('[PWA] useCricketData: Page restored from BFCache, refreshing...');
+                // PWA BFCache refresh
                 fetchLive();
                 fetchHeavy(false);
             }
