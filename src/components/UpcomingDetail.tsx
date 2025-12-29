@@ -111,7 +111,40 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                 team2?.id ? getTeamForm(team2.id, 5, format) : Promise.resolve([])
             ]);
 
-            // ... (H2H and Scorecard processing) ...
+            // Process H2H
+            let h2hDataValue = null;
+            if (h2hResult.status === 'fulfilled') {
+                h2hDataValue = h2hResult.value;
+                setH2hData(h2hResult.value);
+            }
+            setLoadingH2H(false);
+
+            // Process Scorecard
+            let scorecardValue = null;
+            if (scorecardResult.status === 'fulfilled') {
+                scorecardValue = scorecardResult.value;
+                const scData = scorecardResult.value;
+                const details = scData?.data?.Matchdetail;
+                const series = details?.Series;
+                const venue = details?.Venue;
+
+                if (series || venue) {
+                    setScorecardData({
+                        Series_match_count: series?.Series_match_count,
+                        Streaming_platform: series?.Streaming_platform || [],
+                        Broadcasting_platform: series?.Broadcasting_platform || [],
+                        Venue: venue,
+                        Teams: scData?.data?.Teams
+                    });
+
+                    // Fetch Weather using venue coordinates
+                    if (venue?.Latitude && venue?.Longitude) {
+                        const lat = parseFloat(venue.Latitude);
+                        const lon = parseFloat(venue.Longitude);
+                        fetchWeather(lat, lon, 7).then(setWeather);
+                    }
+                }
+            }
 
             // Calculate Win Probability
             if (team1?.id && team2?.id) {
