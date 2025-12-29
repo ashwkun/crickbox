@@ -52,16 +52,7 @@ const WinProbabilityCard: React.FC<WinProbabilityCardProps> = ({ data }) => {
                 </div>
             )}
 
-            {/* Logic Explanation / Disclaimer */}
-            <div style={{
-                marginTop: '12px',
-                fontSize: '10px',
-                color: 'rgba(255,255,255,0.3)',
-                textAlign: 'center',
-                fontStyle: 'italic'
-            }}>
-                *Probabilities factor in pitch, form & history.
-            </div>
+
         </div>
     );
 };
