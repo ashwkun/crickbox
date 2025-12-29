@@ -1396,8 +1396,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                     100% { transform: scale(1); opacity: 1; }
                                                 }
                                                 @keyframes bgExpand {
-                                                    0% { transform: scale(0); opacity: 0.8; }
-                                                    30% { transform: scale(12); opacity: 0.5; }
+                                                    0% { transform: scale(0); opacity: 1; }
+                                                    30% { transform: scale(12); opacity: 1; }
                                                     60% { transform: scale(1); opacity: 1; }
                                                     100% { transform: scale(1); opacity: 1; }
                                                 }
