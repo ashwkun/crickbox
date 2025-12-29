@@ -90,6 +90,130 @@ const getPitchImpact = (pitchDetail: any, team1Ranking: number, team2Ranking: nu
     return 0;
 };
 
+// ============================================================
+// ENHANCED LIVE FACTORS - Helper Functions
+// ============================================================
+
+/**
+ * Get current partnership momentum
+ * Returns adjustment for batting team probability
+ */
+const getPartnershipMomentum = (partnerships: any[], wickets: number): { adjustment: number; runs: number; balls: number } => {
+    if (!partnerships || partnerships.length === 0) return { adjustment: 0, runs: 0, balls: 0 };
+
+    // Current partnership is the one after the last wicket
+    const currentPartnership = partnerships.find((p: any) => parseInt(p.ForWicket) === wickets + 1);
+    if (!currentPartnership) return { adjustment: 0, runs: 0, balls: 0 };
+
+    const partnershipRuns = parseInt(currentPartnership.Runs || "0");
+    const partnershipBalls = parseInt(currentPartnership.Balls || "0");
+
+    let adjustment = 0;
+    if (partnershipRuns >= 100) adjustment = 15;        // Century stand - huge momentum
+    else if (partnershipRuns >= 50) adjustment = 10;    // 50+ stand - strong momentum
+    else if (partnershipRuns >= 30) adjustment = 5;     // Decent partnership
+    else if (partnershipBalls < 10 && partnershipRuns < 5) adjustment = -5; // Fresh batter, under pressure
+
+    return { adjustment, runs: partnershipRuns, balls: partnershipBalls };
+};
+
+/**
+ * Analyze bowlers: quota, quality, pitch synergy
+ */
+const analyzeBowlers = (bowlers: any[], pitchType: string, format: 'T20' | 'ODI' | 'Test'): {
+    starBowlersExhausted: number;
+    spinBoost: number;
+    paceBoost: number;
+    logDetails: string[];
+} => {
+    if (!bowlers || bowlers.length === 0) {
+        return { starBowlersExhausted: 0, spinBoost: 0, paceBoost: 0, logDetails: ['No bowler data'] };
+    }
+
+    const maxOvers = format === 'T20' ? 4 : (format === 'ODI' ? 10 : 999);
+    const logDetails: string[] = [];
+    let starBowlersExhausted = 0;
+    let spinBoost = 0;
+    let paceBoost = 0;
+
+    const pitchLower = (pitchType || '').toLowerCase();
+    const isSpinPitch = pitchLower.includes('spin') || pitchLower.includes('turn');
+    const isPacePitch = pitchLower.includes('pace') || pitchLower.includes('seam') || pitchLower.includes('bowling');
+
+    for (const bowler of bowlers) {
+        const overs = parseFloat(bowler.Overs || "0");
+        const economy = parseFloat(bowler.Economyrate || "8");
+        const avgSpeed = parseFloat(bowler.Avg_Speed || "120");
+        const isSpinner = avgSpeed < 100;
+        const isPacer = avgSpeed > 120;
+
+        const oversLeft = Math.max(0, maxOvers - overs);
+        const isExhausted = oversLeft === 0;
+        const isEconomical = economy < 7;
+
+        // Check if star bowler (low economy) is exhausted
+        if (isExhausted && isEconomical) {
+            starBowlersExhausted++;
+            logDetails.push(`🔴 Bowler #${bowler.Number} (Eco: ${economy.toFixed(2)}) exhausted`);
+        }
+
+        // Pitch synergy bonus for remaining bowlers
+        if (!isExhausted && isEconomical) {
+            if (isSpinner && isSpinPitch) {
+                spinBoost += 5;
+                logDetails.push(`✨ Spinner #${bowler.Number} on spin pitch (+5%)`);
+            }
+            if (isPacer && isPacePitch) {
+                paceBoost += 5;
+                logDetails.push(`💨 Pacer #${bowler.Number} on pace pitch (+5%)`);
+            }
+        }
+    }
+
+    return { starBowlersExhausted, spinBoost, paceBoost, logDetails };
+};
+
+/**
+ * Calculate dynamic par score based on conditions
+ */
+const getDynamicParScore = (
+    format: 'T20' | 'ODI' | 'Test',
+    pitchType: string,
+    battingTeamStrength: number, // 1-100 scale
+    bowlingTeamStrength: number  // 1-100 scale
+): { parScore: number; logDetails: string[] } => {
+    const logDetails: string[] = [];
+
+    // Base par scores
+    let basePar = format === 'T20' ? 165 : 270;
+    logDetails.push(`Base par: ${basePar}`);
+
+    // Pitch adjustment
+    const pitchLower = (pitchType || '').toLowerCase();
+    let pitchAdj = 0;
+    if (pitchLower.includes('batting')) {
+        pitchAdj = format === 'T20' ? 15 : 25;
+        logDetails.push(`Batting pitch: +${pitchAdj}`);
+    } else if (pitchLower.includes('bowling') || pitchLower.includes('spin') || pitchLower.includes('seam')) {
+        pitchAdj = format === 'T20' ? -15 : -25;
+        logDetails.push(`Bowling pitch: ${pitchAdj}`);
+    }
+
+    // Team strength differential (batting - bowling)
+    // Scale: 50 = average, 70 = strong, 30 = weak
+    const strengthDiff = (battingTeamStrength - bowlingTeamStrength) / 5;
+    logDetails.push(`Strength diff: ${strengthDiff > 0 ? '+' : ''}${strengthDiff.toFixed(0)}`);
+
+    const parScore = Math.round(basePar + pitchAdj + strengthDiff);
+
+    // Clamp to reasonable values
+    const minPar = format === 'T20' ? 130 : 200;
+    const maxPar = format === 'T20' ? 210 : 350;
+    const clampedPar = Math.max(minPar, Math.min(maxPar, parScore));
+
+    return { parScore: clampedPar, logDetails };
+};
+
 /**
  * Calculate Pre-Match Win Probability
  */
@@ -290,25 +414,70 @@ export const calculateLiveProbability = (
 
     let liveProbBat = 50;
 
+    // Get pitch type for analysis
+    const pitchType = scorecard?.Matchdetail?.Venue?.Pitch_Detail?.Pitch_Suited_For || '';
+
+    // Get partnerships for current innings
+    const partnerships = currentInning.Partnerships || [];
+    const wickets = parseInt(currentInning.Wickets || "0");
+
+    // Get bowler data
+    const bowlers = currentInning.Bowlers || [];
+
     if (currentInningIndex === 0) {
-        // 1st Innings: Projected vs Par
+        // 1st Innings: Projected vs Dynamic Par
         const runs = parseInt(currentInning.Total || "0");
         const crr = parseFloat(currentInning.Runrate || "0");
-        const wickets = parseInt(currentInning.Wickets || "0");
         const oversLeft = Math.max(0, totalOvers - oversBowled);
 
         const resourceFactor = Math.max(0.1, 1 - (wickets * (wickets > 5 ? 0.12 : 0.08)));
         const projected = Math.floor(runs + (crr * oversLeft * resourceFactor));
-        const parScore = totalOvers === 20 ? 170 : 280;
+
+        // Dynamic Par Score (using team strengths placeholder - 50 is average)
+        const battingStrength = 55; // TODO: Calculate from H2H data
+        const bowlingStrength = 50; // TODO: Calculate from H2H data
+        const { parScore, logDetails: parLogDetails } = getDynamicParScore(format, pitchType, battingStrength, bowlingStrength);
 
         const diff = projected - parScore;
         liveProbBat = 50 + (diff * 0.5);
 
         console.log(`🏏 [1ST INNINGS] ${battingTeam} setting target`);
         console.log(`   Score: ${runs}/${wickets} in ${overStr} overs (CRR: ${crr.toFixed(2)})`);
-        console.log(`   Projected: ${projected} | Par: ${parScore} | Diff: ${diff > 0 ? '+' : ''}${diff}`);
+        console.log(`   Projected: ${projected} | Dynamic Par: ${parScore}`);
+        console.log(`   Par Calculation: ${parLogDetails.join(' | ')}`);
         console.log(`   Resource Factor: ${(resourceFactor * 100).toFixed(0)}% (${wickets} wickets down)`);
-        console.log(`   → Live batting probability: ${liveProbBat.toFixed(0)}%`);
+        console.log(`   → Base probability: ${liveProbBat.toFixed(0)}%`);
+
+        // Partnership Momentum
+        const partnership = getPartnershipMomentum(partnerships, wickets);
+        if (partnership.adjustment !== 0) {
+            liveProbBat += partnership.adjustment;
+            console.log(`🤝 [PARTNERSHIP] ${partnership.runs} runs off ${partnership.balls} balls`);
+            console.log(`   → Adjustment: ${partnership.adjustment > 0 ? '+' : ''}${partnership.adjustment}%`);
+        }
+
+        // Bowler Analysis (from bowling team's perspective)
+        const bowlerAnalysis = analyzeBowlers(bowlers, pitchType, format);
+        if (bowlerAnalysis.logDetails.length > 0 && !bowlerAnalysis.logDetails[0].includes('No bowler')) {
+            console.log(`🎳 [BOWLER ANALYSIS]`);
+            bowlerAnalysis.logDetails.forEach(log => console.log(`   ${log}`));
+
+            // Star bowlers exhausted = good for batting team
+            if (bowlerAnalysis.starBowlersExhausted > 0) {
+                const exhaustedBonus = bowlerAnalysis.starBowlersExhausted * 5;
+                liveProbBat += exhaustedBonus;
+                console.log(`   → Batting boost (bowlers exhausted): +${exhaustedBonus}%`);
+            }
+
+            // Pitch synergy boosts bowling team (reduces batting prob)
+            const pitchSynergyPenalty = bowlerAnalysis.spinBoost + bowlerAnalysis.paceBoost;
+            if (pitchSynergyPenalty > 0) {
+                liveProbBat -= pitchSynergyPenalty;
+                console.log(`   → Bowling boost (pitch synergy): -${pitchSynergyPenalty}%`);
+            }
+        }
+
+        console.log(`   → Final 1st innings probability: ${liveProbBat.toFixed(0)}%`);
 
     } else {
         // 2nd Innings: Chase Pressure
@@ -362,7 +531,38 @@ export const calculateLiveProbability = (
                 console.log(`   💀 Death crunch (${runsNeeded} needed, ${ballsLeft} balls) → ×0.5 penalty`);
             }
 
-            console.log(`   → Live batting probability: ${liveProbBat.toFixed(0)}%`);
+            // Partnership Momentum (also applies in 2nd innings)
+            const partnership = getPartnershipMomentum(partnerships, wickets);
+            if (partnership.adjustment !== 0) {
+                liveProbBat += partnership.adjustment;
+                console.log(`🤝 [PARTNERSHIP] ${partnership.runs} runs off ${partnership.balls} balls`);
+                console.log(`   → Adjustment: ${partnership.adjustment > 0 ? '+' : ''}${partnership.adjustment}%`);
+            }
+
+            // Bowler Analysis (bowling team's remaining firepower)
+            // In 2nd innings, get bowlers from 2nd innings Bowlers array
+            const chaseInningBowlers = currentInning.Bowlers || [];
+            const bowlerAnalysis = analyzeBowlers(chaseInningBowlers, pitchType, format);
+            if (bowlerAnalysis.logDetails.length > 0 && !bowlerAnalysis.logDetails[0].includes('No bowler')) {
+                console.log(`🎳 [BOWLER ANALYSIS]`);
+                bowlerAnalysis.logDetails.forEach(log => console.log(`   ${log}`));
+
+                // Star bowlers exhausted = good for chasing team
+                if (bowlerAnalysis.starBowlersExhausted > 0) {
+                    const exhaustedBonus = bowlerAnalysis.starBowlersExhausted * 5;
+                    liveProbBat += exhaustedBonus;
+                    console.log(`   → Chasing boost (bowlers exhausted): +${exhaustedBonus}%`);
+                }
+
+                // Pitch synergy helps bowling team
+                const pitchSynergyPenalty = bowlerAnalysis.spinBoost + bowlerAnalysis.paceBoost;
+                if (pitchSynergyPenalty > 0) {
+                    liveProbBat -= pitchSynergyPenalty;
+                    console.log(`   → Defending boost (pitch synergy): -${pitchSynergyPenalty}%`);
+                }
+            }
+
+            console.log(`   → Final 2nd innings probability: ${liveProbBat.toFixed(0)}%`);
         }
     }
 
