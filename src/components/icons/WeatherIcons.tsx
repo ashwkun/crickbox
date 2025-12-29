@@ -10,12 +10,22 @@ interface WeatherIconProps {
 // Map our icon names to Basmilius icon names
 const iconMap: Record<string, string> = {
     'sun': 'clear-day',
+    'clear': 'clear-day',
+    'sunny': 'clear-day',
     'cloud-sun': 'partly-cloudy-day',
+    'partly-cloudy': 'partly-cloudy-day',
     'cloud': 'cloudy',
+    'cloudy': 'cloudy',
+    'overcast': 'overcast',
     'rain': 'rain',
     'drizzle': 'drizzle',
     'storm': 'thunderstorms-rain',
+    'thunderstorm': 'thunderstorms-rain',
     'fog': 'fog',
+    'mist': 'mist',
+    'haze': 'haze',
+    'snow': 'snow',
+    'wind': 'wind',
 };
 
 // Basmilius official CDN
