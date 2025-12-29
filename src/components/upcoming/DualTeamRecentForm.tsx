@@ -115,13 +115,23 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
     const { allForm: t2All, currentForm: t2Curr } = filterMatches(matches2);
 
     // --- Renderers ---
-    // direction: 'ltr' = left-to-right (Team 1, newest on right), 'rtl' = right-to-left (Team 2, newest on left)
+    // direction: 'ltr' = left-to-right (Team 1, newest on right near center)
+    // direction: 'rtl' = right-to-left (Team 2, newest on left near center)
     const renderPills = (matches: Match[], tId: string, direction: 'ltr' | 'rtl' = 'ltr') => {
-        const orderedMatches = direction === 'rtl' ? [...matches].reverse() : matches;
+        if (matches.length === 0) {
+            return <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>-</span>;
+        }
+
+        // For LTR: index 0 is oldest, last is newest (closest to center)
+        // For RTL: reverse so newest appears on left (closest to center)
+        const displayMatches = direction === 'rtl' ? [...matches].reverse() : matches;
+        const newestIndex = direction === 'rtl' ? 0 : displayMatches.length - 1;
+
         return (
-            <div style={{ display: 'flex', gap: 4, flexDirection: direction === 'rtl' ? 'row-reverse' : 'row' }}>
-                {orderedMatches.length > 0 ? orderedMatches.map(m => {
+            <div style={{ display: 'flex', gap: 4 }}>
+                {displayMatches.map((m, idx) => {
                     const res = getResult(m, tId);
+                    const isNewest = idx === newestIndex;
                     return (
                         <div
                             key={m.game_id}
@@ -138,13 +148,27 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
                                 fontSize: 9,
                                 fontWeight: 700,
                                 cursor: onMatchClick ? 'pointer' : 'default',
-                                border: `1px solid ${getResultColor(res)}30`
+                                border: `1px solid ${getResultColor(res)}30`,
+                                position: 'relative'
                             }}
                         >
                             {res}
+                            {/* Small dot indicator on newest */}
+                            {isNewest && (
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: -4,
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    width: 4,
+                                    height: 4,
+                                    borderRadius: '50%',
+                                    background: 'rgba(255,255,255,0.4)'
+                                }} />
+                            )}
                         </div>
                     );
-                }) : <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>-</span>}
+                })}
             </div>
         );
     };
@@ -153,7 +177,6 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
     // isLeft = false for Team 2 (pills flow right→left, newest near center)
     const renderTeamColumn = (team: TeamInfo, current: Match[], all: Match[], isRedundant: boolean, isLeft: boolean) => {
         const direction = isLeft ? 'ltr' : 'rtl';
-        const arrowIcon = isLeft ? '→' : '←';
 
         return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1, alignItems: 'center' }}>
@@ -167,35 +190,22 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
                 {/* Stats Stack */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', alignItems: 'center' }}>
                     {isRedundant ? (
-                        // SINGLE ROW with arrow
+                        // SINGLE ROW
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                {!isLeft && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{arrowIcon}</span>}
-                                {renderPills(all, team.id, direction)}
-                                {isLeft && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{arrowIcon}</span>}
-                            </div>
-                            <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.2)', marginTop: 2 }}>Latest</span>
+                            {renderPills(all, team.id, direction)}
                         </div>
                     ) : (
-                        // DUAL ROWS (Stacked) with arrows
+                        // DUAL ROWS (Stacked)
                         <>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                                 <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase' }}>
                                     {(currentFormat || 'Recent').replace(/current\s*|\(|\)/gi, '')}
                                 </span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    {!isLeft && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{arrowIcon}</span>}
-                                    {renderPills(current, team.id, direction)}
-                                    {isLeft && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{arrowIcon}</span>}
-                                </div>
+                                {renderPills(current, team.id, direction)}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                                 <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase' }}>ALL</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    {!isLeft && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{arrowIcon}</span>}
-                                    {renderPills(all, team.id, direction)}
-                                    {isLeft && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{arrowIcon}</span>}
-                                </div>
+                                {renderPills(all, team.id, direction)}
                             </div>
                         </>
                     )}
