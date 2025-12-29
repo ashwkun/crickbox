@@ -82,7 +82,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
 
     // Helper to determine Verdict Badge - with clearer labels
     const getVerdict = (runs: number, balls: number, dots: number, wickets: number, sr: number) => {
-        if (wickets > 0) return { label: 'WICKET', color: '#fff', bg: '#ef4444', description: 'Bowler took the wicket' };
+        if (wickets > 0) return { label: 'WICKET', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', description: 'Bowler took the wicket' };
         if (sr > 175 || (runs > 20 && sr > 150)) return { label: 'BATTER DOMINATED', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', description: 'High Strike Rate or Aggressive Scoring' };
         if (dots > 3 && (dots / balls) > 0.6) return { label: 'PINNED DOWN', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)', description: 'Struggling to rotate strike (>60% Dots)' };
         if (sr < 100 && balls > 6) return { label: 'SLOW GOING', color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', description: 'Scoring below a run-a-ball' };
@@ -284,21 +284,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
 
                             // Dynamic Highlight Text
                             let highlightContent: React.ReactNode = `SR ${vs.Strikerate}`;
-                            if (wickets > 0) {
-                                highlightContent = (
-                                    <span style={{
-                                        padding: '4px 8px',
-                                        borderRadius: 4,
-                                        background: '#ef4444',
-                                        color: '#fff',
-                                        fontSize: 9,
-                                        fontWeight: 800
-                                    }}>
-                                        {wickets > 1 ? `${wickets} WKTS` : 'WICKET'}
-                                    </span>
-                                );
-                            }
-                            else if (runs === 0 && balls > 0) highlightContent = `${dots} Dots`;
+                            if (runs === 0 && balls > 0) highlightContent = `${dots} Dots`;
                             else if (fours > 0 || sixes > 0) highlightContent = `${fours > 0 ? `${fours}x4 ` : ''}${sixes > 0 ? `${sixes}x6` : ''}`;
                             else if (dots > 2) highlightContent = `${dots} Dots`;
 
