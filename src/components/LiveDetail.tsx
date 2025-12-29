@@ -46,9 +46,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [overByOverMatchups, setOverByOverMatchups] = useState<OverByOverResponse | null>(null); // Independent for Matchups Wickets
     const [matchupsInnings, setMatchupsInnings] = useState(scorecard?.Innings?.length || 1);
     const [isMatchupsLoading, setIsMatchupsLoading] = useState(false);
+    const [partnershipsInnings, setPartnershipsInnings] = useState(scorecard?.Innings?.length || 1);
     const [overByOver, setOverByOver] = useState<OverByOverResponse | null>(null);
     const [overByOver1, setOverByOver1] = useState<OverByOverResponse | null>(null);
     const [overByOver2, setOverByOver2] = useState<OverByOverResponse | null>(null);
+    // Smart Worm State
+    const [wormPrimary, setWormPrimary] = useState<{ data: OverByOverResponse | null, label: string, color: string } | null>(null);
+    const [wormSecondary, setWormSecondary] = useState<{ data: OverByOverResponse | null, label: string, color: string } | null>(null);
+
     const [activeTab, setActiveTab] = useState<'live' | 'insights'>('live');
     const hasSetInitialTab = React.useRef(false);
 
@@ -61,35 +66,84 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             });
 
             // Fetch current innings batsman splits and over-by-over
-            const currentInnings = scorecard?.Innings?.length || 1;
-            fetchBatsmanSplits(match.game_id, currentInnings).then(data => {
+            const currentInningsLen = scorecard?.Innings?.length || 1;
+            fetchBatsmanSplits(match.game_id, currentInningsLen).then(data => {
                 if (data) {
                     setBatsmanSplits(data);
                     setBatsmanSplitsMatchups(data); // Initialize Matchups with same data
                 }
-                if (currentInnings > 0) {
-                    setWagonWheelInnings(currentInnings);
-                    setMatchupsInnings(currentInnings);
+                if (currentInningsLen > 0) {
+                    setWagonWheelInnings(currentInningsLen);
+                    setMatchupsInnings(currentInningsLen);
+                    setPartnershipsInnings(currentInningsLen);
                 }
             });
-            fetchOverByOver(match.game_id, currentInnings).then(data => {
+            fetchOverByOver(match.game_id, currentInningsLen).then(data => {
                 if (data) {
                     setOverByOver(data);
                     setOverByOverMatchups(data); // Initialize Matchups with same data
                 }
             });
 
-            // Fetch both innings for Worm Chart
-            fetchOverByOver(match.game_id, 1).then(data => {
-                if (data) setOverByOver1(data);
-            });
-            if (currentInnings >= 2) {
-                fetchOverByOver(match.game_id, 2).then(data => {
-                    if (data) setOverByOver2(data);
+            // --- SMART WORM LOGIC ---
+            if (scorecard?.Innings?.length) {
+                const innings = scorecard.Innings;
+                const primaryIdx = innings.length - 1; // Current Last Innings
+                const primaryInn = innings[primaryIdx];
+                const primaryTeamId = primaryInn.Battingteam;
+
+                // Find comparison innings: Last innings by a DIFFERENT team
+                // Iterate backwards from primaryIdx - 1
+                let secondaryIdx = -1;
+                for (let i = primaryIdx - 1; i >= 0; i--) {
+                    if (innings[i].Battingteam !== primaryTeamId) {
+                        secondaryIdx = i;
+                        break;
+                    }
+                }
+
+                // Fallback for Innings 1 (compare with self/empty? or just show nothing) -> logic handles empty
+                // Fallback for Innings 2 same team (unlikely but safe) -> secondaryIdx remains -1
+
+                // Helper to get Label/Color
+                const getMeta = (idx: number) => {
+                    const inn = innings[idx];
+                    const teamId = inn.Battingteam;
+                    const team = scorecard.Teams?.[teamId];
+                    const label = `${team?.Name_Short || 'TM'} ${Math.floor(idx / 2) + 1}`;
+                    const color = getTeamColor(team?.Name_Full || team?.Name_Short) || '#3b82f6';
+                    return { label, color };
+                };
+
+                // Fetch Primary (Current)
+                // Note: API is 1-based, array is 0-based
+                fetchOverByOver(match.game_id, primaryIdx + 1).then(data => {
+                    if (data) {
+                        const meta = getMeta(primaryIdx);
+                        setWormPrimary({ data, label: meta.label, color: meta.color });
+                    }
+                });
+
+                // Fetch Secondary (Context)
+                if (secondaryIdx !== -1) {
+                    fetchOverByOver(match.game_id, secondaryIdx + 1).then(data => {
+                        if (data) {
+                            const meta = getMeta(secondaryIdx);
+                            setWormSecondary({ data, label: meta.label, color: meta.color });
+                        }
+                    });
+                } else {
+                    setWormSecondary(null);
+                }
+            } else {
+                // Default fallback for initial load/no innings
+                fetchOverByOver(match.game_id, 1).then(data => {
+                    if (data) setWormPrimary({ data, label: 'INN 1', color: '#3b82f6' });
                 });
             }
         }
     }, [match?.game_id, scorecard?.Innings?.length, fetchH2H, fetchBatsmanSplits, fetchOverByOver]);
+
 
     // Independent handler for Wagon Wheel innings change
     const handleWagonWheelInningsChange = (innings: number) => {
@@ -113,6 +167,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             if (obo) setOverByOverMatchups(obo);
             setIsMatchupsLoading(false);
         });
+    };
+
+    const handlePartnershipsInningsChange = (innings: number) => {
+        setPartnershipsInnings(innings);
     };
 
 
@@ -745,8 +803,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     scorecard={scorecard}
                     batsmanSplits={batsmanSplits}
                     overByOver={overByOver}
-                    overByOver1={overByOver1}
-                    overByOver2={overByOver2}
+                    wormPrimary={wormPrimary}
+                    wormSecondary={wormSecondary}
                     wagonWheelInnings={wagonWheelInnings}
                     onWagonWheelInningsChange={handleWagonWheelInningsChange}
                     isWagonWheelLoading={isWagonWheelLoading}
@@ -756,6 +814,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     matchupsInnings={matchupsInnings}
                     onMatchupsInningsChange={handleMatchupsInningsChange}
                     isMatchupsLoading={isMatchupsLoading}
+                    // Partnerships Props
+                    partnershipsInnings={partnershipsInnings}
+                    onPartnershipsInningsChange={handlePartnershipsInningsChange}
                 />
             )}
 

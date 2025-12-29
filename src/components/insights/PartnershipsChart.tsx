@@ -3,24 +3,19 @@ import WikiImage from '../WikiImage';
 
 interface PartnershipsChartProps {
     scorecard: any;
+    selectedInnings?: number;
+    onInningsChange?: (innings: number) => void;
 }
 
-const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
-    // State for selected innings (0-indexed internally, but buttons use 1-based display)
-    // Initialize to last innings (current)
-    const [selectedInningsIdx, setSelectedInningsIdx] = useState<number>(scorecard?.Innings?.length ? scorecard.Innings.length - 1 : 0);
+const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard, selectedInnings = 1, onInningsChange }) => {
+    // State lifted to parent
 
     const innings = scorecard?.Innings || [];
 
-    // Auto-select last innings on load
-    useEffect(() => {
-        if (innings.length > 0) {
-            setSelectedInningsIdx(innings.length - 1);
-        }
-    }, [innings.length]);
-
     if (innings.length === 0) return null;
 
+    // Convert 1-based prop to 0-based index for data access
+    const selectedInningsIdx = selectedInnings - 1;
     const selectedInn = innings[selectedInningsIdx];
     const partnerships = selectedInn?.Partnerships || [];
 
@@ -46,7 +41,7 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
                         return (
                             <button
                                 key={idx}
-                                onClick={() => setSelectedInningsIdx(idx)}
+                                onClick={() => onInningsChange?.(idx + 1)}
                                 style={{
                                     flex: 1,
                                     minWidth: 70,
@@ -64,7 +59,7 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard }) => {
                                     textTransform: 'uppercase'
                                 }}
                             >
-                                {scorecard?.Teams?.[inn.Battingteam]?.Name_Short || `INN ${idx + 1}`}
+                                {scorecard?.Teams?.[inn.Battingteam]?.Name_Short} {Math.floor(idx / 2) + 1}
                             </button>
                         );
                     })}
