@@ -97,22 +97,16 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
             boxShadow: '0 4px 24px rgba(0,0,0,0.1)'
         }}>
             {/* Header: Title & Filter/Legend */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
                 <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                    fontSize: 13, fontWeight: 700, color: 'var(--text)',
+                    textTransform: 'uppercase', letterSpacing: 0.5
                 }}>
-                    <div style={{
-                        display: 'flex', alignItems: 'center', gap: 8,
-                        fontSize: 13, fontWeight: 700, color: 'var(--text)',
-                        textTransform: 'uppercase', letterSpacing: 0.5
-                    }}>
-                        <div style={{ width: 4, height: 16, background: '#3b82f6', borderRadius: 2 }} />
-                        Runs per Over
-                    </div>
+                    Innings Progression
                 </div>
 
                 {/* Legend / Filter Row - Styled as Premium Pills */}
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
                     {inningsTabs.map((tab: any) => (
                         <button
                             key={tab.id}
