@@ -40,7 +40,7 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         }
     }, [maxOvers, datasets.length]); // Trigger on structure change
 
-    const chartHeight = 150;
+    const chartHeight = 180; // Increased for better resolution
 
     // Helper to get tab label (standardized)
     const getTabLabel = (idx: number, teamId: string) => {
@@ -48,14 +48,13 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         return `${team?.Name_Short || 'TM'} ${Math.floor(idx / 2) + 1}`;
     };
 
-    // Helper to get team color for the toggle dot (if not selected)
-    // We can try to use the dataset color if available, or fallback
+    // Helper: color for inactive tabs
     const getTabColor = (id: number) => {
         const ds = datasets.find(d => d.id === id);
         return ds?.color || 'var(--text-muted)';
     };
 
-    // Sort innings tabs by order
+    // Tabs / Legend Items
     const inningsTabs = scorecard?.Innings?.map((inn: any, idx: number) => {
         const id = idx + 1;
         const color = getTabColor(id);
@@ -88,163 +87,193 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         <div style={{
             background: 'var(--bg-card)',
             borderRadius: 16,
-            padding: '20px 16px',
+            padding: '20px 20px 24px 20px', // Extra bottom padding
             border: '1px solid var(--border-color)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 20
+            gap: 24,
+            position: 'relative',
+            overflow: 'hidden'
         }}>
-            {/* Header & Tabs */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
+            {/* Header: Title & Filter/Legend */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    fontSize: 12, fontWeight: 700, color: 'var(--text-muted)',
-                    textTransform: 'uppercase', letterSpacing: 1.2
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                 }}>
-                    <div style={{ width: 4, height: 14, background: '#3b82f6', borderRadius: 2 }} />
-                    Comparison by Over
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        fontSize: 12, fontWeight: 700, color: 'var(--text-muted)',
+                        textTransform: 'uppercase', letterSpacing: 1.2
+                    }}>
+                        <div style={{ width: 4, height: 14, background: '#3b82f6', borderRadius: 2 }} />
+                        Runs per Over
+                    </div>
                 </div>
 
-                {/* Multi-Select Chips */}
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                {/* Legend / Filter Row - Styled as Checkboxes */}
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                     {inningsTabs.map((tab: any) => (
                         <button
                             key={tab.id}
                             onClick={() => onInningsToggle(tab.id)}
                             style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 6,
-                                padding: '6px 14px',
-                                borderRadius: 20,
-                                fontSize: 11,
-                                fontWeight: 600,
-                                border: 'none',
+                                display: 'flex', alignItems: 'center', gap: 8,
+                                padding: '8px 12px',
+                                borderRadius: 8,
+                                background: 'rgba(255,255,255,0.03)',
+                                border: `1px solid ${tab.isActive ? tab.color : 'rgba(255,255,255,0.1)'}`,
                                 cursor: 'pointer',
-                                // Active: Team Color Background | Inactive: Darker Background
-                                background: tab.isActive ? tab.color : 'rgba(255,255,255,0.05)',
-                                color: tab.isActive ? '#fff' : 'var(--text-muted)',
-                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: tab.isActive ? `0 4px 12px -2px ${tab.color}40` : 'none',
-                                border: tab.isActive ? `1px solid ${tab.color}` : '1px solid rgba(255,255,255,0.1)'
+                                transition: 'all 0.2s ease',
+                                opacity: tab.isActive ? 1 : 0.6
                             }}
                         >
-                            {/* Dot is always visible in inactive state to show potential color */}
-                            {!tab.isActive && (
-                                <div style={{
-                                    width: 6, height: 6, borderRadius: '50%',
-                                    background: tab.color, opacity: 0.7
-                                }} />
-                            )}
-                            {tab.label}
+                            {/* Checkbox Visual */}
+                            <div style={{
+                                width: 14, height: 14,
+                                borderRadius: 3,
+                                background: tab.isActive ? tab.color : 'transparent',
+                                border: `1px solid ${tab.isActive ? tab.color : 'rgba(255,255,255,0.3)'}`,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                {tab.isActive && (
+                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                        <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                )}
+                            </div>
+
+                            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)' }}>
+                                {tab.label}
+                            </span>
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Chart */}
-            <div
-                ref={scrollRef}
-                className="hide-scrollbar"
-                style={{
-                    overflowX: 'auto',
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    height: chartHeight,
-                    paddingBottom: 24, // Axis labels
-                    paddingTop: 10,
-                    gap: 8, // Wider spacing between over groups for clarity
-                    scrollBehavior: 'smooth'
-                }}
-            >
-                {Array.from({ length: maxOvers }).map((_, i) => {
-                    const overNum = i + 1;
-                    const items = overMap[overNum] || [];
+            {/* Chart Area */}
+            <div style={{ position: 'relative', height: chartHeight }}>
 
-                    // Group width logic
-                    const groupWidth = 16; // Slightly wider base
-                    // If multiple items, split the width
-                    const barWidth = items.length > 1 ? (groupWidth / items.length) - 1 : 10;
-
-                    return (
-                        <div key={overNum} style={{
-                            flex: `0 0 ${Math.max(groupWidth, 16)}px`,
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'flex-end',
-                            justifyContent: 'center',
-                            position: 'relative',
-                            gap: 1
-                        }}>
-                            {/* Bars */}
-                            {items.map((item, idx) => {
-                                // Dynamic Height: Max 25 runs = 100%
-                                const barHeight = Math.min(Math.max((item.runs / 25) * 100, 4), 100);
-
-                                // Special Colors
-                                const isWicket = item.wickets > 0;
-                                const isHighScore = item.runs >= 10;
-                                const bg = isWicket ? '#ef4444' : isHighScore ? '#22c55e' : item.color;
-
-                                return (
-                                    <div key={idx} style={{
-                                        width: barWidth,
-                                        height: `${barHeight}%`,
-                                        background: bg,
-                                        // Visual Polish: Rounded Tops only
-                                        borderRadius: '3px 3px 0 0',
-                                        position: 'relative',
-                                        transition: 'all 0.3s ease',
-                                        opacity: (isWicket || isHighScore) ? 1 : 0.85
+                {/* 1. Y-Axis Grid Lines (Background) */}
+                <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 20,
+                    pointerEvents: 'none', zIndex: 0
+                }}>
+                    {[0, 6, 12, 18, 24].map((val) => {
+                        const bottomPct = (val / 25) * 100;
+                        if (bottomPct > 100) return null;
+                        return (
+                            <div key={val} style={{
+                                position: 'absolute',
+                                left: 0, right: 0,
+                                bottom: `${bottomPct}%`,
+                                height: 1,
+                                background: val === 0 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)',
+                                display: 'flex', alignItems: 'flex-end' // align label
+                            }}>
+                                {val > 0 && (
+                                    <span style={{
+                                        position: 'absolute', left: 0, bottom: 2,
+                                        fontSize: 9, color: 'rgba(255,255,255,0.2)', fontWeight: 500
                                     }}>
-                                        {/* Wicket Indicator (Floating Dot) */}
-                                        {isWicket && (
-                                            <div style={{
-                                                position: 'absolute',
-                                                top: -8,
-                                                left: '50%', transform: 'translateX(-50%)',
-                                                width: 5, height: 5,
-                                                borderRadius: '50%',
-                                                background: '#ef4444',
-                                                boxShadow: '0 0 0 2px var(--bg-card)'
-                                            }} />
-                                        )}
-                                    </div>
-                                );
-                            })}
+                                        {val}
+                                    </span>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
 
-                            {/* Axis Label (Every 5 overs + Last one if needed) */}
-                            {(overNum % 5 === 0 || overNum === 1) && (
-                                <div style={{
-                                    position: 'absolute',
-                                    bottom: -24,
-                                    fontSize: 9,
-                                    color: 'rgba(255,255,255,0.4)',
-                                    fontWeight: 600,
-                                    letterSpacing: 0.5
-                                }}>
-                                    {overNum}
+                {/* 2. Scrollable Bars Area */}
+                <div
+                    ref={scrollRef}
+                    className="hide-scrollbar"
+                    style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        overflowX: 'auto',
+                        display: 'flex',
+                        height: '100%',
+                        paddingLeft: 20, // Space for grid labels
+                        paddingTop: 10,
+                        alignItems: 'flex-end',
+                        scrollBehavior: 'smooth'
+                    }}
+                >
+                    {Array.from({ length: maxOvers }).map((_, i) => {
+                        const overNum = i + 1;
+                        const items = overMap[overNum] || [];
+                        const groupWidth = 24; // Standard width per over
+
+                        // Maintain spacing for missing items (alignment)
+                        const barWidth = items.length > 1 ? (Math.floor(groupWidth / items.length) - 2) : 12;
+
+                        return (
+                            <div key={overNum} style={{
+                                flex: `0 0 ${groupWidth}px`,
+                                height: '100%',
+                                display: 'flex',
+                                alignItems: 'flex-end',
+                                justifyContent: 'center',
+                                position: 'relative',
+                                marginLeft: 8 // Gap between groups
+                            }}>
+                                {/* Bars */}
+                                <div style={{ display: 'flex', gap: 1, alignItems: 'flex-end', height: '100%', paddingBottom: 20 }}>
+                                    {items.map((item, idx) => {
+                                        // Height capped at 100% (25 runs)
+                                        const rawHeight = (item.runs / 25) * 100;
+                                        const safeHeight = Math.min(Math.max(rawHeight, 2), 100);
+
+                                        const isWicket = item.wickets > 0;
+                                        const isHighScore = item.runs >= 10;
+
+                                        // Gradient Logic
+                                        const baseColor = isWicket ? '#ef4444' : isHighScore ? '#22c55e' : item.color;
+                                        // Darken slightly for bottom of gradient
+                                        // We can just use an overlay gradient
+
+                                        return (
+                                            <div key={idx} style={{
+                                                width: barWidth,
+                                                height: `${safeHeight}%`,
+                                                background: `linear-gradient(180deg, ${baseColor} 0%, ${baseColor}90 100%)`,
+                                                borderRadius: '2px 2px 0 0',
+                                                position: 'relative',
+                                                transition: 'height 0.3s ease'
+                                            }}>
+                                                {/* Wicket Indicator */}
+                                                {isWicket && (
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        top: -8, left: '50%', transform: 'translateX(-50%)',
+                                                        width: 6, height: 6, borderRadius: '50%',
+                                                        background: '#ef4444',
+                                                        border: '1px solid var(--bg-card)',
+                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                                                    }} />
+                                                )}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                            )}
 
-                            {/* Subtle Grid Line for 5s */}
-                            {overNum % 5 === 0 && (
-                                <div style={{
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    left: '50%',
-                                    width: 1,
-                                    height: '100%',
-                                    background: 'rgba(255,255,255,0.03)',
-                                    pointerEvents: 'none'
-                                }} />
-                            )}
-                        </div>
-                    );
-                })}
-
-                {/* Padding at end to ensure last label is visible */}
-                <div style={{ flex: '0 0 10px' }} />
+                                {/* X-Axis Label */}
+                                {(overNum % 5 === 0 || overNum === 1) && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        fontSize: 10,
+                                        fontWeight: 600,
+                                        color: 'rgba(255,255,255,0.4)'
+                                    }}>
+                                        {overNum}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                    <div style={{ flex: '0 0 20px' }} />
+                </div>
             </div>
         </div>
     );
