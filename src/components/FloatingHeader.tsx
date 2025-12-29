@@ -213,11 +213,11 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                     fontSize: '16px',
                                     fontWeight: 600,
                                     letterSpacing: '1px',
-                                    background: 'linear-gradient(90deg, #c53030 0%, #c53030 40%, #ff6b6b 50%, #c53030 60%, #c53030 100%)',
+                                    background: 'linear-gradient(90deg, #c53030 0%, #c53030 35%, #ffb3b3 50%, #c53030 65%, #c53030 100%)',
                                     backgroundSize: '200% 100%',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
-                                    animation: 'liveShimmer 2s ease-in-out infinite'
+                                    animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                 }}>.LIVE</span>
                             ) : (
                                 <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
@@ -225,7 +225,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                             <style>{`
                                 @keyframes liveShimmer {
                                     0% { background-position: 100% 0; }
-                                    100% { background-position: -100% 0; }
+                                    100% { background-position: 0% 0; }
                                 }
                             `}</style>
                         </>
