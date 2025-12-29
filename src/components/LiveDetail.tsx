@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import LiveInsights from './LiveInsights';
-import FloatingHeader from './FloatingHeader';
 import CompletedDetail from './CompletedDetail';
 import WikiImage, { getFlagUrl } from './WikiImage';
 import { WallstreamData } from '../utils/wallstreamApi';
@@ -71,12 +70,15 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [selectedRecentMatch, setSelectedRecentMatch] = useState<Match | null>(null);
     const [selectedRecentScorecard, setSelectedRecentScorecard] = useState<any>(null);
     const [isLoadingRecentMatch, setIsLoadingRecentMatch] = useState(false);
-
-    // Sticky Header Logic
     const [showStickyHeader, setShowStickyHeader] = useState(false);
+
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollTop = e.currentTarget.scrollTop;
-        setShowStickyHeader(scrollTop > 280); // Trigger after scrolling past hero
+        if (scrollTop > 260) {
+            setShowStickyHeader(true);
+        } else {
+            setShowStickyHeader(false);
+        }
     };
 
     // Helper to get Label/Color (Reused)
@@ -765,70 +767,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         marginBottom: '20px',
     };
 
-    // Sticky Header Content
-    const stickyContent = showStickyHeader ? (
-        <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', paddingRight: 4 }}>
-            {/* Toggle (Left) */}
-            <div style={{
-                display: 'flex',
-                background: 'rgba(255,255,255,0.08)',
-                borderRadius: 100,
-                padding: 2,
-                border: '1px solid rgba(255,255,255,0.05)'
-            }}>
-                {['live', 'insights'].map((tab) => (
-                    <button
-                        key={tab}
-                        onClick={(e) => { e.stopPropagation(); setActiveTab(tab as any); }}
-                        style={{
-                            padding: '4px 12px',
-                            borderRadius: 100,
-                            border: 'none',
-                            background: activeTab === tab ? 'rgba(255,255,255,0.15)' : 'transparent',
-                            color: activeTab === tab ? '#fff' : 'rgba(255,255,255,0.5)',
-                            fontSize: 10,
-                            fontWeight: activeTab === tab ? 700 : 600,
-                            cursor: 'pointer',
-                            textTransform: 'uppercase',
-                            transition: 'all 0.2s',
-                            letterSpacing: 0.5
-                        }}
-                    >
-                        {tab}
-                    </button>
-                ))}
-            </div>
-
-            {/* Score Stack (Right Aligned) */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', gap: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', letterSpacing: 0.5 }}>
-                    {(() => {
-                        // Extract just the main score (first part) to keep it crisp
-                        const t1S = team1Score ? (team1Score.includes('&') ? team1Score.split('&')[1] : team1Score).split('(')[0] : '';
-                        const t2S = team2Score ? (team2Score.includes('&') ? team2Score.split('&')[1] : team2Score).split('(')[0] : '';
-                        return `${team1?.short_name || 'T1'} ${t1S} vs ${team2?.short_name || 'T2'} ${t2S}`;
-                    })()}
-                </div>
-                <div style={{
-                    fontSize: 9, fontWeight: 600,
-                    color: getMatchStatusConfig(match.short_event_status, match.event_status).color,
-                    maxWidth: 140, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    textAlign: 'right'
-                }}>
-                    {currentStatus}
-                </div>
-            </div>
-        </div>
-    ) : undefined;
-
     return (
-        <div className="upcoming-detail" onScroll={handleScroll} style={{ backgroundColor: '#0f0f14' }}>
-            <FloatingHeader
-                showBack={true}
-                onBack={onClose}
-                stickyContent={stickyContent}
-            />
-
+        <div className="upcoming-detail" onScroll={handleScroll}>
             {/* Hero Card - Same structure as UpcomingDetail */}
             <div className="upcoming-hero" style={heroStyle}>
                 {/* Row 1: Series/Tour name - centered, clickable */}
@@ -1917,6 +1857,99 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         );
                     })()
                 }
+                {/* Sticky Scroll Header - Glassmorphic Card */}
+                <div style={{
+                    position: 'fixed',
+                    top: 70, // Below FloatingHeader
+                    left: 12, right: 12,
+                    padding: '12px 16px',
+                    background: 'rgba(20, 20, 20, 0.9)',
+                    backdropFilter: 'blur(16px)',
+                    zIndex: 2900, // Below FloatingHeader (3000)
+                    borderRadius: 16,
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    transform: showStickyHeader ? 'translateY(0)' : 'translateY(-20px)',
+                    opacity: showStickyHeader ? 1 : 0,
+                    pointerEvents: showStickyHeader ? 'auto' : 'none',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    display: 'flex', flexDirection: 'column', gap: 10,
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+                }}>
+                    {/* Row 1: Segmented Control (Toggle) */}
+                    <div style={{
+                        display: 'flex',
+                        background: 'rgba(255,255,255,0.05)',
+                        borderRadius: 100,
+                        padding: 3,
+                        border: '1px solid rgba(255,255,255,0.05)',
+                        maxWidth: 240,
+                        margin: '0 auto',
+                        width: '100%'
+                    }}>
+                        {['live', 'insights'].map((tab) => {
+                            const isActive = activeTab === tab;
+                            return (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    style={{
+                                        flex: 1,
+                                        padding: '5px 0',
+                                        borderRadius: 100,
+                                        border: 'none',
+                                        background: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
+                                        color: isActive ? '#fff' : 'rgba(255,255,255,0.5)',
+                                        fontSize: 10,
+                                        fontWeight: isActive ? 700 : 600,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease',
+                                        textTransform: 'uppercase'
+                                    }}
+                                >
+                                    {tab === 'live' ? 'Live' : 'Insights'}
+                                </button>
+                            )
+                        })}
+                    </div>
+
+                    {/* Row 2: Score & Status */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {/* Condensed Score */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {team1 && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#fff' }}>
+                                    <span style={{ opacity: 0.6, fontSize: 10 }}>{team1.short_name}</span>
+                                    <span>{team1Score || '0/0'}</span>
+                                </div>
+                            )}
+                            {team2 && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#fff' }}>
+                                    <span style={{ opacity: 0.6, fontSize: 10 }}>{team2.short_name}</span>
+                                    <span>{team2Score || '0/0'}</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Status Box (Mini) */}
+                        <div style={{
+                            background: 'var(--accent-primary)',
+                            backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.1), transparent)',
+                            borderRadius: 8,
+                            padding: '6px 10px',
+                            fontSize: 10,
+                            fontWeight: 700,
+                            color: '#fff',
+                            maxWidth: 120,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            textAlign: 'center'
+                        }}>
+                            {currentStatus || match.event_status}
+                        </div>
+                    </div>
+                </div>
+
             </div >
 
             {/* Drill-down Overlay for Recent Match */}
