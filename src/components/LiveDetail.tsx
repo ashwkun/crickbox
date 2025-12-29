@@ -31,6 +31,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [scoreTicker1, setScoreTicker1] = React.useState<{ text: string, type: 'runs' | 'wicket', key: number } | null>(null);
     const [scoreTicker2, setScoreTicker2] = React.useState<{ text: string, type: 'runs' | 'wicket', key: number } | null>(null);
 
+    // This Over ripple effect
+    const [thisOverRipple, setThisOverRipple] = React.useState<{ color: string, key: number } | null>(null);
+    const prevBallCount = React.useRef<number>(0);
+
     const parseScoreSimple = (score: string) => {
         if (!score) return { runs: 0, wickets: 0 };
         // Format: "145/2 (18.4)" or "145" or "145/2"
@@ -653,6 +657,24 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         prevScores.current = { t1: team1Score || '', t2: team2Score || '' };
     }, [team1Score, team2Score]);
 
+    // Trigger This Over ripple on new ball
+    React.useEffect(() => {
+        const scLimit = getScorecardThisOver ? getScorecardThisOver() : [];
+        const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+        const currentCount = thisOverBalls.length;
+
+        if (currentCount > prevBallCount.current && prevBallCount.current > 0) {
+            // New ball added! Get its color
+            const newBall = thisOverBalls[thisOverBalls.length - 1];
+            const color = getBallColor(newBall);
+            setThisOverRipple({ color, key: Date.now() });
+
+            // Clear after animation
+            setTimeout(() => setThisOverRipple(null), 800);
+        }
+        prevBallCount.current = currentCount;
+    });
+
     // Render score handling Test matches (multi-innings)
     // isBatting: true = green (active), false = white (completed)
     const renderScore = (value: string | undefined, isBatting: boolean) => {
@@ -961,11 +983,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     <div className="upcoming-team" style={{ position: 'relative' }}>
                         {scoreTicker1 && (
                             <div key={scoreTicker1.key} style={{
-                                position: 'absolute', top: 0, right: -10,
+                                position: 'absolute', top: -8, right: -15,
                                 background: getBallColor(scoreTicker1.text.replace('+', '')),
-                                color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                                animation: 'popReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                                color: '#fff', fontSize: 13, fontWeight: 800, padding: '4px 12px', borderRadius: 16,
+                                boxShadow: `0 4px 16px ${getBallColor(scoreTicker1.text.replace('+', ''))}80`,
+                                animation: 'heroTickerPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
                                 transformOrigin: 'center bottom'
                             }}>
                                 {scoreTicker1.text}
@@ -994,11 +1016,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     <div className="upcoming-team right-align" style={{ position: 'relative' }}>
                         {scoreTicker2 && (
                             <div key={scoreTicker2.key} style={{
-                                position: 'absolute', top: 0, left: -10,
+                                position: 'absolute', top: -8, left: -15,
                                 background: getBallColor(scoreTicker2.text.replace('+', '')),
-                                color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                                animation: 'popReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                                color: '#fff', fontSize: 13, fontWeight: 800, padding: '4px 12px', borderRadius: 16,
+                                boxShadow: `0 4px 16px ${getBallColor(scoreTicker2.text.replace('+', ''))}80`,
+                                animation: 'heroTickerPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
                                 transformOrigin: 'center bottom'
                             }}>
                                 {scoreTicker2.text}
@@ -1359,16 +1381,45 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                         flex: 1,
                                         height: '100%',
                                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end',
-                                        paddingBottom: 6, // Align circles (approx 24px height) with text
-                                        paddingLeft: 4, paddingRight: 4
+                                        paddingBottom: 6,
+                                        paddingLeft: 4, paddingRight: 4,
+                                        position: 'relative',
+                                        overflow: 'hidden',
+                                        borderRadius: 8
                                     }}>
-                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 4, letterSpacing: 0.5 }}>This Over</div>
+                                        {/* Circular Ripple Overlay */}
+                                        {thisOverRipple && (
+                                            <div key={thisOverRipple.key} style={{
+                                                position: 'absolute',
+                                                top: '50%', right: 12,
+                                                width: 24, height: 24,
+                                                borderRadius: '50%',
+                                                background: thisOverRipple.color,
+                                                transform: 'translate(50%, -50%)',
+                                                animation: 'circularWipe 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                                                pointerEvents: 'none',
+                                                zIndex: 0
+                                            }} />
+                                        )}
+
+                                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 4, letterSpacing: 0.5, zIndex: 1 }}>This Over</div>
                                         <style>
                                             {`
                                                 @keyframes popReveal {
-                                                    0% { transform: scale(0); opacity: 0; }
-                                                    60% { transform: scale(1.4); opacity: 1; }
-                                                    100% { transform: scale(1); opacity: 1; }
+                                                    0% { transform: scale(0) translateY(-15px); opacity: 0; }
+                                                    50% { transform: scale(1.5) translateY(0); opacity: 1; }
+                                                    100% { transform: scale(1) translateY(0); opacity: 1; }
+                                                }
+                                                @keyframes heroTickerPop {
+                                                    0% { transform: scale(0) translateY(-20px); opacity: 0; }
+                                                    40% { transform: scale(1.5) translateY(3px); opacity: 1; }
+                                                    70% { transform: scale(0.95) translateY(-1px); }
+                                                    100% { transform: scale(1) translateY(0); opacity: 1; }
+                                                }
+                                                @keyframes circularWipe {
+                                                    0% { transform: translate(50%, -50%) scale(1); opacity: 0.6; }
+                                                    50% { transform: translate(50%, -50%) scale(15); opacity: 0.3; }
+                                                    100% { transform: translate(50%, -50%) scale(20); opacity: 0; }
                                                 }
                                             `}
                                         </style>
