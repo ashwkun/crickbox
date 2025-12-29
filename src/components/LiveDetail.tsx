@@ -219,11 +219,12 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             format,
             h2hPlayerData, // Full H2H data for team strength
             team1?.id,
-            team2?.id
+            team2?.id,
+            overByOver // OBO data for momentum calculation
         );
         setWinProb(live);
 
-    }, [scorecard, preMatchProb, h2hPlayerData]);
+    }, [scorecard, preMatchProb, h2hPlayerData, overByOver]);
 
     // Helper to get Label/Color (Reused)
     const getInningsMeta = (inningIdx: number) => { // 0-based index input
