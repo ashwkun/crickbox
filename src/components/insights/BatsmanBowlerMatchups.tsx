@@ -275,7 +275,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                             const wickets = Math.max(derivedWickets, apiWickets);
 
                             if (derivedWickets > 0) {
-                                console.log(`[Matchups] Render: ${selectedBatterId} vs ${bowlerId} -> Wickets: ${derivedWickets}`);
+                                // console.log(`[Matchups] Render: ${selectedBatterId} vs ${bowlerId} -> Wickets: ${derivedWickets}`);
                             }
 
                             const sr = parseFloat(vs.Strikerate) || 0;

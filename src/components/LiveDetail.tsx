@@ -37,14 +37,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     };
 
     const [selectedInningsIdx, setSelectedInningsIdx] = useState(0);
-    const [wagonWheelInnings, setWagonWheelInnings] = useState(1); // Independent of scorecard tabs
+    const [wagonWheelInnings, setWagonWheelInnings] = useState(scorecard?.Innings?.length || 1); // Independent of scorecard tabs
     const [isWagonWheelLoading, setIsWagonWheelLoading] = useState(false);
     const [commentaryExpanded, setCommentaryExpanded] = useState(false);
     const [h2hData, setH2hData] = useState<H2HData | null>(null);
     const [batsmanSplits, setBatsmanSplits] = useState<BatsmanSplitsResponse | null>(null); // For Wagon Wheel (legacy name)
     const [batsmanSplitsMatchups, setBatsmanSplitsMatchups] = useState<BatsmanSplitsResponse | null>(null); // Independent for Matchups
     const [overByOverMatchups, setOverByOverMatchups] = useState<OverByOverResponse | null>(null); // Independent for Matchups Wickets
-    const [matchupsInnings, setMatchupsInnings] = useState(1);
+    const [matchupsInnings, setMatchupsInnings] = useState(scorecard?.Innings?.length || 1);
     const [isMatchupsLoading, setIsMatchupsLoading] = useState(false);
     const [overByOver, setOverByOver] = useState<OverByOverResponse | null>(null);
     const [overByOver1, setOverByOver1] = useState<OverByOverResponse | null>(null);
