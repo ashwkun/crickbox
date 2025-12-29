@@ -892,6 +892,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     manhattanData={manhattanData}
                     manhattanInnings={manhattanInnings}
                     onManhattanInningsChange={handleManhattanInningsChange}
+                    // Initial loading state - show skeleton when no data yet
+                    isLoading={!scorecard && !h2hData && !batsmanSplits}
                 />
             )}
 
