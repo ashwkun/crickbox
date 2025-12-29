@@ -2,23 +2,23 @@ import React from 'react';
 import UpcomingDetail from './UpcomingDetail';
 import LiveDetail from './LiveDetail';
 import CompletedDetail from './CompletedDetail';
-import { WallstreamData } from '../utils/wallstreamApi';
+import { Match, Scorecard, WallstreamData } from '../types';
+import { HeaderDisplayData } from './FloatingHeader';
 
 interface MatchDetailProps {
-    match: any;
-    scorecard: any;
+    match: Match;
+    scorecard: Scorecard;
     wallstream?: WallstreamData | null;
     onClose: () => void;
     onSeriesClick?: (seriesId: string, seriesMatches?: any[]) => void;
-    setHeaderContent: (content: React.ReactNode) => void;
-    setHeaderColor: (color: string | undefined) => void;
+    setHeaderData: (data: HeaderDisplayData | null) => void;
 }
 
 /**
  * MatchDetail - Router component that renders the appropriate detail view
  * based on match state (Upcoming, Live, or Completed)
  */
-const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderContent, setHeaderColor }) => {
+const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderData }) => {
     // Check for forceLive URL parameter (for testing)
     const params = new URLSearchParams(window.location.search);
     const forceLive = params.get('forceLive') === 'true';
@@ -37,8 +37,7 @@ const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream,
                 wallstream={wallstream}
                 onClose={onClose}
                 onSeriesClick={onSeriesClick}
-                setHeaderContent={setHeaderContent}
-                setHeaderColor={setHeaderColor}
+                setHeaderData={setHeaderData}
             />
         );
     }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import HomePage from './components/HomePage';
 import InstallPrompt from './components/InstallPrompt';
 import MatchDetail from './components/MatchDetail';
-import FloatingHeader from './components/FloatingHeader';
+import FloatingHeader, { HeaderDisplayData } from './components/FloatingHeader';
 import useCricketData from './utils/useCricketData';
 import { WallstreamData } from './utils/wallstreamApi';
 import { Match, Scorecard, Series, Tournament } from './types';
@@ -12,8 +12,7 @@ import stubWallstream from '../api_samples/core/wallstream.json';
 export default function App(): React.ReactElement {
     const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream } = useCricketData();
     const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-    const [headerContent, setHeaderContent] = useState<React.ReactNode>(null);
-    const [headerColor, setHeaderColor] = useState<string | undefined>(undefined);
+    const [headerData, setHeaderData] = useState<HeaderDisplayData | null>(null);
     const [scorecard, setScorecard] = useState<Scorecard | null>(null);
     const [wallstream, setWallstream] = useState<WallstreamData | null>(null);
     const [pendingMatchId, setPendingMatchId] = useState<string | null>(null);
@@ -333,8 +332,7 @@ export default function App(): React.ReactElement {
                     else if (selectedTournament) handleCloseTournament();
                 }}
                 onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
-                centerContent={headerContent}
-                accentColor={headerColor}
+                data={headerData}
             />
 
             {/* Main Content */}
@@ -363,8 +361,7 @@ export default function App(): React.ReactElement {
                     wallstream={wallstream}
                     onClose={handleCloseMatch}
                     onSeriesClick={handleOpenSeries}
-                    setHeaderContent={setHeaderContent}
-                    setHeaderColor={setHeaderColor}
+                    setHeaderData={setHeaderData}
                 />
             )}
 
