@@ -82,23 +82,6 @@ export default function App(): React.ReactElement {
             // Handle Match
             if (matchId) {
                 const match = matches.find(m => m.game_id === matchId);
-                // Update Bowler ThisOver
-                // Find active bowler (or use last one if none active - common in completed matches)
-                if (inn.Bowlers && inn.Bowlers.length > 0) {
-                    let bowler = inn.Bowlers.find((b: any) => b.Isbowlingnow);
-                    if (!bowler) {
-                        bowler = inn.Bowlers[inn.Bowlers.length - 1];
-                        bowler.Isbowlingnow = true; // Force active for LiveDetail detection
-                    }
-
-                    if (bowler) {
-                        console.log(`[Simulation] Injecting '${outcome}' to bowler: ${bowler.Bowler} (ThisOver len: ${bowler.ThisOver?.length})`);
-                        if (!bowler.ThisOver) bowler.ThisOver = [];
-                        // Limit to 8 to see scrolling
-                        if (bowler.ThisOver.length >= 8) bowler.ThisOver = [];
-                        bowler.ThisOver.push({ T: outcome === 'W' ? 'W' : undefined, B: outcome === 'W' ? '0' : outcome });
-                    }
-                }
                 if (match) {
                     setSelectedMatch(match);
                 } else {
@@ -142,6 +125,58 @@ export default function App(): React.ReactElement {
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
     }, [matches, selectedSeries, selectedTournament]);
+
+    // Simulation Effect (Restored)
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const forceLive = params.get('forceLive') === 'true';
+
+        if (!forceLive || !ENABLE_SIMULATION_MODE || !selectedMatch) return;
+
+        const interval = setInterval(() => {
+            const outcomes = ['0', '1', '1', '4', '6', 'W', '2'];
+            const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+
+            setScorecard(prev => {
+                if (!prev || !prev.Innings) return prev;
+                const newSc = JSON.parse(JSON.stringify(prev));
+                const inn = newSc.Innings[newSc.Innings.length - 1];
+
+                // Update Total
+                let total = parseInt(inn.Total || '0');
+                let wicks = parseInt(inn.Wickets || '0');
+
+                if (outcome === 'W') {
+                    wicks += 1;
+                } else {
+                    total += parseInt(outcome);
+                }
+                inn.Total = total.toString();
+                inn.Wickets = wicks.toString();
+
+                // Update Bowler ThisOver
+                if (inn.Bowlers && inn.Bowlers.length > 0) {
+                    let bowler = inn.Bowlers.find((b: any) => b.Isbowlingnow);
+                    if (!bowler) {
+                        bowler = inn.Bowlers[inn.Bowlers.length - 1];
+                        // Only set active if we found a bowler
+                        if (bowler) bowler.Isbowlingnow = true;
+                    }
+
+                    if (bowler) {
+                        console.log(`[Simulation] Injecting '${outcome}' to bowler: ${bowler.Bowler || 'Unk'}`);
+                        if (!bowler.ThisOver) bowler.ThisOver = [];
+                        if (bowler.ThisOver.length >= 8) bowler.ThisOver = [];
+                        bowler.ThisOver.push({ T: outcome === 'W' ? 'W' : undefined, B: outcome === 'W' ? '0' : outcome });
+                    }
+                }
+
+                return newSc;
+            });
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [selectedMatch?.game_id]);
 
     // Ref to store current loadData function for visibility handler
     const loadDataRef = useRef<(() => void) | null>(null);
