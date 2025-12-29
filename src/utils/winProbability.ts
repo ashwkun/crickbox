@@ -106,33 +106,121 @@ export const calculatePreMatchProbability = (
     homeTeamId?: string // New Parameter
 ): WinProbabilityResult => {
 
+    const t1Name = team1.name || team1.short_name;
+    const t2Name = team2.name || team2.short_name;
+
+    console.log(`\n🏏 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`📊 WIN PROBABILITY CALCULATION: ${t1Name} vs ${t2Name}`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`🏟️ Venue: ${venueName || '[Unknown Venue]'}`);
+    console.log(`🎯 Match Type: ${isFranchise ? 'Franchise/Domestic' : 'International'}`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+
     let prob1 = 50;
     const weights = isFranchise ? WEIGHTS.FRANCHISE : WEIGHTS.INTERNATIONAL;
 
-    // ... (logic) ...
+    console.log(`📈 Starting probability at 50-50...`);
+
+    // 1. ICC Ranking / Pedigree
+    if (!isFranchise) {
+        const rank1 = parseInt(team1.icc_ranking || "10") || 10;
+        const rank2 = parseInt(team2.icc_ranking || "10") || 10;
+
+        if (team1.icc_ranking || team2.icc_ranking) {
+            const rankDiff = rank2 - rank1;
+            const rankImpact = Math.min(25, Math.max(-25, rankDiff * 2.5)) * weights.RANKING!;
+            prob1 += rankImpact;
+            console.log(`📊 [RANKING] ${t1Name} ranked #${rank1}, ${t2Name} ranked #${rank2}`);
+            console.log(`   → Rank difference gives ${t1Name} ${rankImpact > 0 ? '+' : ''}${rankImpact.toFixed(1)}% advantage`);
+        } else {
+            console.log(`⚠️ [RANKING] No ICC ranking data available - SKIPPED`);
+        }
+    } else {
+        console.log(`ℹ️ [RANKING] Franchise match - ICC rankings not applicable`);
+    }
+
+    // 2. Head to Head
+    if (h2hData && parseInt(h2hData.matches_played) > 0) {
+        const played = parseInt(h2hData.matches_played);
+        const won1 = parseInt(h2hData.won);
+        const winRate1 = (won1 / played) * 100;
+        const h2hImpact = (winRate1 - 50) * weights.H2H!;
+        prob1 += h2hImpact;
+        console.log(`🔄 [HEAD TO HEAD] ${t1Name} has won ${won1} of ${played} matches (${winRate1.toFixed(0)}%)`);
+        console.log(`   → H2H record gives ${t1Name} ${h2hImpact > 0 ? '+' : ''}${h2hImpact.toFixed(1)}% advantage`);
+    } else {
+        console.log(`⚠️ [HEAD TO HEAD] No H2H data available - SKIPPED`);
+    }
+
+    // 3. Recent Form
+    const getFormScore = (form: string[]) => {
+        if (!form || form.length === 0) return 50;
+        let score = 0;
+        form.forEach(res => {
+            if (res === 'W') score += 1;
+            else if (res === 'L') score += 0;
+            else score += 0.5;
+        });
+        return (score / Math.max(form.length, 1)) * 100;
+    };
+
+    if (form1.length > 0 || form2.length > 0) {
+        const formScore1 = getFormScore(form1);
+        const formScore2 = getFormScore(form2);
+        const formDiff = formScore1 - formScore2;
+        const formImpact = formDiff * weights.FORM!;
+        prob1 += formImpact;
+        console.log(`📋 [RECENT FORM] ${t1Name}: ${form1.length > 0 ? form1.join('-') : 'No data'} (${formScore1.toFixed(0)}%)`);
+        console.log(`   ${t2Name}: ${form2.length > 0 ? form2.join('-') : 'No data'} (${formScore2.toFixed(0)}%)`);
+        console.log(`   → Form gives ${t1Name} ${formImpact > 0 ? '+' : ''}${formImpact.toFixed(1)}% advantage`);
+    } else {
+        console.log(`⚠️ [RECENT FORM] No form data available for either team - SKIPPED`);
+    }
 
     // 4. Home Advantage
-    // If homeTeamId provided, use it. Else fallback to string match.
     let home1 = false;
     let home2 = false;
 
     if (homeTeamId) {
         home1 = team1.id === homeTeamId;
         home2 = team2.id === homeTeamId;
+        console.log(`🏠 [HOME ADVANTAGE] Using official home team ID...`);
     } else {
         home1 = getHomeAdvantage(team1, venueName);
         home2 = getHomeAdvantage(team2, venueName);
+        console.log(`🏠 [HOME ADVANTAGE] Using venue name matching (fallback)...`);
     }
 
-    if (home1 && !home2) prob1 += 100 * weights.HOME!; // 10% boost
-    if (!home1 && home2) prob1 -= 100 * weights.HOME!;
+    if (home1 && !home2) {
+        const homeImpact = 100 * weights.HOME!;
+        prob1 += homeImpact;
+        console.log(`   ✓ ${t1Name} is playing at HOME → +${homeImpact.toFixed(1)}% boost`);
+    } else if (!home1 && home2) {
+        const homeImpact = 100 * weights.HOME!;
+        prob1 -= homeImpact;
+        console.log(`   ✓ ${t2Name} is playing at HOME → ${t1Name} gets -${homeImpact.toFixed(1)}%`);
+    } else if (!home1 && !home2) {
+        console.log(`   → Neutral venue - no home advantage applied`);
+    } else {
+        console.log(`⚠️ [HOME ADVANTAGE] Could not determine home team - SKIPPED`);
+    }
 
-    // 5. Pitch Impact
-    // This is minor in pre-match, usually applied to live. 
-    // We can add small bias if needed
+    // 5. Pitch Impact (Minor in pre-match)
+    if (pitchDetail?.Pitch_Suited_For) {
+        console.log(`🌿 [PITCH] ${pitchDetail.Pitch_Suited_For} pitch - factored in slightly`);
+    } else {
+        console.log(`⚠️ [PITCH] No pitch data available - SKIPPED`);
+    }
 
     // Clamp
+    const rawProb = prob1;
     prob1 = Math.max(15, Math.min(85, prob1));
+
+    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`✅ FINAL PROBABILITY (before clamping: ${rawProb.toFixed(1)}%)`);
+    console.log(`   🔵 ${t1Name}: ${prob1.toFixed(0)}%`);
+    console.log(`   🔴 ${t2Name}: ${(100 - prob1).toFixed(0)}%`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
 
     return {
         team1: { name: team1.short_name, probability: prob1 },
