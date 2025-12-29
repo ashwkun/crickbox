@@ -11,12 +11,14 @@ interface WormChartProps {
     primary?: WormData | null;
     secondary?: WormData | null;
     matchFormat?: string;
+    isLoading?: boolean;
 }
 
 const WormChart: React.FC<WormChartProps> = ({
     primary,
     secondary,
-    matchFormat
+    matchFormat,
+    isLoading = false
 }) => {
     // Helper to process data
     const processInnings = (data: OverByOverResponse | null) => {
@@ -40,6 +42,26 @@ const WormChart: React.FC<WormChartProps> = ({
 
     const { points: ptsPrimary, wickets: wktsPrimary, totalWickets: totalWktsPrimary } = useMemo(() => processInnings(primary?.data || null), [primary?.data]);
     const { points: ptsSecondary, wickets: wktsSecondary, totalWickets: totalWktsSecondary } = useMemo(() => processInnings(secondary?.data || null), [secondary?.data]);
+
+    // Show skeleton if loading
+    if (isLoading) {
+        return (
+            <div style={{
+                background: 'var(--bg-card)',
+                borderRadius: 16,
+                padding: '16px 12px',
+                border: '1px solid var(--border-color)',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <div className="skeleton" style={{ width: '100%', height: 180, borderRadius: 8 }}></div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 8 }}>
+                    <div className="skeleton" style={{ width: 80, height: 16, borderRadius: 4 }}></div>
+                    <div className="skeleton" style={{ width: 80, height: 16, borderRadius: 4 }}></div>
+                </div>
+            </div>
+        );
+    }
 
     // If no data, don't render
     if (ptsPrimary.length === 0 && ptsSecondary.length === 0) {

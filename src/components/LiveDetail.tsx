@@ -58,6 +58,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     // Smart Worm State
     const [wormPrimary, setWormPrimary] = useState<{ data: OverByOverResponse | null, label: string, color: string } | null>(null);
     const [wormSecondary, setWormSecondary] = useState<{ data: OverByOverResponse | null, label: string, color: string } | null>(null);
+    const [isWormLoading, setIsWormLoading] = useState(true); // Start as loading
 
     const [activeTab, setActiveTab] = useState<'live' | 'insights'>('live');
     const hasSetInitialTab = React.useRef(false);
@@ -118,6 +119,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             });
 
             // --- SMART WORM LOGIC ---
+            setIsWormLoading(true);
             if (scorecard?.Innings?.length) {
                 const innings = scorecard.Innings;
                 const primaryIdx = innings.length - 1; // Current Last Innings
@@ -147,30 +149,30 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     return { label, color };
                 };
 
-                // Fetch Primary (Current)
-                // Note: API is 1-based, array is 0-based
-                fetchOverByOver(match.game_id, primaryIdx + 1).then(data => {
-                    if (data) {
-                        const meta = getMeta(primaryIdx);
-                        setWormPrimary({ data, label: meta.label, color: meta.color });
-                    }
-                });
+                // Fetch Primary and Secondary in parallel
+                const fetchPrimary = fetchOverByOver(match.game_id, primaryIdx + 1);
+                const fetchSecondaryPromise = secondaryIdx !== -1
+                    ? fetchOverByOver(match.game_id, secondaryIdx + 1)
+                    : Promise.resolve(null);
 
-                // Fetch Secondary (Context)
-                if (secondaryIdx !== -1) {
-                    fetchOverByOver(match.game_id, secondaryIdx + 1).then(data => {
-                        if (data) {
-                            const meta = getMeta(secondaryIdx);
-                            setWormSecondary({ data, label: meta.label, color: meta.color });
-                        }
-                    });
-                } else {
-                    setWormSecondary(null);
-                }
+                Promise.all([fetchPrimary, fetchSecondaryPromise]).then(([primaryData, secondaryData]) => {
+                    if (primaryData) {
+                        const meta = getMeta(primaryIdx);
+                        setWormPrimary({ data: primaryData, label: meta.label, color: meta.color });
+                    }
+                    if (secondaryData && secondaryIdx !== -1) {
+                        const meta = getMeta(secondaryIdx);
+                        setWormSecondary({ data: secondaryData, label: meta.label, color: meta.color });
+                    } else if (secondaryIdx === -1) {
+                        setWormSecondary(null);
+                    }
+                    setIsWormLoading(false);
+                });
             } else {
                 // Default fallback for initial load/no innings
                 fetchOverByOver(match.game_id, 1).then(data => {
                     if (data) setWormPrimary({ data, label: 'INN 1', color: '#3b82f6' });
+                    setIsWormLoading(false);
                 });
             }
         }
@@ -894,6 +896,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     onManhattanInningsChange={handleManhattanInningsChange}
                     // Initial loading state - show skeleton when no data yet
                     isLoading={!scorecard && !h2hData && !batsmanSplits}
+                    isWormLoading={isWormLoading}
                 />
             )}
 
