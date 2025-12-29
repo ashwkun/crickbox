@@ -128,6 +128,7 @@ export default function App(): React.ReactElement {
 
     // Ref to store current loadData function for visibility handler
     const loadDataRef = useRef<(() => void) | null>(null);
+    const hasLoadedBaseData = useRef(false);
 
     // Fetch scorecard and wallstream together for live/completed matches
     // For live matches, refresh every 10 seconds - SYNCHRONIZED
@@ -161,13 +162,15 @@ export default function App(): React.ReactElement {
             const params = new URLSearchParams(window.location.search);
             const forceLive = params.get('forceLive') === 'true';
 
-            if (forceLive && ENABLE_SIMULATION_MODE) {
+            if (forceLive && ENABLE_SIMULATION_MODE && hasLoadedBaseData.current) {
                 console.log('[PWA] Simulation Mode active, skipping real data fetch');
                 return;
             }
 
             console.log('[PWA] Loading data for match:', selectedMatch.game_id);
             const sc = await fetchScorecard(selectedMatch.game_id);
+
+            if (sc) hasLoadedBaseData.current = true;
 
             // Update innings count from fresh scorecard
             if (sc?.Innings?.length) {
