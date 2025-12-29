@@ -26,38 +26,40 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         width: '44px',
         height: '44px',
         borderRadius: '50%',
-        background: 'rgba(20, 20, 20, 0.4)', // Darker glass
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        background: 'rgba(20, 20, 20, 0.65)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         border: '1px solid rgba(255, 255, 255, 0.15)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
         pointerEvents: 'auto', // Re-enable clicks
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
         color: '#fff',
-        transition: 'all 0.2s ease',
+        transition: 'background 0.2s ease, transform 0.2s ease',
     };
 
     const logoStyle: React.CSSProperties = {
         ...btnStyle,
-        width: 'auto',
-        padding: '0 16px',
-        borderRadius: '24px', // Pill shape for logo? Or circle? User said circle.
-        userSelect: 'none', // Prevent text selection
-        // If logo is text "BOX.CRIC", it needs width.
-        // User said "one for the app logo".
-        // If I make it a circle, I can put an icon?
-        // Or I can make it a specific width for the text logo.
+        width: '180px', // Fixed width to prevent dimension changes
+        borderRadius: '100px', // Full pill shape
+        padding: 0,
+        background: centerContent ? 'rgba(0, 0, 0, 0.85)' : 'rgba(20, 20, 20, 0.65)',
     };
-    // Re-reading: "two circular glassmorphiic continers one for the app logo"
-    // Does 'logo' imply the BRAND text or just an icon?
-    // Current logo has text. I'll stick to a Pill for text logo, or just use the icon if available.
-    // I'll keep the text LOGO but inside a glass container.
+
+    const contentKey = centerContent ? 'score' : 'logo';
 
     return (
         <div style={containerStyle}>
+            <style>
+                {`
+                    @keyframes slideInBlob {
+                        0% { opacity: 0; transform: translateY(20px) scale(0.9); filter: blur(8px); }
+                        100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+                    }
+                `}
+            </style>
             {/* Left: Back Button (Conditional) */}
             <div style={{ justifySelf: 'start', pointerEvents: 'auto' }}>
                 {showBack && (
@@ -65,6 +67,8 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                         style={btnStyle}
                         onClick={onBack}
                         className="floating-back"
+                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M15 18l-6-6 6-6" />
@@ -80,24 +84,36 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                     justifySelf: 'center',
                     pointerEvents: 'auto',
                     cursor: onLogoClick ? 'pointer' : 'default',
-                    minWidth: centerContent ? 140 : 'auto', // Ensure enough width for score
-                    transition: 'all 0.3s ease'
                 }}
                 className="floating-logo"
                 onClick={onLogoClick}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
-                {centerContent || (
-                    <>
-                        <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: '#fff' }}>BOX</span>
-                        <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
-                    </>
-                )}
+                <div
+                    key={contentKey}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        animation: 'slideInBlob 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                        whiteSpace: 'nowrap'
+                    }}
+                >
+                    {centerContent || (
+                        <>
+                            <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '18px', fontWeight: 600, letterSpacing: '0.5px', color: '#fff' }}>BOX</span>
+                            <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '18px', fontWeight: 600, letterSpacing: '0.5px', color: 'var(--accent-primary)' }}>.CRIC</span>
+                        </>
+                    )}
+                </div>
             </div>
 
             {/* Right: Empty spacer */}
-            <div />
+            <div style={{ width: 44 }}></div>
         </div>
     );
 };
-
 export default FloatingHeader;
