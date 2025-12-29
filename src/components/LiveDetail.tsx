@@ -34,6 +34,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     // This Over ripple effect
     const [thisOverRipple, setThisOverRipple] = React.useState<{ color: string, key: number } | null>(null);
     const [newBallIndex, setNewBallIndex] = React.useState<number | null>(null);
+    const [heroFlash, setHeroFlash] = React.useState<{ color: string, key: number } | null>(null);
     const prevBallCount = React.useRef<number>(-1); // Start at -1 to detect first load
 
     const parseScoreSimple = (score: string) => {
@@ -665,7 +666,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
             setTicker({ text, type, key: Date.now() });
 
-            // Auto-clear after 5 seconds
+            // Trigger hero flash
+            const flashColor = type === 'wicket' ? '#ef4444' :
+                text.includes('6') ? '#f97316' :
+                    text.includes('4') ? '#22c55e' : '#60a5fa';
+            setHeroFlash({ color: flashColor, key: Date.now() });
+            setTimeout(() => setHeroFlash(null), 800);
+
+            // Auto-clear ticker after 5 seconds
             setTimeout(() => setTicker(null), 5000);
         };
 
@@ -914,7 +922,25 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     return (
         <div className="upcoming-detail" onScroll={handleScroll}>
             {/* Hero Card - Same structure as UpcomingDetail */}
-            <div className="upcoming-hero" style={heroStyle}>
+            <div className="upcoming-hero" style={{ ...heroStyle, position: 'relative', overflow: 'hidden' }}>
+                {/* Hero Flash Overlay */}
+                {heroFlash && (
+                    <div key={heroFlash.key} style={{
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        background: heroFlash.color,
+                        opacity: 0.4,
+                        animation: 'heroFlashFade 0.8s ease-out forwards',
+                        pointerEvents: 'none',
+                        zIndex: 0
+                    }} />
+                )}
+                <style>{`
+                    @keyframes heroFlashFade {
+                        0% { opacity: 0.5; }
+                        100% { opacity: 0; }
+                    }
+                `}</style>
                 {/* Row 1: Series/Tour name - centered, clickable */}
                 <div
                     onClick={() => {
