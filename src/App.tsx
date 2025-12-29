@@ -128,7 +128,7 @@ export default function App(): React.ReactElement {
 
     // Simulation Effect: Manual Control (God Mode)
     // We expose a function or render a UI to inject balls
-    const [simPanelOpen, setSimPanelOpen] = useState(true);
+    const [simPanelOpen, setSimPanelOpen] = useState(false);
 
     const handleSimInject = useCallback((outcome: string) => {
         if (!selectedMatch || !scorecard) return;
@@ -514,45 +514,63 @@ export default function App(): React.ReactElement {
             */}
             {/* Simulation Controls (God Mode) */}
             {showSimControls && (
-                <div style={{
-                    position: 'fixed', bottom: 20, right: 20, zIndex: 9999,
-                    background: 'rgba(0,0,0,0.85)', padding: 12, borderRadius: 16,
-                    display: 'flex', flexDirection: 'column', gap: 10,
-                    backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.15)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.5)', width: 180,
-                    transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
-                }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
-                            <span style={{ color: '#fff', fontSize: 10, fontWeight: 800, letterSpacing: 0.5 }}>GOD MODE</span>
-                        </div>
-                        <button onClick={() => setSimPanelOpen(!simPanelOpen)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: 4, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                            <span style={{ fontSize: 8 }}>{simPanelOpen ? '▼' : '▲'}</span>
-                        </button>
-                    </div>
+                <div
+                    onClick={() => !simPanelOpen && setSimPanelOpen(true)}
+                    style={{
+                        position: 'fixed', bottom: 20, right: 20, zIndex: 9999,
+                        background: 'rgba(0,0,0,0.85)',
+                        padding: simPanelOpen ? 12 : 10,
+                        borderRadius: simPanelOpen ? 16 : 24,
+                        display: 'flex', flexDirection: 'column', gap: 10,
+                        backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.15)',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                        width: simPanelOpen ? 180 : 'auto',
+                        cursor: simPanelOpen ? 'default' : 'pointer',
+                        transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                    }}>
 
-                    {simPanelOpen && (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
-                            {['0', '1', '2', '3', '4', '6', 'W', 'WD', 'NB', 'LB'].map(opt => (
-                                <button key={opt}
-                                    onClick={() => handleSimInject(opt)}
-                                    style={{
-                                        background: opt === 'W' ? '#ef4444' : (opt === '6' || opt === '4' ? '#22c55e' : 'rgba(255,255,255,0.1)'),
-                                        color: '#fff', border: 'none', borderRadius: 8,
-                                        height: 32, fontSize: 11, fontWeight: 700,
-                                        cursor: 'pointer',
-                                        transition: 'transform 0.1s active',
-                                        gridColumn: (opt === 'W' || opt === 'NB' || opt === 'LB') ? 'span 2' : 'span 1'
-                                    }}
-                                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
-                                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                >
-                                    {opt}
-                                </button>
-                            ))}
+                    {/* Minimized: Just icon */}
+                    {!simPanelOpen && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
+                            <span style={{ fontSize: 14 }}>⚡</span>
                         </div>
+                    )}
+
+                    {/* Expanded: Full controls */}
+                    {simPanelOpen && (
+                        <>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
+                                    <span style={{ fontSize: 14 }}>⚡</span>
+                                </div>
+                                <button onClick={(e) => { e.stopPropagation(); setSimPanelOpen(false); }} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: 4, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                                    <span style={{ fontSize: 10 }}>✕</span>
+                                </button>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                                {['0', '1', '2', '3', '4', '6', 'W', 'WD', 'NB', 'LB'].map(opt => (
+                                    <button key={opt}
+                                        onClick={() => handleSimInject(opt)}
+                                        style={{
+                                            background: opt === 'W' ? '#ef4444' : (opt === '6' || opt === '4' ? '#22c55e' : 'rgba(255,255,255,0.1)'),
+                                            color: '#fff', border: 'none', borderRadius: 8,
+                                            height: 32, fontSize: 11, fontWeight: 700,
+                                            cursor: 'pointer',
+                                            transition: 'transform 0.1s active',
+                                            gridColumn: (opt === 'W' || opt === 'NB' || opt === 'LB') ? 'span 2' : 'span 1'
+                                        }}
+                                        onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                                        onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                            </div>
+                        </>
                     )}
                 </div>
             )}
