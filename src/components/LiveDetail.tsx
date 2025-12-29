@@ -86,6 +86,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     // Win Probability State
     const [winProb, setWinProb] = useState<WinProbabilityResult | null>(null);
     const [preMatchProb, setPreMatchProb] = useState<WinProbabilityResult | null>(null);
+    const [h2hPlayerData, setH2hPlayerData] = useState<any>(null);
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollTop = e.currentTarget.scrollTop;
@@ -185,6 +186,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             );
 
             setPreMatchProb(prob);
+            setH2hPlayerData(h2hVal); // Store for live calculation
             setWinProb(prob); // Initialize win prob with pre-match
         };
 
@@ -206,10 +208,22 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         if (code === 'TEST' || type === 'TEST') format = 'Test';
         else if (type === 'ODI') format = 'ODI';
 
-        const live = calculateLiveProbability(preMatchProb, scorecard, currentInningsIdx, format);
+        // Get team IDs for team strength calculation
+        const team1 = match.participants?.[0];
+        const team2 = match.participants?.[1];
+
+        const live = calculateLiveProbability(
+            preMatchProb,
+            scorecard,
+            currentInningsIdx,
+            format,
+            h2hPlayerData, // Full H2H data for team strength
+            team1?.id,
+            team2?.id
+        );
         setWinProb(live);
 
-    }, [scorecard, preMatchProb]);
+    }, [scorecard, preMatchProb, h2hPlayerData]);
 
     // Helper to get Label/Color (Reused)
     const getInningsMeta = (inningIdx: number) => { // 0-based index input
