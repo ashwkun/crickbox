@@ -109,6 +109,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             fetchBatsmanSplits(match.game_id, innings),
             fetchOverByOver(match.game_id, innings)
         ]).then(([splits, obo]) => {
+            console.log(`[LiveDetail] Matchups Update. Innings: ${innings}, Splits: ${!!splits}, OBO: ${!!obo}`);
             if (splits) setBatsmanSplitsMatchups(splits);
             if (obo) setOverByOverMatchups(obo);
             setIsMatchupsLoading(false);

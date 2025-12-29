@@ -428,7 +428,7 @@ export default function useCricketData(): UseCricketDataReturn {
 
         try {
             const data = await proxyFetch(url);
-            // console.log(`[OBO_DEBUG] Success. Data keys:`, Object.keys(data || {}));
+            console.log(`[OBO_DEBUG] Success. Data keys:`, Object.keys(data || {}));
             return data as OverByOverResponse;
         } catch (error) {
             console.error(`[OBO_DEBUG] Failed to fetch over-by-over for innings ${innings}. URL: ${url}`, error);
