@@ -100,7 +100,13 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
                 {/* Team 1 (Left) */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                        <span style={{ fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+                        <span style={{
+                            fontSize: '16px',
+                            fontWeight: 800,
+                            color: animatedProb >= 50 ? '#fff' : 'rgba(255, 255, 255, 0.5)',
+                            lineHeight: 1,
+                            transition: 'color 0.3s ease'
+                        }}>
                             {Math.round(animatedProb)}%
                         </span>
                         <span style={{ fontSize: '11px', color: color1, fontWeight: 700, textTransform: 'uppercase' }}>
@@ -145,7 +151,13 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
                         <span style={{ fontSize: '11px', color: color2, fontWeight: 700, textTransform: 'uppercase' }}>
                             {data.team2.name}
                         </span>
-                        <span style={{ fontSize: '16px', fontWeight: 800, color: 'rgba(255, 255, 255, 0.5)', lineHeight: 1 }}>
+                        <span style={{
+                            fontSize: '16px',
+                            fontWeight: 800,
+                            color: animatedProb < 50 ? '#fff' : 'rgba(255, 255, 255, 0.5)',
+                            lineHeight: 1,
+                            transition: 'color 0.3s ease'
+                        }}>
                             {Math.round(100 - animatedProb)}%
                         </span>
                     </div>
