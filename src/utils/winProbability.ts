@@ -824,19 +824,43 @@ export const calculateLiveProbability = (
 
             console.log(`   Base prob (from RRR ${rrr.toFixed(1)}, ${format} thresholds): ${liveProbBat.toFixed(0)}%`);
 
-            // Wicket Penalty
+            // Wicket Penalty - Harsher in death
             if (wicketsLeft < 3) {
-                liveProbBat *= 0.3;
-                console.log(`   ⚠️ Danger zone (${wicketsLeft} wickets left) → ×0.3 penalty`);
+                liveProbBat *= 0.2;
+                console.log(`   ⚠️ DANGER ZONE (${wicketsLeft} wickets left) → ×0.2 penalty`);
             } else if (wicketsLeft < 5) {
-                liveProbBat *= 0.6;
-                console.log(`   ⚠️ Pressure (${wicketsLeft} wickets left) → ×0.6 penalty`);
+                liveProbBat *= 0.5;
+                console.log(`   ⚠️ Pressure (${wicketsLeft} wickets left) → ×0.5 penalty`);
+            } else if (wicketsLeft < 7) {
+                liveProbBat *= 0.8;
+                console.log(`   ⚠️ Minor pressure (${wicketsLeft} wickets left) → ×0.8 penalty`);
             }
 
-            // Death overs pressure
-            if (ballsLeft < 12 && runsNeeded > 20) {
-                liveProbBat *= 0.5;
-                console.log(`   💀 Death crunch (${runsNeeded} needed, ${ballsLeft} balls) → ×0.5 penalty`);
+            // Death overs pressure - Much harsher and granular
+            const isDeathPhase = format === 'T20' ? ballsLeft <= 30 : (format === 'ODI' ? ballsLeft <= 60 : false);
+            if (isDeathPhase) {
+                const runsPerBallNeeded = runsNeeded / Math.max(1, ballsLeft);
+                console.log(`   💀 [DEATH ANALYSIS] ${runsNeeded} from ${ballsLeft} balls (${runsPerBallNeeded.toFixed(2)} RPB)`);
+
+                if (runsPerBallNeeded > 2.5) {
+                    liveProbBat *= 0.1;
+                    console.log(`      → VIRTUALLY IMPOSSIBLE (>2.5 RPB) → ×0.1`);
+                } else if (runsPerBallNeeded > 2) {
+                    liveProbBat *= 0.2;
+                    console.log(`      → Near impossible (>2 RPB) → ×0.2`);
+                } else if (runsPerBallNeeded > 1.5) {
+                    liveProbBat *= 0.4;
+                    console.log(`      → Very hard (>1.5 RPB) → ×0.4`);
+                } else if (runsPerBallNeeded > 1.2) {
+                    liveProbBat *= 0.6;
+                    console.log(`      → Difficult (>1.2 RPB) → ×0.6`);
+                } else if (runsPerBallNeeded > 1) {
+                    liveProbBat *= 0.8;
+                    console.log(`      → Challenging (>1 RPB) → ×0.8`);
+                } else if (runsPerBallNeeded < 0.5) {
+                    liveProbBat = Math.min(95, liveProbBat * 1.3);
+                    console.log(`      → Easy chase (<0.5 RPB) → ×1.3 boost`);
+                }
             }
 
             // Partnership Momentum (also applies in 2nd innings)
