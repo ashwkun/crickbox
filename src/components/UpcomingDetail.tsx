@@ -16,6 +16,9 @@ import H2HRecentMatches from './upcoming/H2HRecentMatches';
 import TopPlayers from './upcoming/TopPlayers';
 import SquadPreview from './upcoming/SquadPreview';
 import CompletedDetail from './CompletedDetail';
+import { calculatePreMatchProbability, WinProbabilityResult } from '../utils/winProbability';
+import { getTeamForm } from '../utils/matchDatabase';
+import WinProbabilityBar from './WinProbabilityBar';
 
 interface ScorecardData {
     Series_match_count?: number;
@@ -39,6 +42,9 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
     const [squad2, setSquad2] = useState<SquadData | null>(null);
     const [scorecardData, setScorecardData] = useState<ScorecardData | null>(null);
     const [weather, setWeather] = useState<WeatherData[]>([]);
+
+    // Win Probability State
+    const [winProb, setWinProb] = useState<WinProbabilityResult | null>(null);
 
     // Selected Match State (for Drill Down)
     const [selectedRecentMatch, setSelectedRecentMatch] = useState<Match | null>(null);
@@ -94,20 +100,26 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
         const loadData = async () => {
             if (!match.game_id) return;
 
-            // Fetch H2H and Scorecard in PARALLEL for faster loading
-            const [h2hResult, scorecardResult] = await Promise.allSettled([
+            // Fetch H2H, Scorecard, and Form in PARALLEL
+            const [h2hResult, scorecardResult, form1, form2] = await Promise.allSettled([
                 fetchH2H(match.game_id),
-                proxyFetch(`${WISDEN_SCORECARD}${match.game_id}`)
+                proxyFetch(`${WISDEN_SCORECARD}${match.game_id}`),
+                team1?.id ? getTeamForm(team1.id) : Promise.resolve([]),
+                team2?.id ? getTeamForm(team2.id) : Promise.resolve([])
             ]);
 
             // Process H2H
+            let h2hDataValue = null;
             if (h2hResult.status === 'fulfilled') {
+                h2hDataValue = h2hResult.value;
                 setH2hData(h2hResult.value);
             }
             setLoadingH2H(false);
 
             // Process Scorecard
+            let scorecardValue = null;
             if (scorecardResult.status === 'fulfilled') {
+                scorecardValue = scorecardResult.value;
                 const scData = scorecardResult.value;
                 const details = scData?.data?.Matchdetail;
                 const series = details?.Series;
@@ -122,13 +134,51 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                         Teams: scData?.data?.Teams
                     });
 
-                    // Fetch Weather using venue coordinates (fast, no proxy needed)
+                    // Fetch Weather using venue coordinates
                     if (venue?.Latitude && venue?.Longitude) {
                         const lat = parseFloat(venue.Latitude);
                         const lon = parseFloat(venue.Longitude);
                         fetchWeather(lat, lon, 7).then(setWeather);
                     }
                 }
+            }
+
+            // Calculate Win Probability
+            if (team1?.id && team2?.id) {
+                // Determine H2H stats for this matchup
+                let h2hStats = { matches_played: '0', won: '0', lost: '0' };
+                if (h2hDataValue?.team?.head_to_head?.comp_type?.data) {
+                    const opponentStat = h2hDataValue.team.head_to_head.comp_type.data.find((op: any) => op.id === team2.id);
+                    if (opponentStat) {
+                        h2hStats = {
+                            matches_played: opponentStat.matches_played,
+                            won: opponentStat.won,
+                            lost: opponentStat.lost
+                        };
+                    }
+                }
+
+                const isFranchise = match.league?.toLowerCase().includes('ipl') ||
+                    match.league?.toLowerCase().includes('bbl') ||
+                    match.participants[0].is_international === false;
+
+                const f1 = (form1.status === 'fulfilled' ? form1.value : []) as string[];
+                const f2 = (form2.status === 'fulfilled' ? form2.value : []) as string[];
+                // Extract Pitch Detail from Scorecard if available
+                const pitch = scorecardValue?.data?.Matchdetail?.Pitch_Detail || {};
+
+                const prob = calculatePreMatchProbability(
+                    team1 as any,
+                    team2 as any,
+                    h2hStats,
+                    f1,
+                    f2,
+                    {},
+                    pitch,
+                    match.venue_name || "",
+                    isFranchise
+                );
+                setWinProb(prob);
             }
 
             // HYBRID SQUAD APPROACH: Try Scorecard first, fallback to H2H per team
@@ -509,6 +559,13 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
             {/* H2H Section */}
             {!loadingH2H && h2hData && match.participants && (
                 <div className="section-container fade-in">
+                    {/* Win Probability Algorithm */}
+                    {winProb && (
+                        <div className="mb-4">
+                            <WinProbabilityBar data={winProb} />
+                        </div>
+                    )}
+
                     {/* NEW: Recent Form (Consolidated Card) */}
                     <div>
                         {team1?.id && team2?.id && (

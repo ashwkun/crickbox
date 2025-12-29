@@ -12,6 +12,9 @@ import { H2HData, BatsmanSplitsResponse, OverByOverResponse } from '../utils/h2h
 import { Match, Scorecard, WallstreamData, Participant } from '../types';
 import { HeaderDisplayData } from './FloatingHeader';
 import { proxyFetch, WISDEN_SCORECARD } from '../utils/api';
+import { calculatePreMatchProbability, calculateLiveProbability, WinProbabilityResult } from '../utils/winProbability';
+import { getTeamForm } from '../utils/matchDatabase';
+import WinProbabilityBar from './WinProbabilityBar';
 
 interface LiveDetailProps {
     match: any;
@@ -80,6 +83,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [isLoadingRecentMatch, setIsLoadingRecentMatch] = useState(false);
     const [showStickyHeader, setShowStickyHeader] = useState(false);
 
+    // Win Probability State
+    const [winProb, setWinProb] = useState<WinProbabilityResult | null>(null);
+    const [preMatchProb, setPreMatchProb] = useState<WinProbabilityResult | null>(null);
+
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollTop = e.currentTarget.scrollTop;
         if (scrollTop > 260) {
@@ -88,6 +95,88 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             setShowStickyHeader(false);
         }
     };
+
+    // 1. Calculate Pre-Match Probability (Base)
+    useEffect(() => {
+        const loadBaseProb = async () => {
+            if (!match.game_id || preMatchProb) return; // Don't reload if already have base
+
+            const team1 = match.participants?.[0];
+            const team2 = match.participants?.[1];
+            if (!team1?.id || !team2?.id) return;
+
+            const [h2hRes, form1, form2] = await Promise.allSettled([
+                fetchH2H(match.game_id),
+                getTeamForm(team1.id),
+                getTeamForm(team2.id)
+            ]);
+
+            let h2hStats = { matches_played: '0', won: '0', lost: '0' };
+            let h2hVal = null;
+
+            if (h2hRes.status === 'fulfilled' && h2hRes.value) {
+                h2hVal = h2hRes.value;
+                // Parse H2H Stats
+                if (h2hVal?.team?.head_to_head?.comp_type?.data) {
+                    const opponentStat = h2hVal.team.head_to_head.comp_type.data.find((op: any) => op.id === team2.id);
+                    if (opponentStat) {
+                        h2hStats = {
+                            matches_played: opponentStat.matches_played,
+                            won: opponentStat.won,
+                            lost: opponentStat.lost
+                        };
+                    }
+                }
+            }
+
+            const f1 = (form1.status === 'fulfilled' ? form1.value : []) as string[];
+            const f2 = (form2.status === 'fulfilled' ? form2.value : []) as string[];
+
+            const isFranchise = match.league?.toLowerCase().includes('ipl') ||
+                match.league?.toLowerCase().includes('bbl') ||
+                match.participants[0].is_international === false;
+
+            // Pitch detail from initial scorecard prop if available
+            const pitch = scorecard?.Matchdetail?.Pitch_Detail || {};
+
+            const prob = calculatePreMatchProbability(
+                team1 as any,
+                team2 as any,
+                h2hStats,
+                f1,
+                f2,
+                {}, // Venue stats
+                pitch,
+                match.venue_name || "",
+                isFranchise
+            );
+
+            setPreMatchProb(prob);
+            setWinProb(prob); // Initialize win prob with pre-match
+        };
+
+        loadBaseProb();
+    }, [match.game_id]);
+
+    // 2. Calculate Live Probability (on Scorecard update)
+    useEffect(() => {
+        if (!preMatchProb || !scorecard?.Innings) return;
+
+        // Current Innings index
+        // If match is live, likely the last inning in the list is active
+        const currentInningsIdx = scorecard.Innings.length - 1;
+
+        // Determine format
+        const type = scorecard.Matchdetail?.Match?.Type?.toUpperCase(); // T20, ODI, TEST
+        const code = scorecard.Matchdetail?.Match?.Code?.toUpperCase();
+        let format: 'T20' | 'ODI' | 'Test' = 'T20';
+        if (code === 'TEST' || type === 'TEST') format = 'Test';
+        else if (type === 'ODI') format = 'ODI';
+
+        const live = calculateLiveProbability(preMatchProb, scorecard, currentInningsIdx, format);
+        setWinProb(live);
+
+    }, [scorecard, preMatchProb]);
 
     // Helper to get Label/Color (Reused)
     const getInningsMeta = (inningIdx: number) => { // 0-based index input
@@ -1218,6 +1307,13 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 .ticker-wicket { color: #ef4444; font-size: 20px; }
                 `}
                 </style>
+
+                {/* Win Probability Algorithm */}
+                {winProb && (
+                    <div style={{ marginBottom: 16 }}>
+                        <WinProbabilityBar data={winProb} />
+                    </div>
+                )}
 
                 {/* Live Situation Panel */}
                 {(latestBall || scorecard?.Innings?.length > 0) && (() => {
