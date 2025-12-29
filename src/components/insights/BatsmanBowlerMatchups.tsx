@@ -81,15 +81,40 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
 
 
     // Helper to determine Verdict Badge - with clearer labels
-    const getVerdict = (runs: number, balls: number, dots: number, wickets: number, sr: number) => {
+    const getVerdict = (runs: number, balls: number, dots: number, wickets: number, sr: number, matchType: string = 'T20') => {
         if (wickets > 0) return { label: 'WICKET', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', description: 'Bowler took the wicket' };
-        if (sr > 175 || (runs > 20 && sr > 150)) return { label: 'BATTER DOMINATED', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', description: 'High Strike Rate or Aggressive Scoring' };
-        if (dots > 3 && (dots / balls) > 0.6) return { label: 'PINNED DOWN', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)', description: 'Struggling to rotate strike (>60% Dots)' };
-        if (sr < 100 && balls > 6) return { label: 'SLOW GOING', color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', description: 'Scoring below a run-a-ball' };
+
+        const isTest = matchType.toLowerCase().includes('test') || matchType.toLowerCase().includes('fc') || matchType.toLowerCase().includes('first class');
+        const isODI = matchType.toLowerCase().includes('odi') || matchType.toLowerCase().includes('list a') || matchType.toLowerCase().includes('one day');
+
+        let limits = {
+            dominateSr: 175,
+            dominateRuns: 20,
+            dominateRunsSr: 150,
+            pinnedDotPct: 0.6,
+            slowSr: 100
+        };
+
+        if (isTest) {
+            limits = { dominateSr: 90, dominateRuns: 30, dominateRunsSr: 75, pinnedDotPct: 0.85, slowSr: 35 };
+        } else if (isODI) {
+            limits = { dominateSr: 130, dominateRuns: 25, dominateRunsSr: 110, pinnedDotPct: 0.7, slowSr: 75 };
+        }
+
+        if (sr > limits.dominateSr || (runs > limits.dominateRuns && sr > limits.dominateRunsSr))
+            return { label: 'BATTER DOMINATED', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', description: 'High Strike Rate or Aggressive Scoring' };
+
+        if (dots > 3 && (dots / balls) > limits.pinnedDotPct)
+            return { label: 'PINNED DOWN', color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)', description: 'Struggling to rotate strike' };
+
+        if (sr < limits.slowSr && balls > 6)
+            return { label: 'SLOW GOING', color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', description: 'Scoring rate is low' };
+
         return { label: 'NEUTRAL', color: 'rgba(255,255,255,0.4)', bg: 'rgba(255,255,255,0.05)', description: 'Balanced contest so far' };
     };
 
     const innings = scorecard?.Innings || [];
+    const matchType = scorecard?.Matchdetail?.Match?.Type || 'T20';
 
     return (
         <div style={{
@@ -135,13 +160,13 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                             2. Who is Winning?
                         </div>
                         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginBottom: 4 }}>
-                            We analyze every ball to judge the contest:
+                            We analyze every ball to judge the contest relative to the <strong>Match Format</strong> ({matchType}):
                         </div>
 
                         {[
-                            { label: 'PINNED DOWN', color: '#eab308', desc: 'Running high dots (>60%). Pressure is building.' },
-                            { label: 'SLOW GOING', color: '#f97316', desc: 'Scoring <100 SR. The bowler is in control.' },
-                            { label: 'BATTER DOMINATED', color: '#22c55e', desc: 'Aggressive scoring. The batter is on top.' },
+                            { label: 'PINNED DOWN', color: '#eab308', desc: 'High dot ball count. Pressure is building.' },
+                            { label: 'SLOW GOING', color: '#f97316', desc: 'Scoring rate is below par for this format.' },
+                            { label: 'BATTER DOMINATED', color: '#22c55e', desc: 'Aggressive scoring above the format average.' },
                             { label: 'WICKET', color: '#ef4444', desc: 'The bowler won the ultimate contest.' },
                         ].map((item, idx) => (
                             <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -206,7 +231,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                     Batter vs Bowler
                 </h4>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>
-                    Matchup Verdicts
+                    Matchup Verdicts ({matchType})
                 </div>
             </div>
 
@@ -310,7 +335,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
 
                             const sr = parseFloat(vs.Strikerate) || 0;
 
-                            const verdict = getVerdict(runs, balls, dots, wickets, sr);
+                            const verdict = getVerdict(runs, balls, dots, wickets, sr, matchType);
 
                             // Dynamic Highlight Text
                             let highlightContent: React.ReactNode = `SR ${vs.Strikerate}`;
