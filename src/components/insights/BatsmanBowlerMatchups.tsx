@@ -56,8 +56,12 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
         if (!overByOver?.Overbyover) return map;
 
         overByOver.Overbyover.forEach(over => {
-            if (parseInt(over.Wickets || '0') > 0 && over.Batsmen && over.Bowlers) {
+            // We ignore over.Wickets summary and rely on individual Isout flags
+            // This handles cases where summary might be 0 but a dismissal occurred (e.g. runout or data inconsistency)
+            if (over.Batsmen && over.Bowlers) {
                 const bowlerIds = Object.keys(over.Bowlers);
+                // In rare cases of multiple bowlers in an over, we attribute to the first one listed
+                // Ideally this would be ball-by-ball, but OBO is the best proxy we have
                 const bowlerId = bowlerIds.length > 0 ? bowlerIds[0] : null;
 
                 if (bowlerId) {
