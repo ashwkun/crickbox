@@ -124,37 +124,45 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
             overflow: 'hidden',
             position: 'relative'
         }}>
-            {/* Header: Title */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '20px 20px 0 20px',
-                marginBottom: 16
-            }}>
-                <div style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: 'rgba(255,255,255,0.4)',
-                    textTransform: 'uppercase',
-                    letterSpacing: 1
-                }}>
-                    Batter vs Bowler Matchups
+            {/* Innings Tabs (Moved) */}
+            {innings.length > 0 && onInningsChange && (
+                <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    {innings.map((inn: any, idx: number) => {
+                        const inningsNum = idx + 1;
+                        const isSelected = selectedInnings === inningsNum;
+                        return (
+                            <button
+                                key={idx}
+                                onClick={() => onInningsChange(inningsNum)}
+                                style={{
+                                    flex: 1,
+                                    minWidth: 70,
+                                    padding: '10px 12px',
+                                    border: 'none',
+                                    background: isSelected ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
+                                    borderBottom: isSelected ? '2px solid #22c55e' : '2px solid transparent',
+                                    color: isSelected ? '#22c55e' : 'rgba(255,255,255,0.6)',
+                                    fontSize: 11,
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    fontFamily: 'inherit',
+                                    textTransform: 'uppercase'
+                                }}
+                            >
+                                {scorecard?.Teams?.[inn.Battingteam]?.Name_Short} {Math.floor(idx / 2) + 1}
+                            </button>
+                        );
+                    })}
                 </div>
+            )}
 
-                {/* Info Icon */}
-                <button
-                    onClick={() => setShowInfo(true)}
-                    style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: 28, height: 28,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer',
-                        color: 'rgba(255,255,255,0.6)'
-                    }}
-                >
+            {/* Header: Title */}
+            <div style={{ position: 'relative', marginTop: 12, marginBottom: 8, padding: '0 16px' }}>
+                <h4 style={{ margin: 0, fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', textAlign: 'center', letterSpacing: 1 }}>
+                    Batter vs Bowler Matchups
+                </h4>
+                <button onClick={() => setShowInfo(true)} style={{ position: 'absolute', right: 16, top: -4, background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}>
                     <IoInformationCircleOutline size={18} />
                 </button>
             </div>
@@ -221,38 +229,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                 </div>
             )}
 
-            {/* Innings Tabs */}
-            {innings.length > 0 && onInningsChange && (
-                <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    {innings.map((inn: any, idx: number) => {
-                        const inningsNum = idx + 1;
-                        const isSelected = selectedInnings === inningsNum;
-                        return (
-                            <button
-                                key={idx}
-                                onClick={() => onInningsChange(inningsNum)}
-                                style={{
-                                    flex: 1,
-                                    minWidth: 70,
-                                    padding: '10px 12px',
-                                    border: 'none',
-                                    background: isSelected ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
-                                    borderBottom: isSelected ? '2px solid #22c55e' : '2px solid transparent',
-                                    color: isSelected ? '#22c55e' : 'rgba(255,255,255,0.6)',
-                                    fontSize: 11,
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    whiteSpace: 'nowrap',
-                                    fontFamily: 'inherit',
-                                    textTransform: 'uppercase'
-                                }}
-                            >
-                                {scorecard?.Teams?.[inn.Battingteam]?.Name_Short} {Math.floor(idx / 2) + 1}
-                            </button>
-                        );
-                    })}
-                </div>
-            )}
+
 
 
 

@@ -96,26 +96,8 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
             overflow: 'hidden',
             boxShadow: '0 4px 24px rgba(0,0,0,0.1)'
         }}>
-            {/* Header: Title */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 0 // Spacing handled by gap in parent
-            }}>
-                <div style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: 'rgba(255,255,255,0.4)',
-                    textTransform: 'uppercase',
-                    letterSpacing: 1
-                }}>
-                    Innings Progression
-                </div>
-            </div>
-
             {/* Legend / Filter Row - Styled as Premium Pills */}
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 16 }}>
                 {inningsTabs.map((tab: any) => (
                     <button
                         key={tab.id}
@@ -144,6 +126,11 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
                     </button>
                 ))}
             </div>
+
+            {/* Header: Title */}
+            <h4 style={{ margin: '0 0 16px', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', textAlign: 'center', letterSpacing: 1 }}>
+                Innings Progression
+            </h4>
 
 
             {/* Chart Area */}
