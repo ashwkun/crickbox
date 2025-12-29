@@ -1,15 +1,12 @@
 {
   "projects": {
-    "default": "boxboxcric"
+    "default": "theboxcric"
   },
   "targets": {
-    "boxboxcric": {
+    "theboxcric": {
       "hosting": {
         "prod": [
-          "boxboxcric"
-        ],
-        "dev": [
-          "boxboxcric-dev"
+          "theboxcric"
         ]
       }
     }
