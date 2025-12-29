@@ -11,13 +11,14 @@ interface MatchDetailProps {
     onClose: () => void;
     onSeriesClick?: (seriesId: string, seriesMatches?: any[]) => void;
     setHeaderContent: (content: React.ReactNode) => void;
+    setHeaderColor: (color: string | undefined) => void;
 }
 
 /**
  * MatchDetail - Router component that renders the appropriate detail view
  * based on match state (Upcoming, Live, or Completed)
  */
-const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderContent }) => {
+const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderContent, setHeaderColor }) => {
     // Check for forceLive URL parameter (for testing)
     const params = new URLSearchParams(window.location.search);
     const forceLive = params.get('forceLive') === 'true';
@@ -37,6 +38,7 @@ const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream,
                 onClose={onClose}
                 onSeriesClick={onSeriesClick}
                 setHeaderContent={setHeaderContent}
+                setHeaderColor={setHeaderColor}
             />
         );
     }

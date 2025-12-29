@@ -13,6 +13,7 @@ export default function App(): React.ReactElement {
     const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream } = useCricketData();
     const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
     const [headerContent, setHeaderContent] = useState<React.ReactNode>(null);
+    const [headerColor, setHeaderColor] = useState<string | undefined>(undefined);
     const [scorecard, setScorecard] = useState<Scorecard | null>(null);
     const [wallstream, setWallstream] = useState<WallstreamData | null>(null);
     const [pendingMatchId, setPendingMatchId] = useState<string | null>(null);
@@ -333,6 +334,7 @@ export default function App(): React.ReactElement {
                 }}
                 onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
                 centerContent={headerContent}
+                accentColor={headerColor}
             />
 
             {/* Main Content */}
@@ -362,6 +364,7 @@ export default function App(): React.ReactElement {
                     onClose={handleCloseMatch}
                     onSeriesClick={handleOpenSeries}
                     setHeaderContent={setHeaderContent}
+                    setHeaderColor={setHeaderColor}
                 />
             )}
 

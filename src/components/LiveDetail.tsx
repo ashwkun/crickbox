@@ -19,9 +19,10 @@ interface LiveDetailProps {
     onClose: () => void;
     onSeriesClick?: (seriesId: string, seriesMatches?: any[]) => void;
     setHeaderContent: (content: React.ReactNode) => void;
+    setHeaderColor: (color: string | undefined) => void;
 }
 
-const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderContent }) => {
+const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderContent, setHeaderColor }) => {
     const { fetchH2H, fetchBatsmanSplits, fetchOverByOver } = useCricketData();
     const [selectedSquadIdx, setSelectedSquadIdx] = React.useState(0);
 
@@ -772,6 +773,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     useEffect(() => {
         if (!showStickyHeader) {
             setHeaderContent(null);
+            setHeaderColor(undefined);
             return;
         }
 
@@ -784,6 +786,18 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             .replace(/U19/g, '')
             .replace(/-U19/g, '')
             .trim();
+
+        // Determine elegant tint color
+        let color = undefined;
+        const n = cleanName.toUpperCase();
+        if (n.includes('IND') || n.includes('MI')) color = 'rgba(0, 85, 255, 0.35)'; // Blue tint
+        else if (n.includes('CSK') || n.includes('AUS')) color = 'rgba(255, 204, 0, 0.3)'; // Yellow tint
+        else if (n.includes('RCB') || n.includes('ENG')) color = 'rgba(220, 20, 60, 0.35)'; // Red tint
+        else if (n.includes('PAK') || n.includes('SA')) color = 'rgba(0, 153, 0, 0.35)'; // Green tint
+        else if (n.includes('KKR') || n.includes('NZ')) color = 'rgba(20, 20, 20, 0.7)'; // Black tint
+        else if (n.includes('RR') || n.includes('WI')) color = 'rgba(255, 20, 147, 0.35)'; // Pink tint
+        else if (n.includes('SRH')) color = 'rgba(255, 140, 0, 0.35)'; // Orange tint
+
         const scoreStr = score || '0/0';
 
         const scLimit = getScorecardThisOver ? getScorecardThisOver() : [];
@@ -812,8 +826,12 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         );
 
         setHeaderContent(content);
+        setHeaderColor(color);
 
-        return () => setHeaderContent(null);
+        return () => {
+            setHeaderContent(null);
+            setHeaderColor(undefined);
+        };
     }, [showStickyHeader, team1Score, team2Score, isTeam1Batting, isTeam2Batting, team1, team2, latestBall]);
 
     return (
