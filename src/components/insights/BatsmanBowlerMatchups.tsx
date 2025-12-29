@@ -13,11 +13,6 @@ interface BatsmanBowlerMatchupsProps {
 }
 
 const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSplits, overByOver, scorecard, selectedInnings = 1, onInningsChange, isLoading = false }) => {
-    // FORCE LOG: Check if this component is even rendering and what props it has
-    console.log('[Matchups] RENDERED. Inning:', selectedInnings);
-    console.log('[Matchups] Has Splits:', !!batsmanSplits, 'Keys:', Object.keys(batsmanSplits?.Batsmen || {}).length);
-    console.log('[Matchups] Has OBO:', !!overByOver, 'Overs:', overByOver?.Overbyover?.length);
-
     const [selectedBatterId, setSelectedBatterId] = useState<string | null>(null);
     const [showInfo, setShowInfo] = useState(false);
 
