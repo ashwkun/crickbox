@@ -421,13 +421,17 @@ export default function useCricketData(): UseCricketDataReturn {
 
     // Over-by-Over - for innings progression
     const fetchOverByOver = useCallback(async (gameId: string, innings: number): Promise<OverByOverResponse | null> => {
+        const matchFile = gameId.replace(/[^a-z0-9]/gi, '');
+        const url = `https://www.wisden.com/cricket/live/json/${matchFile}_overbyover_${innings}.json`;
+
+        console.log(`[OBO_DEBUG] Fetching: ${url}`);
+
         try {
-            const matchFile = gameId.replace(/[^a-z0-9]/gi, '');
-            const url = `https://www.wisden.com/cricket/live/json/${matchFile}_overbyover_${innings}.json`;
             const data = await proxyFetch(url);
+            // console.log(`[OBO_DEBUG] Success. Data keys:`, Object.keys(data || {}));
             return data as OverByOverResponse;
         } catch (error) {
-            console.warn(`Failed to fetch over-by-over for innings ${innings}:`, error);
+            console.error(`[OBO_DEBUG] Failed to fetch over-by-over for innings ${innings}. URL: ${url}`, error);
             return null;
         }
     }, []);
