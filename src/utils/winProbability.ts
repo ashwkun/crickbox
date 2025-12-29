@@ -215,6 +215,81 @@ const getDynamicParScore = (
 };
 
 /**
+ * Analyze momentum from over-by-over data
+ * Returns adjustment for batting team probability based on recent performance
+ */
+export const getMomentumFromOBO = (
+    overByOverData: any,
+    currentOver: number,
+    format: 'T20' | 'ODI' | 'Test' = 'T20'
+): { adjustment: number; logDetails: string[] } => {
+    const logDetails: string[] = [];
+    let adjustment = 0;
+
+    const overs = overByOverData?.Overbyover;
+    if (!overs || overs.length === 0) {
+        logDetails.push('No OBO data available');
+        return { adjustment, logDetails };
+    }
+
+    // Get last 3 overs data
+    const recentOvers = overs.slice(-3);
+    const recentRuns = recentOvers.reduce((sum: number, o: any) => sum + parseInt(o.Runs || '0'), 0);
+    const recentWickets = recentOvers.reduce((sum: number, o: any) => sum + parseInt(o.Wickets || '0'), 0);
+    const recentRunRate = recentRuns / recentOvers.length;
+
+    // Calculate match run rate
+    const totalRuns = overs.reduce((sum: number, o: any) => sum + parseInt(o.Runs || '0'), 0);
+    const matchRunRate = totalRuns / overs.length;
+
+    logDetails.push(`Last ${recentOvers.length} overs: ${recentRuns} runs (${recentRunRate.toFixed(1)} RPO)`);
+    logDetails.push(`Match rate: ${matchRunRate.toFixed(1)} RPO`);
+
+    // Momentum based on recent vs match rate
+    const rateDiff = recentRunRate - matchRunRate;
+
+    if (rateDiff > 3) {
+        adjustment = 10;
+        logDetails.push('🔥 SURGING (+10%): Acceleration in recent overs');
+    } else if (rateDiff > 1.5) {
+        adjustment = 5;
+        logDetails.push('📈 Positive momentum (+5%): Above match rate');
+    } else if (rateDiff < -3) {
+        adjustment = -10;
+        logDetails.push('📉 SLOWING (-10%): Significant deceleration');
+    } else if (rateDiff < -1.5) {
+        adjustment = -5;
+        logDetails.push('⬇️ Negative momentum (-5%): Below match rate');
+    }
+
+    // Wicket pressure in recent overs
+    if (recentWickets >= 2) {
+        adjustment -= 10;
+        logDetails.push(`⚠️ Wicket pressure (-10%): ${recentWickets} wickets in last 3 overs`);
+    } else if (recentWickets === 1) {
+        adjustment -= 3;
+        logDetails.push(`🎯 Fresh wicket (-3%): 1 wicket in last 3 overs`);
+    }
+
+    // Phase-specific bonuses (all formats)
+    const totalOvers = format === 'T20' ? 20 : (format === 'ODI' ? 50 : 90);
+    const powplayEnd = format === 'T20' ? 6 : (format === 'ODI' ? 10 : 0);
+    const deathStart = format === 'T20' ? 16 : (format === 'ODI' ? 40 : 0);
+    const ppThreshold = format === 'T20' ? 10 : 7; // Strong PP run rate threshold
+    const deathThreshold = format === 'T20' ? 12 : 10;
+
+    if (powplayEnd > 0 && currentOver <= powplayEnd && recentRunRate > ppThreshold) {
+        adjustment += 5;
+        logDetails.push(`💥 Dominant powerplay (+5%): ${recentRunRate.toFixed(1)} RPO`);
+    } else if (deathStart > 0 && currentOver >= deathStart && recentRunRate > deathThreshold) {
+        adjustment += 5;
+        logDetails.push(`🚀 Death overs acceleration (+5%): ${recentRunRate.toFixed(1)} RPO`);
+    }
+
+    return { adjustment, logDetails };
+};
+
+/**
  * Calculate team strength from H2H player data
  * Returns a 1-100 score where 50 is average, 70+ is strong, 30- is weak
  */
@@ -548,7 +623,8 @@ export const calculateLiveProbability = (
     format: 'T20' | 'ODI' | 'Test' = 'T20',
     h2hPlayerData?: any, // For team strength calculation
     team1Id?: string,
-    team2Id?: string
+    team2Id?: string,
+    overByOverData?: any // For momentum calculation
 ): WinProbabilityResult => {
 
     // Default safe return
@@ -664,6 +740,17 @@ export const calculateLiveProbability = (
             }
         }
 
+        // OBO Momentum Analysis
+        if (overByOverData) {
+            const momentum = getMomentumFromOBO(overByOverData, Math.floor(oversBowled), format);
+            if (momentum.adjustment !== 0) {
+                liveProbBat += momentum.adjustment;
+                console.log(`📈 [MOMENTUM]`);
+                momentum.logDetails.forEach(log => console.log(`   ${log}`));
+                console.log(`   → Adjustment: ${momentum.adjustment > 0 ? '+' : ''}${momentum.adjustment}%`);
+            }
+        }
+
         console.log(`   → Final 1st innings probability: ${liveProbBat.toFixed(0)}%`);
 
     } else {
@@ -746,6 +833,17 @@ export const calculateLiveProbability = (
                 if (pitchSynergyPenalty > 0) {
                     liveProbBat -= pitchSynergyPenalty;
                     console.log(`   → Defending boost (pitch synergy): -${pitchSynergyPenalty}%`);
+                }
+            }
+
+            // OBO Momentum Analysis (also applies in 2nd innings)
+            if (overByOverData) {
+                const momentum = getMomentumFromOBO(overByOverData, Math.floor(oversBowled), format);
+                if (momentum.adjustment !== 0) {
+                    liveProbBat += momentum.adjustment;
+                    console.log(`📈 [MOMENTUM]`);
+                    momentum.logDetails.forEach(log => console.log(`   ${log}`));
+                    console.log(`   → Adjustment: ${momentum.adjustment > 0 ? '+' : ''}${momentum.adjustment}%`);
                 }
             }
 
