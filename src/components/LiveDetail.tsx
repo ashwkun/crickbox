@@ -50,12 +50,28 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     const [overByOver, setOverByOver] = useState<OverByOverResponse | null>(null);
     const [overByOver1, setOverByOver1] = useState<OverByOverResponse | null>(null);
     const [overByOver2, setOverByOver2] = useState<OverByOverResponse | null>(null);
+    // Manhattan State
+    const [manhattanInnings, setManhattanInnings] = useState<number[]>([]);
+    const [manhattanData, setManhattanData] = useState<{ data: OverByOverResponse, label: string, color: string, id: number }[]>([]);
+    const [isManhattanLoading, setIsManhattanLoading] = useState(false);
+
     // Smart Worm State
     const [wormPrimary, setWormPrimary] = useState<{ data: OverByOverResponse | null, label: string, color: string } | null>(null);
     const [wormSecondary, setWormSecondary] = useState<{ data: OverByOverResponse | null, label: string, color: string } | null>(null);
 
     const [activeTab, setActiveTab] = useState<'live' | 'insights'>('live');
     const hasSetInitialTab = React.useRef(false);
+
+    // Helper to get Label/Color (Reused)
+    const getInningsMeta = (inningIdx: number) => { // 0-based index input
+        if (!scorecard?.Innings?.[inningIdx]) return { label: `INN ${inningIdx + 1}`, color: '#ccc' };
+        const inn = scorecard.Innings[inningIdx];
+        const teamId = inn.Battingteam;
+        const team = scorecard.Teams?.[teamId];
+        const label = `${team?.Name_Short || 'TM'} ${Math.floor(inningIdx / 2) + 1}`;
+        const color = getTeamColor(team?.Name_Full || team?.Name_Short) || '#3b82f6';
+        return { label, color };
+    };
 
     // Centralized data fetch for insights (uses hook functions)
     useEffect(() => {
@@ -76,12 +92,28 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     setWagonWheelInnings(currentInningsLen);
                     setMatchupsInnings(currentInningsLen);
                     setPartnershipsInnings(currentInningsLen);
+                    // Initialize Manhattan with current innings if empty
+                    if (manhattanInnings.length === 0) {
+                        setManhattanInnings([currentInningsLen]);
+                    }
                 }
             });
             fetchOverByOver(match.game_id, currentInningsLen).then(data => {
                 if (data) {
                     setOverByOver(data);
                     setOverByOverMatchups(data); // Initialize Matchups with same data
+
+                    // Init Manhattan Data
+                    if (manhattanData.length === 0 && scorecard?.Innings) {
+                        const idx = currentInningsLen - 1;
+                        const meta = getInningsMeta(idx);
+                        setManhattanData([{
+                            data,
+                            label: meta.label,
+                            color: meta.color,
+                            id: currentInningsLen
+                        }]);
+                    }
                 }
             });
 
@@ -144,6 +176,45 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         }
     }, [match?.game_id, scorecard?.Innings?.length, fetchH2H, fetchBatsmanSplits, fetchOverByOver]);
 
+
+
+    // Handler for Manhattan (Multi-Select)
+    const handleManhattanInningsChange = async (inningsIdx: number) => { // 1-based index
+        // Toggle logic
+        let newSelection = [...manhattanInnings];
+        if (newSelection.includes(inningsIdx)) {
+            newSelection = newSelection.filter(i => i !== inningsIdx);
+            // Don't allow empty selection, revert if empty
+            if (newSelection.length === 0) newSelection = [inningsIdx];
+        } else {
+            newSelection.push(inningsIdx);
+        }
+
+        setManhattanInnings(newSelection);
+        setIsManhattanLoading(true);
+
+        // Let's just ensure we have data for all selected.
+        const promises = newSelection.map(async (idx) => {
+            const existing = manhattanData.find(d => d.id === idx);
+            if (existing) return existing;
+
+            const data = await fetchOverByOver(match.game_id, idx);
+            if (data) {
+                const meta = getInningsMeta(idx - 1);
+                return { data, label: meta.label, color: meta.color, id: idx };
+            }
+            return null;
+        });
+
+        const results = await Promise.all(promises);
+        const validResults = results.filter(r => r !== null) as any[];
+
+        // Sort by ID to keep consistent order (1, 2, 3...)
+        validResults.sort((a, b) => a.id - b.id);
+
+        setManhattanData(validResults);
+        setIsManhattanLoading(false);
+    };
 
     // Independent handler for Wagon Wheel innings change
     const handleWagonWheelInningsChange = (innings: number) => {
