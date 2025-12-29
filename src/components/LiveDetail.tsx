@@ -849,21 +849,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         </span>
                     )}
 
-                    {/* Insights chip - toggles to H2H view */}
-                    <span
-                        onClick={() => setActiveTab(activeTab === 'live' ? 'insights' : 'live')}
-                        style={{
-                            fontSize: 10,
-                            fontWeight: 600, // Match other chips (600)
-                            padding: '4px 10px',
-                            background: 'rgba(168, 85, 247, 0.15)', // Consistent pill style
-                            borderRadius: 20,
-                            color: '#a855f7',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        {activeTab === 'live' ? 'Insights >' : '< Back to Live'}
-                    </span>
+
                 </div>
 
                 <div className="upcoming-teams">
@@ -926,6 +912,44 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 textAlign: 'center',
             }}>
                 <span style={{ fontSize: 13, color: '#fff', fontWeight: 500, lineHeight: '1.4', display: 'block' }}>{currentStatus}</span>
+            </div>
+
+            {/* View Switcher (Segmented Control) */}
+            <div style={{
+                display: 'flex',
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: 100, // Fully rounded for sleek pill look
+                padding: 3,
+                marginBottom: 20,
+                border: '1px solid rgba(255,255,255,0.05)',
+                maxWidth: 240, // Limit width to keep it sleek
+                margin: '0 auto 20px auto' // Center it
+            }}>
+                {['live', 'insights'].map((tab) => {
+                    const isActive = activeTab === tab;
+                    return (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            style={{
+                                flex: 1,
+                                padding: '6px 0',
+                                borderRadius: 100,
+                                border: 'none',
+                                background: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
+                                color: isActive ? '#fff' : 'rgba(255,255,255,0.5)',
+                                fontSize: 11,
+                                fontWeight: isActive ? 700 : 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                textTransform: 'uppercase',
+                                letterSpacing: 0.5
+                            }}
+                        >
+                            {tab === 'live' ? 'Live' : 'Insights'}
+                        </button>
+                    )
+                })}
             </div>
 
 
