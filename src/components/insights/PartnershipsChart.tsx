@@ -12,7 +12,30 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard, select
 
     const innings = scorecard?.Innings || [];
 
-    if (innings.length === 0) return null;
+    // Create empty state component
+    const EmptyState = ({ message }: { message: string }) => (
+        <div style={{
+            background: 'var(--bg-card)',
+            borderRadius: 16,
+            border: '1px solid var(--border-color)',
+            padding: '32px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12
+        }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>{message}</span>
+        </div>
+    );
+
+    if (innings.length === 0) return <EmptyState message="No innings data available" />;
 
     // Convert 1-based prop to 0-based index for data access
     const selectedInningsIdx = selectedInnings - 1;
@@ -22,7 +45,7 @@ const PartnershipsChart: React.FC<PartnershipsChartProps> = ({ scorecard, select
     // Filter valid partnerships
     const validPartnerships = partnerships.filter((p: any) => (parseInt(p.Runs) || 0) > 0);
 
-    if (validPartnerships.length === 0) return null;
+    if (validPartnerships.length === 0) return <EmptyState message="No partnership data for this innings" />;
 
     return (
         <div style={{

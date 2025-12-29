@@ -63,9 +63,26 @@ const WormChart: React.FC<WormChartProps> = ({
         );
     }
 
-    // If no data, don't render
+    // If no data, show empty state
     if (ptsPrimary.length === 0 && ptsSecondary.length === 0) {
-        return null;
+        return (
+            <div style={{
+                background: 'var(--bg-card)',
+                borderRadius: 16,
+                padding: '32px 24px',
+                border: '1px solid var(--border-color)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 12
+            }}>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5">
+                    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12" />
+                </svg>
+                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>No progression data available</span>
+            </div>
+        );
     }
 
     // Chart dimensions
