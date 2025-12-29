@@ -136,9 +136,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             const f1 = form1; // Now objects or strings? getTeamForm returns 'W'/'L' strings.
             const f2 = form2;
 
-            const isFranchise = match.league?.toLowerCase().includes('ipl') ||
-                match.league?.toLowerCase().includes('bbl') ||
-                match.participants[0].is_international === false;
+            const isInternational = match.league_code === 'icc' ||
+                match.league_code === 'womens_international' ||
+                match.league_code === 'youth_international';
+
+            const isFranchise = !isInternational;
 
             // Pitch detail from initial scorecard prop if available
             const pitch = scorecard?.Matchdetail?.Pitch_Detail || {};
