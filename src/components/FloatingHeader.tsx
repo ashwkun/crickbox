@@ -42,7 +42,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
 
     const logoStyle: React.CSSProperties = {
         ...btnStyle,
-        width: '180px', // Fixed width to prevent dimension changes
+        width: '200px', // Increased width for breathing room
         borderRadius: '100px', // Full pill shape
         padding: 0,
         background: centerContent ? 'rgba(0, 0, 0, 0.85)' : 'rgba(20, 20, 20, 0.65)',
@@ -104,8 +104,8 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                 >
                     {centerContent || (
                         <>
-                            <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '18px', fontWeight: 600, letterSpacing: '0.5px', color: '#fff' }}>BOX</span>
-                            <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '18px', fontWeight: 600, letterSpacing: '0.5px', color: 'var(--accent-primary)' }}>.CRIC</span>
+                            <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: '#fff' }}>BOX</span>
+                            <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
                         </>
                     )}
                 </div>
