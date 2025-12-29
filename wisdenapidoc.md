@@ -35,7 +35,7 @@ Fetches the main list of matches. Used for the Home Screen and finding valid `ga
 | **Method** | `GET` |
 | **Initiation Point** | `src/utils/useCricketData.ts` (Lines 67, 85) |
 | **Poll Interval** | 15s (Live), 5m (Schedule) |
-| **Sample Data** | [live_matches.json](api_samples/live_matches.json) |
+| **Sample Data** | [live_matches.json](api_samples/core/live_matches.json) |
 
 **URL Structure:**
 ```text
@@ -56,7 +56,7 @@ Fetches past match results using a date range filter.
 | **Method** | `GET` |
 | **Initiation Point** | `src/utils/useCricketData.ts` (Lines 86, 184) |
 | **Updates** | On Load / 5 minutes |
-| **Sample Data** | [results_dec_2025.json](api_samples/results_dec_2025.json) |
+| **Sample Data** | [results_dec_2025.json](api_samples/core/results_dec_2025.json) |
 
 **URL Structure:**
 ```text
@@ -76,7 +76,7 @@ Provides detailed innings data, player stats, fall of wickets, and partnerships.
 | **Method** | `GET` |
 | **Initiation Point** | `src/App.tsx` (Line 125) |
 | **Poll Interval** | 15s (Synced with Wallstream for Live games) |
-| **Sample Data** | [scorecard.json](api_samples/scorecard.json) |
+| **Sample Data** | [scorecard.json](api_samples/core/scorecard.json) |
 
 **URL Structure:**
 ```text
@@ -93,7 +93,7 @@ The "Heartbeat" of the Live Detail view. Provides real-time commentary, ball spe
 | **Method** | `GET` |
 | **Initiation Point** | `src/App.tsx` (Line 133) -> `src/utils/wallstreamApi.ts` |
 | **Poll Interval** | 15s (Live) |
-| **Sample Data** | [wallstream.json](api_samples/wallstream.json) |
+| **Sample Data** | [wallstream.json](api_samples/core/wallstream.json) |
 
 **URL Structure:**
 ```text
@@ -111,7 +111,7 @@ Fetches historical data, recent form, and venue statistics for the "Analysis" ta
 | :--- | :--- |
 | **Method** | `GET` |
 | **Initiation Point** | `src/components/MatchDetail.tsx` (via `useH2HData` hook) |
-| **Sample Data** | [h2h_full.json](api_samples/h2h_full.json) |
+| **Sample Data** | [h2h_full.json](api_samples/core/h2h_full.json) |
 
 **URL Structure:**
 ```text
@@ -285,6 +285,110 @@ https://www.wisden.com/cricket/v1/series?series_id={SERIES_ID}&lang=en&feed_form
 - Series result/status
 - Whether teams have squads available
 - Coverage level
+
+---
+
+### L. Live Insights (Matchups & Wagon Wheel)
+
+Detailed match analytics powered by two complementary endpoints.
+
+| Feature | Details |
+| :--- | :--- |
+| **Method** | `GET` |
+| **Initiation Point** | `src/components/LiveDetail.tsx` (Lines 65, 75) via `useCricketData.ts` |
+| **Poll Interval** | Updates on innings change / user request |
+| **Sample Data** | [batsman_splits.json](api_samples/insights_api/batsman_splits.json), [overbyover.json](api_samples/insights_api/overbyover.json) |
+
+#### 1. Batsman Splits (Matchups & Wagon Wheel)
+Provides aggregated stats for valid shots, zones, and bowler matchups.
+
+| Feature | Details |
+| :--- | :--- |
+| **Method** | `GET` |
+| **Initiation Point** | `src/utils/useCricketData.ts` (Line 410) |
+| **Sample Data** | [batsman_splits.json](api_samples/insights_api/batsman_splits.json) |
+
+**URL Structure:**
+```text
+https://www.wisden.com/cricket/live/json/{MATCH_FILE_ID}_batsman_splits_{INNINGS}.json
+```
+- `{MATCH_FILE_ID}`: Lowercase alphanumeric filtered `game_id` (e.g., `inwslw12282025268163`)
+- `{INNINGS}`: 1, 2, 3, or 4
+
+**Key Data Structure:**
+```json
+{
+  "Batsmen": {
+    "{PLAYER_ID}": {
+      "Batsman": "Name",
+      "Against": {
+        "{BOWLER_ID}": {
+          "Bowler": "Name",
+          "Runs": "12",
+          "Balls": "8",
+          "Dots": "2",
+          "Strikerate": "150",
+          "Scoringshots": "6",
+          "Fours": "2",
+          "Sixes": "0"
+        }
+      },
+      "Shots": [
+        {
+          "Id": "5",
+          "Runs": "1",
+          "Zone": "8", // 1-8 Wagon Wheel Zones
+          "Angle": "340",
+          "Distance": "3"
+        }
+      ]
+    }
+  }
+}
+```
+
+#### 2. Over-by-Over (Innings Progression & Wickets)
+Provides ultra-granular ball-by-ball details. Critical for identifying **Wickets** which are absent in the Splits API.
+
+| Feature | Details |
+| :--- | :--- |
+| **Method** | `GET` |
+| **Initiation Point** | `src/utils/useCricketData.ts` (Line 423) |
+| **Sample Data** | [overbyover.json](api_samples/insights_api/overbyover.json) |
+
+**URL Structure:**
+```text
+https://www.wisden.com/cricket/live/json/{MATCH_FILE_ID}_overbyover_{INNINGS}.json
+```
+
+**Key Data Structure:**
+```json
+{
+  "Overbyover": [
+    {
+      "Over": 1,
+      "Runs": "10",
+      "Wickets": "0", // Total wickets in this over
+      "Batsmen": {
+        "{PLAYER_ID}": {
+          "Batsman": "Name",
+          "Runs": "9",
+          "Isout": true // Boolean OR String "true"/"1" - CRITICAL FLAG
+        }
+      },
+      "Bowlers": {
+        "{BOWLER_ID}": {
+          "Bowler": "Name",
+          "Runs": "10"
+        }
+      }
+    }
+  ]
+}
+```
+
+> [!NOTE]
+> The Live Insights component merges these two feeds: Splits for stats + OverByOver for Wicket confirmation.
 
 ---
 

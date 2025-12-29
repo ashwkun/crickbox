@@ -7,7 +7,7 @@ import useCricketData from './utils/useCricketData';
 import { WallstreamData } from './utils/wallstreamApi';
 import { Match, Scorecard, Series, Tournament } from './types';
 // Stub wallstream data for forceLive testing
-import stubWallstream from '../api_samples/wallstream.json';
+import stubWallstream from '../api_samples/core/wallstream.json';
 
 export default function App(): React.ReactElement {
     const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream } = useCricketData();
