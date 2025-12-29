@@ -559,12 +559,13 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
             {/* H2H Section */}
             {!loadingH2H && h2hData && match.participants && (
                 <div className="section-container fade-in">
-                    {/* Win Probability Algorithm */}
-                    {winProb && (
-                        <div className="mb-4">
-                            <WinProbabilityBar data={winProb} />
-                        </div>
-                    )}
+                    {/* Win Probability Algorithm - Always render for structure */}
+                    <div className="mb-4">
+                        <WinProbabilityBar
+                            data={winProb}
+                            isLoading={!winProb}
+                        />
+                    </div>
 
                     {/* NEW: Recent Form (Consolidated Card) */}
                     <div>

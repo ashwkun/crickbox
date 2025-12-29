@@ -1308,12 +1308,13 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 `}
                 </style>
 
-                {/* Win Probability Algorithm */}
-                {winProb && (
-                    <div style={{ marginBottom: 16 }}>
-                        <WinProbabilityBar data={winProb} />
-                    </div>
-                )}
+                {/* Win Probability Algorithm - Always render structure */}
+                <div style={{ marginBottom: 16 }}>
+                    <WinProbabilityBar
+                        data={winProb}
+                        isLoading={!winProb}
+                    />
+                </div>
 
                 {/* Live Situation Panel */}
                 {(latestBall || scorecard?.Innings?.length > 0) && (() => {
