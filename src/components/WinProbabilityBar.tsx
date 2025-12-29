@@ -10,21 +10,37 @@ interface WinProbabilityBarProps {
 const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }) => {
     // Animation state
     const [animatedProb, setAnimatedProb] = useState(50);
+    const [isCalculating, setIsCalculating] = useState(true);
 
     useEffect(() => {
         if (data?.team1.probability) {
-            setAnimatedProb(data.team1.probability);
+            // Reset to 50 when data changes drastically? No, just when loading completes initially.
+            // If we were loading, now animate from 50 to target
+            if (isCalculating) {
+                // Small delay to show "50-50" starting point
+                setTimeout(() => {
+                    setAnimatedProb(data.team1.probability);
+                    setIsCalculating(false);
+                }, 100);
+            } else {
+                // Live update - smooth transition
+                setAnimatedProb(data.team1.probability);
+            }
         }
-    }, [data]);
+    }, [data, isCalculating]);
 
-    // Loading Skeleton
-    if (isLoading) {
+    // Loading Skeleton - Matching LiveDetail.tsx card skeleton style where possible
+    if (isLoading || !data) {
         return (
             <div style={{
                 background: 'rgba(255, 255, 255, 0.05)',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
                 borderRadius: '16px',
                 padding: '12px 16px',
-                marginBottom: '12px',
+                marginBottom: '16px',
+                border: '1px solid rgba(255,255,255,0.05)',
                 animation: 'pulse 1.5s infinite'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -37,11 +53,18 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
         );
     }
 
-    if (!data) return null;
-
     // Dynamic Colors
     const color1 = getTeamColor(data.team1.name) || '#3b82f6';
     const color2 = getTeamColor(data.team2.name) || '#ef4444';
+
+    // Phase formatting
+    const getPhaseText = () => {
+        if (!data.phase) return '';
+        const p = data.phase.toUpperCase().replace('-', ' ');
+        if (p.includes('PHASE')) return p;
+        if (p.includes('MATCH')) return p; // "PRE MATCH" is fine without "PHASE" maybe? Or add it? User said "sat PHASE for all"
+        return `${p} PHASE`;
+    };
 
     return (
         <div style={{
@@ -76,14 +99,14 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
                     </div>
                 </div>
 
-                {/* Center Info (Hidden on very small screens if tight, but generally visible) */}
+                {/* Center Info */}
                 <div style={{
                     flex: 1,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    opacity: 0.5
+                    opacity: 0.6
                 }}>
                     <span style={{
                         fontSize: '9px',
@@ -95,17 +118,15 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
                     }}>
                         WIN PROBABILITY
                     </span>
-                    {data.phase && (
-                        <span style={{
-                            fontSize: '8px',
-                            fontWeight: 500,
-                            textTransform: 'uppercase',
-                            color: '#fff',
-                            marginTop: '1px'
-                        }}>
-                            {data.phase.replace('-', ' ')}
-                        </span>
-                    )}
+                    <span style={{
+                        fontSize: '8px',
+                        fontWeight: 500,
+                        textTransform: 'uppercase',
+                        color: 'rgba(255,255,255,0.7)',
+                        marginTop: '1px'
+                    }}>
+                        {getPhaseText()}
+                    </span>
                 </div>
 
                 {/* Team 2 (Right) */}
@@ -155,7 +176,7 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading }
                 <div style={{
                     flex: 1,
                     height: '100%',
-                    background: `linear-gradient(90deg, ${color2}dd 0%, ${color2} 100%)`, // Gradient for team 2
+                    background: `linear-gradient(90deg, ${color2}dd 0%, ${color2} 100%)`,
                     boxShadow: `0 0 10px ${color2}44`,
                     transition: 'all 1s ease',
                     position: 'relative',
