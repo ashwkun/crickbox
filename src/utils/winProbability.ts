@@ -436,7 +436,10 @@ export const calculateLiveProbability = (
     preMatchProb: WinProbabilityResult,
     scorecard: any,
     currentInnings: number,
-    format: 'T20' | 'ODI' | 'Test' = 'T20'
+    format: 'T20' | 'ODI' | 'Test' = 'T20',
+    h2hPlayerData?: any, // For team strength calculation
+    team1Id?: string,
+    team2Id?: string
 ): WinProbabilityResult => {
 
     // Default safe return
@@ -494,9 +497,19 @@ export const calculateLiveProbability = (
         const resourceFactor = Math.max(0.1, 1 - (wickets * (wickets > 5 ? 0.12 : 0.08)));
         const projected = Math.floor(runs + (crr * oversLeft * resourceFactor));
 
-        // Dynamic Par Score (using team strengths placeholder - 50 is average)
-        const battingStrength = 55; // TODO: Calculate from H2H data
-        const bowlingStrength = 50; // TODO: Calculate from H2H data
+        // Dynamic Par Score using actual team strengths from H2H
+        const battingTeamId = isTeam1Batting ? team1Id : team2Id;
+        const bowlingTeamId = isTeam1Batting ? team2Id : team1Id;
+        const battingTeamStrength = getTeamStrengthFromH2H(h2hPlayerData, battingTeamId || '');
+        const bowlingTeamStrength = getTeamStrengthFromH2H(h2hPlayerData, bowlingTeamId || '');
+
+        const battingStrength = battingTeamStrength.battingStrength;
+        const bowlingStrength = bowlingTeamStrength.bowlingStrength;
+
+        console.log(`📊 [TEAM STRENGTH FOR PAR]`);
+        console.log(`   Batting (${battingTeam}): ${battingStrength.toFixed(0)}`);
+        console.log(`   Bowling (${bowlingTeam}): ${bowlingStrength.toFixed(0)}`);
+
         const { parScore, logDetails: parLogDetails } = getDynamicParScore(format, pitchType, battingStrength, bowlingStrength);
 
         const diff = projected - parScore;
