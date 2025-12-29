@@ -643,7 +643,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 setTicker({ text: `+${diff}`, type: 'runs', key: Date.now() });
             } else {
                 // Dot ball (Overs changed but runs/wickets same)
-                setTicker({ text: '•', type: 'dot', key: Date.now() });
+                setTicker({ text: '0', type: 'dot', key: Date.now() });
             }
         };
 
@@ -704,7 +704,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             if (t.includes('4') || b === '4') return '#22c55e';
             if (t.includes('WD') || t.includes('NB')) return '#eab308';
             if (t.includes('LB') || t.includes('B')) return '#60a5fa';
-            if (b === '0' || (!t && !b)) return 'rgba(255,255,255,0.2)';
+            if (b === '0' || (!t && !b)) return '#64748b'; // Dot - solid grey
             return '#60a5fa';
         }
         // String input
@@ -714,7 +714,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         if (s.includes('6')) return '#f97316';
         if (s.includes('4')) return '#22c55e';
         if (s.includes('LB') || s.includes('B')) return '#60a5fa';
-        if (s === '0') return 'rgba(255,255,255,0.2)';
+        if (s === '0') return '#64748b'; // Dot - solid grey
         return '#60a5fa';
     };
 
@@ -962,7 +962,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         {scoreTicker1 && (
                             <div key={scoreTicker1.key} style={{
                                 position: 'absolute', top: 0, right: -10,
-                                background: getBallColor(scoreTicker1.text.replace('+', '').replace('•', '0')),
+                                background: getBallColor(scoreTicker1.text.replace('+', '')),
                                 color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                                 animation: 'popReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
@@ -995,7 +995,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         {scoreTicker2 && (
                             <div key={scoreTicker2.key} style={{
                                 position: 'absolute', top: 0, left: -10,
-                                background: getBallColor(scoreTicker2.text.replace('+', '').replace('•', '0')),
+                                background: getBallColor(scoreTicker2.text.replace('+', '')),
                                 color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                                 animation: 'popReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
