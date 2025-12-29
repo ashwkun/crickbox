@@ -260,6 +260,115 @@ export const getTeamStrengthFromH2H = (
 };
 
 /**
+ * Get team strength from actual playing XI (scorecard) cross-referenced with H2H ICC rankings
+ * This is more accurate for live matches as it uses the confirmed playing 11
+ */
+export const getPlayingXIStrength = (
+    scorecard: any,
+    h2hPlayerData: any,
+    teamId: string
+): { battingStrength: number; bowlingStrength: number; logDetails: string[] } => {
+    const logDetails: string[] = [];
+    let battingStrength = 50;
+    let bowlingStrength = 50;
+
+    // Get playing XI from scorecard Teams
+    const teams = scorecard?.Teams;
+    if (!teams) {
+        logDetails.push('No scorecard Teams data');
+        return { battingStrength, bowlingStrength, logDetails };
+    }
+
+    // Find the team's players
+    const teamEntry = Object.entries(teams).find(([_, t]: [string, any]) =>
+        String(t.Team_Id) === String(teamId) || t.Name_Short === teamId
+    );
+
+    if (!teamEntry) {
+        logDetails.push(`Team ${teamId} not found in scorecard`);
+        return { battingStrength, bowlingStrength, logDetails };
+    }
+
+    const teamData: any = teamEntry[1];
+    const playersObj = teamData.Players || {};
+
+    // Filter confirmed playing XI
+    const playingXI = Object.entries(playersObj)
+        .filter(([_, p]: [string, any]) => p.Confirm_XI === true)
+        .map(([id, p]: [string, any]) => ({
+            id,
+            name: p.Name_Full || p.Name_Short,
+            role: p.Role || p.Skill_Name,
+            battingAvg: parseFloat(p.Batting?.Average || '0'),
+            bowlingEco: parseFloat(p.Bowling?.Economyrate || '10')
+        }));
+
+    if (playingXI.length === 0) {
+        logDetails.push('No confirmed playing XI found');
+        return { battingStrength, bowlingStrength, logDetails };
+    }
+
+    logDetails.push(`Playing XI: ${playingXI.length} players`);
+
+    // Build H2H player lookup (all players from both teams)
+    const h2hPlayers: { [key: string]: number } = {};
+    if (h2hPlayerData?.player?.head_to_head?.comp_type?.teams) {
+        for (const team of h2hPlayerData.player.head_to_head.comp_type.teams) {
+            const batsmen = team.top_players?.batsmen?.player || [];
+            const bowlers = team.top_players?.bowler?.player || [];
+            [...batsmen, ...bowlers].forEach((p: any) => {
+                if (p.id) h2hPlayers[String(p.id)] = p.icc_ranking || 100;
+                if (p.short_name) h2hPlayers[p.short_name.toLowerCase()] = p.icc_ranking || 100;
+            });
+        }
+    }
+
+    // Match playing XI with H2H rankings
+    let totalBatRanking = 0;
+    let batCount = 0;
+    let totalBowlRanking = 0;
+    let bowlCount = 0;
+
+    for (const player of playingXI) {
+        // Try to match by ID first, then by name
+        let iccRanking = h2hPlayers[player.id] ||
+            h2hPlayers[player.name.toLowerCase()] ||
+            h2hPlayers[player.name.split(' ').pop()?.toLowerCase() || ''];
+
+        if (!iccRanking && player.battingAvg > 30) {
+            // Estimate from batting average if no ranking: avg 50 ≈ rank 10, avg 25 ≈ rank 100
+            iccRanking = Math.max(10, 120 - player.battingAvg * 2);
+        }
+
+        const isBatter = player.role?.toLowerCase().includes('bat') || player.battingAvg > 25;
+        const isBowler = player.role?.toLowerCase().includes('bowl') || player.bowlingEco < 8;
+
+        if (isBatter && iccRanking) {
+            totalBatRanking += iccRanking;
+            batCount++;
+        }
+        if (isBowler && iccRanking) {
+            totalBowlRanking += iccRanking;
+            bowlCount++;
+        }
+    }
+
+    // Calculate strength from rankings
+    if (batCount > 0) {
+        const avgBatRanking = totalBatRanking / batCount;
+        battingStrength = Math.max(30, Math.min(90, 90 - (avgBatRanking * 0.5)));
+        logDetails.push(`Batting: ${batCount} batters, avg rank ${avgBatRanking.toFixed(0)} → ${battingStrength.toFixed(0)}`);
+    }
+    if (bowlCount > 0) {
+        const avgBowlRanking = totalBowlRanking / bowlCount;
+        bowlingStrength = Math.max(30, Math.min(90, 90 - (avgBowlRanking * 0.5)));
+        logDetails.push(`Bowling: ${bowlCount} bowlers, avg rank ${avgBowlRanking.toFixed(0)} → ${bowlingStrength.toFixed(0)}`);
+    }
+
+    return { battingStrength, bowlingStrength, logDetails };
+};
+
+/**
  * Calculate Pre-Match Win Probability
  */
 export const calculatePreMatchProbability = (
@@ -497,18 +606,22 @@ export const calculateLiveProbability = (
         const resourceFactor = Math.max(0.1, 1 - (wickets * (wickets > 5 ? 0.12 : 0.08)));
         const projected = Math.floor(runs + (crr * oversLeft * resourceFactor));
 
-        // Dynamic Par Score using actual team strengths from H2H
+        // Dynamic Par Score using actual playing XI from scorecard, cross-referenced with H2H ICC rankings
         const battingTeamId = isTeam1Batting ? team1Id : team2Id;
         const bowlingTeamId = isTeam1Batting ? team2Id : team1Id;
-        const battingTeamStrength = getTeamStrengthFromH2H(h2hPlayerData, battingTeamId || '');
-        const bowlingTeamStrength = getTeamStrengthFromH2H(h2hPlayerData, bowlingTeamId || '');
+
+        // Use getPlayingXIStrength for actual playing 11 (not H2H's top 5)
+        const battingTeamStrength = getPlayingXIStrength(scorecard, h2hPlayerData, battingTeamId || '');
+        const bowlingTeamStrength = getPlayingXIStrength(scorecard, h2hPlayerData, bowlingTeamId || '');
 
         const battingStrength = battingTeamStrength.battingStrength;
         const bowlingStrength = bowlingTeamStrength.bowlingStrength;
 
-        console.log(`📊 [TEAM STRENGTH FOR PAR]`);
-        console.log(`   Batting (${battingTeam}): ${battingStrength.toFixed(0)}`);
-        console.log(`   Bowling (${bowlingTeam}): ${bowlingStrength.toFixed(0)}`);
+        console.log(`📊 [PLAYING XI STRENGTH]`);
+        console.log(`   ${battingTeam} (batting):`);
+        battingTeamStrength.logDetails.forEach(log => console.log(`      ${log}`));
+        console.log(`   ${bowlingTeam} (bowling):`);
+        bowlingTeamStrength.logDetails.forEach(log => console.log(`      ${log}`));
 
         const { parScore, logDetails: parLogDetails } = getDynamicParScore(format, pitchType, battingStrength, bowlingStrength);
 
