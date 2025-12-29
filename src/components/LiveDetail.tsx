@@ -767,8 +767,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
     // Sticky Header Content
     const stickyContent = showStickyHeader ? (
-        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', justifyContent: 'center', gap: 6, paddingTop: 4 }}>
-            {/* Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', paddingRight: 4 }}>
+            {/* Toggle (Left) */}
             <div style={{
                 display: 'flex',
                 background: 'rgba(255,255,255,0.08)',
@@ -781,7 +781,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         key={tab}
                         onClick={(e) => { e.stopPropagation(); setActiveTab(tab as any); }}
                         style={{
-                            padding: '4px 14px',
+                            padding: '4px 12px',
                             borderRadius: 100,
                             border: 'none',
                             background: activeTab === tab ? 'rgba(255,255,255,0.15)' : 'transparent',
@@ -799,8 +799,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 ))}
             </div>
 
-            {/* Score Row */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', justifyContent: 'center' }}>
+            {/* Score Stack (Right Aligned) */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', gap: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', letterSpacing: 0.5 }}>
                     {(() => {
                         // Extract just the main score (first part) to keep it crisp
@@ -809,13 +809,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         return `${team1?.short_name || 'T1'} ${t1S} vs ${team2?.short_name || 'T2'} ${t2S}`;
                     })()}
                 </div>
-                {/* Status Box (Mini) */}
                 <div style={{
-                    fontSize: 10, fontWeight: 600,
+                    fontSize: 9, fontWeight: 600,
                     color: getMatchStatusConfig(match.short_event_status, match.event_status).color,
-                    background: 'rgba(255,255,255,0.05)',
-                    padding: '2px 6px', borderRadius: 4,
-                    maxWidth: 140, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                    maxWidth: 140, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    textAlign: 'right'
                 }}>
                     {currentStatus}
                 </div>
@@ -824,7 +822,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     ) : undefined;
 
     return (
-        <div className="upcoming-detail" onScroll={handleScroll}>
+        <div className="upcoming-detail" onScroll={handleScroll} style={{ backgroundColor: '#0f0f14' }}>
             <FloatingHeader
                 showBack={true}
                 onBack={onClose}
