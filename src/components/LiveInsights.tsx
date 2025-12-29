@@ -33,7 +33,7 @@ interface LiveInsightsProps {
 
 const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, overByOver1, overByOver2, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading }) => {
     const [manhattanInnings, setManhattanInnings] = useState<1 | 2>(1);
-    if (!h2hData) return null;
+    // if (!h2hData) return null; // Removed to allow Matchups to show even if H2H fails
 
     const team1 = match?.participants?.[0];
     const team2 = match?.participants?.[1];
@@ -229,7 +229,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
             )}
 
             {/* 6. Head to Head (Premium Card) */}
-            {h2hData.team?.head_to_head?.comp_type?.data && (
+            {h2hData?.team?.head_to_head?.comp_type?.data && (
                 <div style={{ padding: '0 0px' }}>
                     <H2HCard
                         teams={h2hData.team.head_to_head.comp_type.data}
@@ -240,7 +240,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
             )}
 
             {/* 7. Recent H2H Matches */}
-            {h2hData.team?.against_last_n_matches?.result && h2hData.team.against_last_n_matches.result.length > 0 && teamIds && (
+            {h2hData?.team?.against_last_n_matches?.result && h2hData.team.against_last_n_matches.result.length > 0 && teamIds && (
                 <H2HRecentMatches
                     matches={h2hData.team.against_last_n_matches.result}
                     teamIds={teamIds}
