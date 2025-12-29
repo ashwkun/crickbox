@@ -139,7 +139,7 @@ export const calculatePreMatchProbability = (
         console.log(`ℹ️ [RANKING] Franchise match - ICC rankings not applicable`);
     }
 
-    // 2. Head to Head
+    // 2. Head to Head (Overall)
     if (h2hData && parseInt(h2hData.matches_played) > 0) {
         const played = parseInt(h2hData.matches_played);
         const won1 = parseInt(h2hData.won);
@@ -150,6 +150,21 @@ export const calculatePreMatchProbability = (
         console.log(`   → H2H record gives ${t1Name} ${h2hImpact > 0 ? '+' : ''}${h2hImpact.toFixed(1)}% advantage`);
     } else {
         console.log(`⚠️ [HEAD TO HEAD] No H2H data available - SKIPPED`);
+    }
+
+    // 2b. Venue-Specific H2H (if available)
+    if (venueStats && venueStats.team1_matches > 0 && venueStats.team2_matches > 0) {
+        const venue1WinPct = venueStats.team1_win_pct || 50;
+        const venue2WinPct = venueStats.team2_win_pct || 50;
+        const venueDiff = venue1WinPct - venue2WinPct;
+        const venueImpact = venueDiff * weights.VENUE!;
+        prob1 += venueImpact;
+        console.log(`📍 [VENUE H2H] At this venue:`);
+        console.log(`   ${t1Name}: ${venueStats.team1_matches} matches, ${venue1WinPct.toFixed(0)}% win rate`);
+        console.log(`   ${t2Name}: ${venueStats.team2_matches} matches, ${venue2WinPct.toFixed(0)}% win rate`);
+        console.log(`   → Venue record gives ${t1Name} ${venueImpact > 0 ? '+' : ''}${venueImpact.toFixed(1)}% advantage`);
+    } else {
+        console.log(`⚠️ [VENUE H2H] No venue-specific H2H data - SKIPPED`);
     }
 
     // 3. Recent Form

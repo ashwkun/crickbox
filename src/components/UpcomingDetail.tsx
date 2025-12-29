@@ -161,6 +161,22 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                     }
                 }
 
+                // Extract Venue-specific H2H
+                let venueH2H = {};
+                if (h2hDataValue?.team?.head_to_head?.venue?.data) {
+                    const venueData = h2hDataValue.team.head_to_head.venue.data;
+                    const team1VenueStat = venueData.find((t: any) => String(t.id) === String(team1.id));
+                    const team2VenueStat = venueData.find((t: any) => String(t.id) === String(team2.id));
+                    if (team1VenueStat && team2VenueStat) {
+                        venueH2H = {
+                            team1_matches: team1VenueStat.matches_played || 0,
+                            team1_win_pct: team1VenueStat.win_percentage || 50,
+                            team2_matches: team2VenueStat.matches_played || 0,
+                            team2_win_pct: team2VenueStat.win_percentage || 50
+                        };
+                    }
+                }
+
                 // Determine if International (Men's='icc', Women's='womens_international', Youth='youth_international')
                 const isInternational = match.league_code === 'icc' ||
                     match.league_code === 'womens_international' ||
@@ -179,7 +195,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                     h2hStats,
                     f1,
                     f2,
-                    {},
+                    venueH2H,
                     pitch,
                     match.venue_name || "",
                     isFranchise,
