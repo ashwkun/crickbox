@@ -413,6 +413,13 @@ export default function App(): React.ReactElement {
 
     return (
         <div className="app-container">
+            {/* Debug Log */}
+            {console.log('[App] Header Props ->', {
+                selectedMatchId: selectedMatch?.game_id,
+                eventState: selectedMatch?.event_state,
+                isLive: selectedMatch?.event_state === 'L'
+            })}
+
             {/* Floating Header */}
             <FloatingHeader
                 showBack={!!selectedMatch || !!selectedSeries || !!selectedTournament}
@@ -423,7 +430,7 @@ export default function App(): React.ReactElement {
                 }}
                 onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
                 data={headerData}
-                isLive={matches.some(m => m.event_state === 'L') || selectedMatch?.event_state === 'L'}
+                isLive={selectedMatch?.event_state === 'L'}
             />
 
             {/* Main Content */}
