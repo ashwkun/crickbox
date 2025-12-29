@@ -45,18 +45,18 @@ export default function App(): React.ReactElement {
         // For forceLive, allow stub creation even before matches load
         if (pendingMatchId && (matches.length > 0 || forceLive)) {
             const match = matches.find(m => m.game_id === pendingMatchId);
-            console.log('[ForceLive] pendingMatchId:', pendingMatchId, 'forceLive:', forceLive, 'matchFound:', !!match);
+            // ForceLive check
 
             if (match) {
                 if (forceLive) {
-                    console.log('[ForceLive] Overriding real match state to LIVE');
+                    // Overriding to LIVE
                     setSelectedMatch({ ...match, event_state: 'L' });
                 } else {
                     setSelectedMatch(match);
                 }
             } else if (forceLive) {
                 // Create stub match for forceLive testing (India W vs Sri Lanka W)
-                console.log('[ForceLive] Creating stub match for:', pendingMatchId);
+                // Creating stub match
                 setSelectedMatch({
                     game_id: pendingMatchId,
                     event_state: 'L', // Force as live
@@ -189,7 +189,7 @@ export default function App(): React.ReactElement {
                 }
 
                 if (bowler) {
-                    console.log(`[Simulation] Manual Inject: '${outcome}'`);
+                    // Manual inject simulation
                     if (!bowler.ThisOver) bowler.ThisOver = [];
                     if (bowler.ThisOver.length >= 8) bowler.ThisOver = [];
 
@@ -217,7 +217,7 @@ export default function App(): React.ReactElement {
     // Fetch scorecard and wallstream together for live/completed matches
     // For live matches, refresh every 10 seconds - SYNCHRONIZED
     useEffect(() => {
-        console.log('[PWA] selectedMatch changed:', selectedMatch?.game_id, 'state:', selectedMatch?.event_state);
+        // Match selection changed
         if (!selectedMatch) {
             setScorecard(null);
             setWallstream(null);
@@ -227,7 +227,7 @@ export default function App(): React.ReactElement {
 
         const isLive = selectedMatch.event_state === 'L';
         const isCompleted = selectedMatch.event_state === 'C' || selectedMatch.event_state === 'R';
-        console.log('[PWA] isLive:', isLive, 'isCompleted:', isCompleted);
+        // Live/completed state
 
         if (!isLive && !isCompleted) {
             setScorecard(null);
@@ -247,11 +247,11 @@ export default function App(): React.ReactElement {
             const forceLive = params.get('forceLive') === 'true';
 
             if (forceLive && ENABLE_SIMULATION_MODE && hasLoadedBaseData.current) {
-                console.log('[PWA] Simulation Mode active, skipping real data fetch');
+                // Sim mode, skip fetch
                 return;
             }
 
-            console.log('[PWA] Loading data for match:', selectedMatch.game_id);
+            // Loading match data
             const sc = await fetchScorecard(selectedMatch.game_id);
 
             if (sc) hasLoadedBaseData.current = true;

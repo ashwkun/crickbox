@@ -81,7 +81,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
     const officials = matchDetails?.Officials;
     const venueName = venue?.Name;
 
-    console.log('LiveInsights Render Debug:', { manhattanData });
+    // Manhattan debug removed
 
     // Skeleton Placeholder Component
     const SkeletonCard = ({ height = 200 }: { height?: number }) => (
