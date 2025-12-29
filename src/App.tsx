@@ -82,6 +82,23 @@ export default function App(): React.ReactElement {
             // Handle Match
             if (matchId) {
                 const match = matches.find(m => m.game_id === matchId);
+                // Update Bowler ThisOver
+                // Find active bowler (or use last one if none active - common in completed matches)
+                if (inn.Bowlers && inn.Bowlers.length > 0) {
+                    let bowler = inn.Bowlers.find((b: any) => b.Isbowlingnow);
+                    if (!bowler) {
+                        bowler = inn.Bowlers[inn.Bowlers.length - 1];
+                        bowler.Isbowlingnow = true; // Force active for LiveDetail detection
+                    }
+
+                    if (bowler) {
+                        console.log(`[Simulation] Injecting '${outcome}' to bowler: ${bowler.Bowler} (ThisOver len: ${bowler.ThisOver?.length})`);
+                        if (!bowler.ThisOver) bowler.ThisOver = [];
+                        // Limit to 8 to see scrolling
+                        if (bowler.ThisOver.length >= 8) bowler.ThisOver = [];
+                        bowler.ThisOver.push({ T: outcome === 'W' ? 'W' : undefined, B: outcome === 'W' ? '0' : outcome });
+                    }
+                }
                 if (match) {
                     setSelectedMatch(match);
                 } else {
