@@ -15,7 +15,7 @@ const TEAM_COLORS: Record<string, string> = {
     'Ireland': '#76D74F', // Brighter Green
     'Zimbabwe': '#FF3333', // Brighter Red
     // Associates & Others
-    'Scotland': '#002C5B',
+    'Scotland': '#FFD700', // Gold (User Request)
     'Nepal': '#003DA5',
     'UAE': '#000000',
     'USA': '#2C498D',
