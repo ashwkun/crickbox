@@ -738,7 +738,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
 
             {/* === INSIGHTS VIEW === */}
-            {activeTab === 'insights' && h2hData && (
+            {activeTab === 'insights' && (
                 <LiveInsights
                     match={match}
                     h2hData={h2hData}
