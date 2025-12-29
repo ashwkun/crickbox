@@ -157,6 +157,15 @@ export default function App(): React.ReactElement {
 
         // Fetch both scorecard and wallstream together
         const loadData = async () => {
+            // Check for forceLive mode
+            const params = new URLSearchParams(window.location.search);
+            const forceLive = params.get('forceLive') === 'true';
+
+            if (forceLive && ENABLE_SIMULATION_MODE) {
+                console.log('[PWA] Simulation Mode active, skipping real data fetch');
+                return;
+            }
+
             console.log('[PWA] Loading data for match:', selectedMatch.game_id);
             const sc = await fetchScorecard(selectedMatch.game_id);
 
@@ -165,9 +174,7 @@ export default function App(): React.ReactElement {
                 currentInningsCount = sc.Innings.length;
             }
 
-            // Check for forceLive mode
-            const params = new URLSearchParams(window.location.search);
-            const forceLive = params.get('forceLive') === 'true';
+
 
             let ws: WallstreamData | null = null;
             if (isLive) {
