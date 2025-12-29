@@ -126,57 +126,66 @@ export default function App(): React.ReactElement {
         return () => window.removeEventListener('popstate', handlePopState);
     }, [matches, selectedSeries, selectedTournament]);
 
-    // Simulation Effect (Restored)
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const forceLive = params.get('forceLive') === 'true';
+    // Simulation Effect: Manual Control (God Mode)
+    // We expose a function or render a UI to inject balls
+    const [simPanelOpen, setSimPanelOpen] = useState(true);
 
-        if (!forceLive || !ENABLE_SIMULATION_MODE || !selectedMatch) return;
+    const handleSimInject = useCallback((outcome: string) => {
+        if (!selectedMatch || !scorecard) return;
 
-        const interval = setInterval(() => {
-            const outcomes = ['0', '1', '1', '4', '6', 'W', '2'];
-            const outcome = outcomes[Math.floor(Math.random() * outcomes.length)];
+        setScorecard(prev => {
+            if (!prev || !prev.Innings) return prev;
+            const newSc = JSON.parse(JSON.stringify(prev));
+            const inn = newSc.Innings[newSc.Innings.length - 1];
 
-            setScorecard(prev => {
-                if (!prev || !prev.Innings) return prev;
-                const newSc = JSON.parse(JSON.stringify(prev));
-                const inn = newSc.Innings[newSc.Innings.length - 1];
+            // Logic for Runs/Extras
+            let total = parseInt(inn.Total || '0');
+            let wicks = parseInt(inn.Wickets || '0');
 
-                // Update Total
-                let total = parseInt(inn.Total || '0');
-                let wicks = parseInt(inn.Wickets || '0');
+            const isWide = outcome === 'WD';
+            const isNoBall = outcome === 'NB';
+            const isBye = outcome === 'B' || outcome === 'LB';
+            const isWicket = outcome === 'W';
 
-                if (outcome === 'W') {
-                    wicks += 1;
-                } else {
-                    total += parseInt(outcome);
-                }
-                inn.Total = total.toString();
-                inn.Wickets = wicks.toString();
+            let runs = 0;
+            if (!isNaN(parseInt(outcome))) runs = parseInt(outcome);
+            else if (isWide || isNoBall) runs = 1; // Basic extra
 
-                // Update Bowler ThisOver
-                if (inn.Bowlers && inn.Bowlers.length > 0) {
-                    let bowler = inn.Bowlers.find((b: any) => b.Isbowlingnow);
-                    if (!bowler) {
-                        bowler = inn.Bowlers[inn.Bowlers.length - 1];
-                        // Only set active if we found a bowler
-                        if (bowler) bowler.Isbowlingnow = true;
-                    }
+            if (isWicket) wicks += 1;
+            else total += runs;
 
-                    if (bowler) {
-                        console.log(`[Simulation] Injecting '${outcome}' to bowler: ${bowler.Bowler || 'Unk'}`);
-                        if (!bowler.ThisOver) bowler.ThisOver = [];
-                        if (bowler.ThisOver.length >= 8) bowler.ThisOver = [];
-                        bowler.ThisOver.push({ T: outcome === 'W' ? 'W' : undefined, B: outcome === 'W' ? '0' : outcome });
-                    }
+            inn.Total = total.toString();
+            inn.Wickets = wicks.toString();
+
+            // Update Bowler ThisOver
+            if (inn.Bowlers && inn.Bowlers.length > 0) {
+                let bowler = inn.Bowlers.find((b: any) => b.Isbowlingnow);
+                if (!bowler) {
+                    bowler = inn.Bowlers[inn.Bowlers.length - 1];
+                    if (bowler) bowler.Isbowlingnow = true;
                 }
 
-                return newSc;
-            });
-        }, 3000);
+                if (bowler) {
+                    console.log(`[Simulation] Manual Inject: '${outcome}'`);
+                    if (!bowler.ThisOver) bowler.ThisOver = [];
+                    if (bowler.ThisOver.length >= 8) bowler.ThisOver = [];
 
-        return () => clearInterval(interval);
-    }, [selectedMatch?.game_id]);
+                    // Display Text
+                    let disp = outcome;
+                    if (isWide) disp = 'WD'; // or 1WD
+                    else if (isNoBall) disp = 'NB';
+                    else if (isBye) disp = 'LB';
+
+                    bowler.ThisOver.push({ T: disp, B: isWicket ? '0' : runs.toString() });
+                }
+            }
+
+            return newSc;
+        });
+    }, [selectedMatch, scorecard]);
+
+    // Check if Sim Mode Active for UI rendering
+    const showSimControls = ENABLE_SIMULATION_MODE && (new URLSearchParams(window.location.search).get('forceLive') === 'true');
 
     // Ref to store current loadData function for visibility handler
     const loadDataRef = useRef<(() => void) | null>(null);
@@ -485,6 +494,50 @@ export default function App(): React.ReactElement {
                 </svg>
             </button>
             */}
+            {/* Simulation Controls (God Mode) */}
+            {showSimControls && (
+                <div style={{
+                    position: 'fixed', bottom: 20, right: 20, zIndex: 9999,
+                    background: 'rgba(0,0,0,0.85)', padding: 12, borderRadius: 16,
+                    display: 'flex', flexDirection: 'column', gap: 10,
+                    backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.15)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.5)', width: 180,
+                    transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 8px #22c55e' }} />
+                            <span style={{ color: '#fff', fontSize: 10, fontWeight: 800, letterSpacing: 0.5 }}>GOD MODE</span>
+                        </div>
+                        <button onClick={() => setSimPanelOpen(!simPanelOpen)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: 4, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                            <span style={{ fontSize: 8 }}>{simPanelOpen ? '▼' : '▲'}</span>
+                        </button>
+                    </div>
+
+                    {simPanelOpen && (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                            {['0', '1', '2', '3', '4', '6', 'W', 'WD', 'NB', 'LB'].map(opt => (
+                                <button key={opt}
+                                    onClick={() => handleSimInject(opt)}
+                                    style={{
+                                        background: opt === 'W' ? '#ef4444' : (opt === '6' || opt === '4' ? '#22c55e' : 'rgba(255,255,255,0.1)'),
+                                        color: '#fff', border: 'none', borderRadius: 8,
+                                        height: 32, fontSize: 11, fontWeight: 700,
+                                        cursor: 'pointer',
+                                        transition: 'transform 0.1s active',
+                                        gridColumn: (opt === 'W' || opt === 'NB' || opt === 'LB') ? 'span 2' : 'span 1'
+                                    }}
+                                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
