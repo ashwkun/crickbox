@@ -1274,6 +1274,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     isLoading={!scorecard && !h2hData && !batsmanSplits}
                     isWormLoading={isWormLoading}
                     onH2HMatchClick={handleRecentMatchClick}
+                    winProb={winProb}
                 />
             )}
 
