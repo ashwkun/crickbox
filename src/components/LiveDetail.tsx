@@ -112,8 +112,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             let h2hStats = { matches_played: '0', won: '0', lost: '0' };
 
             // Process H2H result
+            let h2hVal: any = null;
             if (h2hRes.status === 'fulfilled' && h2hRes.value) {
-                const h2hVal = h2hRes.value;
+                h2hVal = h2hRes.value;
                 if (h2hVal?.team?.head_to_head?.comp_type?.data) {
                     const opponentStat = h2hVal.team.head_to_head.comp_type.data.find(
                         (op: any) => String(op.id) === String(team2.id)
@@ -125,6 +126,22 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                             lost: String(opponentStat.lost || 0)
                         };
                     }
+                }
+            }
+
+            // Extract Venue-specific H2H
+            let venueH2H = {};
+            if (h2hVal?.team?.head_to_head?.venue?.data) {
+                const venueData = h2hVal.team.head_to_head.venue.data;
+                const team1VenueStat = venueData.find((t: any) => String(t.id) === String(team1.id));
+                const team2VenueStat = venueData.find((t: any) => String(t.id) === String(team2.id));
+                if (team1VenueStat && team2VenueStat) {
+                    venueH2H = {
+                        team1_matches: team1VenueStat.matches_played || 0,
+                        team1_win_pct: team1VenueStat.win_percentage || 50,
+                        team2_matches: team2VenueStat.matches_played || 0,
+                        team2_win_pct: team2VenueStat.win_percentage || 50
+                    };
                 }
             }
 
@@ -156,10 +173,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             const prob = calculatePreMatchProbability(
                 team1 as any,
                 team2 as any,
-                h2hStats, // Use extracted H2H stats
+                h2hStats,
                 f1,
                 f2,
-                {}, // Venue stats
+                venueH2H,
                 pitch,
                 match.venue_name || "",
                 isFranchise,
