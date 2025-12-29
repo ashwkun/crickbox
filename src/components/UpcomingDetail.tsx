@@ -199,7 +199,8 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                     pitch,
                     match.venue_name || "",
                     isFranchise,
-                    homeTeamId
+                    homeTeamId,
+                    h2hDataValue // Full H2H data for player strength analysis
                 );
                 setWinProb(prob);
             }

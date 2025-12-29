@@ -180,7 +180,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 pitch,
                 match.venue_name || "",
                 isFranchise,
-                homeTeamId
+                homeTeamId,
+                h2hVal // Full H2H data for player strength analysis
             );
 
             setPreMatchProb(prob);

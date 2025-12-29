@@ -215,6 +215,51 @@ const getDynamicParScore = (
 };
 
 /**
+ * Calculate team strength from H2H player data
+ * Returns a 1-100 score where 50 is average, 70+ is strong, 30- is weak
+ */
+export const getTeamStrengthFromH2H = (
+    h2hPlayerData: any,
+    teamId: string
+): { battingStrength: number; bowlingStrength: number; logDetails: string[] } => {
+    const logDetails: string[] = [];
+    let battingStrength = 50;
+    let bowlingStrength = 50;
+
+    if (!h2hPlayerData?.player?.head_to_head?.comp_type?.teams) {
+        logDetails.push('No player H2H data available');
+        return { battingStrength, bowlingStrength, logDetails };
+    }
+
+    const teams = h2hPlayerData.player.head_to_head.comp_type.teams;
+    const teamData = teams.find((t: any) => String(t.id) === String(teamId));
+
+    if (!teamData?.top_players) {
+        logDetails.push(`No player data for team ${teamId}`);
+        return { battingStrength, bowlingStrength, logDetails };
+    }
+
+    // Calculate batting strength from top batsmen ICC rankings
+    const batsmen = teamData.top_players.batsmen?.player || [];
+    if (batsmen.length > 0) {
+        const avgBatRanking = batsmen.reduce((sum: number, p: any) => sum + (p.icc_ranking || 100), 0) / batsmen.length;
+        // Convert ranking to strength: Rank 1 = 90 strength, Rank 50 = 60 strength, Rank 100 = 40 strength
+        battingStrength = Math.max(30, Math.min(90, 90 - (avgBatRanking * 0.5)));
+        logDetails.push(`Batting: avg ICC rank ${avgBatRanking.toFixed(0)} → strength ${battingStrength.toFixed(0)}`);
+    }
+
+    // Calculate bowling strength from top bowlers ICC rankings
+    const bowlers = teamData.top_players.bowler?.player || [];
+    if (bowlers.length > 0) {
+        const avgBowlRanking = bowlers.reduce((sum: number, p: any) => sum + (p.icc_ranking || 100), 0) / bowlers.length;
+        bowlingStrength = Math.max(30, Math.min(90, 90 - (avgBowlRanking * 0.5)));
+        logDetails.push(`Bowling: avg ICC rank ${avgBowlRanking.toFixed(0)} → strength ${bowlingStrength.toFixed(0)}`);
+    }
+
+    return { battingStrength, bowlingStrength, logDetails };
+};
+
+/**
  * Calculate Pre-Match Win Probability
  */
 export const calculatePreMatchProbability = (
@@ -227,7 +272,8 @@ export const calculatePreMatchProbability = (
     pitchDetail: any,
     venueName: string,
     isFranchise: boolean = false,
-    homeTeamId?: string // New Parameter
+    homeTeamId?: string,
+    h2hPlayerData?: any // Full H2H data for player-level analysis
 ): WinProbabilityResult => {
 
     const t1Name = team1.name || team1.short_name;
@@ -240,10 +286,25 @@ export const calculatePreMatchProbability = (
     console.log(`🎯 Match Type: ${isFranchise ? 'Franchise/Domestic' : 'International'}`);
     console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
 
+    // Calculate team strengths from H2H player data
+    const team1Strength = getTeamStrengthFromH2H(h2hPlayerData, team1.id);
+    const team2Strength = getTeamStrengthFromH2H(h2hPlayerData, team2.id);
+
+    console.log(`💪 [TEAM STRENGTH]`);
+    console.log(`   ${t1Name}:`);
+    team1Strength.logDetails.forEach(log => console.log(`      ${log}`));
+    console.log(`   ${t2Name}:`);
+    team2Strength.logDetails.forEach(log => console.log(`      ${log}`));
+
+    // Team 1 overall = their batting vs opponent bowling, their bowling vs opponent batting
+    const team1Overall = (team1Strength.battingStrength + team1Strength.bowlingStrength) / 2;
+    const team2Overall = (team2Strength.battingStrength + team2Strength.bowlingStrength) / 2;
+    console.log(`   Overall: ${t1Name} ${team1Overall.toFixed(0)} | ${t2Name} ${team2Overall.toFixed(0)}`);
+
     let prob1 = 50;
     const weights = isFranchise ? WEIGHTS.FRANCHISE : WEIGHTS.INTERNATIONAL;
 
-    console.log(`📈 Starting probability at 50-50...`);
+    console.log(`\n📈 Starting probability at 50-50...`);
 
     // 1. ICC Ranking / Pedigree
     if (!isFranchise) {
