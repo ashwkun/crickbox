@@ -350,5 +350,14 @@ export const getTeamColor = (teamName?: string): string | null => {
     const foundPartial = Object.keys(TEAM_COLORS).find(k => cleanLower.includes(k.toLowerCase()));
     if (foundPartial) return TEAM_COLORS[foundPartial];
 
+    // 5. Alias Partial Match (Name contains Alias)
+    // e.g. "IND W" contains "IND" -> India
+    // Sort aliases by length descending to match longest alias first (avoid matching "S" in "USA")
+    const foundAliasPartial = Object.keys(TEAM_ALIASES)
+        .sort((a, b) => b.length - a.length)
+        .find(alias => cleanLower.includes(alias.toLowerCase()));
+
+    if (foundAliasPartial) return TEAM_COLORS[TEAM_ALIASES[foundAliasPartial]];
+
     return null;
 };
