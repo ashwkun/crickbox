@@ -151,7 +151,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                 // Determine H2H stats for this matchup
                 let h2hStats = { matches_played: '0', won: '0', lost: '0' };
                 if (h2hDataValue?.team?.head_to_head?.comp_type?.data) {
-                    const opponentStat = h2hDataValue.team.head_to_head.comp_type.data.find((op: any) => op.id === team2.id);
+                    const opponentStat = h2hDataValue.team.head_to_head.comp_type.data.find((op: any) => String(op.id) === String(team2.id));
                     if (opponentStat) {
                         h2hStats = {
                             matches_played: opponentStat.matches_played,
