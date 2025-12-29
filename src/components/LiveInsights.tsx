@@ -32,7 +32,6 @@ interface LiveInsightsProps {
 
 
 const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, overByOver1, overByOver2, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading }) => {
-    console.log(`[LiveInsights] Render. OBO_Matchups: ${!!overByOverMatchups}, Keys: ${Object.keys(overByOverMatchups || {}).length}`);
     const [manhattanInnings, setManhattanInnings] = useState<1 | 2>(1);
     // if (!h2hData) return null; // Removed to allow Matchups to show even if H2H fails
 
