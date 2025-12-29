@@ -632,6 +632,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     React.useEffect(() => {
         if (!team1Score && !team2Score) return;
 
+        // Get latest ball display for extras
+        const scLimit = getScorecardThisOver ? getScorecardThisOver() : [];
+        const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+        const lastBallDisplay = thisOverBalls.length > 0 ? getBallDisplay(thisOverBalls[thisOverBalls.length - 1]) : null;
+
         const checkScore = (curr: string, prev: string, setTicker: any) => {
             if (!curr || curr === prev) return;
             // Prevent animation on initial load (when prev is empty)
@@ -640,15 +645,27 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             const c = parseScoreSimple(curr);
             const p = parseScoreSimple(prev);
 
+            let text = '0';
+            let type: 'runs' | 'wicket' | 'dot' = 'dot';
+
             if (c.wickets > p.wickets) {
-                setTicker({ text: 'W', type: 'wicket', key: Date.now() });
+                text = 'W';
+                type = 'wicket';
             } else if (c.runs > p.runs) {
                 const diff = c.runs - p.runs;
-                setTicker({ text: `+${diff}`, type: 'runs', key: Date.now() });
-            } else {
-                // Dot ball (Overs changed but runs/wickets same)
-                setTicker({ text: '0', type: 'dot', key: Date.now() });
+                // Check if it's an extra (NB, WD, LB, B)
+                if (lastBallDisplay && (lastBallDisplay.includes('NB') || lastBallDisplay.includes('WD') || lastBallDisplay.includes('LB') || lastBallDisplay.includes('B'))) {
+                    text = `+${lastBallDisplay}`;
+                } else {
+                    text = `+${diff}`;
+                }
+                type = 'runs';
             }
+
+            setTicker({ text, type, key: Date.now() });
+
+            // Auto-clear after 5 seconds
+            setTimeout(() => setTicker(null), 5000);
         };
 
         checkScore(team1Score || '', prevScores.current.t1, setScoreTicker1);
