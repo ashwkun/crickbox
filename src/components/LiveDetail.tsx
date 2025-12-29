@@ -1421,8 +1421,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                 }
                                                 @keyframes bgExpand {
                                                     0% { transform: scale(0); opacity: 1; }
-                                                    30% { transform: scale(12); opacity: 1; }
-                                                    60% { transform: scale(1); opacity: 1; }
+                                                    40% { transform: scale(15); opacity: 1; }
+                                                    70% { transform: scale(1); opacity: 1; }
                                                     100% { transform: scale(1); opacity: 1; }
                                                 }
                                                 @keyframes heroTickerPop {
@@ -1469,8 +1469,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                                             position: 'absolute',
                                                                             width: 24, height: 24, borderRadius: '50%',
                                                                             background: getBallColor(ball),
-                                                                            animation: 'bgExpand 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-                                                                            transformOrigin: 'center center'
+                                                                            animation: 'bgExpand 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                                                                            transformOrigin: 'center center',
+                                                                            zIndex: 100
                                                                         }} />
                                                                     )}
                                                                     {/* Number layer */}
