@@ -1912,40 +1912,53 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         })}
                     </div>
 
-                    {/* Row 2: Score & Status */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        {/* Condensed Score */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            {team1 && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#fff' }}>
-                                    <span style={{ opacity: 0.6, fontSize: 10 }}>{team1.short_name}</span>
-                                    <span>{team1Score || '0/0'}</span>
-                                </div>
-                            )}
-                            {team2 && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#fff' }}>
-                                    <span style={{ opacity: 0.6, fontSize: 10 }}>{team2.short_name}</span>
-                                    <span>{team2Score || '0/0'}</span>
-                                </div>
-                            )}
+                    {/* Row 2: Simplified Score & Last Ball */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
+                        {/* Current Batting Team & Score */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            {(() => {
+                                const showTeam1 = isTeam1Batting || (!isTeam2Batting && team1); // Default to Team 1 if uncertain
+                                const team = showTeam1 ? team1 : team2;
+                                const score = showTeam1 ? team1Score : team2Score;
+
+                                return (
+                                    <>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
+                                            {team?.short_name || 'Match'}
+                                        </span>
+                                        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>
+                                            {score ? score.split('(')[0].trim() : '0/0'}
+                                        </span>
+                                    </>
+                                );
+                            })()}
                         </div>
 
-                        {/* Status Box (Mini) */}
-                        <div style={{
-                            background: 'var(--accent-primary)',
-                            backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.1), transparent)',
-                            borderRadius: 8,
-                            padding: '6px 10px',
-                            fontSize: 10,
-                            fontWeight: 700,
-                            color: '#fff',
-                            maxWidth: 120,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            textAlign: 'center'
-                        }}>
-                            {currentStatus || match.event_status}
+                        {/* Last Ball Visual */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Last Ball</span>
+                            {(() => {
+                                // Logic to get last ball
+                                const scLimit = getScorecardThisOver();
+                                const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                                const lastBall = thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null;
+
+                                if (lastBall) {
+                                    return (
+                                        <div style={{
+                                            width: 20, height: 20, borderRadius: '50%',
+                                            background: getBallColor(lastBall),
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            fontSize: 9, fontWeight: 700, color: '#fff',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                        }}>
+                                            {getBallDisplay(lastBall)}
+                                        </div>
+                                    );
+                                } else {
+                                    return <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>-</span>;
+                                }
+                            })()}
                         </div>
                     </div>
                 </div>
