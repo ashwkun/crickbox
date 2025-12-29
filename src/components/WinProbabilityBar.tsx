@@ -5,7 +5,7 @@ import { getTeamColor } from '../utils/teamColors';
 interface WinProbabilityBarProps {
     data: WinProbabilityResult | null;
     isLoading?: boolean;
-    expanded?: boolean; // New prop for LiveInsights view
+    expanded?: boolean;
 }
 
 const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading, expanded = false }) => {
@@ -21,31 +21,25 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading, 
                     setIsCalculating(false);
                 }, 100);
             } else {
-                // Live update - smooth transition
                 setAnimatedProb(data.team1.probability);
             }
         }
     }, [data, isCalculating]);
 
-    // Loading Skeleton - Matching LiveDetail.tsx card skeleton style where possible
+    // Loading Skeleton
     if (isLoading || !data) {
         return (
             <div style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
+                background: 'var(--bg-card)',
                 borderRadius: '16px',
-                padding: '12px 16px',
+                padding: '20px',
                 marginBottom: '16px',
-                border: '1px solid rgba(255,255,255,0.05)',
+                border: '1px solid var(--border-color)',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                 animation: 'pulse 1.5s infinite'
             }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <div style={{ height: '10px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px', width: '20%' }}></div>
-                    <div style={{ height: '10px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px', width: '20%' }}></div>
-                </div>
-                <div style={{ height: '6px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px', width: '100%' }}></div>
+                <div style={{ height: '12px', background: 'var(--bg-secondary)', borderRadius: '6px', width: '30%', marginBottom: '16px' }}></div>
+                <div style={{ height: '8px', background: 'var(--bg-secondary)', borderRadius: '4px', width: '100%' }}></div>
                 <style>{`@keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 0.3; } 100% { opacity: 0.6; } }`}</style>
             </div>
         );
@@ -54,169 +48,147 @@ const WinProbabilityBar: React.FC<WinProbabilityBarProps> = ({ data, isLoading, 
     // Dynamic Colors
     const color1 = getTeamColor(data.team1.name) || '#3b82f6';
     let color2 = getTeamColor(data.team2.name) || '#ef4444';
-
-    // Prevent clashes: If colors are identical/too similar, shift Team 2
     if (color1 === color2) {
-        // Fallback or shift hue? Simple fallback for now.
-        // If both are Blue (Ind/SL), make Team 2 Red/Orange or a generic dark grey?
-        // User asked for team colors, so maybe use a secondary color if available? 
-        // For now, hardcode a distinct fallback if collision occurs.
-        color2 = '#ef4444'; // Red conflict fallback
-        if (color1 === '#ef4444') color2 = '#3b82f6'; // Blue fallback if both red
+        color2 = '#ef4444'; // Red fallback
+        if (color1 === '#ef4444') color2 = '#3b82f6'; // Blue fallback
     }
 
-    // Phase formatting
     const getPhaseText = () => {
-        if (!data.phase) return '';
-        const p = data.phase.toUpperCase().replace('-', ' ');
-        if (p.includes('PHASE')) return p;
-        if (p.includes('MATCH')) return p; // "PRE MATCH" is fine without "PHASE" maybe? Or add it? User said "sat PHASE for all"
-        return `${p} PHASE`;
+        if (!data.phase) return 'MATCH START';
+        return data.phase.toUpperCase().replace('-', ' ');
     };
+
+    const details = data.details;
+    const isChase = data.message === 'Chase On';
+    const showDetails = expanded && details;
 
     return (
         <div style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-            backdropFilter: 'blur(10px)',
-            WebkitBackdropFilter: 'blur(10px)',
+            background: 'var(--bg-card)',
             borderRadius: '16px',
-            padding: '12px 16px',
-            marginBottom: '12px',
-            fontFamily: 'var(--font-family-base, sans-serif)',
-            border: '1px solid rgba(255,255,255,0.05)'
+            padding: '20px',
+            marginBottom: '16px',
+            border: '1px solid var(--border-color)',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
         }}>
-            {/* Header Row: Combined Title, Percentages, Names, Phase */}
+            {/* Header: Centered "Win Probability" */}
+            <div style={{
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                textAlign: 'center',
+                marginBottom: '16px'
+            }}>
+                Win Probability
+            </div>
+
             <div style={{
                 display: 'flex',
+                alignItems: 'flex-end',
                 justifyContent: 'space-between',
-                alignItems: 'baseline',
-                marginBottom: '8px',
-                flexWrap: 'wrap',
-                gap: '8px'
+                marginBottom: '12px'
             }}>
                 {/* Team 1 (Left) */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                        <span style={{
-                            fontSize: '16px',
-                            fontWeight: 800,
-                            color: animatedProb >= 50 ? '#fff' : 'rgba(255, 255, 255, 0.5)',
-                            lineHeight: 1,
-                            transition: 'color 0.3s ease'
-                        }}>
-                            {Math.round(animatedProb)}%
-                        </span>
-                        <span style={{ fontSize: '11px', color: color1, fontWeight: 700, textTransform: 'uppercase' }}>
-                            {data.team1.name}
-                        </span>
+                <div style={{ textAlign: 'left' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                        {data.team1.short_name || data.team1.name}
+                    </div>
+                    <div style={{ fontSize: '32px', fontWeight: 800, lineHeight: 1, color: 'var(--text-primary)' }}>
+                        {Math.round(animatedProb)}%
                     </div>
                 </div>
 
-                {/* Center Info */}
-                <div style={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: 0.6
-                }}>
+                {/* Center Phase */}
+                <div style={{ textAlign: 'center', paddingBottom: '6px' }}>
                     <span style={{
-                        fontSize: '9px',
-                        fontWeight: 600,
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        color: 'var(--text-muted)',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        color: '#fff',
-                        textAlign: 'center'
-                    }}>
-                        WIN PROBABILITY
-                    </span>
-                    <span style={{
-                        fontSize: '8px',
-                        fontWeight: 500,
-                        textTransform: 'uppercase',
-                        color: 'rgba(255,255,255,0.7)',
-                        marginTop: '1px'
+                        background: 'var(--bg-secondary)',
+                        padding: '4px 8px',
+                        borderRadius: '6px'
                     }}>
                         {getPhaseText()}
                     </span>
                 </div>
 
                 {/* Team 2 (Right) */}
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                        <span style={{ fontSize: '11px', color: color2, fontWeight: 700, textTransform: 'uppercase' }}>
-                            {data.team2.name}
-                        </span>
-                        <span style={{
-                            fontSize: '16px',
-                            fontWeight: 800,
-                            color: animatedProb < 50 ? '#fff' : 'rgba(255, 255, 255, 0.5)',
-                            lineHeight: 1,
-                            transition: 'color 0.3s ease'
-                        }}>
-                            {Math.round(100 - animatedProb)}%
-                        </span>
+                <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                        {data.team2.short_name || data.team2.name}
+                    </div>
+                    <div style={{ fontSize: '32px', fontWeight: 800, lineHeight: 1, color: 'var(--text-primary)' }}>
+                        {Math.round(100 - animatedProb)}%
                     </div>
                 </div>
             </div>
 
-            {/* Split Bar */}
+            {/* The Bar */}
             <div style={{
-                position: 'relative',
-                height: '6px',
+                height: '8px',
                 width: '100%',
-                borderRadius: '10px',
+                borderRadius: '4px',
+                background: 'rgba(255, 255, 255, 0.05)',
                 overflow: 'hidden',
                 display: 'flex',
-                background: 'rgba(0,0,0,0.2)'
+                marginBottom: showDetails ? '20px' : '0'
             }}>
-                {/* Team 1 Segment */}
                 <div style={{
                     width: `${animatedProb}%`,
                     height: '100%',
-                    background: `linear-gradient(90deg, ${color1} 0%, ${color1}dd 100%)`,
-                    boxShadow: `0 0 10px ${color1}66`,
-                    transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)',
-                    borderTopRightRadius: '2px',
-                    borderBottomRightRadius: '2px',
-                    position: 'relative',
-                    zIndex: 2
-                }}>
-                    {/* Shine */}
-                    <div style={{
-                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
-                        transform: 'skewX(-20deg)'
-                    }} />
-                </div>
-
-                {/* Team 2 Segment */}
+                    background: color1,
+                    transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}></div>
                 <div style={{
                     flex: 1,
                     height: '100%',
-                    background: `linear-gradient(90deg, ${color2}dd 0%, ${color2} 100%)`,
-                    boxShadow: `0 0 10px ${color2}44`,
-                    transition: 'all 1s ease',
-                    position: 'relative',
-                    zIndex: 1
-                }}></div>
-
-                {/* Center Marker */}
-                <div style={{
-                    position: 'absolute',
-                    left: '50%',
-                    top: 0,
-                    bottom: 0,
-                    width: '2px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    zIndex: 10,
-                    transform: 'translateX(-50%)'
+                    background: color2,
+                    transition: 'all 1s ease'
                 }}></div>
             </div>
+
+            {/* EXPANDED DETAILS GRID */}
+            {showDetails && (
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '12px',
+                    paddingTop: '20px',
+                    borderTop: '1px solid var(--border-color)'
+                }}>
+                    {!isChase ? (
+                        <>
+                            <StatBox label="Projected" value={details.projectedScore?.toString() || '-'} />
+                            <StatBox label="Par Score" value={details.parScore?.toString() || '-'} />
+                            <StatBox label="Current RR" value={details.crr?.toFixed(2) || '-'} />
+                        </>
+                    ) : (
+                        <>
+                            <StatBox label="Need" value={details.runsNeeded?.toString() || '-'} sub="Runs" />
+                            <StatBox label="From" value={details.ballsRemaining?.toString() || '-'} sub="Balls" />
+                            <StatBox label="Req RR" value={details.rrr?.toFixed(2) || '-'} highlight={details.rrr && details.rrr > 10} />
+                        </>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
+
+const StatBox = ({ label, value, sub, highlight }: { label: string, value: string, sub?: string, highlight?: boolean }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>{label}</span>
+        <span style={{
+            fontSize: '18px',
+            fontWeight: 700,
+            color: highlight ? '#ef4444' : 'var(--text-primary)'
+        }}>
+            {value} {sub && <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>{sub}</span>}
+        </span>
+    </div>
+);
 
 export default WinProbabilityBar;
