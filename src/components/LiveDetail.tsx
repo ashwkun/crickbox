@@ -641,6 +641,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             } else if (c.runs > p.runs) {
                 const diff = c.runs - p.runs;
                 setTicker({ text: `+${diff}`, type: 'runs', key: Date.now() });
+            } else {
+                // Dot ball (Overs changed but runs/wickets same)
+                setTicker({ text: '•', type: 'dot', key: Date.now() });
             }
         };
 
@@ -921,7 +924,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         {scoreTicker1 && (
                             <div key={scoreTicker1.key} style={{
                                 position: 'absolute', top: 0, right: -10,
-                                background: scoreTicker1.text === 'W' ? '#ef4444' : (scoreTicker1.text === '+6' ? '#8b5cf6' : (scoreTicker1.text === '+4' ? '#22c55e' : '#3b82f6')),
+                                background: scoreTicker1.text === 'W' ? '#ef4444' : (scoreTicker1.text === '•' ? '#64748b' : (scoreTicker1.text === '+6' ? '#8b5cf6' : (scoreTicker1.text === '+4' ? '#22c55e' : '#3b82f6'))),
                                 color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                                 animation: 'popReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
@@ -954,7 +957,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         {scoreTicker2 && (
                             <div key={scoreTicker2.key} style={{
                                 position: 'absolute', top: 0, left: -10,
-                                background: scoreTicker2.text === 'W' ? '#ef4444' : (scoreTicker2.text === '+6' ? '#8b5cf6' : (scoreTicker2.text === '+4' ? '#22c55e' : '#3b82f6')),
+                                background: scoreTicker2.text === 'W' ? '#ef4444' : (scoreTicker2.text === '•' ? '#64748b' : (scoreTicker2.text === '+6' ? '#8b5cf6' : (scoreTicker2.text === '+4' ? '#22c55e' : '#3b82f6'))),
                                 color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                                 animation: 'popReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
