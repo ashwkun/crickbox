@@ -188,7 +188,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         };
 
         loadBaseProb();
-    }, [match.game_id]);
+    }, [match.game_id, scorecard?.Matchdetail?.Venue?.Pitch_Detail]); // Recalculate when pitch data becomes available
 
     // 2. Calculate Live Probability (on Scorecard update)
     useEffect(() => {
