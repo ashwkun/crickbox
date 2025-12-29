@@ -110,7 +110,23 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             ]);
 
             let h2hStats = { matches_played: '0', won: '0', lost: '0' };
-            let h2hVal = null;
+
+            // Process H2H result
+            if (h2hRes.status === 'fulfilled' && h2hRes.value) {
+                const h2hVal = h2hRes.value;
+                if (h2hVal?.team?.head_to_head?.comp_type?.data) {
+                    const opponentStat = h2hVal.team.head_to_head.comp_type.data.find(
+                        (op: any) => String(op.id) === String(team2.id)
+                    );
+                    if (opponentStat) {
+                        h2hStats = {
+                            matches_played: String(opponentStat.matches_played || 0),
+                            won: String(opponentStat.won || 0),
+                            lost: String(opponentStat.lost || 0)
+                        };
+                    }
+                }
+            }
 
             const id1 = team1.id;
             const id2 = team2.id;
@@ -124,14 +140,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
             if (!isMounted) return;
 
-            // H2H Stats Mock (since getH2HMatches returns array, we need to process it or use fetchH2H from context?)
-            // For now using the passed h2hData prop if available, or fetch
-            // The logic here seems to rely on empty mock or passed data.
-            // Let's assume h2hStats is handled elsewhere or mock it.
-            // Actually existing code uses 'h2hStats' which was undefined in snippet?
-            // Ah, h2hData is a prop.
-
-            const f1 = form1; // Now objects or strings? getTeamForm returns 'W'/'L' strings.
+            const f1 = form1;
             const f2 = form2;
 
             const isInternational = match.league_code === 'icc' ||
@@ -147,14 +156,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             const prob = calculatePreMatchProbability(
                 team1 as any,
                 team2 as any,
-                h2hData?.Summary || {}, // Use Summary from prop
+                h2hStats, // Use extracted H2H stats
                 f1,
                 f2,
                 {}, // Venue stats
                 pitch,
                 match.venue_name || "",
                 isFranchise,
-                homeTeamId // New ID
+                homeTeamId
             );
 
             setPreMatchProb(prob);
