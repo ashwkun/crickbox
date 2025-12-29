@@ -673,6 +673,22 @@ export const calculateLiveProbability = (
     // Get bowler data
     const bowlers = currentInning.Bowlers || [];
 
+    // === VERBOSE INPUT LOGGING ===
+    console.log(`📋 [INPUT DATA RECEIVED]`);
+    console.log(`   • Pre-Match Prob: ${preMatchProb.team1.name} ${preMatchProb.team1.probability.toFixed(0)}% | ${preMatchProb.team2.name} ${preMatchProb.team2.probability.toFixed(0)}%`);
+    console.log(`   • Scorecard: ${scorecard ? '✅ Available' : '❌ Missing'}`);
+    console.log(`   • Innings Count: ${innings.length} (viewing #${currentInningIndex + 1})`);
+    console.log(`   • Batting Team ID: "${batTeamName}" → isTeam1Batting: ${isTeam1Batting}`);
+    console.log(`   • Format: ${format} | Total Overs: ${totalOvers}`);
+    console.log(`   • Overs Bowled: ${oversBowled} | Progress: ${(progress * 100).toFixed(1)}% | Phase: ${phase}`);
+    console.log(`   • Pitch Type: "${pitchType || 'NOT AVAILABLE'}"`);
+    console.log(`   • Partnerships: ${partnerships.length} entries`);
+    console.log(`   • Bowlers: ${bowlers.length} entries`);
+    console.log(`   • H2H Player Data: ${h2hPlayerData ? '✅ Available' : '❌ Missing'}`);
+    console.log(`   • Team IDs: team1="${team1Id || 'MISSING'}" | team2="${team2Id || 'MISSING'}"`);
+    console.log(`   • OBO Data: ${overByOverData?.Overbyover ? `✅ ${overByOverData.Overbyover.length} overs` : '❌ Missing'}`);
+    console.log(``);
+
     if (currentInningIndex === 0) {
         // 1st Innings: Projected vs Dynamic Par
         const runs = parseInt(currentInning.Total || "0");
@@ -717,6 +733,8 @@ export const calculateLiveProbability = (
             liveProbBat += partnership.adjustment;
             console.log(`🤝 [PARTNERSHIP] ${partnership.runs} runs off ${partnership.balls} balls`);
             console.log(`   → Adjustment: ${partnership.adjustment > 0 ? '+' : ''}${partnership.adjustment}%`);
+        } else {
+            console.log(`🤝 [PARTNERSHIP] ${partnership.runs} runs off ${partnership.balls} balls → No adjustment (below threshold)`);
         }
 
         // Bowler Analysis (from bowling team's perspective)
@@ -737,7 +755,11 @@ export const calculateLiveProbability = (
             if (pitchSynergyPenalty > 0) {
                 liveProbBat -= pitchSynergyPenalty;
                 console.log(`   → Bowling boost (pitch synergy): -${pitchSynergyPenalty}%`);
+            } else {
+                console.log(`   → No pitch synergy (spin: ${bowlerAnalysis.spinBoost}, pace: ${bowlerAnalysis.paceBoost})`);
             }
+        } else {
+            console.log(`🎳 [BOWLER ANALYSIS] ⏭️ SKIPPED - ${bowlerAnalysis.logDetails[0] || 'No bowler data available'}`);
         }
 
         // OBO Momentum Analysis
@@ -748,7 +770,11 @@ export const calculateLiveProbability = (
                 console.log(`📈 [MOMENTUM]`);
                 momentum.logDetails.forEach(log => console.log(`   ${log}`));
                 console.log(`   → Adjustment: ${momentum.adjustment > 0 ? '+' : ''}${momentum.adjustment}%`);
+            } else {
+                console.log(`📈 [MOMENTUM] ⏭️ No adjustment - ${momentum.logDetails.join(' | ')}`);
             }
+        } else {
+            console.log(`📈 [MOMENTUM] ⏭️ SKIPPED - No OBO data available`);
         }
 
         console.log(`   → Final 1st innings probability: ${liveProbBat.toFixed(0)}%`);
