@@ -252,36 +252,43 @@ export const calculateLiveProbability = (
     scorecard: any,
     currentInnings: number,
     format: 'T20' | 'ODI' | 'Test' = 'T20'
-): WinProbabilityResult => { // Ignoring prevProb for simplicity now
+): WinProbabilityResult => {
 
     // Default safe return
-    if (!scorecard || !scorecard.Innings || scorecard.Innings.length === 0) return preMatchProb;
+    if (!scorecard || !scorecard.Innings || scorecard.Innings.length === 0) {
+        console.log(`⚠️ [LIVE CALC] No innings data available - returning pre-match probability`);
+        return preMatchProb;
+    }
 
     // Identify current innings
     const innings = scorecard.Innings;
-    // For live match, use last available inning as "current"
     const currentInningIndex = innings.length - 1;
     const currentInning = innings[currentInningIndex];
 
     const batTeamName = currentInning.Battingteam;
-    // Check if Team 1 is batting
     const isTeam1Batting = preMatchProb.team1.name === batTeamName;
+    const battingTeam = isTeam1Batting ? preMatchProb.team1.name : preMatchProb.team2.name;
+    const bowlingTeam = isTeam1Batting ? preMatchProb.team2.name : preMatchProb.team1.name;
 
     // Determine Overs Progress
-    // Logic to handle "12.3" -> 12.5 overs
     const overStr = currentInning.Overs || "0";
     const totalOvers = format === 'T20' ? 20 : (format === 'ODI' ? 50 : 90);
     const oversBowled = parseFloat(overStr);
     const progress = Math.min(1, oversBowled / totalOvers);
+    const phase = progress < 0.3 ? 'EARLY' : progress < 0.8 ? 'MID' : 'DEATH';
 
-    // Weight shifts from 0.4 (start) to 0.9 (end)
-    // At start: 60% PreMatch, 40% Live (Pitch, Conditions, Start)
-    // At end: 10% PreMatch, 90% Live (Scoreboard pressure)
+    // Weight shifts from 0.4 (start) to 0.95 (end)
     const liveWeight = 0.4 + (0.55 * progress);
 
-    let liveProbBat = 50;
+    console.log(`\n⚡ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`📺 LIVE PROBABILITY UPDATE: ${battingTeam} batting`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`📊 Innings: ${currentInningIndex + 1} | Format: ${format} | Phase: ${phase}`);
+    console.log(`⏱️ Overs: ${overStr}/${totalOvers} (${(progress * 100).toFixed(0)}% complete)`);
+    console.log(`⚖️ Blend: ${((1 - liveWeight) * 100).toFixed(0)}% Pre-Match + ${(liveWeight * 100).toFixed(0)}% Live`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
 
-    // --- LIVE LOGIC ---
+    let liveProbBat = 50;
 
     if (currentInningIndex === 0) {
         // 1st Innings: Projected vs Par
@@ -290,40 +297,45 @@ export const calculateLiveProbability = (
         const wickets = parseInt(currentInning.Wickets || "0");
         const oversLeft = Math.max(0, totalOvers - oversBowled);
 
-        // Resource Factor (Wickets penalty)
-        // 0-2 wkts: 1.0, 5 wkts: 0.8, 9 wkts: 0.2
         const resourceFactor = Math.max(0.1, 1 - (wickets * (wickets > 5 ? 0.12 : 0.08)));
+        const projected = Math.floor(runs + (crr * oversLeft * resourceFactor));
+        const parScore = totalOvers === 20 ? 170 : 280;
 
-        const projected = runs + (crr * oversLeft * resourceFactor);
-        const parScore = totalOvers === 20 ? 170 : 280; // Hardcoded avg for now
-
-        // Win% based on projected lead over par
         const diff = projected - parScore;
-        // +20 runs = +10% win chance roughly
         liveProbBat = 50 + (diff * 0.5);
+
+        console.log(`🏏 [1ST INNINGS] ${battingTeam} setting target`);
+        console.log(`   Score: ${runs}/${wickets} in ${overStr} overs (CRR: ${crr.toFixed(2)})`);
+        console.log(`   Projected: ${projected} | Par: ${parScore} | Diff: ${diff > 0 ? '+' : ''}${diff}`);
+        console.log(`   Resource Factor: ${(resourceFactor * 100).toFixed(0)}% (${wickets} wickets down)`);
+        console.log(`   → Live batting probability: ${liveProbBat.toFixed(0)}%`);
 
     } else {
         // 2nd Innings: Chase Pressure
-        // Target is usually in Innings[0].Total + 1, OR explicitly in Target field
         let target = parseInt(currentInning.Target || "0");
         if (!target && innings[0]) target = parseInt(innings[0].Total || "0") + 1;
-        if (!target) target = 200; // Fallback
+        if (!target) target = 200;
 
         const runs = parseInt(currentInning.Total || "0");
         const wickets = parseInt(currentInning.Wickets || "0");
 
-        // Balls Remaining
-        // 12.3 -> 12 * 6 + 3 = 75 balls bowled
         const ballsBowled = Math.floor(oversBowled) * 6 + Math.round((oversBowled % 1) * 10);
         const ballsLeft = (totalOvers * 6) - ballsBowled;
         const runsNeeded = target - runs;
+        const rrr = runsNeeded / (Math.max(1, ballsLeft) / 6);
+        const wicketsLeft = 10 - wickets;
 
-        if (runs >= target) liveProbBat = 100;
-        else if (wickets >= 10 || ballsLeft <= 0) liveProbBat = 0;
-        else {
-            const rrr = runsNeeded / (Math.max(1, ballsLeft) / 6);
-            const wicketsLeft = 10 - wickets;
+        console.log(`🎯 [2ND INNINGS] ${battingTeam} chasing ${target}`);
+        console.log(`   Score: ${runs}/${wickets} (Need ${runsNeeded} from ${ballsLeft} balls)`);
+        console.log(`   RRR: ${rrr.toFixed(2)} | Wickets in hand: ${wicketsLeft}`);
 
+        if (runs >= target) {
+            liveProbBat = 100;
+            console.log(`   ✅ Target achieved! ${battingTeam} wins.`);
+        } else if (wickets >= 10 || ballsLeft <= 0) {
+            liveProbBat = 0;
+            console.log(`   ❌ ${battingTeam} ${wickets >= 10 ? 'all out' : 'out of overs'}.`);
+        } else {
             // Base Calculation (RRR Pressure)
             if (rrr > 13) liveProbBat = 5;
             else if (rrr > 12) liveProbBat = 10;
@@ -331,32 +343,45 @@ export const calculateLiveProbability = (
             else if (rrr > 9) liveProbBat = 35;
             else if (rrr > 8) liveProbBat = 45;
             else if (rrr < 6) liveProbBat = 80;
-            else liveProbBat = 60; // 6-8 is manageable
+            else liveProbBat = 60;
+
+            console.log(`   Base prob (from RRR): ${liveProbBat.toFixed(0)}%`);
 
             // Wicket Penalty
-            if (wicketsLeft < 3) liveProbBat *= 0.3;
-            else if (wicketsLeft < 5) liveProbBat *= 0.6;
+            if (wicketsLeft < 3) {
+                liveProbBat *= 0.3;
+                console.log(`   ⚠️ Danger zone (${wicketsLeft} wickets left) → ×0.3 penalty`);
+            } else if (wicketsLeft < 5) {
+                liveProbBat *= 0.6;
+                console.log(`   ⚠️ Pressure (${wicketsLeft} wickets left) → ×0.6 penalty`);
+            }
 
-            // Balls Left Penalty (Death overs pressure)
-            if (ballsLeft < 12 && runsNeeded > 20) liveProbBat *= 0.5;
+            // Death overs pressure
+            if (ballsLeft < 12 && runsNeeded > 20) {
+                liveProbBat *= 0.5;
+                console.log(`   💀 Death crunch (${runsNeeded} needed, ${ballsLeft} balls) → ×0.5 penalty`);
+            }
+
+            console.log(`   → Live batting probability: ${liveProbBat.toFixed(0)}%`);
         }
     }
 
-    // Clamp Live Prob
+    // Clamp
     liveProbBat = Math.max(1, Math.min(99, liveProbBat));
 
-    // Blend: (PreMath * (1-w)) + (Live * w)
-    // Note: PreMatch prob is for Team1. We need to respect that.
-
+    // Blend
     const preMatchBatProb = isTeam1Batting ? preMatchProb.team1.probability : preMatchProb.team2.probability;
     const finalBatProb = (preMatchBatProb * (1 - liveWeight)) + (liveProbBat * liveWeight);
-
     const finalProb = Math.max(1, Math.min(99, finalBatProb));
+
+    console.log(`\n📈 [BLENDING]`);
+    console.log(`   Pre-match ${battingTeam}: ${preMatchBatProb.toFixed(0)}%`);
+    console.log(`   Live ${battingTeam}: ${liveProbBat.toFixed(0)}%`);
+    console.log(`   Blended: (${preMatchBatProb.toFixed(0)} × ${((1 - liveWeight) * 100).toFixed(0)}%) + (${liveProbBat.toFixed(0)} × ${(liveWeight * 100).toFixed(0)}%) = ${finalBatProb.toFixed(1)}%`);
 
     // Calculate details for UI
     let details: WinProbabilityDetails = {};
     if (currentInningIndex === 0) {
-        // Re-calculate or accessible vars? Need to scope them up or recalculate.
         const runs = parseInt(currentInning.Total || "0");
         const crr = parseFloat(currentInning.Runrate || "0");
         const wickets = parseInt(currentInning.Wickets || "0");
@@ -375,7 +400,6 @@ export const calculateLiveProbability = (
         if (!target && innings[0]) target = parseInt(innings[0].Total || "0") + 1;
         const runs = parseInt(currentInning.Total || "0");
         const runsNeeded = target - runs;
-        // Balls Remaining
         const ballsBowled = Math.floor(oversBowled) * 6 + Math.round((oversBowled % 1) * 10);
         const ballsLeft = Math.max(0, (totalOvers * 6) - ballsBowled);
         const rrr = runsNeeded / (Math.max(1, ballsLeft) / 6);
@@ -389,14 +413,23 @@ export const calculateLiveProbability = (
         };
     }
 
+    const t1Prob = isTeam1Batting ? finalProb : 100 - finalProb;
+    const t2Prob = isTeam1Batting ? 100 - finalProb : finalProb;
+
+    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`✅ LIVE PROBABILITY (${phase} PHASE)`);
+    console.log(`   🔵 ${preMatchProb.team1.name}: ${t1Prob.toFixed(0)}%`);
+    console.log(`   🔴 ${preMatchProb.team2.name}: ${t2Prob.toFixed(0)}%`);
+    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+
     return {
         team1: {
             name: preMatchProb.team1.name,
-            probability: isTeam1Batting ? finalProb : 100 - finalProb
+            probability: t1Prob
         },
         team2: {
             name: preMatchProb.team2.name,
-            probability: isTeam1Batting ? 100 - finalProb : finalProb
+            probability: t2Prob
         },
         phase: progress < 0.3 ? 'early' : progress < 0.8 ? 'mid' : 'death',
         message: currentInningIndex === 0 ? 'Setting Target' : 'Chase On',
