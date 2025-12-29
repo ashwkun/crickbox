@@ -5,9 +5,10 @@ interface FloatingHeaderProps {
     onBack: () => void;
     onLogoClick?: () => void;
     centerContent?: React.ReactNode;
+    accentColor?: string;
 }
 
-const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, centerContent }) => {
+const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, centerContent, accentColor }) => {
     // Styles for the floating container
     const containerStyle: React.CSSProperties = {
         position: 'fixed',
@@ -45,7 +46,8 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         width: '200px', // Increased width for breathing room
         borderRadius: '100px', // Full pill shape
         padding: 0,
-        background: 'rgba(20, 20, 20, 0.4)',
+        background: accentColor || 'rgba(20, 20, 20, 0.4)',
+        transition: 'background 1.2s ease, width 0.3s ease, transform 0.2s ease', // Slower background transition
     };
 
     const contentKey = centerContent ? 'score' : 'logo';
@@ -55,8 +57,8 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
             <style>
                 {`
                     @keyframes blurFocus {
-                        0% { opacity: 0; filter: blur(12px); transform: scale(1.1); }
-                        100% { opacity: 1; filter: blur(0); transform: scale(1); }
+                        0% { opacity: 0; filter: blur(12px); transform: translateY(8px) scale(1.1); }
+                        100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
                     }
 
                 `}
@@ -99,8 +101,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        animation: 'blurFocus 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-
+                        animation: 'blurFocus 1s cubic-bezier(0.16, 1, 0.3, 1)',
                         whiteSpace: 'nowrap'
                     }}
                 >
