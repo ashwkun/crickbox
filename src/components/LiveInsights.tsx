@@ -18,10 +18,8 @@ interface LiveInsightsProps {
     h2hData: any;
     scorecard?: any;
     batsmanSplits?: BatsmanSplitsResponse | null;
-    batsmanSplitsMatchups?: BatsmanSplitsResponse | null; // Independent data for Matchups
-    overByOverMatchups?: OverByOverResponse | null; // Independent data for Matchups Wickets
-    overByOver?: OverByOverResponse | null;
-    overByOverMatchups?: OverByOverResponse | null; // Independent data for Matchups Wickets
+    batsmanSplitsMatchups?: BatsmanSplitsResponse | null;
+    overByOverMatchups?: OverByOverResponse | null;
     overByOver?: OverByOverResponse | null;
     wormPrimary?: { data: OverByOverResponse | null, label: string, color: string } | null;
     wormSecondary?: { data: OverByOverResponse | null, label: string, color: string } | null;
@@ -33,14 +31,14 @@ interface LiveInsightsProps {
     isMatchupsLoading?: boolean;
     partnershipsInnings?: number;
     onPartnershipsInningsChange?: (innings: number) => void;
-    // Manhattan
     manhattanData?: { data: OverByOverResponse, label: string, color: string, id: number }[];
     manhattanInnings?: number[];
     onManhattanInningsChange?: (innings: number) => void;
+    isLoading?: boolean; // Global loading state for initial data
 }
 
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange, manhattanData = [], manhattanInnings = [], onManhattanInningsChange = () => { } }) => {
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange, manhattanData = [], manhattanInnings = [], onManhattanInningsChange = () => { }, isLoading = false }) => {
     // if (!h2hData) return null; // Removed to allow Matchups to show even if H2H fails
 
     const team1 = match?.participants?.[0];
@@ -73,6 +71,25 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
     const pitchDetail = matchDetails?.Pitch_Detail;
 
     console.log('LiveInsights Render Debug:', { manhattanData });
+
+    // Skeleton Placeholder Component
+    const SkeletonCard = ({ height = 200 }: { height?: number }) => (
+        <div className="skeleton" style={{ height, borderRadius: 16, width: '100%' }}></div>
+    );
+
+    // Show skeletons if initial loading
+    if (isLoading) {
+        return (
+            <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <SkeletonCard height={280} /> {/* Wagon Wheel */}
+                <SkeletonCard height={220} /> {/* Worm Chart */}
+                <SkeletonCard height={200} /> {/* Partnerships */}
+                <SkeletonCard height={240} /> {/* Matchups */}
+                <SkeletonCard height={220} /> {/* Manhattan */}
+                <SkeletonCard height={120} /> {/* Recent Form */}
+            </div>
+        );
+    }
 
     return (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

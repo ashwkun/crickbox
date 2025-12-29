@@ -42,8 +42,32 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
     }, [team1.id, team2.id]);
 
     if (loading) return (
-        <div className="section-container" style={{ minHeight: 180, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="spinner"></div>
+        <div className="h2h-card" style={{ marginTop: 12 }}>
+            <div className="h2h-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                Recent Form
+            </div>
+            <div className="h2h-content" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingTop: 16, paddingBottom: 16 }}>
+                {/* Team 1 Skeleton */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1, alignItems: 'center' }}>
+                    <div className="skeleton" style={{ width: 40, height: 16, borderRadius: 4 }}></div>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <div key={i} className="skeleton" style={{ width: 22, height: 22, borderRadius: 4 }}></div>
+                        ))}
+                    </div>
+                </div>
+                {/* Divider */}
+                <div style={{ width: 1, background: 'rgba(255,255,255,0.1)', alignSelf: 'stretch', margin: '0 8px' }}></div>
+                {/* Team 2 Skeleton */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1, alignItems: 'center' }}>
+                    <div className="skeleton" style={{ width: 40, height: 16, borderRadius: 4 }}></div>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <div key={i} className="skeleton" style={{ width: 22, height: 22, borderRadius: 4 }}></div>
+                        ))}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 
