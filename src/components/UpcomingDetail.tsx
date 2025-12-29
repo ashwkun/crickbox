@@ -170,7 +170,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                 const f1 = (form1.status === 'fulfilled' ? form1.value : []) as string[];
                 const f2 = (form2.status === 'fulfilled' ? form2.value : []) as string[];
                 // Extract Pitch Detail from Scorecard if available
-                const pitch = scorecardValue?.data?.Matchdetail?.Pitch_Detail || {};
+                const pitch = scorecardValue?.data?.Matchdetail?.Venue?.Pitch_Detail || {};
                 const homeTeamId = scorecardValue?.data?.Matchdetail?.Team_Home;
 
                 const prob = calculatePreMatchProbability(

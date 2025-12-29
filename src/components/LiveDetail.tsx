@@ -150,7 +150,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             const isFranchise = !isInternational;
 
             // Pitch detail from initial scorecard prop if available
-            const pitch = scorecard?.Matchdetail?.Pitch_Detail || {};
+            const pitch = scorecard?.Matchdetail?.Venue?.Pitch_Detail || {};
             const homeTeamId = scorecard?.Matchdetail?.Team_Home;
 
             const prob = calculatePreMatchProbability(
