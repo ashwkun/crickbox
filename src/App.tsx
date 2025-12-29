@@ -154,6 +154,24 @@ export default function App(): React.ReactElement {
             if (isWicket) wicks += 1;
             else total += runs;
 
+            // Update Overs (Simple logic: .6 -> next over)
+            // Assuming 6 ball over
+            let oversStr = inn.Overs || '0.0';
+            if (!oversStr.includes('.')) oversStr += '.0';
+
+            let [ov, bl] = oversStr.split('.').map((n: string) => parseInt(n));
+            if (isNaN(ov)) ov = 0;
+            if (isNaN(bl)) bl = 0;
+
+            if (!isWide && !isNoBall) {
+                bl += 1;
+                if (bl >= 6) {
+                    bl = 0;
+                    ov += 1;
+                }
+            }
+            inn.Overs = `${ov}.${bl}`;
+
             inn.Total = total.toString();
             inn.Wickets = wicks.toString();
 
