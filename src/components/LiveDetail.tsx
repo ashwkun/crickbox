@@ -1862,155 +1862,123 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     position: 'fixed',
                     top: 70, // Below FloatingHeader
                     left: 12, right: 12,
-                    padding: '12px 16px',
-                    background: 'rgba(20, 20, 20, 0.9)',
+                    padding: '10px 16px',
+                    background: 'rgba(20, 20, 20, 0.95)',
                     backdropFilter: 'blur(16px)',
-                    zIndex: 2900, // Below FloatingHeader (3000)
-                    borderRadius: 16,
+                    zIndex: 2900,
+                    borderRadius: 100, // Pill shape for single row
                     border: '1px solid rgba(255,255,255,0.1)',
                     transform: showStickyHeader ? 'translateY(0)' : 'translateY(-20px)',
                     opacity: showStickyHeader ? 1 : 0,
                     pointerEvents: showStickyHeader ? 'auto' : 'none',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    display: 'flex', flexDirection: 'column', gap: 10,
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
                 }}>
-                    {/* Row 1: Segmented Control (Toggle) */}
-                    <div style={{
-                        display: 'flex',
-                        background: 'rgba(255,255,255,0.05)',
-                        borderRadius: 100,
-                        padding: 3,
-                        border: '1px solid rgba(255,255,255,0.05)',
-                        maxWidth: 240,
-                        margin: '0 auto',
-                        width: '100%'
-                    }}>
-                        {['live', 'insights'].map((tab) => {
-                            const isActive = activeTab === tab;
+                    {/* Current Batting Team & Score */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {(() => {
+                            const showTeam1 = isTeam1Batting || (!isTeam2Batting && team1);
+                            const team = showTeam1 ? team1 : team2;
+                            const score = showTeam1 ? team1Score : team2Score;
+
+                            // Name Sanitization: Remove -W, U19, Women, etc
+                            const cleanName = (team?.short_name || 'Match')
+                                .replace(/-W/g, '')
+                                .replace(/Women/g, '')
+                                .replace(/U19/g, '')
+                                .replace(/-U19/g, '')
+                                .trim();
+
                             return (
-                                <button
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab)}
-                                    style={{
-                                        flex: 1,
-                                        padding: '5px 0',
-                                        borderRadius: 100,
-                                        border: 'none',
-                                        background: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
-                                        color: isActive ? '#fff' : 'rgba(255,255,255,0.5)',
-                                        fontSize: 10,
-                                        fontWeight: isActive ? 700 : 600,
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s ease',
-                                        textTransform: 'uppercase'
-                                    }}
-                                >
-                                    {tab === 'live' ? 'Live' : 'Insights'}
-                                </button>
-                            )
-                        })}
+                                <>
+                                    <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
+                                        {cleanName}
+                                    </span>
+                                    <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>
+                                        {score ? score.split('(')[0].trim() : '0/0'}
+                                    </span>
+                                </>
+                            );
+                        })()}
                     </div>
 
-                    {/* Row 2: Simplified Score & Last Ball */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
-                        {/* Current Batting Team & Score */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            {(() => {
-                                const showTeam1 = isTeam1Batting || (!isTeam2Batting && team1); // Default to Team 1 if uncertain
-                                const team = showTeam1 ? team1 : team2;
-                                const score = showTeam1 ? team1Score : team2Score;
+                    {/* Last Ball Visual */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', fontWeight: 600 }}>LB</span>
+                        {(() => {
+                            const scLimit = getScorecardThisOver();
+                            const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
+                            const lastBall = thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null;
 
+                            if (lastBall) {
                                 return (
-                                    <>
-                                        <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
-                                            {team?.short_name || 'Match'}
-                                        </span>
-                                        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>
-                                            {score ? score.split('(')[0].trim() : '0/0'}
-                                        </span>
-                                    </>
+                                    <div style={{
+                                        width: 20, height: 20, borderRadius: '50%',
+                                        background: getBallColor(lastBall),
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 9, fontWeight: 700, color: '#fff',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                    }}>
+                                        {getBallDisplay(lastBall)}
+                                    </div>
                                 );
-                            })()}
-                        </div>
-
-                        {/* Last Ball Visual */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Last Ball</span>
-                            {(() => {
-                                // Logic to get last ball
-                                const scLimit = getScorecardThisOver();
-                                const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
-                                const lastBall = thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null;
-
-                                if (lastBall) {
-                                    return (
-                                        <div style={{
-                                            width: 20, height: 20, borderRadius: '50%',
-                                            background: getBallColor(lastBall),
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            fontSize: 9, fontWeight: 700, color: '#fff',
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                        }}>
-                                            {getBallDisplay(lastBall)}
-                                        </div>
-                                    );
-                                } else {
-                                    return <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>-</span>;
-                                }
-                            })()}
-                        </div>
+                            } else {
+                                return <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>-</span>;
+                            }
+                        })()}
                     </div>
                 </div>
 
-            </div >
 
-            {/* Drill-down Overlay for Recent Match */}
-            {
-                selectedRecentMatch && selectedRecentScorecard && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        zIndex: 2200,
-                        background: 'var(--bg-app)'
-                    }}>
-                        <CompletedDetail
-                            match={selectedRecentMatch}
-                            scorecard={selectedRecentScorecard}
-                            onClose={() => {
-                                setSelectedRecentMatch(null);
-                                setSelectedRecentScorecard(null);
-                            }}
-                        />
-                    </div>
-                )
-            }
+        </div >
 
-            {/* Loading Overlay */}
-            {
-                isLoadingRecentMatch && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'rgba(0,0,0,0.8)',
-                        zIndex: 2300,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexDirection: 'column',
-                        backdropFilter: 'blur(4px)'
-                    }}>
-                        <div className="spinner" style={{ width: 40, height: 40, border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#f59e0b', borderRadius: '50%', marginBottom: 16 }}></div>
-                        <div style={{ color: '#fff', fontSize: 14, fontWeight: 500 }}>Loading Match...</div>
-                    </div>
-                )
-            }
+    {/* Drill-down Overlay for Recent Match */ }
+{
+    selectedRecentMatch && selectedRecentScorecard && (
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 2200,
+            background: 'var(--bg-app)'
+        }}>
+            <CompletedDetail
+                match={selectedRecentMatch}
+                scorecard={selectedRecentScorecard}
+                onClose={() => {
+                    setSelectedRecentMatch(null);
+                    setSelectedRecentScorecard(null);
+                }}
+            />
+        </div>
+    )
+}
+
+{/* Loading Overlay */ }
+{
+    isLoadingRecentMatch && (
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.8)',
+            zIndex: 2300,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            backdropFilter: 'blur(4px)'
+        }}>
+            <div className="spinner" style={{ width: 40, height: 40, border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#f59e0b', borderRadius: '50%', marginBottom: 16 }}></div>
+            <div style={{ color: '#fff', fontSize: 14, fontWeight: 500 }}>Loading Match...</div>
+        </div>
+    )
+}
         </div >
     );
 };
