@@ -13,6 +13,8 @@ import PartnershipsChart from './insights/PartnershipsChart';
 import ManhattanChart from './insights/ManhattanChart';
 import BatsmanBowlerMatchups from './insights/BatsmanBowlerMatchups';
 import ConditionsCard from './insights/ConditionsCard';
+import WinProbabilityCard from './WinProbabilityCard';
+import { WinProbabilityResult } from '../utils/winProbability';
 
 interface LiveInsightsProps {
     match?: Match;
@@ -39,10 +41,11 @@ interface LiveInsightsProps {
     isLoading?: boolean; // Global loading state for initial data
     isWormLoading?: boolean; // Worm chart specific loading
     onH2HMatchClick?: (matchId: string) => void; // Click handler for H2H matches
+    winProb?: WinProbabilityResult | null;
 }
 
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange, manhattanData = [], manhattanInnings = [], onManhattanInningsChange = () => { }, isManhattanLoading = false, isLoading = false, isWormLoading = false, onH2HMatchClick }) => {
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange, manhattanData = [], manhattanInnings = [], onManhattanInningsChange = () => { }, isManhattanLoading = false, isLoading = false, isWormLoading = false, onH2HMatchClick, winProb }) => {
     // if (!h2hData) return null; // Removed to allow Matchups to show even if H2H fails
 
     const team1 = match?.participants?.[0];
@@ -103,6 +106,11 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* === SECTION 1: MATCH SITUATION === */}
+
+            {/* 0. Win Probability (Extended) */}
+            {winProb && (
+                <WinProbabilityCard data={winProb} />
+            )}
 
             {/* 1. Worm Chart (Score Comparison) */}
             <WormChart

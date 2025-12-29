@@ -14,6 +14,16 @@ export interface WinProbabilityResult {
     factors?: WinProbabilityFactors;
     phase?: 'pre-match' | 'early' | 'mid' | 'death';
     message?: string;
+    details?: WinProbabilityDetails;
+}
+
+export interface WinProbabilityDetails {
+    projectedScore?: number;
+    parScore?: number;
+    rrr?: number;
+    crr?: number;
+    runsNeeded?: number;
+    ballsRemaining?: number;
 }
 
 export interface WinProbabilityFactors {
@@ -269,6 +279,42 @@ export const calculateLiveProbability = (
 
     const finalProb = Math.max(1, Math.min(99, finalBatProb));
 
+    // Calculate details for UI
+    let details: WinProbabilityDetails = {};
+    if (currentInningIndex === 0) {
+        // Re-calculate or accessible vars? Need to scope them up or recalculate.
+        const runs = parseInt(currentInning.Total || "0");
+        const crr = parseFloat(currentInning.Runrate || "0");
+        const wickets = parseInt(currentInning.Wickets || "0");
+        const oversLeft = Math.max(0, totalOvers - oversBowled);
+        const resourceFactor = Math.max(0.1, 1 - (wickets * (wickets > 5 ? 0.12 : 0.08)));
+        const projected = Math.floor(runs + (crr * oversLeft * resourceFactor));
+        const parScore = totalOvers === 20 ? 170 : 280;
+
+        details = {
+            projectedScore: projected,
+            parScore: parScore,
+            crr: crr
+        };
+    } else {
+        let target = parseInt(currentInning.Target || "0");
+        if (!target && innings[0]) target = parseInt(innings[0].Total || "0") + 1;
+        const runs = parseInt(currentInning.Total || "0");
+        const runsNeeded = target - runs;
+        // Balls Remaining
+        const ballsBowled = Math.floor(oversBowled) * 6 + Math.round((oversBowled % 1) * 10);
+        const ballsLeft = Math.max(0, (totalOvers * 6) - ballsBowled);
+        const rrr = runsNeeded / (Math.max(1, ballsLeft) / 6);
+        const crr = parseFloat(currentInning.Runrate || "0");
+
+        details = {
+            rrr: rrr,
+            runsNeeded: runsNeeded,
+            ballsRemaining: ballsLeft,
+            crr: crr
+        };
+    }
+
     return {
         team1: {
             name: preMatchProb.team1.name,
@@ -279,6 +325,7 @@ export const calculateLiveProbability = (
             probability: isTeam1Batting ? 100 - finalProb : finalProb
         },
         phase: progress < 0.3 ? 'early' : progress < 0.8 ? 'mid' : 'death',
-        message: currentInningIndex === 0 ? 'Setting Target' : 'Chase On'
+        message: currentInningIndex === 0 ? 'Setting Target' : 'Chase On',
+        details: details
     };
 };
