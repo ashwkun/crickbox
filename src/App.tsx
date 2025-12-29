@@ -330,7 +330,7 @@ export default function App(): React.ReactElement {
                     else if (selectedSeries) handleCloseSeries();
                     else if (selectedTournament) handleCloseTournament();
                 }}
-                onLogoClick={() => window.location.href = 'https://boxboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
+                onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
             />
 
             {/* Main Content */}
