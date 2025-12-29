@@ -666,12 +666,19 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
             setTicker({ text, type, key: Date.now() });
 
-            // Trigger hero flash
-            const flashColor = type === 'wicket' ? '#ef4444' :
-                text.includes('6') ? '#f97316' :
-                    text.includes('4') ? '#22c55e' : '#60a5fa';
-            setHeroFlash({ color: flashColor, key: Date.now() });
-            setTimeout(() => setHeroFlash(null), 800);
+            // Trigger hero flash ONLY for W, 6, 4, WD, NB
+            const shouldFlash = type === 'wicket' ||
+                text.includes('6') || text.includes('4') ||
+                text.includes('WD') || text.includes('NB');
+
+            if (shouldFlash) {
+                const flashColor = type === 'wicket' ? '#ef4444' :
+                    text.includes('6') ? '#f97316' :
+                        text.includes('4') ? '#22c55e' :
+                            (text.includes('WD') || text.includes('NB')) ? '#eab308' : '#60a5fa';
+                setHeroFlash({ color: flashColor, key: Date.now() });
+                setTimeout(() => setHeroFlash(null), 800);
+            }
 
             // Auto-clear ticker after 5 seconds
             setTimeout(() => setTicker(null), 5000);
