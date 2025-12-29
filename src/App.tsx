@@ -423,7 +423,7 @@ export default function App(): React.ReactElement {
                 }}
                 onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
                 data={headerData}
-                isLive={selectedMatch?.event_state === 'L'}
+                isLive={matches.some(m => m.event_state === 'L') || selectedMatch?.event_state === 'L'}
             />
 
             {/* Main Content */}
