@@ -12,6 +12,7 @@ import WormChart from './insights/WormChart';
 import PartnershipsChart from './insights/PartnershipsChart';
 import ManhattanChart from './insights/ManhattanChart';
 import BatsmanBowlerMatchups from './insights/BatsmanBowlerMatchups';
+import { WeatherIcon } from './icons/WeatherIcons';
 
 interface LiveInsightsProps {
     match?: Match;
@@ -68,9 +69,28 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
     const t2Id = team2?.id ? parseInt(team2.id) : undefined;
     const teamIds: [number, number] | undefined = t1Id && t2Id ? [t1Id, t2Id] : undefined;
 
-    // Extract pitch and umpire info from scorecard
-    const matchDetails = scorecard?.Matchdetail || scorecard?.Match_Details;
-    const pitchDetail = matchDetails?.Pitch_Detail;
+    // Extract venue, pitch, weather, and officials from scorecard
+    const matchDetails = scorecard?.Matchdetail;
+    const venue = matchDetails?.Venue;
+    const pitchDetail = venue?.Pitch_Detail;
+    const weather = venue?.Venue_Weather;
+    const officials = matchDetails?.Officials;
+
+    // Helper to map API weather to icon key
+    const getWeatherKey = (weatherName: string | undefined): string => {
+        if (!weatherName) return 'cloud';
+        const lower = weatherName.toLowerCase();
+        if (lower.includes('clear') || lower.includes('sun')) return 'clear';
+        if (lower.includes('partly') || lower.includes('cloud')) return 'partly-cloudy';
+        if (lower.includes('overcast')) return 'overcast';
+        if (lower.includes('rain') || lower.includes('shower')) return 'rain';
+        if (lower.includes('drizzle')) return 'drizzle';
+        if (lower.includes('storm') || lower.includes('thunder')) return 'storm';
+        if (lower.includes('fog')) return 'fog';
+        if (lower.includes('mist')) return 'mist';
+        if (lower.includes('haze')) return 'haze';
+        return 'cloud';
+    };
 
     console.log('LiveInsights Render Debug:', { manhattanData });
 
@@ -96,46 +116,9 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
     return (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            {/* 2. Pitch Report */}
-            {(pitchDetail?.Pitch_Suited_For || pitchDetail?.Pitch_Surface) && (
-                <div style={{
-                    background: 'var(--bg-card)',
-                    borderRadius: 16,
-                    padding: 20,
-                    border: '1px solid var(--border-color)',
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                        <div style={{ width: 4, height: 16, background: '#f59e0b', borderRadius: 2 }} />
-                        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Pitch Report</div>
-                    </div>
+            {/* === SECTION 1: MATCH SITUATION === */}
 
-                    <div style={{ display: 'flex', gap: 12 }}>
-                        {pitchDetail?.Pitch_Suited_For && (
-                            <div style={{ flex: 1, padding: 16, background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 6 }}>Suited For</div>
-                                <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{pitchDetail.Pitch_Suited_For}</div>
-                            </div>
-                        )}
-                        {pitchDetail?.Pitch_Surface && (
-                            <div style={{ flex: 1, padding: 16, background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 6 }}>Surface</div>
-                                <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{pitchDetail.Pitch_Surface}</div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {/* Wagon Wheel */}
-            <WagonWheel
-                batsmanSplits={batsmanSplits || null}
-                scorecard={scorecard}
-                selectedInnings={wagonWheelInnings}
-                onInningsChange={onWagonWheelInningsChange}
-                isLoading={isWagonWheelLoading}
-            />
-
-            {/* Worm Chart */}
+            {/* 1. Worm Chart (Score Comparison) */}
             <WormChart
                 primary={wormPrimary}
                 secondary={wormSecondary}
@@ -143,24 +126,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 isLoading={isWormLoading}
             />
 
-            {/* Partnerships Chart */}
-            <PartnershipsChart
-                scorecard={scorecard}
-                selectedInnings={partnershipsInnings}
-                onInningsChange={onPartnershipsInningsChange}
-            />
-
-            {/* Batsman vs Bowler Matchups */}
-            <BatsmanBowlerMatchups
-                batsmanSplits={batsmanSplitsMatchups || batsmanSplits || null}
-                overByOver={overByOverMatchups || null} // Strict: Do not fallback to main overByOver as it might be wrong innings
-                scorecard={scorecard}
-                selectedInnings={matchupsInnings}
-                onInningsChange={onMatchupsInningsChange}
-                isLoading={isMatchupsLoading}
-            />
-
-            {/* Innings Progression (Manhattan) */}
+            {/* 2. Manhattan Chart (Innings Progression) */}
             <ManhattanChart
                 datasets={manhattanData}
                 scorecard={scorecard}
@@ -169,19 +135,142 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 isLoading={isManhattanLoading}
             />
 
-            {/* 5. Recent Form (Dual Team) */}
+            {/* 3. Wagon Wheel (Shot Map) */}
+            <WagonWheel
+                batsmanSplits={batsmanSplits || null}
+                scorecard={scorecard}
+                selectedInnings={wagonWheelInnings}
+                onInningsChange={onWagonWheelInningsChange}
+                isLoading={isWagonWheelLoading}
+            />
+
+            {/* 4. Batsman vs Bowler Matchups */}
+            <BatsmanBowlerMatchups
+                batsmanSplits={batsmanSplitsMatchups || batsmanSplits || null}
+                overByOver={overByOverMatchups || null}
+                scorecard={scorecard}
+                selectedInnings={matchupsInnings}
+                onInningsChange={onMatchupsInningsChange}
+                isLoading={isMatchupsLoading}
+            />
+
+            {/* 5. Partnerships Chart */}
+            <PartnershipsChart
+                scorecard={scorecard}
+                selectedInnings={partnershipsInnings}
+                onInningsChange={onPartnershipsInningsChange}
+            />
+
+            {/* === SECTION 2: MATCH DEEP DIVE === */}
+
+            {/* 6. Conditions & Info Card */}
+            {(pitchDetail?.Pitch_Suited_For || pitchDetail?.Pitch_Surface || weather || officials) && (
+                <div style={{
+                    background: 'var(--bg-card)',
+                    borderRadius: 16,
+                    padding: 20,
+                    border: '1px solid var(--border-color)',
+                }}>
+                    {/* Weather Row - Icon focused */}
+                    {weather && (
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 16,
+                            marginBottom: pitchDetail || officials ? 16 : 0,
+                            padding: 12,
+                            background: 'rgba(255,255,255,0.03)',
+                            borderRadius: 12
+                        }}>
+                            <WeatherIcon icon={getWeatherKey(weather.Weather)} size={40} />
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 16, fontWeight: 600, color: '#fff' }}>
+                                    {weather.Weather}
+                                </div>
+                                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
+                                    {weather.Description}
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: 16, fontSize: 12 }}>
+                                {weather.Temperature && (
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>
+                                            {weather.Temperature.replace('C', '°')}
+                                        </div>
+                                    </div>
+                                )}
+                                {weather.Humidity && (
+                                    <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
+                                        <div style={{ fontSize: 11, marginBottom: 2 }}>💧</div>
+                                        <div style={{ fontSize: 10 }}>{weather.Humidity}</div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Pitch Row */}
+                    {(pitchDetail?.Pitch_Suited_For || pitchDetail?.Pitch_Surface) && (
+                        <div style={{
+                            display: 'flex',
+                            gap: 12,
+                            marginBottom: officials ? 16 : 0
+                        }}>
+                            {pitchDetail?.Pitch_Suited_For && (
+                                <div style={{ flex: 1, padding: 12, background: 'rgba(245, 158, 11, 0.1)', borderRadius: 10, border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>Pitch</div>
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#f59e0b' }}>{pitchDetail.Pitch_Suited_For}</div>
+                                </div>
+                            )}
+                            {pitchDetail?.Pitch_Surface && (
+                                <div style={{ flex: 1, padding: 12, background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>Surface</div>
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{pitchDetail.Pitch_Surface}</div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Officials Row - Minimal */}
+                    {officials && (officials.Umpire1_Name || officials.Referee) && (
+                        <div style={{
+                            display: 'flex',
+                            gap: 16,
+                            fontSize: 11,
+                            color: 'rgba(255,255,255,0.4)',
+                            paddingTop: (pitchDetail || weather) ? 12 : 0,
+                            borderTop: (pitchDetail || weather) ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                            flexWrap: 'wrap',
+                            justifyContent: 'center'
+                        }}>
+                            {officials.Umpire1_Name && (
+                                <span>🧑‍⚖️ {officials.Umpire1_Name.replace(/\s*\([^)]*\)/g, '')}</span>
+                            )}
+                            {officials.Umpire2_Name && (
+                                <span>🧑‍⚖️ {officials.Umpire2_Name.replace(/\s*\([^)]*\)/g, '')}</span>
+                            )}
+                            {officials.Referee && (
+                                <span>📋 {officials.Referee.replace(/\s*\([^)]*\)/g, '')}</span>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* === SECTION 3: TEAM CONTEXT === */}
+
+            {/* 7. Recent Form */}
             {team1?.id && team2?.id && (
                 <div style={{ padding: '0 0px' }}>
                     <DualTeamRecentForm
                         team1={{ id: team1.id, name: team1.name, short_name: team1.short_name }}
                         team2={{ id: team2.id, name: team2.name, short_name: team2.short_name }}
                         currentFormat={match?.event_format || match?.match_type}
-                    // onMatchClick not provided here as we might not want navigation inside live tab yet
                     />
                 </div>
             )}
 
-            {/* 6. Head to Head (Premium Card) */}
+            {/* 8. Head to Head */}
             {h2hData?.team?.head_to_head?.comp_type?.data && (
                 <div style={{ padding: '0 0px' }}>
                     <H2HCard
@@ -192,7 +281,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 </div>
             )}
 
-            {/* 7. Recent H2H Matches */}
+            {/* 9. Recent H2H Matches */}
             {h2hData?.team?.against_last_n_matches?.result && h2hData.team.against_last_n_matches.result.length > 0 && teamIds && (
                 <H2HRecentMatches
                     matches={h2hData.team.against_last_n_matches.result}
@@ -202,7 +291,7 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 />
             )}
 
-            {/* 8. Venue Stats (Premium Card) */}
+            {/* 10. Venue Stats */}
             {h2hData?.team?.head_to_head?.venue && (
                 <VenueCard
                     venue={h2hData.team.head_to_head.venue}
@@ -212,36 +301,6 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                         Pitch_Surface: pitchDetail.Pitch_Surface
                     } : undefined}
                 />
-            )}
-
-            {/* 7. Match Officials (Simple Footer) */}
-            {matchDetails?.Umpire1_Name && (
-                <div style={{
-                    padding: 16,
-                    borderTop: '1px solid rgba(255,255,255,0.05)',
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
-                    gap: 16,
-                    opacity: 0.6
-                }}>
-                    <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: 9, textTransform: 'uppercase', marginBottom: 2 }}>Umpire</div>
-                        <div style={{ fontSize: 11, color: '#fff' }}>{matchDetails.Umpire1_Name}</div>
-                    </div>
-                    {matchDetails.Umpire2_Name && (
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 9, textTransform: 'uppercase', marginBottom: 2 }}>Umpire</div>
-                            <div style={{ fontSize: 11, color: '#fff' }}>{matchDetails.Umpire2_Name}</div>
-                        </div>
-                    )}
-                    {matchDetails.Referee_Name && (
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 9, textTransform: 'uppercase', marginBottom: 2 }}>Referee</div>
-                            <div style={{ fontSize: 11, color: '#fff' }}>{matchDetails.Referee_Name}</div>
-                        </div>
-                    )}
-                </div>
             )}
 
         </div>
