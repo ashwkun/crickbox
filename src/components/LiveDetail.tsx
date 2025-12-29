@@ -817,6 +817,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     // Partnerships Props
                     partnershipsInnings={partnershipsInnings}
                     onPartnershipsInningsChange={handlePartnershipsInningsChange}
+                    // Manhattan Props
+                    manhattanData={manhattanData}
+                    manhattanInnings={manhattanInnings}
+                    onManhattanInningsChange={handleManhattanInningsChange}
                 />
             )}
 

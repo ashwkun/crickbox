@@ -10,6 +10,7 @@ import H2HRecentMatches from './upcoming/H2HRecentMatches';
 import WagonWheel from './insights/WagonWheel';
 import WormChart from './insights/WormChart';
 import PartnershipsChart from './insights/PartnershipsChart';
+import ManhattanChart from './insights/ManhattanChart';
 import BatsmanBowlerMatchups from './insights/BatsmanBowlerMatchups';
 
 interface LiveInsightsProps {
@@ -32,11 +33,14 @@ interface LiveInsightsProps {
     isMatchupsLoading?: boolean;
     partnershipsInnings?: number;
     onPartnershipsInningsChange?: (innings: number) => void;
+    // Manhattan
+    manhattanData?: { data: OverByOverResponse, label: string, color: string, id: number }[];
+    manhattanInnings?: number[];
+    onManhattanInningsChange?: (innings: number) => void;
 }
 
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange }) => {
-    const [manhattanInnings, setManhattanInnings] = useState<1 | 2>(1);
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange, manhattanData = [], manhattanInnings = [], onManhattanInningsChange = () => { } }) => {
     // if (!h2hData) return null; // Removed to allow Matchups to show even if H2H fails
 
     const team1 = match?.participants?.[0];
@@ -134,89 +138,13 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
                 isLoading={isMatchupsLoading}
             />
 
-            {/* 4. Manhattan Chart (Over by Over) */}
-            {overByOver?.Overbyover && overByOver.Overbyover.length > 0 && (
-                <div style={{
-                    background: 'var(--bg-card)',
-                    borderRadius: 16,
-                    padding: 20,
-                    border: '1px solid var(--border-color)',
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 4, height: 16, background: '#3b82f6', borderRadius: 2 }} />
-                            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Innings Progression</div>
-                        </div>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>
-                            {overByOver.Overbyover.length} Overs
-                        </div>
-                    </div>
-
-                    {/* Scrollable Chart */}
-                    <div className="hide-scrollbar" style={{
-                        display: 'flex',
-                        alignItems: 'flex-end',
-                        gap: 4,
-                        height: 120,
-                        overflowX: 'auto',
-                        paddingBottom: 20 // Space for labels
-                    }}>
-                        {overByOver.Overbyover.map((over, idx) => {
-                            const runs = parseInt(over.Runs) || 0;
-                            const wickets = parseInt(over.Wickets) || 0;
-                            // Normalize height: Max expected runs per over ~25
-                            // Max it at 100%
-                            const barHeight = Math.min(Math.max((runs / 25) * 100, 4), 100);
-
-                            return (
-                                <div key={idx} style={{
-                                    flex: '0 0 14px', // Fixed width bars
-                                    height: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'flex-end',
-                                    alignItems: 'center',
-                                    position: 'relative'
-                                }}>
-                                    <div style={{
-                                        width: '100%',
-                                        height: `${barHeight}%`,
-                                        background: wickets > 0 ? '#ef4444' : runs >= 10 ? '#22c55e' : runs >= 6 ? '#fbbf24' : 'rgba(255,255,255,0.3)',
-                                        borderRadius: '2px 2px 0 0',
-                                        transition: 'all 0.3s ease'
-                                    }} />
-
-                                    {/* Wicket Indicator */}
-                                    {wickets > 0 && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: `${100 - barHeight - 15}%`,
-                                            width: 12, height: 12,
-                                            background: '#ef4444',
-                                            borderRadius: '50%',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            fontSize: 7, fontWeight: 700, color: '#fff',
-                                            zIndex: 2,
-                                            border: '1px solid var(--bg-card)'
-                                        }}>W</div>
-                                    )}
-
-                                    {/* Over Number (Every 5) */}
-                                    {(idx + 1) % 5 === 0 && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            bottom: -18,
-                                            fontSize: 9,
-                                            color: 'rgba(255,255,255,0.4)',
-                                            whiteSpace: 'nowrap'
-                                        }}>{idx + 1}</div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
+            {/* Innings Progression (Manhattan) */}
+            <ManhattanChart
+                datasets={manhattanData}
+                scorecard={scorecard}
+                selectedInnings={manhattanInnings}
+                onInningsToggle={onManhattanInningsChange}
+            />
 
             {/* 5. Recent Form (Dual Team) */}
             {team1?.id && team2?.id && (
