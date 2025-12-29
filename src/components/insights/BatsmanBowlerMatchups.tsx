@@ -56,19 +56,19 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
         if (!overByOver?.Overbyover) return map;
 
         overByOver.Overbyover.forEach(over => {
+            // console.log(`[Matchups] Proc Over ${over.Over}, Bowlers: ${Object.keys(over.Bowlers || {}).join(',')}`);
+
             // We ignore over.Wickets summary and rely on individual Isout flags
-            // This handles cases where summary might be 0 but a dismissal occurred (e.g. runout or data inconsistency)
             if (over.Batsmen && over.Bowlers) {
                 const bowlerIds = Object.keys(over.Bowlers);
-                // In rare cases of multiple bowlers in an over, we attribute to the first one listed
-                // Ideally this would be ball-by-ball, but OBO is the best proxy we have
                 const bowlerId = bowlerIds.length > 0 ? bowlerIds[0] : null;
 
                 if (bowlerId) {
                     Object.entries(over.Batsmen).forEach(([batterId, stats]) => {
-                        // Robust check for Isout (boolean, string 'true', or '1')
                         const isOut = stats.Isout === true || stats.Isout === 'true' || stats.Isout === '1' || stats.Isout === 1;
+
                         if (isOut) {
+                            console.log(`[Matchups] WICKET DETECTED! Over: ${over.Over}, Batter: ${batterId}, Bowler: ${bowlerId}, Isout: ${stats.Isout}`);
                             if (!map[batterId]) map[batterId] = {};
                             if (!map[batterId][bowlerId]) map[batterId][bowlerId] = 0;
                             map[batterId][bowlerId]++;
@@ -77,6 +77,7 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                 }
             }
         });
+        console.log('[Matchups] Final Wicket Map:', JSON.stringify(map));
         return map;
     }, [overByOver]);
 
@@ -274,6 +275,10 @@ const BatsmanBowlerMatchups: React.FC<BatsmanBowlerMatchupsProps> = ({ batsmanSp
                             const derivedWickets = wicketMap[selectedBatterId!]?.[bowlerId] || 0;
                             const apiWickets = parseInt(vs.Dismissals || '0') || 0;
                             const wickets = Math.max(derivedWickets, apiWickets);
+
+                            if (derivedWickets > 0) {
+                                console.log(`[Matchups] Render: ${selectedBatterId} vs ${bowlerId} -> Wickets: ${derivedWickets}`);
+                            }
 
                             const sr = parseFloat(vs.Strikerate) || 0;
 
