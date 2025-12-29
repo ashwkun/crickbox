@@ -4,9 +4,10 @@ interface FloatingHeaderProps {
     showBack: boolean;
     onBack: () => void;
     onLogoClick?: () => void;
+    centerContent?: React.ReactNode;
 }
 
-const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick }) => {
+const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, centerContent }) => {
     // Styles for the floating container
     const containerStyle: React.CSSProperties = {
         position: 'fixed',
@@ -74,12 +75,23 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
 
             {/* Center: App Logo - clickable to trigger install prompt */}
             <div
-                style={{ ...logoStyle, justifySelf: 'center', pointerEvents: 'auto', cursor: onLogoClick ? 'pointer' : 'default' }}
+                style={{
+                    ...logoStyle,
+                    justifySelf: 'center',
+                    pointerEvents: 'auto',
+                    cursor: onLogoClick ? 'pointer' : 'default',
+                    minWidth: centerContent ? 140 : 'auto', // Ensure enough width for score
+                    transition: 'all 0.3s ease'
+                }}
                 className="floating-logo"
                 onClick={onLogoClick}
             >
-                <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: '#fff' }}>BOX</span>
-                <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
+                {centerContent || (
+                    <>
+                        <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: '#fff' }}>BOX</span>
+                        <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 400, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
+                    </>
+                )}
             </div>
 
             {/* Right: Empty spacer */}
