@@ -685,27 +685,65 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         );
     };
 
-    // Ball dot color
-    const getBallColor = (ball: string) => {
-        const b = ball.toUpperCase();
-        if (b === 'W') return '#ef4444'; // Wicket - red
-        if (b.includes('B') || b.includes('LB') || b.includes('WD') || b.includes('NB')) return '#eab308'; // Byes/Wides/NoBalls - yellow
-        if (b === '6' || b.includes('6')) return '#f97316'; // Six - orange
-        if (b === '4' || b.includes('4')) return '#22c55e'; // Four - green
-        if (b === '0') return 'rgba(255,255,255,0.2)'; // Dot - dim
-        return '#60a5fa'; // Other runs - blue
+    // Ball dot color (handles both object and string input)
+    const getBallColor = (ball: any): string => {
+        // If it's an object (from wallstream/scorecard)
+        if (typeof ball === 'object' && ball !== null) {
+            // Wallstream object check
+            if (ball.isWicket) return '#ef4444';
+            if (ball.isSix) return '#f97316';
+            if (ball.isFour) return '#22c55e';
+            if (ball.detail?.toLowerCase() === 'nb') return '#f97316';
+            if (ball.detail?.toLowerCase() === 'wd') return '#eab308';
+            if (ball.detail?.toLowerCase() === 'lb' || ball.detail?.toLowerCase() === 'b') return '#60a5fa';
+            // Scorecard ThisOver object { T: '4', B: '1' }
+            const t = (ball.T || '').toString().toUpperCase();
+            const b = (ball.B || '').toString().toUpperCase();
+            if (t === 'W') return '#ef4444';
+            if (t.includes('6') || b === '6') return '#f97316';
+            if (t.includes('4') || b === '4') return '#22c55e';
+            if (t.includes('WD') || t.includes('NB')) return '#eab308';
+            if (t.includes('LB') || t.includes('B')) return '#60a5fa';
+            if (b === '0' || (!t && !b)) return 'rgba(255,255,255,0.2)';
+            return '#60a5fa';
+        }
+        // String input
+        const s = String(ball).toUpperCase();
+        if (s === 'W') return '#ef4444';
+        if (s.includes('WD') || s.includes('NB')) return '#eab308';
+        if (s.includes('6')) return '#f97316';
+        if (s.includes('4')) return '#22c55e';
+        if (s.includes('LB') || s.includes('B')) return '#60a5fa';
+        if (s === '0') return 'rgba(255,255,255,0.2)';
+        return '#60a5fa';
     };
 
-    // Format ball display (W shows as W, byes as 4B not 4(4B))
-    const getBallDisplay = (ball: string) => {
-        const b = ball.toUpperCase();
-        // Wicket - just show W
-        if (b === 'W' || b === '0W') return 'W';
-        // Already nicely formatted (like 4B, 1LB, 1WD, 1NB)
-        if (b.includes('B') || b.includes('LB') || b.includes('WD') || b.includes('NB')) {
-            // Remove redundant formats like "4(4B)" -> "4B"
-            const match = b.match(/(\d+)(B|LB|WD|NB)/);
-            if (match) return `${match[1]}${match[2]}`;
+    // Format ball display (handles both object and string input)
+    const getBallDisplay = (ball: any): string => {
+        // If it's an object
+        if (typeof ball === 'object' && ball !== null) {
+            // Wallstream object
+            if (ball.isWicket) return 'W';
+            if (ball.isSix) return '6';
+            if (ball.isFour) return '4';
+            if (ball.detail?.toLowerCase() === 'nb') return 'NB';
+            if (ball.detail?.toLowerCase() === 'wd') return 'WD';
+            if (ball.detail?.toLowerCase() === 'lb') return 'LB';
+            if (ball.detail?.toLowerCase() === 'b') return 'B';
+            if (ball.runs !== undefined) return String(ball.runs);
+            // Scorecard ThisOver object { T: '4', B: '1' }
+            const t = (ball.T || '').toString().toUpperCase();
+            const b = (ball.B || '').toString().toUpperCase();
+            if (t === 'W') return 'W';
+            if (t) return t;
+            return b || '0';
+        }
+        // String input
+        const s = String(ball).toUpperCase();
+        if (s === 'W' || s === '0W') return 'W';
+        if (s.includes('B') || s.includes('LB') || s.includes('WD') || s.includes('NB')) {
+            const match = s.match(/(\d+)?(B|LB|WD|NB)/);
+            if (match) return match[1] ? `${match[1]}${match[2]}` : match[2];
         }
         return ball;
     };
@@ -924,7 +962,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         {scoreTicker1 && (
                             <div key={scoreTicker1.key} style={{
                                 position: 'absolute', top: 0, right: -10,
-                                background: scoreTicker1.text === 'W' ? '#ef4444' : (scoreTicker1.text === '•' ? '#64748b' : (scoreTicker1.text === '+6' ? '#8b5cf6' : (scoreTicker1.text === '+4' ? '#22c55e' : '#3b82f6'))),
+                                background: getBallColor(scoreTicker1.text.replace('+', '').replace('•', '0')),
                                 color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                                 animation: 'popReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
@@ -957,7 +995,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         {scoreTicker2 && (
                             <div key={scoreTicker2.key} style={{
                                 position: 'absolute', top: 0, left: -10,
-                                background: scoreTicker2.text === 'W' ? '#ef4444' : (scoreTicker2.text === '•' ? '#64748b' : (scoreTicker2.text === '+6' ? '#8b5cf6' : (scoreTicker2.text === '+4' ? '#22c55e' : '#3b82f6'))),
+                                background: getBallColor(scoreTicker2.text.replace('+', '').replace('•', '0')),
                                 color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                                 animation: 'popReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
