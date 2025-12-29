@@ -1308,6 +1308,15 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                         paddingLeft: 4, paddingRight: 4
                                     }}>
                                         <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: 'auto', paddingTop: 4, letterSpacing: 0.5 }}>This Over</div>
+                                        <style>
+                                            {`
+                                                @keyframes popReveal {
+                                                    0% { transform: scale(0); opacity: 0; }
+                                                    60% { transform: scale(1.4); opacity: 1; }
+                                                    100% { transform: scale(1); opacity: 1; }
+                                                }
+                                            `}
+                                        </style>
 
                                         <div className="hide-scrollbar" style={{
                                             display: 'flex', gap: 6, alignItems: 'center',
@@ -1336,7 +1345,9 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                                 fontSize: 9, fontWeight: 700, color: '#fff',
                                                                 boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                                                                flexShrink: 0
+                                                                flexShrink: 0,
+                                                                animation: 'popReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards',
+                                                                animationDelay: `${idx * 0.05}s` // Stagger slightly if loading all
                                                             }}>
                                                                 {getBallDisplay(ball)}
                                                             </div>
