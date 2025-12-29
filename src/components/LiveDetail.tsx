@@ -33,7 +33,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
     // This Over ripple effect
     const [thisOverRipple, setThisOverRipple] = React.useState<{ color: string, key: number } | null>(null);
-    const prevBallCount = React.useRef<number>(0);
+    const [newBallIndex, setNewBallIndex] = React.useState<number | null>(null);
+    const prevBallCount = React.useRef<number>(-1); // Start at -1 to detect first load
 
     const parseScoreSimple = (score: string) => {
         if (!score) return { runs: 0, wickets: 0 };
@@ -674,21 +675,27 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         prevScores.current = { t1: team1Score || '', t2: team2Score || '' };
     }, [team1Score, team2Score]);
 
-    // Trigger This Over ripple on new ball
+    // Trigger This Over animation on new ball
     React.useEffect(() => {
         const scLimit = getScorecardThisOver ? getScorecardThisOver() : [];
         const thisOverBalls = scLimit.length > 0 ? scLimit : (latestBall?.thisOver || []);
         const currentCount = thisOverBalls.length;
 
-        if (currentCount > prevBallCount.current && prevBallCount.current > 0) {
-            // New ball added! Get its color
-            const newBall = thisOverBalls[thisOverBalls.length - 1];
-            const color = getBallColor(newBall);
-            setThisOverRipple({ color, key: Date.now() });
-
-            // Clear after animation
-            setTimeout(() => setThisOverRipple(null), 800);
+        // First load: just set the count, don't animate
+        if (prevBallCount.current === -1) {
+            prevBallCount.current = currentCount;
+            return;
         }
+
+        // New ball added after initial load
+        if (currentCount > prevBallCount.current) {
+            const newIdx = currentCount - 1;
+            setNewBallIndex(newIdx);
+
+            // Clear after animation completes
+            setTimeout(() => setNewBallIndex(null), 700);
+        }
+
         prevBallCount.current = currentCount;
     });
 
@@ -1447,38 +1454,41 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                                         margin: thisOverBalls.length > 7 ? '0' : '0 auto', // Center if few balls, left align if many
                                                         flexShrink: 0
                                                     }}>
-                                                        {thisOverBalls.map((ball: any, idx: number) => (
-                                                            <div key={idx} style={{
-                                                                width: 24, height: 24, borderRadius: '50%',
-                                                                position: 'relative',
-                                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                                flexShrink: 0,
-                                                            }}>
-                                                                {/* Background layer - scales very large, clipped by container */}
-                                                                <div style={{
-                                                                    position: 'absolute',
+                                                        {thisOverBalls.map((ball: any, idx: number) => {
+                                                            const isNewBall = idx === newBallIndex;
+                                                            return (
+                                                                <div key={idx} style={{
                                                                     width: 24, height: 24, borderRadius: '50%',
-                                                                    background: getBallColor(ball),
-                                                                    animation: 'bgExpand 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-                                                                    animationDelay: `${idx * 0.05}s`,
-                                                                    transformOrigin: 'center center'
-                                                                }} />
-                                                                {/* Number layer - normal pop scale */}
-                                                                <div style={{
                                                                     position: 'relative',
-                                                                    width: 24, height: 24, borderRadius: '50%',
-                                                                    background: getBallColor(ball),
                                                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                                    fontSize: 9, fontWeight: 700, color: '#fff',
-                                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                                                                    animation: 'popReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards',
-                                                                    animationDelay: `${idx * 0.05}s`,
-                                                                    zIndex: 1
+                                                                    flexShrink: 0,
                                                                 }}>
-                                                                    {getBallDisplay(ball)}
+                                                                    {/* Background layer - only animate for new ball */}
+                                                                    {isNewBall && (
+                                                                        <div style={{
+                                                                            position: 'absolute',
+                                                                            width: 24, height: 24, borderRadius: '50%',
+                                                                            background: getBallColor(ball),
+                                                                            animation: 'bgExpand 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                                                                            transformOrigin: 'center center'
+                                                                        }} />
+                                                                    )}
+                                                                    {/* Number layer */}
+                                                                    <div style={{
+                                                                        position: 'relative',
+                                                                        width: 24, height: 24, borderRadius: '50%',
+                                                                        background: getBallColor(ball),
+                                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                        fontSize: 9, fontWeight: 700, color: '#fff',
+                                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                                                        animation: isNewBall ? 'popReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards' : 'none',
+                                                                        zIndex: 1
+                                                                    }}>
+                                                                        {getBallDisplay(ball)}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        ))}
+                                                            );
+                                                        })}
                                                         {/* Placeholders */}
                                                         {Array(Math.max(0, 6 - thisOverBalls.length)).fill(null).map((_, idx) => (
                                                             <div key={`e-${idx}`} style={{
