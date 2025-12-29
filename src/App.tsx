@@ -48,7 +48,12 @@ export default function App(): React.ReactElement {
             console.log('[ForceLive] pendingMatchId:', pendingMatchId, 'forceLive:', forceLive, 'matchFound:', !!match);
 
             if (match) {
-                setSelectedMatch(match);
+                if (forceLive) {
+                    console.log('[ForceLive] Overriding real match state to LIVE');
+                    setSelectedMatch({ ...match, event_state: 'L' });
+                } else {
+                    setSelectedMatch(match);
+                }
             } else if (forceLive) {
                 // Create stub match for forceLive testing (India W vs Sri Lanka W)
                 console.log('[ForceLive] Creating stub match for:', pendingMatchId);
