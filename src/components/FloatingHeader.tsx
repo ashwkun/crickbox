@@ -19,6 +19,8 @@ interface FloatingHeaderProps {
 }
 
 const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive }) => {
+    console.log('[FloatingHeader] Render:', { isLive, hasData: !!data, data });
+
     const [celebrating, setCelebrating] = React.useState(false);
     const prevBallId = React.useRef<string | undefined>(undefined);
 
