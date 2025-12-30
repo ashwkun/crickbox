@@ -102,6 +102,11 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         };
     }) || [];
 
+    console.log('Manhattan Debug: Rendering', {
+        selectedInnings,
+        tabs: inningsTabs.map(t => ({ id: t.id, active: t.isActive, label: t.label }))
+    });
+
     // Process data for rendering
     const overMap = useMemo(() => {
         const map: Record<number, { runs: number, wickets: number, color: string, label: string }[]> = {};
@@ -137,7 +142,12 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
                 {inningsTabs.map((tab: any) => (
                     <button
                         key={tab.id}
-                        onClick={() => onInningsToggle(tab.id)}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Manhattan Debug: Tab Clicked', { id: tab.id, currentSelected: selectedInnings });
+                            onInningsToggle(tab.id);
+                        }}
                         style={{
                             display: 'flex', alignItems: 'center', gap: 8,
                             padding: '6px 14px',
