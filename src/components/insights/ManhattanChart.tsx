@@ -33,12 +33,45 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         return Math.max(max, 5);
     }, [datasets]);
 
-    // Auto-scroll to the right (latest overs) when data changes
+    // Auto-scroll to Current Over (Right Snap)
     useLayoutEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+        if (!scrollRef.current) return;
+
+        // 1. Find the last over that actually has data (runs/wickets)
+        let maxOverWithData = 0;
+        datasets.forEach(ds => {
+            ds.data.Overbyover.forEach(o => {
+                if (o.Over > maxOverWithData) maxOverWithData = o.Over;
+            });
+        });
+
+        // If no data, default to 0
+        if (maxOverWithData === 0) {
+            scrollRef.current.scrollLeft = 0;
+            return;
         }
-    }, [maxOvers, datasets.length]); // Trigger on structure change
+
+        // 2. Calculate pixel position of that over
+        // Per render logic:
+        // groupWidth = 28px (width) + 4px (marginRight) = 32px per unit
+        // paddingLeft = 24px
+        const groupWidth = 32;
+        const paddingLeft = 24;
+
+        // Right edge of the target item
+        const itemRightEdge = (maxOverWithData * groupWidth) + paddingLeft;
+
+        // Container visible width
+        const containerWidth = scrollRef.current.clientWidth;
+
+        // 3. Scroll so itemRightEdge is at container's right edge (minus some padding)
+        // targetScroll = itemRightEdge - containerWidth + paddingRight (e.g. 20px)
+        const targetScroll = itemRightEdge - containerWidth + 20;
+
+        // Clamp
+        scrollRef.current.scrollLeft = Math.max(0, targetScroll);
+
+    }, [datasets, maxOvers]); // Trigger when data updates
 
     const chartHeight = 200; // Increased for better resolution and spacing
 
