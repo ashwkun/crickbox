@@ -102,10 +102,19 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         };
     }) || [];
 
-    console.log('Manhattan Debug: Rendering', {
-        selectedInnings,
-        tabs: inningsTabs.map(t => ({ id: t.id, active: t.isActive, label: t.label }))
-    });
+    // DEBUG: Button State
+    console.log('Manhattan Debug: Tabs State', inningsTabs.map(t => ({
+        id: t.id,
+        label: t.label,
+        isActive: t.isActive,
+        color: t.color
+    })));
+
+    // console.log('Manhattan Debug: Rendering', {
+    //     selectedInnings,
+    //     tabs: inningsTabs.map(t => ({ id: t.id, active: t.isActive, label: t.label }))
+    // });
+
 
     // Process data for rendering
     const overMap = useMemo(() => {
@@ -123,6 +132,17 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         });
         return map;
     }, [datasets]);
+
+    // DEBUG: Visual of Bars
+    useMemo(() => {
+        const visualSummary = Object.entries(overMap).map(([over, items]) => ({
+            over,
+            items: items.map(i => ({ runs: i.runs, wickets: i.wickets, color: i.color }))
+        }));
+        if (visualSummary.length > 0) {
+            console.log('Manhattan Debug: Bar Visuals (First 5 overs)', visualSummary.slice(0, 5));
+        }
+    }, [overMap]);
 
     // DEBUG: Visual of Bars
     useMemo(() => {
