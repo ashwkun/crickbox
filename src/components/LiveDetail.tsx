@@ -202,11 +202,18 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         const currentInningsIdx = scorecard.Innings.length - 1;
 
         // Determine format
-        const type = scorecard.Matchdetail?.Match?.Type?.toUpperCase(); // T20, ODI, TEST
-        const code = scorecard.Matchdetail?.Match?.Code?.toUpperCase();
+        // Determine format
+        const type = scorecard.Matchdetail?.Match?.Type?.toUpperCase() || ''; // T20, ODI, TEST
+        const code = scorecard.Matchdetail?.Match?.Code?.toUpperCase() || '';
+        const league = scorecard.Matchdetail?.Match?.League?.toUpperCase() || '';
+
         let format: 'T20' | 'ODI' | 'Test' = 'T20';
-        if (code === 'TEST' || type === 'TEST') format = 'Test';
-        else if (type === 'ODI') format = 'ODI';
+
+        if (code.includes('TEST') || type.includes('TEST') || type.includes('First Class') || type.includes('FC') || league.includes('TEST')) {
+            format = 'Test';
+        } else if (type.includes('ODI') || type.includes('ONE DAY') || type.includes('LIST A') || league.includes('ODI')) {
+            format = 'ODI';
+        }
 
         // Get team IDs for team strength calculation
         const team1 = match.participants?.[0];
