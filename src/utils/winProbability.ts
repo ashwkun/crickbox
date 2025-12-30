@@ -471,9 +471,9 @@ export const calculatePreMatchProbability = (
     // Team 1 overall = their batting vs opponent bowling, their bowling vs opponent batting
     const team1Overall = (team1Strength.battingStrength + team1Strength.bowlingStrength) / 2;
     const team2Overall = (team2Strength.battingStrength + team2Strength.bowlingStrength) / 2;
-    // console.log(`   Overall: ${t1Name} ${team1Overall.toFixed(0)} | ${t2Name} ${team2Overall.toFixed(0)}`);
 
     let prob1 = 50;
+    const weights = isFranchise ? WEIGHTS.FRANCHISE : WEIGHTS.INTERNATIONAL;
 
     // 1. ICC Ranking / Pedigree
     if (!isFranchise) {
@@ -488,15 +488,12 @@ export const calculatePreMatchProbability = (
             // SKIPPED
         }
     } else {
-        console.log(`ℹ️ [RANKING] Franchise match - ICC rankings not applicable`);
+        // SKIPPED
     }
-
-    // 2. Head to Head (Overall)
     if (h2hData && parseInt(h2hData.matches_played) > 0) {
         const played = parseInt(h2hData.matches_played);
         const won1 = parseInt(h2hData.won);
         const winRate1 = (won1 / played) * 100;
-        const h2hImpact = (winRate1 - 50) * weights.H2H!;
         const h2hImpact = (winRate1 - 50) * weights.H2H!;
         prob1 += h2hImpact;
     } else {
@@ -531,7 +528,6 @@ export const calculatePreMatchProbability = (
         const formScore1 = getFormScore(form1);
         const formScore2 = getFormScore(form2);
         const formDiff = formScore1 - formScore2;
-        const formDiff = formScore1 - formScore2;
         const formImpact = formDiff * weights.FORM!;
         prob1 += formImpact;
     } else {
@@ -545,32 +541,19 @@ export const calculatePreMatchProbability = (
     if (homeTeamId) {
         home1 = team1.id === homeTeamId;
         home2 = team2.id === homeTeamId;
-        console.log(`🏠 [HOME ADVANTAGE] Using official home team ID...`);
     } else {
         home1 = getHomeAdvantage(team1, venueName);
         home2 = getHomeAdvantage(team2, venueName);
-        console.log(`🏠 [HOME ADVANTAGE] Using venue name matching (fallback)...`);
     }
 
     if (home1 && !home2) {
         const homeImpact = 100 * weights.HOME!;
         prob1 += homeImpact;
-        console.log(`   ✓ ${t1Name} is playing at HOME → +${homeImpact.toFixed(1)}% boost`);
     } else if (!home1 && home2) {
         const homeImpact = 100 * weights.HOME!;
         prob1 -= homeImpact;
-        console.log(`   ✓ ${t2Name} is playing at HOME → ${t1Name} gets -${homeImpact.toFixed(1)}%`);
-    } else if (!home1 && !home2) {
-        console.log(`   → Neutral venue - no home advantage applied`);
     } else {
-        console.log(`⚠️ [HOME ADVANTAGE] Could not determine home team - SKIPPED`);
-    }
-
-    // 5. Pitch Impact (Minor in pre-match)
-    if (pitchDetail?.Pitch_Suited_For) {
-        console.log(`🌿 [PITCH] ${pitchDetail.Pitch_Suited_For} pitch - factored in slightly`);
-    } else {
-        console.log(`⚠️ [PITCH] No pitch data available - SKIPPED`);
+        // SKIPPED
     }
 
     // Clamp
@@ -600,7 +583,6 @@ export const calculateLiveProbability = (
 
     // Default safe return
     if (!scorecard || !scorecard.Innings || scorecard.Innings.length === 0) {
-        console.log(`⚠️ [LIVE CALC] No innings data available - returning pre-match probability`);
         return preMatchProb;
     }
 
@@ -694,43 +676,21 @@ export const calculateLiveProbability = (
         // Bowler Analysis (from bowling team's perspective)
         const bowlerAnalysis = analyzeBowlers(bowlers, pitchType, format);
         if (bowlerAnalysis.logDetails.length > 0 && !bowlerAnalysis.logDetails[0].includes('No bowler')) {
-            console.log(`🎳 [BOWLER ANALYSIS]`);
-            bowlerAnalysis.logDetails.forEach(log => console.log(`   ${log}`));
-
-            // Star bowlers exhausted = good for batting team
-            if (bowlerAnalysis.starBowlersExhausted > 0) {
-                const exhaustedBonus = bowlerAnalysis.starBowlersExhausted * 5;
-                liveProbBat += exhaustedBonus;
-            }
-
-            // Pitch synergy boosts bowling team (reduces batting prob)
-            const pitchSynergyPenalty = bowlerAnalysis.spinBoost + bowlerAnalysis.paceBoost;
-            if (pitchSynergyPenalty > 0) {
-                liveProbBat -= pitchSynergyPenalty;
-                console.log(`   → Bowling boost (pitch synergy): -${pitchSynergyPenalty}%`);
-            } else {
-                console.log(`   → No pitch synergy (spin: ${bowlerAnalysis.spinBoost}, pace: ${bowlerAnalysis.paceBoost})`);
-            }
         } else {
-            console.log(`🎳 [BOWLER ANALYSIS] ⏭️ SKIPPED - ${bowlerAnalysis.logDetails[0] || 'No bowler data available'}`);
+            // SKIPPED
         }
 
-        // OBO Momentum Analysis
+        // Momentum Analysis (OBO)
         if (overByOverData) {
             const momentum = getMomentumFromOBO(overByOverData, Math.floor(oversBowled), format);
             if (momentum.adjustment !== 0) {
                 liveProbBat += momentum.adjustment;
-                console.log(`📈 [MOMENTUM]`);
-                momentum.logDetails.forEach(log => console.log(`   ${log}`));
-                console.log(`   → Adjustment: ${momentum.adjustment > 0 ? '+' : ''}${momentum.adjustment}%`);
             } else {
-                console.log(`📈 [MOMENTUM] ⏭️ No adjustment - ${momentum.logDetails.join(' | ')}`);
+                // No adjustment
             }
         } else {
-            console.log(`📈 [MOMENTUM] ⏭️ SKIPPED - No OBO data available`);
+            // SKIPPED
         }
-
-        console.log(`   → Final 1st innings probability: ${liveProbBat.toFixed(0)}%`);
 
     } else {
         // 2nd Innings: Chase Pressure
