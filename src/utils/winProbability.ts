@@ -235,6 +235,7 @@ export const getMomentumFromOBO = (
     // Get last 3 overs data
     const recentOvers = overs.slice(-3);
     const recentRuns = recentOvers.reduce((sum: number, o: any) => sum + parseInt(o.Runs || '0'), 0);
+    // Fix: Wickets in OBO is a string representing count in that over
     const recentWickets = recentOvers.reduce((sum: number, o: any) => sum + parseInt(o.Wickets || '0'), 0);
     const recentRunRate = recentRuns / recentOvers.length;
 
