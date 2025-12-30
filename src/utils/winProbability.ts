@@ -709,9 +709,11 @@ export const calculateLiveProbability = (
 
         if (runs >= target) {
             liveProbBat = 100;
-        } else if (wickets >= 10 || ballsLeft <= 0 || (runsNeeded > ballsLeft * 6)) {
-            // Impossible to win if runs needed > max possible runs (6 per ball)
+        } else if (wickets >= 10 || ballsLeft <= 0) {
             liveProbBat = 0;
+        } else if (runsNeeded > ballsLeft * 6) {
+            // Technically impossible without extras, but leave 0.1% for miracles (no balls etc)
+            liveProbBat = 0.1;
         } else {
             // Base Calculation (RRR Pressure) - Format-aware thresholds
             // T20: RRR 13+ is near impossible, ODI: 8+ is very hard, Test: 5+ is high
