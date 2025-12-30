@@ -638,8 +638,24 @@ export const calculateLiveProbability = (
     const currentInningIndex = innings.length - 1;
     const currentInning = innings[currentInningIndex];
 
-    const batTeamName = currentInning.Battingteam;
-    const isTeam1Batting = preMatchProb.team1.name === batTeamName;
+    const batTeamId = currentInning.Battingteam;
+
+    // Robust Team Identification
+    // Try to match by ID first, then name fallback
+    let isTeam1Batting = false;
+
+    if (team1Id && team2Id) {
+        if (String(batTeamId) === String(team1Id)) isTeam1Batting = true;
+        else if (String(batTeamId) === String(team2Id)) isTeam1Batting = false;
+        else {
+            // Fallback to name match if IDs don't match (rare but possible in bad data)
+            isTeam1Batting = preMatchProb.team1.name === batTeamId;
+        }
+    } else {
+        // Legacy fallback
+        isTeam1Batting = preMatchProb.team1.name === batTeamId;
+    }
+
     const battingTeam = isTeam1Batting ? preMatchProb.team1.name : preMatchProb.team2.name;
     const bowlingTeam = isTeam1Batting ? preMatchProb.team2.name : preMatchProb.team1.name;
 
@@ -678,7 +694,9 @@ export const calculateLiveProbability = (
     console.log(`   • Pre-Match Prob: ${preMatchProb.team1.name} ${preMatchProb.team1.probability.toFixed(0)}% | ${preMatchProb.team2.name} ${preMatchProb.team2.probability.toFixed(0)}%`);
     console.log(`   • Scorecard: ${scorecard ? '✅ Available' : '❌ Missing'}`);
     console.log(`   • Innings Count: ${innings.length} (viewing #${currentInningIndex + 1})`);
-    console.log(`   • Batting Team ID: "${batTeamName}" → isTeam1Batting: ${isTeam1Batting}`);
+    console.log(`   • Batting Team ID: "${batTeamId}"`);
+    console.log(`   • Team 1 ID: "${team1Id}" | Team 2 ID: "${team2Id}"`);
+    console.log(`   • Identified Batting Team: ${battingTeam} (isTeam1: ${isTeam1Batting})`);
     console.log(`   • Format: ${format} | Total Overs: ${totalOvers}`);
     console.log(`   • Overs Bowled: ${oversBowled} | Progress: ${(progress * 100).toFixed(1)}% | Phase: ${phase}`);
     console.log(`   • Pitch Type: "${pitchType || 'NOT AVAILABLE'}"`);
