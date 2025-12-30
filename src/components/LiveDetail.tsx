@@ -325,7 +325,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
             });
 
             // C. Smart Worm Logic (Recalculate on every update)
-            setIsWormLoading(true);
+            if (!wormPrimary) setIsWormLoading(true); // Only show loader on initial fetch
+
             if (scorecard?.Innings?.length) {
                 const innings = scorecard.Innings;
                 const primaryIdx = innings.length - 1;
