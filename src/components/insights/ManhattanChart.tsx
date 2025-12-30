@@ -124,6 +124,17 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         return map;
     }, [datasets]);
 
+    // DEBUG: Visual of Bars
+    useMemo(() => {
+        const visualSummary = Object.entries(overMap).map(([over, items]) => ({
+            over,
+            items: items.map(i => ({ runs: i.runs, wickets: i.wickets, color: i.color }))
+        }));
+        if (visualSummary.length > 0) {
+            console.log('Manhattan Debug: Bar Visuals (First 5 overs)', visualSummary.slice(0, 5));
+        }
+    }, [overMap]);
+
     return (
         <div style={{
             background: 'var(--bg-card)',
