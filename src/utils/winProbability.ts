@@ -486,10 +486,8 @@ export const calculatePreMatchProbability = (
             const rankDiff = rank2 - rank1;
             const rankImpact = Math.min(25, Math.max(-25, rankDiff * 2.5)) * weights.RANKING!;
             prob1 += rankImpact;
-            console.log(`📊 [RANKING] ${t1Name} ranked #${rank1}, ${t2Name} ranked #${rank2}`);
-            console.log(`   → Rank difference gives ${t1Name} ${rankImpact > 0 ? '+' : ''}${rankImpact.toFixed(1)}% advantage`);
         } else {
-            console.log(`⚠️ [RANKING] No ICC ranking data available - SKIPPED`);
+            // SKIPPED
         }
     } else {
         console.log(`ℹ️ [RANKING] Franchise match - ICC rankings not applicable`);
@@ -501,11 +499,10 @@ export const calculatePreMatchProbability = (
         const won1 = parseInt(h2hData.won);
         const winRate1 = (won1 / played) * 100;
         const h2hImpact = (winRate1 - 50) * weights.H2H!;
+        const h2hImpact = (winRate1 - 50) * weights.H2H!;
         prob1 += h2hImpact;
-        console.log(`🔄 [HEAD TO HEAD] ${t1Name} has won ${won1} of ${played} matches (${winRate1.toFixed(0)}%)`);
-        console.log(`   → H2H record gives ${t1Name} ${h2hImpact > 0 ? '+' : ''}${h2hImpact.toFixed(1)}% advantage`);
     } else {
-        console.log(`⚠️ [HEAD TO HEAD] No H2H data available - SKIPPED`);
+        // SKIPPED
     }
 
     // 2b. Venue-Specific H2H (if available)
@@ -513,14 +510,11 @@ export const calculatePreMatchProbability = (
         const venue1WinPct = venueStats.team1_win_pct || 50;
         const venue2WinPct = venueStats.team2_win_pct || 50;
         const venueDiff = venue1WinPct - venue2WinPct;
+        const venueDiff = venue1WinPct - venue2WinPct;
         const venueImpact = venueDiff * weights.VENUE!;
         prob1 += venueImpact;
-        console.log(`📍 [VENUE H2H] At this venue:`);
-        console.log(`   ${t1Name}: ${venueStats.team1_matches} matches, ${venue1WinPct.toFixed(0)}% win rate`);
-        console.log(`   ${t2Name}: ${venueStats.team2_matches} matches, ${venue2WinPct.toFixed(0)}% win rate`);
-        console.log(`   → Venue record gives ${t1Name} ${venueImpact > 0 ? '+' : ''}${venueImpact.toFixed(1)}% advantage`);
     } else {
-        console.log(`⚠️ [VENUE H2H] No venue-specific H2H data - SKIPPED`);
+        // SKIPPED
     }
 
     // 3. Recent Form
@@ -539,13 +533,11 @@ export const calculatePreMatchProbability = (
         const formScore1 = getFormScore(form1);
         const formScore2 = getFormScore(form2);
         const formDiff = formScore1 - formScore2;
+        const formDiff = formScore1 - formScore2;
         const formImpact = formDiff * weights.FORM!;
         prob1 += formImpact;
-        console.log(`📋 [RECENT FORM] ${t1Name}: ${form1.length > 0 ? form1.join('-') : 'No data'} (${formScore1.toFixed(0)}%)`);
-        console.log(`   ${t2Name}: ${form2.length > 0 ? form2.join('-') : 'No data'} (${formScore2.toFixed(0)}%)`);
-        console.log(`   → Form gives ${t1Name} ${formImpact > 0 ? '+' : ''}${formImpact.toFixed(1)}% advantage`);
     } else {
-        console.log(`⚠️ [RECENT FORM] No form data available for either team - SKIPPED`);
+        // SKIPPED
     }
 
     // 4. Home Advantage
