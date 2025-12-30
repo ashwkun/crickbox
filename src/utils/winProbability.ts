@@ -905,6 +905,25 @@ export const calculateLiveProbability = (
                 }
             }
 
+
+            // SANITY CAPS - Prevent illogical probabilities
+            // 1. 8+ Wickets down cap
+            if (wickets >= 8 && runsNeeded > 10) {
+                const cap = wickets >= 9 ? 5 : 15;
+                if (liveProbBat > cap) {
+                    console.log(`   🚫 [SANITY CAP] 8+ wickets down (${wickets}) -> Capping at ${cap}%`);
+                    liveProbBat = Math.min(liveProbBat, cap);
+                }
+            }
+
+            // 2. High RRR Cap
+            if (rrr > 12 && runsNeeded > 15) {
+                if (liveProbBat > 10) {
+                    console.log(`   🚫 [SANITY CAP] RRR > 12 -> Capping at 10%`);
+                    liveProbBat = Math.min(liveProbBat, 10);
+                }
+            }
+
             console.log(`   → Final 2nd innings probability: ${liveProbBat.toFixed(0)}%`);
         }
     }
