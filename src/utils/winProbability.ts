@@ -707,16 +707,10 @@ export const calculateLiveProbability = (
         const rrr = runsNeeded / (Math.max(1, ballsLeft) / 6);
         const wicketsLeft = 10 - wickets;
 
-        console.log(`🎯 [2ND INNINGS] ${battingTeam} chasing ${target}`);
-        console.log(`   Score: ${runs}/${wickets} (Need ${runsNeeded} from ${ballsLeft} balls)`);
-        console.log(`   RRR: ${rrr.toFixed(2)} | Wickets in hand: ${wicketsLeft}`);
-
         if (runs >= target) {
             liveProbBat = 100;
-            console.log(`   ✅ Target achieved! ${battingTeam} wins.`);
         } else if (wickets >= 10 || ballsLeft <= 0) {
             liveProbBat = 0;
-            console.log(`   ❌ ${battingTeam} ${wickets >= 10 ? 'all out' : 'out of overs'}.`);
         } else {
             // Base Calculation (RRR Pressure) - Format-aware thresholds
             // T20: RRR 13+ is near impossible, ODI: 8+ is very hard, Test: 5+ is high
@@ -735,44 +729,32 @@ export const calculateLiveProbability = (
             else if (rrr < rrrEasy) liveProbBat = 80;
             else liveProbBat = 60;
 
-            console.log(`   Base prob (from RRR ${rrr.toFixed(1)}, ${format} thresholds): ${liveProbBat.toFixed(0)}%`);
-
             // Wicket Penalty - Harsher in death
             if (wicketsLeft < 3) {
                 liveProbBat *= 0.2;
-                console.log(`   ⚠️ DANGER ZONE (${wicketsLeft} wickets left) → ×0.2 penalty`);
             } else if (wicketsLeft < 5) {
                 liveProbBat *= 0.5;
-                console.log(`   ⚠️ Pressure (${wicketsLeft} wickets left) → ×0.5 penalty`);
             } else if (wicketsLeft < 7) {
                 liveProbBat *= 0.8;
-                console.log(`   ⚠️ Minor pressure (${wicketsLeft} wickets left) → ×0.8 penalty`);
             }
 
             // Death overs pressure - Much harsher and granular
             const isDeathPhase = format === 'T20' ? ballsLeft <= 30 : (format === 'ODI' ? ballsLeft <= 60 : false);
             if (isDeathPhase) {
                 const runsPerBallNeeded = runsNeeded / Math.max(1, ballsLeft);
-                console.log(`   💀 [DEATH ANALYSIS] ${runsNeeded} from ${ballsLeft} balls (${runsPerBallNeeded.toFixed(2)} RPB)`);
 
                 if (runsPerBallNeeded > 2.5) {
                     liveProbBat *= 0.1;
-                    console.log(`      → VIRTUALLY IMPOSSIBLE (>2.5 RPB) → ×0.1`);
                 } else if (runsPerBallNeeded > 2) {
                     liveProbBat *= 0.2;
-                    console.log(`      → Near impossible (>2 RPB) → ×0.2`);
                 } else if (runsPerBallNeeded > 1.5) {
                     liveProbBat *= 0.4;
-                    console.log(`      → Very hard (>1.5 RPB) → ×0.4`);
                 } else if (runsPerBallNeeded > 1.2) {
                     liveProbBat *= 0.6;
-                    console.log(`      → Difficult (>1.2 RPB) → ×0.6`);
                 } else if (runsPerBallNeeded > 1) {
                     liveProbBat *= 0.8;
-                    console.log(`      → Challenging (>1 RPB) → ×0.8`);
                 } else if (runsPerBallNeeded < 0.5) {
                     liveProbBat = Math.min(95, liveProbBat * 1.3);
-                    console.log(`      → Easy chase (<0.5 RPB) → ×1.3 boost`);
                 }
             }
 
@@ -780,8 +762,6 @@ export const calculateLiveProbability = (
             const partnership = getPartnershipMomentum(partnerships, wickets);
             if (partnership.adjustment !== 0) {
                 liveProbBat += partnership.adjustment;
-                console.log(`🤝 [PARTNERSHIP] ${partnership.runs} runs off ${partnership.balls} balls`);
-                console.log(`   → Adjustment: ${partnership.adjustment > 0 ? '+' : ''}${partnership.adjustment}%`);
             }
 
             // Bowler Analysis (bowling team's remaining firepower)
@@ -789,21 +769,17 @@ export const calculateLiveProbability = (
             const chaseInningBowlers = currentInning.Bowlers || [];
             const bowlerAnalysis = analyzeBowlers(chaseInningBowlers, pitchType, format);
             if (bowlerAnalysis.logDetails.length > 0 && !bowlerAnalysis.logDetails[0].includes('No bowler')) {
-                console.log(`🎳 [BOWLER ANALYSIS]`);
-                bowlerAnalysis.logDetails.forEach(log => console.log(`   ${log}`));
 
                 // Star bowlers exhausted = good for chasing team
                 if (bowlerAnalysis.starBowlersExhausted > 0) {
                     const exhaustedBonus = bowlerAnalysis.starBowlersExhausted * 5;
                     liveProbBat += exhaustedBonus;
-                    console.log(`   → Chasing boost (bowlers exhausted): +${exhaustedBonus}%`);
                 }
 
                 // Pitch synergy helps bowling team
                 const pitchSynergyPenalty = bowlerAnalysis.spinBoost + bowlerAnalysis.paceBoost;
                 if (pitchSynergyPenalty > 0) {
                     liveProbBat -= pitchSynergyPenalty;
-                    console.log(`   → Defending boost (pitch synergy): -${pitchSynergyPenalty}%`);
                 }
             }
 
@@ -812,9 +788,6 @@ export const calculateLiveProbability = (
                 const momentum = getMomentumFromOBO(overByOverData, Math.floor(oversBowled), format);
                 if (momentum.adjustment !== 0) {
                     liveProbBat += momentum.adjustment;
-                    console.log(`📈 [MOMENTUM]`);
-                    momentum.logDetails.forEach(log => console.log(`   ${log}`));
-                    console.log(`   → Adjustment: ${momentum.adjustment > 0 ? '+' : ''}${momentum.adjustment}%`);
                 }
             }
 
@@ -824,7 +797,6 @@ export const calculateLiveProbability = (
             if (wickets >= 8 && runsNeeded > 10) {
                 const cap = wickets >= 9 ? 5 : 15;
                 if (liveProbBat > cap) {
-                    console.log(`   🚫 [SANITY CAP] 8+ wickets down (${wickets}) -> Capping at ${cap}%`);
                     liveProbBat = Math.min(liveProbBat, cap);
                 }
             }
@@ -832,12 +804,10 @@ export const calculateLiveProbability = (
             // 2. High RRR Cap
             if (rrr > 12 && runsNeeded > 15) {
                 if (liveProbBat > 10) {
-                    console.log(`   🚫 [SANITY CAP] RRR > 12 -> Capping at 10%`);
                     liveProbBat = Math.min(liveProbBat, 10);
                 }
             }
 
-            console.log(`   → Final 2nd innings probability: ${liveProbBat.toFixed(0)}%`);
         }
     }
 
@@ -852,10 +822,8 @@ export const calculateLiveProbability = (
 
         if (w >= 10 || (currentInning.Overs === String(totalOvers) && r < t)) {
             liveProbBat = 0; // All out or out of overs = LOSS
-            console.log(`   🏁 MATCH OVER: ${battingTeam} Lost (Force 0%)`);
         } else if (t > 0 && r >= t) {
             liveProbBat = 100; // Target reached = WIN
-            console.log(`   🏁 MATCH OVER: ${battingTeam} Won (Force 100%)`);
         }
     }
 
@@ -873,11 +841,6 @@ export const calculateLiveProbability = (
     const preMatchBatProb = isTeam1Batting ? preMatchProb.team1.probability : preMatchProb.team2.probability;
     const finalBatProb = (preMatchBatProb * (1 - finalLiveWeight)) + (liveProbBat * finalLiveWeight);
     const finalProb = Math.max(0, Math.min(100, finalBatProb)); // Allow 0/100 now
-
-    console.log(`\n📈 [BLENDING]`);
-    console.log(`   Pre-match ${battingTeam}: ${preMatchBatProb.toFixed(0)}%`);
-    console.log(`   Live ${battingTeam}: ${liveProbBat.toFixed(0)}%`);
-    console.log(`   Blended: (${preMatchBatProb.toFixed(0)} × ${((1 - finalLiveWeight) * 100).toFixed(0)}%) + (${liveProbBat.toFixed(0)} × ${(finalLiveWeight * 100).toFixed(0)}%) = ${finalBatProb.toFixed(1)}%`);
 
     // Calculate details for UI
     let details: WinProbabilityDetails = {};
@@ -916,12 +879,6 @@ export const calculateLiveProbability = (
 
     const t1Prob = isTeam1Batting ? finalProb : 100 - finalProb;
     const t2Prob = isTeam1Batting ? 100 - finalProb : finalProb;
-
-    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`✅ LIVE PROBABILITY (${phase} PHASE)`);
-    console.log(`   🔵 ${preMatchProb.team1.name}: ${t1Prob.toFixed(0)}%`);
-    console.log(`   🔴 ${preMatchProb.team2.name}: ${t2Prob.toFixed(0)}%`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
 
     return {
         team1: {
