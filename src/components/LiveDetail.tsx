@@ -237,60 +237,80 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         return { label, color };
     };
 
-    // Centralized data fetch for insights (uses hook functions)
+    // --- DATA FETCHING STRATEGY ---
+    // 1. Static/One-time Data (H2H, Squads, etc.)
     useEffect(() => {
         if (match?.game_id) {
             // Fetch H2H data
             fetchH2H(match.game_id).then(data => {
                 if (data) setH2hData(data);
             });
+        }
+    }, [match?.game_id, fetchH2H]);
 
-            // Fetch current innings batsman splits and over-by-over
+    // Derived state for dependency: Current Overs (String) to trigger updates
+    // Use string to avoid float comparison issues, change on every ball
+    const currentOversStr = scorecard?.Innings?.[scorecard.Innings.length - 1]?.Overs || "0";
+
+    // 2. Real-time/Live Data (Charts, Splits, OBO) - Re-runs on every ball/over change
+    useEffect(() => {
+        if (match?.game_id) {
             const currentInningsLen = scorecard?.Innings?.length || 1;
+
+            // console.log(`[LIVE UPDATE] Refreshing insights for ${currentOversStr} overs (Inn ${currentInningsLen})`);
+
+            // A. Fetch Batsman Splits (Wagon Wheel, Matchups)
             fetchBatsmanSplits(match.game_id, currentInningsLen).then(data => {
                 if (data) {
                     setBatsmanSplits(data);
-                    setBatsmanSplitsMatchups(data); // Initialize Matchups with same data
+                    setBatsmanSplitsMatchups(data);
                 }
-                if (currentInningsLen > 0) {
+
+                // Initialize active tab states if not set (only on first valid load)
+                if (currentInningsLen > 0 && batsmanSplits === null) {
                     setWagonWheelInnings(currentInningsLen);
                     setMatchupsInnings(currentInningsLen);
                     setPartnershipsInnings(currentInningsLen);
-                    // Initialize Manhattan with current innings if empty
                     if (manhattanInnings.length === 0) {
                         setManhattanInnings([currentInningsLen]);
                     }
                 }
             });
+
+            // B. Fetch OBO (Manhattan, Worm, Matchups Wickets)
             fetchOverByOver(match.game_id, currentInningsLen).then(data => {
                 if (data) {
                     setOverByOver(data);
-                    setOverByOverMatchups(data); // Initialize Matchups with same data
+                    setOverByOverMatchups(data);
 
-                    // Init Manhattan Data
-                    if (manhattanData.length === 0 && scorecard?.Innings) {
-                        const idx = currentInningsLen - 1;
-                        const meta = getInningsMeta(idx);
-                        setManhattanData([{
-                            data,
-                            label: meta.label,
-                            color: meta.color,
-                            id: currentInningsLen
-                        }]);
+                    // Auto-update Manhattan for current innings
+                    if (scorecard?.Innings) {
+                        // Update existing entry if checks match, or add new
+                        const idx = currentInningsLen;
+                        const meta = getInningsMeta(idx - 1);
+
+                        setManhattanData(prev => {
+                            // Replace or add current innings data
+                            const filtered = prev.filter(p => p.id !== idx);
+                            return [...filtered, {
+                                data,
+                                label: meta.label,
+                                color: meta.color,
+                                id: idx
+                            }].sort((a, b) => a.id - b.id);
+                        });
                     }
                 }
             });
 
-            // --- SMART WORM LOGIC ---
+            // C. Smart Worm Logic (Recalculate on every update)
             setIsWormLoading(true);
             if (scorecard?.Innings?.length) {
                 const innings = scorecard.Innings;
-                const primaryIdx = innings.length - 1; // Current Last Innings
+                const primaryIdx = innings.length - 1;
                 const primaryInn = innings[primaryIdx];
                 const primaryTeamId = primaryInn.Battingteam;
 
-                // Find comparison innings: Last innings by a DIFFERENT team
-                // Iterate backwards from primaryIdx - 1
                 let secondaryIdx = -1;
                 for (let i = primaryIdx - 1; i >= 0; i--) {
                     if (innings[i].Battingteam !== primaryTeamId) {
@@ -298,9 +318,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         break;
                     }
                 }
-
-                // Fallback for Innings 1 (compare with self/empty? or just show nothing) -> logic handles empty
-                // Fallback for Innings 2 same team (unlikely but safe) -> secondaryIdx remains -1
 
                 // Helper to get Label/Color
                 const getMeta = (idx: number) => {
@@ -312,7 +329,6 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     return { label, color };
                 };
 
-                // Fetch Primary and Secondary in parallel
                 const fetchPrimary = fetchOverByOver(match.game_id, primaryIdx + 1);
                 const fetchSecondaryPromise = secondaryIdx !== -1
                     ? fetchOverByOver(match.game_id, secondaryIdx + 1)
@@ -332,14 +348,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     setIsWormLoading(false);
                 });
             } else {
-                // Default fallback for initial load/no innings
+                // Fallback
                 fetchOverByOver(match.game_id, 1).then(data => {
                     if (data) setWormPrimary({ data, label: 'INN 1', color: '#3b82f6' });
                     setIsWormLoading(false);
                 });
             }
         }
-    }, [match?.game_id, scorecard?.Innings?.length, fetchH2H, fetchBatsmanSplits, fetchOverByOver]);
+    }, [match?.game_id, scorecard?.Innings?.length, currentOversStr, fetchBatsmanSplits, fetchOverByOver]);
 
 
 
