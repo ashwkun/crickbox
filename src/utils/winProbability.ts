@@ -1044,8 +1044,8 @@ export const calculateLiveProbability = (
             name: preMatchProb.team2.name,
             probability: t2Prob
         },
-        phase: progress < 0.3 ? 'early' : progress < 0.8 ? 'mid' : 'death',
-        message: currentInningIndex === 0 ? 'Setting Target' : 'Chase On',
-        details: details
+        phase: phase, // Fix: explicitly return the calculated phase
+        details: details,
+        message: isTeam1Batting ? `${battingTeam} Batting` : `Chase On`
     };
 };
