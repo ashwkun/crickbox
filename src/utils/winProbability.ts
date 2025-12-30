@@ -464,27 +464,13 @@ export const calculatePreMatchProbability = (
     const t1Name = team1.name || team1.short_name;
     const t2Name = team2.name || team2.short_name;
 
-    console.log(`\n🏏 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`📊 WIN PROBABILITY CALCULATION: ${t1Name} vs ${t2Name}`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`🏟️ Venue: ${venueName || '[Unknown Venue]'}`);
-    console.log(`🎯 Match Type: ${isFranchise ? 'Franchise/Domestic' : 'International'}`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
-
     // Calculate team strengths from H2H player data
     const team1Strength = getTeamStrengthFromH2H(h2hPlayerData, team1.id);
     const team2Strength = getTeamStrengthFromH2H(h2hPlayerData, team2.id);
 
-    console.log(`💪 [TEAM STRENGTH]`);
-    console.log(`   ${t1Name}:`);
-    team1Strength.logDetails.forEach(log => console.log(`      ${log}`));
-    console.log(`   ${t2Name}:`);
-    team2Strength.logDetails.forEach(log => console.log(`      ${log}`));
-
     // Team 1 overall = their batting vs opponent bowling, their bowling vs opponent batting
     const team1Overall = (team1Strength.battingStrength + team1Strength.bowlingStrength) / 2;
     const team2Overall = (team2Strength.battingStrength + team2Strength.bowlingStrength) / 2;
-    console.log(`   Overall: ${t1Name} ${team1Overall.toFixed(0)} | ${t2Name} ${team2Overall.toFixed(0)}`);
 
     let prob1 = 50;
     const weights = isFranchise ? WEIGHTS.FRANCHISE : WEIGHTS.INTERNATIONAL;
@@ -601,12 +587,6 @@ export const calculatePreMatchProbability = (
     const rawProb = prob1;
     prob1 = Math.max(15, Math.min(85, prob1));
 
-    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`✅ FINAL PROBABILITY (before clamping: ${rawProb.toFixed(1)}%)`);
-    console.log(`   🔵 ${t1Name}: ${prob1.toFixed(0)}%`);
-    console.log(`   🔴 ${t2Name}: ${(100 - prob1).toFixed(0)}%`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
-
     return {
         team1: { name: team1.short_name, probability: prob1 },
         team2: { name: team2.short_name, probability: 100 - prob1 },
@@ -676,14 +656,6 @@ export const calculateLiveProbability = (
     // Weight shifts from 0.4 (start) to 1.0 (death phase = 100% live, 0% pre-match)
     const liveWeight = Math.min(1, 0.4 + (0.6 * progress));
 
-    console.log(`\n⚡ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`📺 LIVE PROBABILITY UPDATE: ${battingTeam} batting`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`📊 Innings: ${currentInningIndex + 1} | Format: ${format} | Phase: ${phase}`);
-    console.log(`⏱️ Overs: ${overStr}/${totalOvers} (${(progress * 100).toFixed(0)}% complete)`);
-    console.log(`⚖️ Blend: ${((1 - liveWeight) * 100).toFixed(0)}% Pre-Match + ${(liveWeight * 100).toFixed(0)}% Live`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
-
     let liveProbBat = 50;
 
     // Get pitch type for analysis
@@ -695,24 +667,6 @@ export const calculateLiveProbability = (
 
     // Get bowler data
     const bowlers = currentInning.Bowlers || [];
-
-    // === VERBOSE INPUT LOGGING ===
-    console.log(`📋 [INPUT DATA RECEIVED]`);
-    console.log(`   • Pre-Match Prob: ${preMatchProb.team1.name} ${preMatchProb.team1.probability.toFixed(0)}% | ${preMatchProb.team2.name} ${preMatchProb.team2.probability.toFixed(0)}%`);
-    console.log(`   • Scorecard: ${scorecard ? '✅ Available' : '❌ Missing'}`);
-    console.log(`   • Innings Count: ${innings.length} (viewing #${currentInningIndex + 1})`);
-    console.log(`   • Batting Team ID: "${batTeamId}"`);
-    console.log(`   • Team 1 ID: "${team1Id}" | Team 2 ID: "${team2Id}"`);
-    console.log(`   • Identified Batting Team: ${battingTeam} (isTeam1: ${isTeam1Batting})`);
-    console.log(`   • Format: ${format} | Total Overs: ${totalOvers}`);
-    console.log(`   • Overs Bowled: ${oversBowled} | Progress: ${(progress * 100).toFixed(1)}% | Phase: ${phase}`);
-    console.log(`   • Pitch Type: "${pitchType || 'NOT AVAILABLE'}"`);
-    console.log(`   • Partnerships: ${partnerships.length} entries`);
-    console.log(`   • Bowlers: ${bowlers.length} entries`);
-    console.log(`   • H2H Player Data: ${h2hPlayerData ? '✅ Available' : '❌ Missing'}`);
-    console.log(`   • Team IDs: team1="${team1Id || 'MISSING'}" | team2="${team2Id || 'MISSING'}"`);
-    console.log(`   • OBO Data: ${overByOverData?.Overbyover ? `✅ ${overByOverData.Overbyover.length} overs` : '❌ Missing'}`);
-    console.log(``);
 
     if (currentInningIndex === 0) {
         // 1st Innings: Projected vs Dynamic Par
