@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useLayoutEffect } from 'react';
 import { OverByOverResponse } from '../../utils/h2hApi';
+import { getTeamColor } from '../../utils/teamColors';
 
 interface ManhattanDataset {
     data: OverByOverResponse;
@@ -85,19 +86,17 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         return `${team?.Name_Short || 'TM'} ${Math.floor(idx / 2) + 1}`;
     };
 
-    // Helper: color for inactive tabs
-    const getTabColor = (id: number) => {
-        const ds = datasets.find(d => d.id === id);
-        return ds?.color || 'var(--text-muted)';
-    };
-
-    // Tabs / Legend Items
+    // Tabs / Legend Items - DECOUPLED from Datasets so they load instantly
     const inningsTabs = scorecard?.Innings?.map((inn: any, idx: number) => {
         const id = idx + 1;
-        const color = getTabColor(id);
+        const teamId = inn.Battingteam;
+        const team = scorecard.Teams?.[teamId];
+        // Calculate color synchronously from static data
+        const color = getTeamColor(team?.Name_Full || team?.Name_Short) || '#3b82f6';
+
         return {
             id,
-            label: getTabLabel(idx, inn.Battingteam),
+            label: getTabLabel(idx, teamId),
             isActive: selectedInnings.includes(id),
             color
         };
