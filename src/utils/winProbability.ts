@@ -664,7 +664,13 @@ export const calculateLiveProbability = (
     const totalOvers = format === 'T20' ? 20 : (format === 'ODI' ? 50 : 90);
     const oversBowled = parseFloat(overStr);
     const progress = Math.min(1, oversBowled / totalOvers);
-    const phase = progress < 0.3 ? 'EARLY' : progress < 0.8 ? 'MID' : 'DEATH';
+
+    // User Request: 1st Innings logic should not be "DEATH". Treat as MID.
+    // DEATH phase reserved for 2nd innings (chasing pressure)
+    let phase = progress < 0.3 ? 'EARLY' : 'MID';
+    if (currentInnings === 2 && progress >= 0.8) {
+        phase = 'DEATH';
+    }
 
     // Weight shifts from 0.4 (start) to 1.0 (death phase = 100% live, 0% pre-match)
     const liveWeight = Math.min(1, 0.4 + (0.6 * progress));
