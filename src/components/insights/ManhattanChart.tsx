@@ -142,12 +142,7 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
                 {inningsTabs.map((tab: any) => (
                     <button
                         key={tab.id}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log('Manhattan Debug: Tab Clicked', { id: tab.id, currentSelected: selectedInnings });
-                            onInningsToggle(tab.id);
-                        }}
+                        onClick={() => onInningsToggle(tab.id)}
                         style={{
                             display: 'flex', alignItems: 'center', gap: 8,
                             padding: '6px 14px',

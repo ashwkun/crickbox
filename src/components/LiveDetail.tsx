@@ -302,7 +302,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         });
 
                         // SMART INITIALIZATION: If 2nd innings (or later), auto-select previous opponent innings for comparison
-                        if (manhattanInnings.length === 0 || (manhattanInnings.length === 1 && manhattanInnings[0] !== currentInningsLen)) {
+                        // FIXED: Only init if empty. Do NOT override if user has manually selected just one innings.
+                        if (manhattanInnings.length === 0) {
                             let initialSelection = [currentInningsLen];
 
                             if (currentInningsLen > 1) {
