@@ -120,6 +120,9 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
     const overMap = useMemo(() => {
         const map: Record<number, { runs: number, wickets: number, color: string, label: string }[]> = {};
         datasets.forEach(ds => {
+            // Filter: Only process if this dataset's ID is selected
+            if (!selectedInnings.includes(ds.id)) return;
+
             ds.data.Overbyover.forEach(o => {
                 if (!map[o.Over]) map[o.Over] = [];
                 map[o.Over].push({
@@ -131,29 +134,7 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
             });
         });
         return map;
-    }, [datasets]);
-
-    // DEBUG: Visual of Bars
-    useMemo(() => {
-        const visualSummary = Object.entries(overMap).map(([over, items]) => ({
-            over,
-            items: items.map(i => ({ runs: i.runs, wickets: i.wickets, color: i.color }))
-        }));
-        if (visualSummary.length > 0) {
-            console.log('Manhattan Debug: Bar Visuals (First 5 overs)', visualSummary.slice(0, 5));
-        }
-    }, [overMap]);
-
-    // DEBUG: Visual of Bars
-    useMemo(() => {
-        const visualSummary = Object.entries(overMap).map(([over, items]) => ({
-            over,
-            items: items.map(i => ({ runs: i.runs, wickets: i.wickets, color: i.color }))
-        }));
-        if (visualSummary.length > 0) {
-            console.log('Manhattan Debug: Bar Visuals (First 5 overs)', visualSummary.slice(0, 5));
-        }
-    }, [overMap]);
+    }, [datasets, selectedInnings]);
 
     return (
         <div style={{
