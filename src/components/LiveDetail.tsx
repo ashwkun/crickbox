@@ -1431,17 +1431,35 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     // But user wants strict scorecard? Let's try scorecard first.
 
                     // Determine Striker / Non-Striker
-                    let striker = activeBatsmen?.find((b: any) => b.isStriker);
-                    let nonStriker = activeBatsmen?.find((b: any) => !b.isStriker && b !== striker);
+                    let striker;
+                    let nonStriker;
 
-                    // If no striker flag found, default to 0 and 1
+                    // Priority 1: Use Wallstream (latestBall) to identify striker by name
+                    if (latestBall?.batsmanName && activeBatsmen) {
+                        const wbName = latestBall.batsmanName.toLowerCase();
+                        striker = activeBatsmen.find((b: any) => {
+                            const pName = b.name.toLowerCase();
+                            return pName.includes(wbName) || wbName.includes(pName);
+                        });
+                    }
+
+                    // Priority 2: Use Scorecard 'Striker' flag (if API ever fixes it/provides it)
+                    if (!striker && activeBatsmen) {
+                        striker = activeBatsmen.find((b: any) => b.isStriker);
+                    }
+
+                    // Priority 3: Fallback logic
+                    // If no striker flag found and no Wallstream match, default to 0 and 1
                     if (!striker && activeBatsmen && activeBatsmen.length > 0) {
                         striker = activeBatsmen[0];
-                        if (activeBatsmen.length > 1) nonStriker = activeBatsmen[1];
                     }
-                    // If striker found but no non-striker (and we have 2 players), pick the other one
-                    if (striker && !nonStriker && activeBatsmen && activeBatsmen.length > 1) {
+
+                    // Determine Non-Striker (anyone who is not the striker)
+                    if (striker && activeBatsmen && activeBatsmen.length > 1) {
                         nonStriker = activeBatsmen.find((b: any) => b !== striker);
+                    } else if (!striker && activeBatsmen && activeBatsmen.length > 1) {
+                        // Fallback if striker is still null (e.g. empty array?)
+                        nonStriker = activeBatsmen[1];
                     }
 
                     // Strict Scorecard usage as requested
