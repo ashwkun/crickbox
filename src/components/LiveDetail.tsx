@@ -705,16 +705,29 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         const battingTeamId = currentInn.Battingteam;
         const players = scorecard.Teams?.[battingTeamId]?.Players || {};
 
+        // Find Striker ID from Partnership_Current (Reliable Source)
+        let strikerId: string | null = null;
+        if (currentInn.Partnership_Current?.Batsmen) {
+            const pBatsmen = currentInn.Partnership_Current.Batsmen;
+            const s = pBatsmen.find((pb: any) => pb.IsStriker === true || String(pb.IsStriker).toLowerCase() === 'true');
+            if (s) strikerId = s.Batsman;
+        }
+
         return activeBatsmen.map((b: any) => {
             const p = players[b.Batsman];
+            // Check direct Striker flag (if present) OR match with Partnership_Current striker ID
+            const isStrikerDirect = String(b.Striker).toLowerCase() === 'true' || b.Striker === true || b.Striker === '1';
+            const isStrikerViaPartnership = strikerId ? (b.Batsman === strikerId) : false;
+
             return {
                 name: p?.Name_Full || p?.Name_Short || b.Batsman,
+                id: b.Batsman, // Store ID for matching
                 runs: b.Runs,
                 balls: b.Balls,
                 fours: b.Fours,
                 sixes: b.Sixes,
                 strikeRate: b.Strikerate,
-                isStriker: String(b.Striker).toLowerCase() === 'true' || b.Striker === true || b.Striker === '1'
+                isStriker: isStrikerDirect || isStrikerViaPartnership
             };
         });
     };
