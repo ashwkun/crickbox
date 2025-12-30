@@ -115,23 +115,43 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
     const { allForm: t2All, currentForm: t2Curr } = filterMatches(matches2);
 
     // --- Renderers ---
-    // direction: 'ltr' = left-to-right (Team 1, newest on right near center)
-    // direction: 'rtl' = right-to-left (Team 2, newest on left near center)
-    const renderPills = (matches: Match[], tId: string, direction: 'ltr' | 'rtl' = 'ltr') => {
+    // isLeftColumn = true (Team 1): content aligns right (closest to center divider)
+    // isLeftColumn = false (Team 2): content aligns left (closest to center divider)
+    const renderPills = (matches: Match[], tId: string, isLeftColumn: boolean) => {
         if (matches.length === 0) {
-            return <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>-</span>;
+            return <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>-</div>;
         }
 
-        // For LTR: index 0 is oldest, last is newest (closest to center)
-        // For RTL: reverse so newest appears on left (closest to center)
-        const displayMatches = direction === 'rtl' ? [...matches].reverse() : matches;
-        const newestIndex = direction === 'rtl' ? 0 : displayMatches.length - 1;
+        // We want the LATEST match to be closest to the center divider.
+        // matches array is typically [Match 1, Match 2... Match 5] where Match 1 is Newest (if API returns that way)
+        // Let's assume matches 0 is NEWEST.
+
+        // If matches[0] is newest:
+        // Team 1 (Right Align): [5, 4, 3, 2, 1(Newest)] -> Center
+        // Team 2 (Left Align):  Center -> [1(Newest), 2, 3, 4, 5]
+
+        // Actually matches from getTeamMatches usually come [Latest... Oldest].
+        // Let's ensure strict order: Newest First.
+        // If sorting isn't guaranteed, we'd sort by date, but assume API is good.
+
+        // Visual Order:
+        // Team 1: [Oldest ... Newest] -> Divider
+        // Team 2: Divider -> [Newest ... Oldest]
+
+        // This creates a "Mirror" effect where Newest is always in the center.
+
+        const displayMatches = [...matches]; // Assume [Newest, ..., Oldest]
+        const newestMatch = displayMatches[0];
+
+        // For Team 1 (Left Column, Right Aligned): flex-direction: row-reverse
+        // For Team 2 (Right Column, Left Aligned): flex-direction: row
+        const flexDirection = isLeftColumn ? 'row-reverse' : 'row';
 
         return (
-            <div style={{ display: 'flex', gap: 4 }}>
+            <div style={{ display: 'flex', gap: 4, flexDirection }}>
                 {displayMatches.map((m, idx) => {
                     const res = getResult(m, tId);
-                    const isNewest = idx === newestIndex;
+                    const isNewest = idx === 0; // First item is newest
                     return (
                         <div
                             key={m.game_id}
@@ -163,7 +183,8 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
                                     width: 4,
                                     height: 4,
                                     borderRadius: '50%',
-                                    background: 'rgba(255,255,255,0.4)'
+                                    background: 'rgba(255,255,255,0.4)',
+                                    boxShadow: '0 0 4px rgba(0,0,0,0.5)'
                                 }} />
                             )}
                         </div>
@@ -192,7 +213,7 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
                     {isRedundant ? (
                         // SINGLE ROW
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                            {renderPills(all, team.id, direction)}
+                            {renderPills(all, team.id, isLeft)}
                         </div>
                     ) : (
                         // DUAL ROWS (Stacked)
@@ -201,11 +222,11 @@ const DualTeamRecentForm: React.FC<DualTeamRecentFormProps> = ({ team1, team2, c
                                 <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase' }}>
                                     {(currentFormat || 'Recent').replace(/current\s*|\(|\)/gi, '')}
                                 </span>
-                                {renderPills(current, team.id, direction)}
+                                {renderPills(current, team.id, isLeft)}
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                                 <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase' }}>ALL</span>
-                                {renderPills(all, team.id, direction)}
+                                {renderPills(all, team.id, isLeft)}
                             </div>
                         </>
                     )}
