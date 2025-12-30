@@ -102,19 +102,6 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         };
     }) || [];
 
-    // DEBUG: Button State
-    console.log('Manhattan Debug: Tabs State', inningsTabs.map(t => ({
-        id: t.id,
-        label: t.label,
-        isActive: t.isActive,
-        color: t.color
-    })));
-
-    // console.log('Manhattan Debug: Rendering', {
-    //     selectedInnings,
-    //     tabs: inningsTabs.map(t => ({ id: t.id, active: t.isActive, label: t.label }))
-    // });
-
 
     // Process data for rendering
     const overMap = useMemo(() => {
