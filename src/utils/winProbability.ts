@@ -471,11 +471,9 @@ export const calculatePreMatchProbability = (
     // Team 1 overall = their batting vs opponent bowling, their bowling vs opponent batting
     const team1Overall = (team1Strength.battingStrength + team1Strength.bowlingStrength) / 2;
     const team2Overall = (team2Strength.battingStrength + team2Strength.bowlingStrength) / 2;
+    // console.log(`   Overall: ${t1Name} ${team1Overall.toFixed(0)} | ${t2Name} ${team2Overall.toFixed(0)}`);
 
     let prob1 = 50;
-    const weights = isFranchise ? WEIGHTS.FRANCHISE : WEIGHTS.INTERNATIONAL;
-
-    console.log(`\n📈 Starting probability at 50-50...`);
 
     // 1. ICC Ranking / Pedigree
     if (!isFranchise) {
@@ -680,32 +678,17 @@ export const calculateLiveProbability = (
         const battingStrength = battingTeamStrength.battingStrength;
         const bowlingStrength = bowlingTeamStrength.bowlingStrength;
 
-        console.log(`📊 [PLAYING XI STRENGTH]`);
-        console.log(`   ${battingTeam} (batting):`);
-        battingTeamStrength.logDetails.forEach(log => console.log(`      ${log}`));
-        console.log(`   ${bowlingTeam} (bowling):`);
-        bowlingTeamStrength.logDetails.forEach(log => console.log(`      ${log}`));
-
         const { parScore, logDetails: parLogDetails } = getDynamicParScore(format, pitchType, battingStrength, bowlingStrength);
 
         const diff = projected - parScore;
         liveProbBat = 50 + (diff * 0.5);
 
-        console.log(`🏏 [1ST INNINGS] ${battingTeam} setting target`);
-        console.log(`   Score: ${runs}/${wickets} in ${overStr} overs (CRR: ${crr.toFixed(2)})`);
-        console.log(`   Projected: ${projected} | Dynamic Par: ${parScore}`);
-        console.log(`   Par Calculation: ${parLogDetails.join(' | ')}`);
-        console.log(`   Resource Factor: ${(resourceFactor * 100).toFixed(0)}% (${wickets} wickets down)`);
-        console.log(`   → Base probability: ${liveProbBat.toFixed(0)}%`);
-
         // Partnership Momentum
         const partnership = getPartnershipMomentum(partnerships, wickets);
         if (partnership.adjustment !== 0) {
             liveProbBat += partnership.adjustment;
-            console.log(`🤝 [PARTNERSHIP] ${partnership.runs} runs off ${partnership.balls} balls`);
-            console.log(`   → Adjustment: ${partnership.adjustment > 0 ? '+' : ''}${partnership.adjustment}%`);
         } else {
-            console.log(`🤝 [PARTNERSHIP] ${partnership.runs} runs off ${partnership.balls} balls → No adjustment (below threshold)`);
+            // No adjustment
         }
 
         // Bowler Analysis (from bowling team's perspective)
@@ -718,7 +701,6 @@ export const calculateLiveProbability = (
             if (bowlerAnalysis.starBowlersExhausted > 0) {
                 const exhaustedBonus = bowlerAnalysis.starBowlersExhausted * 5;
                 liveProbBat += exhaustedBonus;
-                console.log(`   → Batting boost (bowlers exhausted): +${exhaustedBonus}%`);
             }
 
             // Pitch synergy boosts bowling team (reduces batting prob)
