@@ -1447,22 +1447,13 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     let striker;
                     let nonStriker;
 
-                    // Priority 1: Use Wallstream (latestBall) to identify striker by name
-                    if (latestBall?.batsmanName && activeBatsmen) {
-                        const wbName = latestBall.batsmanName.toLowerCase();
-                        striker = activeBatsmen.find((b: any) => {
-                            const pName = b.name.toLowerCase();
-                            return pName.includes(wbName) || wbName.includes(pName);
-                        });
-                    }
-
-                    // Priority 2: Use Scorecard 'Striker' flag (if API ever fixes it/provides it)
-                    if (!striker && activeBatsmen) {
+                    // Priority 1: Use Scorecard 'Striker' flag (checked via Partnership_Current in getCurrentBatsmenFromScorecard)
+                    if (activeBatsmen) {
                         striker = activeBatsmen.find((b: any) => b.isStriker);
                     }
 
-                    // Priority 3: Fallback logic
-                    // If no striker flag found and no Wallstream match, default to 0 and 1
+                    // Priority 2: Fallback logic
+                    // If no striker flag found, default to 0 and 1
                     if (!striker && activeBatsmen && activeBatsmen.length > 0) {
                         striker = activeBatsmen[0];
                     }
