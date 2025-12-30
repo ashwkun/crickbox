@@ -823,7 +823,7 @@ export const calculateLiveProbability = (
         const w = parseInt(currentInning.Wickets || "0");
         const t = parseInt(currentInning.Target || "0");
 
-        if (w >= 10 || (currentInning.Overs === String(totalOvers) && r < t)) {
+        if (w >= 10 || (oversBowled >= totalOvers && r < t)) {
             liveProbBat = 0; // All out or out of overs = LOSS
         } else if (t > 0 && r >= t) {
             liveProbBat = 100; // Target reached = WIN
