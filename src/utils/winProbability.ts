@@ -621,7 +621,7 @@ export const calculateLiveProbability = (
     // User Request: 1st Innings logic should not be "DEATH". Treat as MID.
     // DEATH phase reserved for 2nd innings (chasing pressure)
     let phase = progress < 0.3 ? 'EARLY' : 'MID';
-    if (currentInnings === 2 && progress >= 0.8) {
+    if (currentInningIndex > 0 && progress >= 0.8) {
         phase = 'DEATH';
     }
 
@@ -709,7 +709,8 @@ export const calculateLiveProbability = (
 
         if (runs >= target) {
             liveProbBat = 100;
-        } else if (wickets >= 10 || ballsLeft <= 0) {
+        } else if (wickets >= 10 || ballsLeft <= 0 || (runsNeeded > ballsLeft * 6)) {
+            // Impossible to win if runs needed > max possible runs (6 per ball)
             liveProbBat = 0;
         } else {
             // Base Calculation (RRR Pressure) - Format-aware thresholds
@@ -877,9 +878,13 @@ export const calculateLiveProbability = (
         };
     }
 
-    const roundedFinalProb = Math.round(finalProb);
-    const t1Prob = isTeam1Batting ? roundedFinalProb : 100 - roundedFinalProb;
-    const t2Prob = isTeam1Batting ? 100 - roundedFinalProb : roundedFinalProb;
+    // 1-decimal precision logic (as requested)
+    // Avoid double rounding errors by calculating one and subtracting from 100
+    const roundedFinalProb1 = parseFloat(finalProb.toFixed(1));
+    const roundedFinalProb2 = parseFloat((100 - roundedFinalProb1).toFixed(1));
+
+    const t1Prob = isTeam1Batting ? roundedFinalProb1 : roundedFinalProb2;
+    const t2Prob = isTeam1Batting ? roundedFinalProb2 : roundedFinalProb1;
 
     return {
         team1: {
