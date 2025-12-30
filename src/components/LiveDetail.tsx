@@ -292,13 +292,33 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         setManhattanData(prev => {
                             // Replace or add current innings data
                             const filtered = prev.filter(p => p.id !== idx);
-                            return [...filtered, {
+                            const newData = [...filtered, {
                                 data,
                                 label: meta.label,
                                 color: meta.color,
                                 id: idx
                             }].sort((a, b) => a.id - b.id);
+                            return newData;
                         });
+
+                        // SMART INITIALIZATION: If 2nd innings (or later), auto-select previous opponent innings for comparison
+                        if (manhattanInnings.length === 0 || (manhattanInnings.length === 1 && manhattanInnings[0] !== currentInningsLen)) {
+                            let initialSelection = [currentInningsLen];
+
+                            if (currentInningsLen > 1) {
+                                const currentTeam = scorecard.Innings[currentInningsLen - 1].Battingteam;
+                                // Find last innings by opponent
+                                for (let i = currentInningsLen - 2; i >= 0; i--) {
+                                    if (scorecard.Innings[i].Battingteam !== currentTeam) {
+                                        // Found opponent innings (add to selection)
+                                        // Order: [Opponent, Current] so current is last (and focused)
+                                        initialSelection = [i + 1, currentInningsLen];
+                                        break;
+                                    }
+                                }
+                            }
+                            setManhattanInnings(initialSelection);
+                        }
                     }
                 }
             });
@@ -358,44 +378,60 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
     }, [match?.game_id, scorecard?.Innings?.length, currentOversStr, fetchBatsmanSplits, fetchOverByOver]);
 
 
+    // 3. REACTIVE MANHATTAN FETCHING
+    // Watch 'manhattanInnings' state and fetch missing data automatically
+    // This replaces manual fetching in the click handler
+    useEffect(() => {
+        const fetchMissingManhattanData = async () => {
+            if (!match?.game_id || manhattanInnings.length === 0) return;
 
-    // Handler for Manhattan (Multi-Select)
-    const handleManhattanInningsChange = async (inningsIdx: number) => { // 1-based index
-        // Toggle logic
-        let newSelection = [...manhattanInnings];
-        if (newSelection.includes(inningsIdx)) {
-            newSelection = newSelection.filter(i => i !== inningsIdx);
-            // Don't allow empty selection, revert if empty
-            if (newSelection.length === 0) newSelection = [inningsIdx];
-        } else {
-            newSelection.push(inningsIdx);
-        }
+            const missingIds = manhattanInnings.filter(id => !manhattanData.find(d => d.id === id));
 
-        setManhattanInnings(newSelection);
-        setIsManhattanLoading(true);
+            if (missingIds.length > 0) {
+                setIsManhattanLoading(true);
+                const promises = missingIds.map(async (idx) => {
+                    const data = await fetchOverByOver(match.game_id, idx);
+                    if (data) {
+                        const meta = getInningsMeta(idx - 1);
+                        return { data, label: meta.label, color: meta.color, id: idx };
+                    }
+                    return null;
+                });
 
-        // Let's just ensure we have data for all selected.
-        const promises = newSelection.map(async (idx) => {
-            const existing = manhattanData.find(d => d.id === idx);
-            if (existing) return existing;
+                const results = await Promise.all(promises);
+                const validResults = results.filter(r => r !== null) as any[];
 
-            const data = await fetchOverByOver(match.game_id, idx);
-            if (data) {
-                const meta = getInningsMeta(idx - 1);
-                return { data, label: meta.label, color: meta.color, id: idx };
+                setManhattanData(prev => {
+                    // Add new data, remove duplicates if any, sort by ID
+                    const combined = [...prev, ...validResults];
+                    // De-dupe by ID
+                    const unique = Array.from(new Map(combined.map(item => [item.id, item])).values());
+                    return unique.sort((a, b) => a.id - b.id);
+                });
+                setIsManhattanLoading(false);
             }
-            return null;
+        };
+
+        fetchMissingManhattanData();
+    }, [manhattanInnings, match?.game_id]); // Trigger whenever selection changes
+
+
+    // Simplified Handler for Manhattan Toggle
+    const handleManhattanInningsChange = (inningsIdx: number) => { // 1-based index
+        setManhattanInnings(prev => {
+            if (prev.includes(inningsIdx)) {
+                const newVal = prev.filter(i => i !== inningsIdx);
+                // Don't allow empty selection, revert if empty
+                return newVal.length === 0 ? prev : newVal;
+            } else {
+                return [...prev, inningsIdx].sort((a, b) => a - b);
+            }
         });
-
-        const results = await Promise.all(promises);
-        const validResults = results.filter(r => r !== null) as any[];
-
-        // Sort by ID to keep consistent order (1, 2, 3...)
-        validResults.sort((a, b) => a.id - b.id);
-
-        setManhattanData(validResults);
-        setIsManhattanLoading(false);
     };
+
+
+
+
 
     // Independent handler for Wagon Wheel innings change
     const handleWagonWheelInningsChange = (innings: number) => {
