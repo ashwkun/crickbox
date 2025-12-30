@@ -557,8 +557,8 @@ export const calculatePreMatchProbability = (
     }
 
     // Clamp
-    const rawProb = prob1;
-    prob1 = Math.max(15, Math.min(85, prob1));
+    // Clamp and Round
+    prob1 = Math.round(Math.max(15, Math.min(85, prob1)));
 
     return {
         team1: { name: team1.short_name, probability: prob1 },
@@ -877,8 +877,9 @@ export const calculateLiveProbability = (
         };
     }
 
-    const t1Prob = isTeam1Batting ? finalProb : 100 - finalProb;
-    const t2Prob = isTeam1Batting ? 100 - finalProb : finalProb;
+    const roundedFinalProb = Math.round(finalProb);
+    const t1Prob = isTeam1Batting ? roundedFinalProb : 100 - roundedFinalProb;
+    const t2Prob = isTeam1Batting ? 100 - roundedFinalProb : roundedFinalProb;
 
     return {
         team1: {
