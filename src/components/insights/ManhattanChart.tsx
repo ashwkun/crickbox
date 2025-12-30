@@ -33,25 +33,30 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         return Math.max(max, 5);
     }, [datasets]);
 
-    // Auto-scroll to Current Over (Right Snap)
+    // Auto-scroll to Current Over (Right Snap - Focused on Latest Innings)
     useLayoutEffect(() => {
         if (!scrollRef.current) return;
 
-        // 1. Find the last over that actually has data (runs/wickets)
-        let maxOverWithData = 0;
-        datasets.forEach(ds => {
-            ds.data.Overbyover.forEach(o => {
-                if (o.Over > maxOverWithData) maxOverWithData = o.Over;
-            });
+        // 1. Find the "Primary Focus Dataset" (Highest ID = Latest Innings)
+        // In 2nd innings chase (IDs: [1, 2]), we want to focus on ID 2's progress.
+        const sortedDatasets = [...datasets].sort((a, b) => b.id - a.id);
+        const primaryDataset = sortedDatasets[0];
+
+        if (!primaryDataset) return;
+
+        // 2. Find the last over that has data *specifically for the primary dataset*
+        let primaryMaxOver = 0;
+        primaryDataset.data.Overbyover.forEach(o => {
+            if (o.Over > primaryMaxOver) primaryMaxOver = o.Over;
         });
 
-        // If no data, default to 0
-        if (maxOverWithData === 0) {
+        // If primary dataset has no data (e.g. over 0.0), default to 0
+        if (primaryMaxOver === 0) {
             scrollRef.current.scrollLeft = 0;
             return;
         }
 
-        // 2. Calculate pixel position of that over
+        // 3. Calculate pixel position of that over
         // Per render logic:
         // groupWidth = 28px (width) + 4px (marginRight) = 32px per unit
         // paddingLeft = 24px
@@ -59,13 +64,12 @@ const ManhattanChart: React.FC<ManhattanChartProps> = ({
         const paddingLeft = 24;
 
         // Right edge of the target item
-        const itemRightEdge = (maxOverWithData * groupWidth) + paddingLeft;
+        const itemRightEdge = (primaryMaxOver * groupWidth) + paddingLeft;
 
         // Container visible width
         const containerWidth = scrollRef.current.clientWidth;
 
-        // 3. Scroll so itemRightEdge is at container's right edge (minus some padding)
-        // targetScroll = itemRightEdge - containerWidth + paddingRight (e.g. 20px)
+        // 4. Scroll so itemRightEdge is at container's right edge (minus some padding)
         const targetScroll = itemRightEdge - containerWidth + 20;
 
         // Clamp
