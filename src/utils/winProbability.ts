@@ -949,15 +949,40 @@ export const calculateLiveProbability = (
     // Clamp
     liveProbBat = Math.max(1, Math.min(99, liveProbBat));
 
-    // Blend
+    // Force Result (override all blending if match is decisively over)
+    if (currentInningIndex > 0) { // 2nd Innings checks
+        const r = parseInt(currentInning.Total || "0");
+        const w = parseInt(currentInning.Wickets || "0");
+        const t = parseInt(currentInning.Target || "0");
+
+        if (w >= 10 || (currentInning.Overs === String(totalOvers) && r < t)) {
+            liveProbBat = 0; // All out or out of overs = LOSS
+            console.log(`   🏁 MATCH OVER: ${battingTeam} Lost (Force 0%)`);
+        } else if (t > 0 && r >= t) {
+            liveProbBat = 100; // Target reached = WIN
+            console.log(`   🏁 MATCH OVER: ${battingTeam} Won (Force 100%)`);
+        }
+    }
+
+    // Blend with Pre-Match Probability
+    // Increase steepness: reach 100% live by 90% progress (e.g. 18th over in T20)
+    // Formula: min(1, 0.4 + (0.7 * progress)) -> reaches 1.0 at ~0.85 progress
+    // Wait, old was 0.4 + 0.6*p. Let's make it hit 1.0 at 0.9 progress
+    // 0.2 + 0.9*p ? at 0.9 -> 1.01. Yes.
+    // Let's use steepLiveWeight = Math.min(1, 0.2 + (0.9 * progress));
+    const steepLiveWeight = Math.min(1, 0.2 + (0.9 * progress));
+
+    // If we forced a result (0 or 100), weight MUST be 1.0
+    const finalLiveWeight = (liveProbBat === 0 || liveProbBat === 100) ? 1.0 : steepLiveWeight;
+
     const preMatchBatProb = isTeam1Batting ? preMatchProb.team1.probability : preMatchProb.team2.probability;
-    const finalBatProb = (preMatchBatProb * (1 - liveWeight)) + (liveProbBat * liveWeight);
-    const finalProb = Math.max(1, Math.min(99, finalBatProb));
+    const finalBatProb = (preMatchBatProb * (1 - finalLiveWeight)) + (liveProbBat * finalLiveWeight);
+    const finalProb = Math.max(0, Math.min(100, finalBatProb)); // Allow 0/100 now
 
     console.log(`\n📈 [BLENDING]`);
     console.log(`   Pre-match ${battingTeam}: ${preMatchBatProb.toFixed(0)}%`);
     console.log(`   Live ${battingTeam}: ${liveProbBat.toFixed(0)}%`);
-    console.log(`   Blended: (${preMatchBatProb.toFixed(0)} × ${((1 - liveWeight) * 100).toFixed(0)}%) + (${liveProbBat.toFixed(0)} × ${(liveWeight * 100).toFixed(0)}%) = ${finalBatProb.toFixed(1)}%`);
+    console.log(`   Blended: (${preMatchBatProb.toFixed(0)} × ${((1 - finalLiveWeight) * 100).toFixed(0)}%) + (${liveProbBat.toFixed(0)} × ${(finalLiveWeight * 100).toFixed(0)}%) = ${finalBatProb.toFixed(1)}%`);
 
     // Calculate details for UI
     let details: WinProbabilityDetails = {};
