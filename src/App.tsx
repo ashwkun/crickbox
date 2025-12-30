@@ -418,13 +418,6 @@ export default function App(): React.ReactElement {
 
     return (
         <div className="app-container">
-            {/* Debug Log */}
-            {console.log('[App] Header Props ->', {
-                selectedMatchId: selectedMatch?.game_id,
-                eventState: selectedMatch?.event_state,
-                isLive: selectedMatch?.event_state === 'L'
-            })}
-
             {/* Floating Header */}
             <FloatingHeader
                 showBack={!!selectedMatch || !!selectedSeries || !!selectedTournament}
