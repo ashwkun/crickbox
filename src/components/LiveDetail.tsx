@@ -1047,7 +1047,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         const lastBall = thisOverBalls.length > 0 ? thisOverBalls[thisOverBalls.length - 1] : null;
 
         const ballData = lastBall ? {
-            id: lastBall.comm_id || lastBall.event_id || `${Date.now()}`,
+            // Fix: Use deterministic ID instead of Date.now() to prevent redundant animations
+            id: (lastBall && typeof lastBall === 'object' && (lastBall.comm_id || lastBall.event_id))
+                ? (lastBall.comm_id || lastBall.event_id)
+                : `ball_${cleanName.replace(/\s/g, '')}_${scoreStr}_${thisOverBalls.length}`,
             text: getBallDisplay(lastBall),
             color: getBallColor(lastBall)
         } : undefined;

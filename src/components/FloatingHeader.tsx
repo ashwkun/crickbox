@@ -23,15 +23,24 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
     const prevBallId = React.useRef<string | undefined>(undefined);
 
     // Detect Ball Change
+    // Detect Ball Change
     React.useEffect(() => {
-        if (data?.ball?.id && prevBallId.current !== data.ball.id) {
-            // New ball! Trigger celebration
-            setCelebrating(true);
-            prevBallId.current = data.ball.id;
+        if (data?.ball?.id) {
+            // First load - do not animate
+            if (prevBallId.current === undefined) {
+                prevBallId.current = data.ball.id;
+                return;
+            }
 
-            // Reset after 1.5s
-            const timer = setTimeout(() => setCelebrating(false), 1500);
-            return () => clearTimeout(timer);
+            // Real change
+            if (prevBallId.current !== data.ball.id) {
+                setCelebrating(true);
+                prevBallId.current = data.ball.id;
+
+                // Reset after 1.5s
+                const timer = setTimeout(() => setCelebrating(false), 1500);
+                return () => clearTimeout(timer);
+            }
         }
     }, [data?.ball?.id]);
 
