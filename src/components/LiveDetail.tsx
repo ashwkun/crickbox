@@ -660,7 +660,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 fours: b.Fours,
                 sixes: b.Sixes,
                 strikeRate: b.Strikerate,
-                isStriker: b.Striker === true || b.Striker === 'true' // Some APIs mark this
+                isStriker: String(b.Striker).toLowerCase() === 'true' || b.Striker === true || b.Striker === '1'
             };
         });
     };
@@ -1374,9 +1374,8 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     // But user wants strict scorecard? Let's try scorecard first.
 
                     // Determine Striker / Non-Striker
-                    // Determine Striker / Non-Striker
-                    let striker = activeBatsmen?.find(b => b.isStriker);
-                    let nonStriker = activeBatsmen?.find(b => !b.isStriker && b !== striker);
+                    let striker = activeBatsmen?.find((b: any) => b.isStriker);
+                    let nonStriker = activeBatsmen?.find((b: any) => !b.isStriker && b !== striker);
 
                     // If no striker flag found, default to 0 and 1
                     if (!striker && activeBatsmen && activeBatsmen.length > 0) {
@@ -1385,18 +1384,17 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     }
                     // If striker found but no non-striker (and we have 2 players), pick the other one
                     if (striker && !nonStriker && activeBatsmen && activeBatsmen.length > 1) {
-                        nonStriker = activeBatsmen.find(b => b !== striker);
+                        nonStriker = activeBatsmen.find((b: any) => b !== striker);
                     }
 
-                    // If scorecard fails, fallback to latestBall (but user prefers scorecard)
-                    // We will use scorecard data if available, else Wallstream
-                    const sName = striker?.name || latestBall?.batsmanName;
-                    const sRuns = striker ? striker.runs : latestBall?.batsmanRuns;
-                    const sBalls = striker ? striker.balls : latestBall?.batsmanBalls;
+                    // Strict Scorecard usage as requested
+                    const sName = striker?.name;
+                    const sRuns = striker?.runs;
+                    const sBalls = striker?.balls;
 
-                    const nsName = nonStriker?.name || latestBall?.nonStrikerName;
-                    const nsRuns = nonStriker ? nonStriker.runs : latestBall?.nonStrikerRuns;
-                    const nsBalls = nonStriker ? nonStriker.balls : latestBall?.nonStrikerBalls;
+                    const nsName = nonStriker?.name;
+                    const nsRuns = nonStriker?.runs;
+                    const nsBalls = nonStriker?.balls;
 
                     return (
                         <div style={{
