@@ -68,7 +68,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
             : '1px solid rgba(255, 255, 255, 0.15)',
         color: '#fff', // Always white text
         boxShadow: isActive
-            ? '0 0 16px rgba(255, 255, 255, 0.15)' // Subtle glow
+            ? 'none' // No glow for active state
             : '0 4px 16px rgba(0, 0, 0, 0.2)',
     });
 
