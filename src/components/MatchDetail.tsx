@@ -23,13 +23,27 @@ const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream,
     const params = new URLSearchParams(window.location.search);
     const forceLive = params.get('forceLive') === 'true';
 
-    // Route to appropriate component based on match state
+    // 1. Force Live Override (Testing)
+    if (forceLive) {
+        return (
+            <LiveDetail
+                match={match}
+                scorecard={scorecard}
+                wallstream={wallstream}
+                onClose={onClose}
+                onSeriesClick={onSeriesClick}
+                setHeaderData={setHeaderData}
+            />
+        );
+    }
+
+    // 2. Upcoming Match
     if (match.event_state === 'U') {
         return <UpcomingDetail match={match} onClose={onClose} onSeriesClick={onSeriesClick} />;
     }
 
-    // Force LiveDetail for completed matches if forceLive=true
-    if (match.event_state === 'L' || forceLive) {
+    // 3. Live Match
+    if (match.event_state === 'L') {
         return (
             <LiveDetail
                 match={match}
