@@ -112,6 +112,7 @@ export default function HomePage({
     const [activeLiveChip, setActiveLiveChip] = useState('all');
     const [upcomingTimeFilter, setUpcomingTimeFilter] = useState<TimeFilterValue>('all');
     const [activeUpcomingChip, setActiveUpcomingChip] = useState('all');
+    const [lastChangedFilter, setLastChangedFilter] = useState<'time' | 'type' | null>(null);
     const [hasInitializedTimeFilter, setHasInitializedTimeFilter] = useState(false);
     const resultsScrollRef = useRef<HTMLDivElement>(null);
     const upcomingScrollRef = useRef<HTMLDivElement>(null);
@@ -358,16 +359,22 @@ export default function HomePage({
         return result;
     }, [processedUpcoming, upcomingTimeFilter, activeUpcomingChip]);
 
-    // Smart fallback: if category filter yields no results, reset category to 'all'
-    // (Time filter takes precedence - user's time choice stays, category expands)
+    // Smart bidirectional fallback:
+    // - If user changed TIME filter and it results in empty → reset TYPE to 'all'
+    // - If user changed TYPE filter and it results in empty → reset TIME to 'all'
     useEffect(() => {
-        if (filteredUpcoming.length === 0 &&
-            activeUpcomingChip !== 'all' &&
-            upcomingTimeFilter !== 'all') {
-            // Reset category chip to show all matches in selected time range
-            setActiveUpcomingChip('all');
+        if (filteredUpcoming.length === 0 && lastChangedFilter) {
+            if (lastChangedFilter === 'time' && activeUpcomingChip !== 'all') {
+                // User changed time, reset category
+                setActiveUpcomingChip('all');
+            } else if (lastChangedFilter === 'type' && upcomingTimeFilter !== 'all') {
+                // User changed type, reset time
+                setUpcomingTimeFilter('all');
+            }
+            // Clear the flag after handling
+            setLastChangedFilter(null);
         }
-    }, [filteredUpcoming.length, activeUpcomingChip, upcomingTimeFilter]);
+    }, [filteredUpcoming.length, lastChangedFilter, activeUpcomingChip, upcomingTimeFilter]);
 
     // Tournament Hub View
     if (selectedTournament) {
@@ -561,7 +568,10 @@ export default function HomePage({
                 }}>
                     <TimeFilter
                         value={upcomingTimeFilter}
-                        onChange={setUpcomingTimeFilter}
+                        onChange={(v) => {
+                            setLastChangedFilter('time');
+                            setUpcomingTimeFilter(v);
+                        }}
                     />
                 </div>
 
@@ -576,7 +586,10 @@ export default function HomePage({
                     {upcomingChips.slice(0, 8).map(chip => (
                         <div
                             key={chip.id}
-                            onClick={() => setActiveUpcomingChip(chip.id)}
+                            onClick={() => {
+                                setLastChangedFilter('type');
+                                setActiveUpcomingChip(chip.id);
+                            }}
                             style={{
                                 padding: '5px 10px',
                                 borderRadius: 12,
