@@ -620,16 +620,27 @@ export default function HomePage({
                                 />
                             )
                         )}
-                        {filteredUpcoming.length > 8 && (
+                        {/* Show All Dates chip when time filter is active */}
+                        {upcomingTimeFilter !== 'all' && (
                             <button
                                 className="view-more-card"
-                                onClick={onOpenUpcomingList}
+                                onClick={() => setUpcomingTimeFilter('all')}
+                                style={{ minWidth: 120, maxWidth: 120 }}
                             >
-                                <span className="view-more-icon">+</span>
-                                <span className="view-more-text">Full Calendar</span>
-                                <span className="view-more-count">{filteredUpcoming.length} total</span>
+                                <span className="view-more-icon" style={{ fontSize: 16 }}>↻</span>
+                                <span className="view-more-text">Show All</span>
+                                <span className="view-more-count">{upcomingMatches.length} matches</span>
                             </button>
                         )}
+                        {/* Full Calendar always visible */}
+                        <button
+                            className="view-more-card"
+                            onClick={onOpenUpcomingList}
+                        >
+                            <span className="view-more-icon">+</span>
+                            <span className="view-more-text">Full Calendar</span>
+                            <span className="view-more-count">{upcomingMatches.length} total</span>
+                        </button>
                     </div>
                 ) : (
                     <div className="empty-state">No upcoming matches</div>
