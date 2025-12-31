@@ -212,7 +212,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
 
                 {hasAction && (
                     <button className="upcoming-action-btn" onClick={handleAction}>
-                        {actionText}
+                        {actionText} <span style={{ opacity: 0.6, fontSize: '1.2em', lineHeight: 0.5 }}>›</span>
                     </button>
                 )}
             </div>
