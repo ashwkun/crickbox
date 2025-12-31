@@ -13,11 +13,31 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
 
     const containerStyle: React.CSSProperties = {
         display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        padding: '0 20px 12px 20px',
+    };
+
+    const liveTextStyle: React.CSSProperties = {
+        fontFamily: '"BBH Bartle", sans-serif',
+        fontSize: '16px',
+        fontWeight: 600,
+        letterSpacing: '1px',
+        background: 'linear-gradient(90deg, #c53030 0%, #c53030 35%, #e87070 50%, #c53030 65%, #c53030 100%)',
+        backgroundSize: '200% 100%',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        animation: 'liveShimmer 1.5s ease-in-out infinite alternate',
+        flexShrink: 0,
+    };
+
+    const chipsScrollStyle: React.CSSProperties = {
+        display: 'flex',
         gap: '8px',
         overflowX: 'auto',
-        padding: '0 20px 12px 20px',
-        scrollbarWidth: 'none', // Firefox
-        msOverflowStyle: 'none', // IE/Edge
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        flex: 1,
     };
 
     const chipStyle = (isActive: boolean): React.CSSProperties => ({
@@ -29,7 +49,6 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         cursor: 'pointer',
         flexShrink: 0,
         transition: 'all 0.2s ease',
-        // Glassmorphic styling
         background: isActive
             ? 'rgba(255, 255, 255, 0.95)'
             : 'rgba(20, 20, 20, 0.4)',
@@ -45,32 +64,42 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
     });
 
     return (
-        <div style={containerStyle} className="filter-chips-scroll">
-            {chips.map(chip => (
-                <div
-                    key={chip.id}
-                    style={chipStyle(chip.id === activeChip)}
-                    onClick={() => onChipClick(chip.id)}
-                >
-                    {chip.label}
-                    {chip.id !== 'all' && (
-                        <span style={{
-                            marginLeft: '6px',
-                            opacity: 0.6,
-                            fontSize: '11px'
-                        }}>
-                            {chip.count}
-                        </span>
-                    )}
-                </div>
-            ))}
-
-            {/* Hide scrollbar */}
+        <div style={containerStyle}>
+            {/* Shimmer keyframes */}
             <style>{`
+                @keyframes liveShimmer {
+                    0% { background-position: 0% 50%; }
+                    100% { background-position: 100% 50%; }
+                }
                 .filter-chips-scroll::-webkit-scrollbar {
                     display: none;
                 }
             `}</style>
+
+            {/* Frozen LIVE text */}
+            <span style={liveTextStyle}>LIVE</span>
+
+            {/* Scrollable chips */}
+            <div style={chipsScrollStyle} className="filter-chips-scroll">
+                {chips.map(chip => (
+                    <div
+                        key={chip.id}
+                        style={chipStyle(chip.id === activeChip)}
+                        onClick={() => onChipClick(chip.id)}
+                    >
+                        {chip.label}
+                        {chip.id !== 'all' && (
+                            <span style={{
+                                marginLeft: '6px',
+                                opacity: 0.6,
+                                fontSize: '11px'
+                            }}>
+                                {chip.count}
+                            </span>
+                        )}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };

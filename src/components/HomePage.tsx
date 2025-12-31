@@ -316,14 +316,7 @@ export default function HomePage({
     return (
         <>
             {/* Live Section */}
-            <section className="section">
-                <div className="section-header">
-                    <h3 className="section-title">Live</h3>
-                    <div className="section-line"></div>
-                    {liveMatchesSorted.length > 0 && (
-                        <span className="section-count">{liveMatchesSorted.length}</span>
-                    )}
-                </div>
+            <section className="section" style={{ paddingTop: 8 }}>
 
                 {/* Filter Chips */}
                 <FilterChips
