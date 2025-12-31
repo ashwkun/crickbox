@@ -76,21 +76,18 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     const seriesName = shortenSeriesName(match.series_name);
     const matchFormat = normalizeFormat(match.event_format);
 
-    // Dynamic Team Colors for Background Glow
+    // Dynamic Team Colors for Dual Glow
     const color1 = getTeamColor(team1Name !== 'TBC' ? team1Name : undefined);
     const color2 = getTeamColor(team2Name !== 'TBC' ? team2Name : undefined);
 
-    let background = '#0f0f13'; // Default dark theme
-    let borderColor = 'rgba(255, 255, 255, 0.06)';
+    let background = '#0f0f13';
+    // NEUTRAL STROKE as requested
+    let borderColor = 'rgba(255, 255, 255, 0.08)';
 
     if (color1 && color2) {
-        // Dual Glow: Team 1 (Top Left) vs Team 2 (Bottom Right)
         background = `radial-gradient(circle at top left, ${color1}40, transparent 55%), radial-gradient(circle at bottom right, ${color2}40, transparent 55%), #0f0f13`;
-        borderColor = `${color1}44`;
     } else if (color1) {
-        // Fallback: Single Team Glow
         background = `radial-gradient(circle at top left, ${color1}33, #0f0f13 70%)`;
-        borderColor = `${color1}44`;
     }
 
     const cardStyle = {
@@ -115,12 +112,22 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
             onClick={() => onClick(match)}
             style={cardStyle}
         >
-            {/* Background Watermark (Home Team Logo) */}
+            {/* Background Watermarks (Dual) */}
             {team1Name !== 'TBC' && (
-                <div className="upcoming-bg-logo">
+                <div className="upcoming-bg-logo home">
                     <WikiImage
                         name={team1Name}
                         id={team1Id}
+                        type="team"
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                </div>
+            )}
+            {team2Name !== 'TBC' && (
+                <div className="upcoming-bg-logo away">
+                    <WikiImage
+                        name={team2Name}
+                        id={team2Id}
                         type="team"
                         style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     />

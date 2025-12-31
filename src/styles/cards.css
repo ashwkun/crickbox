@@ -336,16 +336,24 @@
 /* Background Team Logo (Watermark) */
 .upcoming-bg-logo {
     position: absolute;
-    right: -30px;
-    top: -30px;
-    width: 180px;
-    height: 180px;
-    opacity: 0.12;
-    /* Increased visibility */
+    width: 200px;
+    height: 200px;
+    opacity: 0.06;
     filter: grayscale(100%);
-    transform: rotate(15deg);
     z-index: 0;
     pointer-events: none;
+}
+
+.upcoming-bg-logo.home {
+    top: -40px;
+    left: -40px;
+    transform: rotate(-15deg);
+}
+
+.upcoming-bg-logo.away {
+    bottom: -40px;
+    right: -40px;
+    transform: rotate(15deg);
 }
 
 /* Header: Floating Glass Pill */
