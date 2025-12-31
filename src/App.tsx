@@ -33,6 +33,12 @@ export default function App(): React.ReactElement {
             setPendingMatchId(matchId);
         }
 
+        // Check for upcoming list page
+        const upcomingParam = params.get('upcoming');
+        if (upcomingParam === 'true') {
+            setShowUpcomingList(true);
+        }
+
         // Push initial state so back button doesn't close app immediately
         if (!window.history.state) {
             window.history.replaceState({ home: true }, '', window.location.pathname + window.location.search);
@@ -126,6 +132,14 @@ export default function App(): React.ReactElement {
                 }
             } else if (!event.state?.tournamentId) {
                 setSelectedTournament(null);
+            }
+
+            // Handle Upcoming List
+            const upcomingParam = params.get('upcoming');
+            if (upcomingParam === 'true') {
+                setShowUpcomingList(true);
+            } else if (!event.state?.upcoming) {
+                setShowUpcomingList(false);
             }
         };
 
@@ -450,7 +464,11 @@ export default function App(): React.ReactElement {
                     onCloseSeries={handleCloseSeries}
                     onOpenTournament={handleOpenTournament}
                     onCloseTournament={handleCloseTournament}
-                    onOpenUpcomingList={() => setShowUpcomingList(true)}
+                    onOpenUpcomingList={() => {
+                        setShowUpcomingList(true);
+                        window.history.pushState({ upcoming: true }, '', '?upcoming=true');
+                        window.scrollTo(0, 0);
+                    }}
                 />
             </main>
 
@@ -470,9 +488,14 @@ export default function App(): React.ReactElement {
             {showUpcomingList && (
                 <UpcomingListPage
                     matches={matches.filter(m => m.event_state === 'U')}
-                    onBack={() => setShowUpcomingList(false)}
-                    onMatchClick={(match) => {
+                    onBack={() => {
                         setShowUpcomingList(false);
+                        if (window.history.state?.upcoming) {
+                            window.history.back();
+                        }
+                    }}
+                    onMatchClick={(match) => {
+                        // Navigate to match (will push new history entry)
                         handleSelectMatch(match);
                     }}
                     onSeriesClick={handleOpenSeries}
