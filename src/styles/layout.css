@@ -137,7 +137,7 @@
     border-radius: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
-    scroll-snap-align: start;
+    scroll-snap-align: center;
 }
 
 .view-more-card:hover {
