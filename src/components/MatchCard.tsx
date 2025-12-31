@@ -146,6 +146,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onClick, isHero = false, o
         width: 'calc(100vw - 48px)', // 16px page padding + 8px card margin on each side
         maxWidth: 380,
         flexShrink: 0,
+        scrollSnapAlign: 'center',
     };
 
     if (isHero) {
