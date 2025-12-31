@@ -27,7 +27,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         alignItems: 'center',
         flexShrink: 0,
         transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)', // Bouncy wow effect
-        width: isShrunk ? '12px' : '55px',
+        width: isShrunk ? '12px' : '65px',
     };
 
     const textStyle: React.CSSProperties = {
