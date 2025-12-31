@@ -583,7 +583,7 @@ export default function HomePage({
                     overflowX: 'auto',
                     scrollbarWidth: 'none',
                 }}>
-                    {upcomingChips.slice(0, 8).map(chip => (
+                    {upcomingChips.map(chip => (
                         <div
                             key={chip.id}
                             onClick={() => {
