@@ -52,6 +52,16 @@ export function isThisMonth(date: Date): boolean {
 }
 
 /**
+ * Check if a date is within the next 60 days
+ */
+export function is60Days(date: Date): boolean {
+    const now = new Date();
+    const sixtyDaysLater = new Date();
+    sixtyDaysLater.setDate(now.getDate() + 60);
+    return date >= now && date <= sixtyDaysLater;
+}
+
+/**
  * Filter matches by time context
  */
 export function filterByTime(matches: Match[], timeFilter: TimeFilterValue): Match[] {
@@ -69,6 +79,8 @@ export function filterByTime(matches: Match[], timeFilter: TimeFilterValue): Mat
                 return isThisWeek(matchDate);
             case 'month':
                 return isThisMonth(matchDate);
+            case '60d':
+                return is60Days(matchDate);
             default:
                 return true;
         }
