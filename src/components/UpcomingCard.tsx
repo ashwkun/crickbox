@@ -54,86 +54,97 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
 }) => {
     const startDate = new Date(match.start_date);
 
-    const month = startDate.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
-    const day = startDate.getDate();
-    const weekday = startDate.toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase();
+    const dateStr = startDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
     const time = startDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
 
     const teams = match.participants || [];
     const seriesName = shortenSeriesName(match.series_name);
     const matchFormat = normalizeFormat(match.event_format);
 
-    const hasButton = (showSeriesButton && onViewSeries) || (showTournamentButton && onViewTournament);
+    const handleAction = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (showSeriesButton && onViewSeries) {
+            onViewSeries(match.series_id, matches);
+        } else if (showTournamentButton && onViewTournament) {
+            onViewTournament(match.series_id);
+        }
+    };
+
+    const hasAction = (showSeriesButton && onViewSeries) || (showTournamentButton && onViewTournament);
 
     return (
-        <div className="expandable-card">
-            {/* Main Card */}
-            <div
-                className={`upcoming-card ${hasButton ? 'has-series' : ''}`}
-                onClick={() => onClick(match)}
-            >
-                {/* Calendar Date Block */}
-                <div className="upcoming-date-block">
-                    <div className="upcoming-month">{month}</div>
-                    <div className="upcoming-day">{day}</div>
-                    <div className="upcoming-weekday">{weekday}</div>
+        <div
+            className="upcoming-card"
+            onClick={() => onClick(match)}
+        >
+            {/* Header: Date | Time | Format Badge */}
+            <div className="upcoming-card-header">
+                <div className="upcoming-date-pill">
+                    {dateStr} <span>•</span> {time}
+                </div>
+                {matchFormat && (
+                    <div className="upcoming-format-badge">
+                        {matchFormat}
+                    </div>
+                )}
+            </div>
+
+            {/* Content: Team A vs Team B */}
+            <div className="upcoming-content">
+                {/* VS Badge Center */}
+                <div className="upcoming-vs-badge">VS</div>
+
+                {/* Team A */}
+                <div className="upcoming-team-col">
+                    <div className="upcoming-team-logo-wrapper">
+                        {teams[0] ? (
+                            <WikiImage
+                                name={teams[0].name}
+                                id={teams[0].id}
+                                type="team"
+                                style={{ maxHeight: 32, maxWidth: 32, width: 'auto', height: 'auto' }}
+                            />
+                        ) : (
+                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
+                        )}
+                    </div>
+                    <span className="upcoming-team-name">
+                        {teams[0]?.name || 'TBC'}
+                    </span>
                 </div>
 
-                {/* Match Info */}
-                <div className="upcoming-info">
-                    {/* Teams - Logo on top, name below */}
-                    <div className="upcoming-teams-row">
-                        {teams.slice(0, 2).map((team, idx) => (
-                            <React.Fragment key={idx}>
-                                <div className="upcoming-team-block">
-                                    <WikiImage
-                                        name={team.name}
-                                        id={team.id}
-                                        type="team"
-                                        style={{ maxHeight: 32, maxWidth: 32, width: 'auto', height: 'auto', borderRadius: 8, background: '#1a1a1a', padding: 4 }}
-                                    />
-                                    <span className="upcoming-team-name">{team.name}</span>
-                                </div>
-                                {idx === 0 && <span className="upcoming-vs">vs</span>}
-                            </React.Fragment>
-                        ))}
+                {/* Team B */}
+                <div className="upcoming-team-col">
+                    <div className="upcoming-team-logo-wrapper">
+                        {teams[1] ? (
+                            <WikiImage
+                                name={teams[1].name}
+                                id={teams[1].id}
+                                type="team"
+                                style={{ maxHeight: 32, maxWidth: 32, width: 'auto', height: 'auto' }}
+                            />
+                        ) : (
+                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
+                        )}
                     </div>
-
-                    {/* Series Name */}
-                    {seriesName && (
-                        <div className="upcoming-series">{seriesName}</div>
-                    )}
-
-                    {/* Divider */}
-                    <div className="upcoming-divider"></div>
-
-                    {/* Footer: Time + Format */}
-                    <div className="upcoming-footer">
-                        <span className="upcoming-time">{time}</span>
-                        {matchFormat && <span className="upcoming-format">{matchFormat}</span>}
-                    </div>
+                    <span className="upcoming-team-name">
+                        {teams[1]?.name || 'TBC'}
+                    </span>
                 </div>
             </div>
 
-            {/* View Series Button */}
-            {showSeriesButton && onViewSeries && (
-                <button
-                    className="view-series-button"
-                    onClick={(e) => { e.stopPropagation(); onViewSeries(match.series_id, matches); }}
-                >
-                    View Series →
-                </button>
-            )}
-
-            {/* View Tournament Button */}
-            {showTournamentButton && onViewTournament && (
-                <button
-                    className="view-tournament-button"
-                    onClick={(e) => { e.stopPropagation(); onViewTournament(match.series_id); }}
-                >
-                    View Tournament →
-                </button>
-            )}
+            {/* Footer: Series Name or Action Button */}
+            <div className="upcoming-card-footer">
+                {hasAction ? (
+                    <button className="upcoming-action-btn" onClick={handleAction}>
+                        {showSeriesButton ? 'View Series →' : 'View Tournament →'}
+                    </button>
+                ) : (
+                    <span className="upcoming-series-name">
+                        {seriesName}
+                    </span>
+                )}
+            </div>
         </div>
     );
 });
