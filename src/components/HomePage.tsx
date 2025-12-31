@@ -539,52 +539,79 @@ export default function HomePage({
 
             {/* Upcoming Section */}
             <section className="section">
-                <div className="section-header" style={{ flexWrap: 'wrap', gap: 12 }}>
-                    <h3 className="section-title">Coming Up</h3>
+                {/* Premium Header Bar */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '0 20px 12px 16px',
+                }}>
+                    {/* .NEXTUP Branding */}
+                    <span style={{
+                        fontFamily: '"BBH Bartle", sans-serif',
+                        fontSize: 14,
+                        fontWeight: 600,
+                        letterSpacing: '1px',
+                        background: 'linear-gradient(90deg, #6366f1 0%, #6366f1 35%, #a5b4fc 50%, #6366f1 65%, #6366f1 100%)',
+                        backgroundSize: '200% 100%',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        animation: 'liveShimmer 2s ease-in-out infinite alternate',
+                        flexShrink: 0,
+                    }}>
+                        .NEXTUP
+                    </span>
+
+                    {/* Time Filter Dropdown */}
                     <TimeFilter
                         value={upcomingTimeFilter}
                         onChange={setUpcomingTimeFilter}
                     />
-                    <div className="section-line" style={{ flex: 1, minWidth: 40 }}></div>
-                </div>
-                {/* Category Filter Chips */}
-                {upcomingChips.length > 1 && (
-                    <div style={{ padding: '0 20px 8px 20px' }}>
-                        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-                            {upcomingChips.map(chip => (
-                                <div
-                                    key={chip.id}
-                                    onClick={() => setActiveUpcomingChip(chip.id)}
-                                    style={{
-                                        padding: '8px 16px',
-                                        borderRadius: 20,
-                                        fontSize: 13,
-                                        fontWeight: chip.id === activeUpcomingChip ? 600 : 500,
-                                        whiteSpace: 'nowrap',
-                                        cursor: 'pointer',
-                                        flexShrink: 0,
-                                        transition: 'all 0.2s ease',
-                                        background: chip.id === activeUpcomingChip
-                                            ? 'rgba(255, 255, 255, 0.15)'
-                                            : 'rgba(20, 20, 20, 0.4)',
-                                        backdropFilter: 'blur(16px)',
-                                        border: chip.id === activeUpcomingChip
-                                            ? '1px solid rgba(255, 255, 255, 0.4)'
-                                            : '1px solid rgba(255, 255, 255, 0.15)',
-                                        color: '#fff',
-                                    }}
-                                >
-                                    {chip.label}
-                                    {chip.id !== 'all' && (
-                                        <span style={{ marginLeft: 6, opacity: 0.6, fontSize: 11 }}>
-                                            {chip.count}
-                                        </span>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
+
+                    {/* Category Chips (scrollable) */}
+                    <div style={{
+                        display: 'flex',
+                        gap: 8,
+                        flex: 1,
+                        overflowX: 'auto',
+                        scrollbarWidth: 'none',
+                        padding: '4px 0',
+                        marginRight: -20,
+                        paddingRight: 20,
+                    }}>
+                        {upcomingChips.map(chip => (
+                            <div
+                                key={chip.id}
+                                onClick={() => setActiveUpcomingChip(chip.id)}
+                                style={{
+                                    padding: '6px 12px',
+                                    borderRadius: 16,
+                                    fontSize: 12,
+                                    fontWeight: chip.id === activeUpcomingChip ? 600 : 500,
+                                    whiteSpace: 'nowrap',
+                                    cursor: 'pointer',
+                                    flexShrink: 0,
+                                    transition: 'all 0.2s ease',
+                                    background: chip.id === activeUpcomingChip
+                                        ? 'rgba(99, 102, 241, 0.2)'
+                                        : 'rgba(20, 20, 20, 0.4)',
+                                    backdropFilter: 'blur(12px)',
+                                    border: chip.id === activeUpcomingChip
+                                        ? '1px solid rgba(99, 102, 241, 0.5)'
+                                        : '1px solid rgba(255, 255, 255, 0.1)',
+                                    color: chip.id === activeUpcomingChip ? '#a5b4fc' : 'rgba(255,255,255,0.7)',
+                                }}
+                            >
+                                {chip.label}
+                                {chip.id !== 'all' && (
+                                    <span style={{ marginLeft: 4, opacity: 0.5, fontSize: 10 }}>
+                                        {chip.count}
+                                    </span>
+                                )}
+                            </div>
+                        ))}
                     </div>
-                )}
+                </div>
                 {loading && matches.length === 0 ? (
                     <div className="horizontal-scroll">
                         <SkeletonMatchCard />
