@@ -76,12 +76,27 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     const seriesName = shortenSeriesName(match.series_name);
     const matchFormat = normalizeFormat(match.event_format);
 
-    // Dynamic Team Color for Background Glow
-    const homeTeamColor = getTeamColor(team1Name !== 'TBC' ? team1Name : undefined);
-    const cardStyle = homeTeamColor ? {
-        background: `radial-gradient(circle at top right, ${homeTeamColor}33, #0f0f13 70%)`, // 20% opacity color -> dark
-        borderColor: `${homeTeamColor}44`
-    } : {};
+    // Dynamic Team Colors for Background Glow
+    const color1 = getTeamColor(team1Name !== 'TBC' ? team1Name : undefined);
+    const color2 = getTeamColor(team2Name !== 'TBC' ? team2Name : undefined);
+
+    let background = '#0f0f13'; // Default dark theme
+    let borderColor = 'rgba(255, 255, 255, 0.06)';
+
+    if (color1 && color2) {
+        // Dual Glow: Team 1 (Top Left) vs Team 2 (Bottom Right)
+        background = `radial-gradient(circle at top left, ${color1}40, transparent 55%), radial-gradient(circle at bottom right, ${color2}40, transparent 55%), #0f0f13`;
+        borderColor = `${color1}44`;
+    } else if (color1) {
+        // Fallback: Single Team Glow
+        background = `radial-gradient(circle at top left, ${color1}33, #0f0f13 70%)`;
+        borderColor = `${color1}44`;
+    }
+
+    const cardStyle = {
+        background,
+        borderColor
+    };
 
     const handleAction = (e: React.MouseEvent) => {
         e.stopPropagation();
