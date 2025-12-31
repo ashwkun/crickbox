@@ -422,15 +422,17 @@ export default function App(): React.ReactElement {
         <div className="app-container">
             {/* Floating Header */}
             <FloatingHeader
-                showBack={!!selectedMatch || !!selectedSeries || !!selectedTournament}
+                showBack={!!selectedMatch || !!selectedSeries || !!selectedTournament || showUpcomingList}
                 onBack={() => {
-                    if (selectedMatch) handleCloseMatch();
+                    if (showUpcomingList) setShowUpcomingList(false);
+                    else if (selectedMatch) handleCloseMatch();
                     else if (selectedSeries) handleCloseSeries();
                     else if (selectedTournament) handleCloseTournament();
                 }}
                 onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
                 data={headerData}
                 isLive={selectedMatch?.event_state === 'L'}
+                isUpcoming={selectedMatch?.event_state === 'U' || showUpcomingList}
             />
 
             {/* Main Content */}
