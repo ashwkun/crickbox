@@ -29,9 +29,16 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         flexShrink: 0,
         transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
         width: isShrunk ? '28px' : '80px', // Square pill when shrunk, wide when expanded
-        background: isShrunk ? '#c53030' : 'rgba(197, 48, 48, 0.05)', // Solid red when shrunk, very subtle tint when expanded
+        // Glassmorphic background for both states, but more opaque when shrunk if desired
+        background: isShrunk
+            ? 'rgba(255, 255, 255, 0.15)'
+            : 'rgba(255, 255, 255, 0.02)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
         borderRadius: '100px',
-        border: isShrunk ? '1px solid #c53030' : '1px solid rgba(197, 48, 48, 0.0)', // Border only when shrunk
+        border: isShrunk
+            ? '1px solid rgba(255, 255, 255, 0.2)'
+            : '1px solid rgba(255, 255, 255, 0.05)',
         overflow: 'hidden',
     };
 
@@ -40,13 +47,8 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         fontSize: '14px',
         fontWeight: 600,
         letterSpacing: '1px',
-        // Text is white when shrunk (on solid bg), gradient when expanded (on light bg)
-        background: isShrunk ? 'none' : 'linear-gradient(90deg, #c53030 0%, #c53030 35%, #e87070 50%, #c53030 65%, #c53030 100%)',
-        backgroundSize: '200% 100%',
-        color: isShrunk ? '#fff' : 'transparent',
-        WebkitBackgroundClip: isShrunk ? 'border-box' : 'text',
-        WebkitTextFillColor: isShrunk ? '#fff' : 'transparent',
-        animation: isShrunk ? 'none' : 'liveShimmer 1.5s ease-in-out infinite alternate',
+        // Solid Red Color always
+        color: '#ff4d4d', // Bright red that stands out on glass
         whiteSpace: 'nowrap',
         transition: 'all 0.4s ease',
         transform: isShrunk ? 'scale(0.95)' : 'scale(1)',
@@ -55,7 +57,8 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        paddingTop: isShrunk ? '1px' : '0', // Optical adjustment for vertical center in pill
+        paddingTop: isShrunk ? '1px' : '0', // Optical adjustment
+        // Remove old gradient props
     };
 
     const chipsScrollStyle: React.CSSProperties = {
