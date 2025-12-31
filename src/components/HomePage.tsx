@@ -334,7 +334,14 @@ export default function HomePage({
                 />
 
                 {loading && matches.length === 0 ? (
-                    <div className="horizontal-scroll">
+                    <div className="horizontal-scroll" style={{
+                        justifyContent: 'center',
+                        minHeight: 220,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 24, // Match Carousel GAP
+                        paddingLeft: 0, paddingRight: 0
+                    }}>
                         <SkeletonMatchCard />
                         <SkeletonMatchCard />
                     </div>

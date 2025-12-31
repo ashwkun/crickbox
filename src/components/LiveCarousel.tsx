@@ -45,9 +45,18 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
     }, []);
 
     // Animate to position whenever index or offset changes
+    const isFirstRender = useRef(true);
+
     useEffect(() => {
         const stride = CARD_WIDTH + GAP;
         const targetX = -(activeIndex * stride) + centerOffset;
+
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            // Immediate set without animation for first render
+            x.set(targetX);
+            return;
+        }
 
         // Only animate if there is a meaningful difference to prevent micro-jitters
         if (Math.abs(x.get() - targetX) > 1) {
