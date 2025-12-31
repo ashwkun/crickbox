@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
+import { LuMoonStar, LuCalendarClock } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
 import UpcomingCard from './UpcomingCard';
 import SeriesHub from './SeriesHub';
@@ -416,14 +417,8 @@ export default function HomePage({
                             pointerEvents: 'none',
                         }} />
 
-                        {/* Stumps Icon */}
-                        <svg width="48" height="48" style={{ marginBottom: 12 }} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M8 21v-12" />
-                            <path d="M12 21v-12" />
-                            <path d="M16 21v-12" />
-                            <path d="M6 9h12" />
-                            <path d="M6 21h12" />
-                        </svg>
+                        {/* ... inside the component render */}
+                        <LuMoonStar size={42} color="rgba(255,255,255,0.4)" style={{ marginBottom: 12 }} />
 
                         <h3 style={{
                             margin: '12px 0 4px',
@@ -440,7 +435,10 @@ export default function HomePage({
                             color: 'rgba(255,255,255,0.5)',
                             lineHeight: '1.4'
                         }}>
-                            No live matches at the moment.<br />Check upcoming fixtures below.
+                            The pitch is quiet. <br />
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                                <LuCalendarClock size={12} /> Check upcoming fixtures
+                            </span>
                         </p>
                     </div>
                 )}
