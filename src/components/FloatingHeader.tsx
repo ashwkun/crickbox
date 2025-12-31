@@ -250,7 +250,17 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.NEXT</span>
                                 ) : (
-                                    <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
+                                    <span style={{
+                                        fontFamily: '"BBH Bartle", sans-serif',
+                                        fontSize: '16px',
+                                        fontWeight: 600,
+                                        letterSpacing: '1px',
+                                        background: 'linear-gradient(90deg, #22c55e 0%, #22c55e 35%, #86efac 50%, #22c55e 65%, #22c55e 100%)',
+                                        backgroundSize: '200% 100%',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        animation: 'liveShimmer 2s ease-in-out infinite alternate'
+                                    }}>.CRIC</span>
                                 )}
                             </div>
                             <style>{`
