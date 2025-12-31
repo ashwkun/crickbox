@@ -57,7 +57,7 @@ const SERIES_FALLBACK = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3d
 // Get flag URL from FlagsCDN
 export const getFlagUrl = (teamName: string | undefined): string | null => {
     if (!teamName) return null;
-    const cleanName = teamName.toLowerCase().replace(/(-w|women|women's|-u19|under-19)/gi, '').trim();
+    const cleanName = teamName.toLowerCase().replace(/(-w|\sW$|women|women's|-u19|under-19)/gi, '').trim();
     const code = COUNTRY_CODES[cleanName];
     if (code && code !== 'wi') {
         return `https://flagcdn.com/w80/${code}.png`;
@@ -143,7 +143,7 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
         }
 
         try {
-            const cleanName = type === 'team' ? name.replace(/(-W|Women|Women's)/gi, '').trim() : name;
+            const cleanName = type === 'team' ? name.replace(/(-W|\sW$|Women|Women's)/gi, '').trim() : name;
             let query = cleanName;
 
             if (type === 'team' && !cleanName.toLowerCase().includes('team')) query += ' cricket team';
