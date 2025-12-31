@@ -552,35 +552,12 @@ export default function HomePage({
 
             {/* Upcoming Section - Gamer Design Pivot */}
             <section className="section">
-                {/* Header Row: .NEXT + TimeFilter (fixed, no scroll) */}
+                {/* Header Row: .NEXT + Time Chips with collapsible branding */}
                 <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
                     padding: '0 20px 8px 16px',
                     position: 'relative',
                     zIndex: 10,
                 }}>
-                    {/* .NEXT Branding */}
-                    <span style={{
-                        fontFamily: '"BBH Bartle", sans-serif',
-                        fontSize: 13,
-                        fontWeight: 600,
-                        letterSpacing: '0.5px',
-                        background: 'linear-gradient(90deg, #6366f1 0%, #a5b4fc 50%, #6366f1 100%)',
-                        backgroundSize: '200% 100%',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        animation: 'liveShimmer 2s ease-in-out infinite alternate',
-                        flexShrink: 0,
-                    }}>
-                        .NEXT
-                    </span>
-
-                    {/* Spacer */}
-                    <div style={{ flex: 1 }} />
-
-                    {/* Time Filter Dropdown (right side) */}
                     <TimeFilter
                         value={upcomingTimeFilter}
                         onChange={setUpcomingTimeFilter}
