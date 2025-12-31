@@ -202,6 +202,86 @@ export function generateChips(matches: Match[]): Chip[] {
 }
 
 /**
+ * Generate filter chips for UPCOMING matches with smart sorting
+ * Sorts by: Priority tier first, then by imminence within tier
+ * This ensures high-priority categories stay at top while still surfacing imminent matches
+ */
+export function generateUpcomingChips(matches: Match[]): Chip[] {
+    const chipData: Record<string, { count: number; earliestDate: Date; priorityTier: number }> = {};
+
+    // Collect data for each chip
+    for (const match of matches) {
+        const chipId = getMatchChip(match);
+        const matchDate = new Date(match.start_date);
+        const priority = getMatchPriority(match);
+
+        // Assign priority tier (groups of similar priority)
+        // Tier 1: ICC Events (1-3)
+        // Tier 2: Top Internationals + Premium Leagues (4-15)
+        // Tier 3: Other International (16-30)
+        // Tier 4: Domestic/Other (31+)
+        let tier = 4;
+        if (priority <= 3) tier = 1;
+        else if (priority <= 15) tier = 2;
+        else if (priority <= 30) tier = 3;
+
+        if (!chipData[chipId]) {
+            chipData[chipId] = {
+                count: 0,
+                earliestDate: matchDate,
+                priorityTier: tier
+            };
+        }
+
+        chipData[chipId].count++;
+        if (matchDate < chipData[chipId].earliestDate) {
+            chipData[chipId].earliestDate = matchDate;
+        }
+        // Use the best (lowest) tier for this chip
+        if (tier < chipData[chipId].priorityTier) {
+            chipData[chipId].priorityTier = tier;
+        }
+    }
+
+    // Build chip array with metadata
+    const chips: (Chip & { earliestDate: Date; priorityTier: number })[] =
+        Object.entries(chipData).map(([id, data]) => ({
+            id,
+            label: id,
+            count: data.count,
+            earliestDate: data.earliestDate,
+            priorityTier: data.priorityTier
+        }));
+
+    // Add "All" chip at the start
+    chips.unshift({
+        id: 'all',
+        label: 'All',
+        count: matches.length,
+        earliestDate: new Date(),
+        priorityTier: 0
+    });
+
+    // Sort: Priority tier first, then earliestDate within tier
+    chips.sort((a, b) => {
+        // "All" always first
+        if (a.id === 'all') return -1;
+        if (b.id === 'all') return 1;
+
+        // Compare tiers first
+        if (a.priorityTier !== b.priorityTier) {
+            return a.priorityTier - b.priorityTier;
+        }
+
+        // Within same tier, sort by earliest upcoming match
+        return a.earliestDate.getTime() - b.earliestDate.getTime();
+    });
+
+    // Return only the Chip interface properties
+    return chips.map(({ id, label, count }) => ({ id, label, count }));
+}
+
+/**
  * Filter matches by chip
  */
 export function filterByChip(matches: Match[], chipId: string): Match[] {
