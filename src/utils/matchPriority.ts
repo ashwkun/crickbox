@@ -1,0 +1,210 @@
+/**
+ * Match Priority & Filter Chip Utilities
+ * Used for sorting live matches and generating filter chips
+ */
+
+import { Match } from '../types';
+
+// Top 10 ICC Men's Teams (by ID)
+const TOP_ICC_TEAMS = ['4', '1', '3', '13', '5', '6', '9', '8', '7', '2'];
+// IND=4, AUS=1, ENG=3, SA=13, NZ=5, PAK=6, SL=9, BAN=8, WI=7, AFG=2
+
+// ICC World Cup Events (highest priority)
+const ICC_WORLD_CUPS: Record<string, { priority: number; chip: string }> = {
+    'ICC World Twenty20': { priority: 1, chip: 'T20 WC' },
+    'ICC Cricket World Cup': { priority: 1, chip: 'ODI WC' },
+    'ICC Champions Trophy': { priority: 1, chip: 'CT' },
+    "ICC Women's World Twenty20": { priority: 1, chip: 'W-T20 WC' },
+    "ICC Women's World Cup": { priority: 1, chip: 'W-ODI WC' },
+    'ICC Under-19 World Cup': { priority: 2, chip: 'U19 WC' },
+};
+
+// Secondary ICC Events
+const ICC_EVENTS: Record<string, { priority: number; chip: string }> = {
+    'Asia Cup': { priority: 3, chip: 'Asia Cup' },
+    'Asia Cup T20I': { priority: 3, chip: 'Asia Cup' },
+};
+
+// Premium T20 Leagues
+const PREMIUM_LEAGUES: Record<string, { priority: number; chip: string }> = {
+    'Indian Premier League': { priority: 4, chip: 'IPL' },
+    "Women's Premier League": { priority: 5, chip: 'WPL' },
+    'Big Bash League': { priority: 6, chip: 'BBL' },
+    "Women's Big Bash League": { priority: 7, chip: 'WBBL' },
+    'The Hundred': { priority: 8, chip: 'The Hundred' },
+    'The Hundred Women': { priority: 8, chip: 'The Hundred' },
+    'SA20 league': { priority: 9, chip: 'SA20' },
+    'ILT20': { priority: 10, chip: 'ILT20' },
+    'Pakistan Super League': { priority: 11, chip: 'PSL' },
+    'Caribbean Premier League': { priority: 12, chip: 'CPL' },
+    'Bangladesh Premier League': { priority: 13, chip: 'BPL' },
+    'Lanka Premier League': { priority: 14, chip: 'LPL' },
+};
+
+// Chip display order
+const CHIP_ORDER = [
+    'all', 'T20 WC', 'ODI WC', 'CT', 'W-T20 WC', 'W-ODI WC', 'U19 WC',
+    'Asia Cup', 'International', 'IPL', 'WPL', 'BBL', 'WBBL',
+    'The Hundred', 'SA20', 'ILT20', 'PSL', 'CPL', 'BPL', 'LPL',
+    "Women's", 'Youth', 'Domestic'
+];
+
+export interface Chip {
+    id: string;
+    label: string;
+    count: number;
+}
+
+/**
+ * Check if match involves a Top 10 ICC team
+ */
+function isTopTeamMatch(match: Match): boolean {
+    const teamIds = match.participants?.map(p => p.id) || [];
+    return teamIds.some(id => TOP_ICC_TEAMS.includes(id));
+}
+
+/**
+ * Get the chip category for a match
+ */
+export function getMatchChip(match: Match): string {
+    const parentSeries = match.parent_series_name || '';
+    const championship = match.championship_name || '';
+    const leagueCode = match.league_code || '';
+
+    // 1. Check ICC World Cups
+    for (const [name, config] of Object.entries(ICC_WORLD_CUPS)) {
+        if (parentSeries.includes(name) || championship.includes(name)) {
+            return config.chip;
+        }
+    }
+
+    // 2. Check Secondary ICC Events
+    for (const [name, config] of Object.entries(ICC_EVENTS)) {
+        if (parentSeries.includes(name)) {
+            return config.chip;
+        }
+    }
+
+    // 3. Check Premium Leagues (exact match for parent_series_name)
+    if (PREMIUM_LEAGUES[parentSeries]) {
+        return PREMIUM_LEAGUES[parentSeries].chip;
+    }
+
+    // 4. Categorize by league_code
+    if (leagueCode === 'icc') {
+        return 'International';
+    }
+    if (leagueCode === 'womens_international') {
+        return "Women's";
+    }
+    if (leagueCode === 'youth_international') {
+        return 'Youth';
+    }
+
+    // 5. Everything else is domestic
+    return 'Domestic';
+}
+
+/**
+ * Calculate match priority (lower = higher priority)
+ */
+export function getMatchPriority(match: Match): number {
+    const parentSeries = match.parent_series_name || '';
+    const championship = match.championship_name || '';
+    const leagueCode = match.league_code || '';
+
+    // 1. ICC World Cups = highest priority
+    for (const [name, config] of Object.entries(ICC_WORLD_CUPS)) {
+        if (parentSeries.includes(name) || championship.includes(name)) {
+            return config.priority;
+        }
+    }
+
+    // 2. Top 10 ICC team matches (bilateral internationals)
+    if (leagueCode === 'icc' && isTopTeamMatch(match)) {
+        return 2; // Above premium leagues
+    }
+
+    // 3. Secondary ICC events (Asia Cup, etc.)
+    for (const [name, config] of Object.entries(ICC_EVENTS)) {
+        if (parentSeries.includes(name)) {
+            return config.priority;
+        }
+    }
+
+    // 4. Premium Leagues
+    if (PREMIUM_LEAGUES[parentSeries]) {
+        return PREMIUM_LEAGUES[parentSeries].priority;
+    }
+
+    // 5. Use API event_priority if available
+    const apiPriority = parseInt(match.event_priority || '') || 999;
+    if (apiPriority < 50) {
+        return 15 + apiPriority; // Offset to keep below premium leagues
+    }
+
+    // 6. League-based fallback
+    if (leagueCode === 'icc') return 20;
+    if (leagueCode === 'womens_international') return 25;
+    if (leagueCode === 'youth_international') return 30;
+
+    // 7. Domestic/Other
+    return 100;
+}
+
+/**
+ * Sort matches by priority, then by start_date
+ */
+export function sortByPriority(matches: Match[]): Match[] {
+    return [...matches].sort((a, b) => {
+        // Primary: Priority (lower first)
+        const priorityDiff = getMatchPriority(a) - getMatchPriority(b);
+        if (priorityDiff !== 0) return priorityDiff;
+
+        // Tie-breaker: Earlier start_date first
+        const dateA = new Date(a.start_date).getTime();
+        const dateB = new Date(b.start_date).getTime();
+        if (dateA !== dateB) return dateA - dateB;
+
+        // Final: Preserve original order
+        return 0;
+    });
+}
+
+/**
+ * Generate filter chips from match list
+ * Only returns chips with at least 1 match
+ */
+export function generateChips(matches: Match[]): Chip[] {
+    const chipCounts: Record<string, number> = { all: matches.length };
+
+    for (const match of matches) {
+        const chipId = getMatchChip(match);
+        chipCounts[chipId] = (chipCounts[chipId] || 0) + 1;
+    }
+
+    // Build chip array
+    const chips: Chip[] = Object.entries(chipCounts).map(([id, count]) => ({
+        id,
+        label: id === 'all' ? 'All' : id,
+        count
+    }));
+
+    // Sort by predefined order
+    chips.sort((a, b) => {
+        const orderA = CHIP_ORDER.indexOf(a.id);
+        const orderB = CHIP_ORDER.indexOf(b.id);
+        // Unknown chips go to end
+        return (orderA === -1 ? 999 : orderA) - (orderB === -1 ? 999 : orderB);
+    });
+
+    return chips;
+}
+
+/**
+ * Filter matches by chip
+ */
+export function filterByChip(matches: Match[], chipId: string): Match[] {
+    if (chipId === 'all') return matches;
+    return matches.filter(m => getMatchChip(m) === chipId);
+}
