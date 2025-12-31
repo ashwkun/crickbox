@@ -75,6 +75,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
 
     // Badge Text: Use specific event name (e.g. "2nd T20I") if available, else format
     const badgeText = match.event_name || normalizeFormat(match.event_format);
+    const seriesName = shortenSeriesName(match.series_name);
 
     // Dynamic Team Colors for Dual Glow
     const color1 = getTeamColor(team1Name !== 'TBC' ? team1Name : undefined);
