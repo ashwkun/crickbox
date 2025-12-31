@@ -539,12 +539,12 @@ export default function HomePage({
 
             {/* Upcoming Section */}
             <section className="section">
-                {/* Premium Header Bar */}
+                {/* Row 1: .NEXTUP + TimeFilter */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: 12,
-                    padding: '0 20px 12px 16px',
+                    padding: '0 20px 8px 16px',
                 }}>
                     {/* .NEXTUP Branding */}
                     <span style={{
@@ -567,50 +567,47 @@ export default function HomePage({
                         value={upcomingTimeFilter}
                         onChange={setUpcomingTimeFilter}
                     />
+                </div>
 
-                    {/* Category Chips (scrollable) */}
-                    <div style={{
-                        display: 'flex',
-                        gap: 8,
-                        flex: 1,
-                        overflowX: 'auto',
-                        scrollbarWidth: 'none',
-                        padding: '4px 0',
-                        marginRight: -20,
-                        paddingRight: 20,
-                    }}>
-                        {upcomingChips.map(chip => (
-                            <div
-                                key={chip.id}
-                                onClick={() => setActiveUpcomingChip(chip.id)}
-                                style={{
-                                    padding: '6px 12px',
-                                    borderRadius: 16,
-                                    fontSize: 12,
-                                    fontWeight: chip.id === activeUpcomingChip ? 600 : 500,
-                                    whiteSpace: 'nowrap',
-                                    cursor: 'pointer',
-                                    flexShrink: 0,
-                                    transition: 'all 0.2s ease',
-                                    background: chip.id === activeUpcomingChip
-                                        ? 'rgba(99, 102, 241, 0.2)'
-                                        : 'rgba(20, 20, 20, 0.4)',
-                                    backdropFilter: 'blur(12px)',
-                                    border: chip.id === activeUpcomingChip
-                                        ? '1px solid rgba(99, 102, 241, 0.5)'
-                                        : '1px solid rgba(255, 255, 255, 0.1)',
-                                    color: chip.id === activeUpcomingChip ? '#a5b4fc' : 'rgba(255,255,255,0.7)',
-                                }}
-                            >
-                                {chip.label}
-                                {chip.id !== 'all' && (
-                                    <span style={{ marginLeft: 4, opacity: 0.5, fontSize: 10 }}>
-                                        {chip.count}
-                                    </span>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                {/* Row 2: Category Chips (full width scrollable) */}
+                <div style={{
+                    display: 'flex',
+                    gap: 8,
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                    padding: '0 20px 12px 16px',
+                }}>
+                    {upcomingChips.map(chip => (
+                        <div
+                            key={chip.id}
+                            onClick={() => setActiveUpcomingChip(chip.id)}
+                            style={{
+                                padding: '6px 12px',
+                                borderRadius: 16,
+                                fontSize: 12,
+                                fontWeight: chip.id === activeUpcomingChip ? 600 : 500,
+                                whiteSpace: 'nowrap',
+                                cursor: 'pointer',
+                                flexShrink: 0,
+                                transition: 'all 0.2s ease',
+                                background: chip.id === activeUpcomingChip
+                                    ? 'rgba(99, 102, 241, 0.2)'
+                                    : 'rgba(20, 20, 20, 0.4)',
+                                backdropFilter: 'blur(12px)',
+                                border: chip.id === activeUpcomingChip
+                                    ? '1px solid rgba(99, 102, 241, 0.5)'
+                                    : '1px solid rgba(255, 255, 255, 0.1)',
+                                color: chip.id === activeUpcomingChip ? '#a5b4fc' : 'rgba(255,255,255,0.7)',
+                            }}
+                        >
+                            {chip.label}
+                            {chip.id !== 'all' && (
+                                <span style={{ marginLeft: 4, opacity: 0.5, fontSize: 10 }}>
+                                    {chip.count}
+                                </span>
+                            )}
+                        </div>
+                    ))}
                 </div>
                 {loading && matches.length === 0 ? (
                     <div className="horizontal-scroll">
