@@ -458,15 +458,15 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 44px;
-    background: rgba(5, 5, 8, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    height: 38px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 16px;
     z-index: 3;
 }
 
@@ -494,19 +494,22 @@
 
 .upcoming-action-btn {
     font-size: 11px;
-    font-weight: 600;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    padding: 6px 14px;
-    border-radius: 20px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .upcoming-action-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transform: translateX(2px);
 }
 
 .upcoming-format {
