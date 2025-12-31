@@ -41,7 +41,14 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
     };
 
     return (
-        <div ref={containerRef} style={{ width: '100%', overflow: 'hidden', position: 'relative', paddingTop: 10, paddingBottom: 10 }}>
+        <div ref={containerRef} style={{
+            width: '100vw',
+            marginLeft: 'calc(50% - 50vw)',
+            overflow: 'hidden',
+            position: 'relative',
+            paddingTop: 10,
+            paddingBottom: 10
+        }}>
             <motion.div
                 style={{
                     x,
@@ -49,10 +56,10 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
                     gap: GAP,
                     cursor: 'grab',
                     width: 'max-content',
-                    // CSS Centering Magic: 50% of parent minus half card width
-                    paddingLeft: `calc(50% - ${CARD_WIDTH / 2}px)`,
-                    // Add right padding so last card can also be centered
-                    paddingRight: `calc(50% - ${CARD_WIDTH / 2}px)`
+                    // Use VW to ensure we rely on screen width, not parent width
+                    paddingLeft: `calc(50vw - ${CARD_WIDTH / 2}px)`,
+                    paddingRight: `calc(50vw - ${CARD_WIDTH / 2}px)`,
+                    boxSizing: 'border-box'
                 }}
                 drag="x"
                 dragConstraints={{
