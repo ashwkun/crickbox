@@ -12,7 +12,7 @@ import { filterByTime } from '../utils/upcomingUtils';
 
 import SkeletonMatchCard from './SkeletonMatchCard';
 import { Match, Scorecard } from '../types';
-import { sortByPriority, generateChips, filterByChip } from '../utils/matchPriority';
+import { sortByPriority, generateChips, generateUpcomingChips, filterByChip } from '../utils/matchPriority';
 
 // Types for processed items
 interface ProcessedSeriesItem {
@@ -201,7 +201,7 @@ export default function HomePage({
     );
 
     // Generate chips for upcoming section
-    const upcomingChips = useMemo(() => generateChips(upcomingMatches), [upcomingMatches]);
+    const upcomingChips = useMemo(() => generateUpcomingChips(upcomingMatches), [upcomingMatches]);
 
     const completedMatches = useMemo(() =>
         matches
