@@ -368,30 +368,27 @@
 }
 
 .upcoming-date-pill {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
     padding: 6px 12px;
     border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
     font-size: 11px;
     font-weight: 700;
-    color: #fff;
     letter-spacing: 0.5px;
-    /* box-shadow removed */
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.1);
 }
 
 .upcoming-format-badge {
-    background: #6366f1;
-    /* Indigo Accent */
-    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 600;
     text-transform: uppercase;
     padding: 6px 10px;
     border-radius: 30px;
     letter-spacing: 1px;
-    /* box-shadow removed */
 }
 
 /* Content: Centered Battle Arena */
