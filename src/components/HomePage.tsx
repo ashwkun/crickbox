@@ -358,15 +358,9 @@ export default function HomePage({
         return result;
     }, [processedUpcoming, upcomingTimeFilter, activeUpcomingChip]);
 
-    // Smart fallback: if category filter yields no results, expand time filter
-    useEffect(() => {
-        if (filteredUpcoming.length === 0 &&
-            activeUpcomingChip !== 'all' &&
-            upcomingTimeFilter !== 'all') {
-            // Expand to all dates to find results for this category
-            setUpcomingTimeFilter('all');
-        }
-    }, [filteredUpcoming.length, activeUpcomingChip, upcomingTimeFilter]);
+    // Note: Removed auto-fallback that was resetting time filter to 'all'
+    // when category filter yielded no results - this was preventing users
+    // from manually selecting time filters
 
     // Tournament Hub View
     if (selectedTournament) {
