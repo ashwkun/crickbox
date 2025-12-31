@@ -42,6 +42,16 @@ export function isThisWeek(date: Date): boolean {
 }
 
 /**
+ * Check if a date is within the next 30 days
+ */
+export function isThisMonth(date: Date): boolean {
+    const now = new Date();
+    const monthLater = new Date();
+    monthLater.setDate(now.getDate() + 30);
+    return date >= now && date <= monthLater;
+}
+
+/**
  * Filter matches by time context
  */
 export function filterByTime(matches: Match[], timeFilter: TimeFilterValue): Match[] {
@@ -57,6 +67,8 @@ export function filterByTime(matches: Match[], timeFilter: TimeFilterValue): Mat
                 return isTomorrow(matchDate);
             case 'week':
                 return isThisWeek(matchDate);
+            case 'month':
+                return isThisMonth(matchDate);
             default:
                 return true;
         }

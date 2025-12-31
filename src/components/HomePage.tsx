@@ -530,16 +530,19 @@ export default function HomePage({
                             Nothing happening right now.<br />The pitch is bored.
                         </p>
 
-                        <div style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            marginTop: 16,
-                            background: 'rgba(255,255,255,0.05)',
-                            padding: '8px 16px',
-                            borderRadius: 100,
-                            border: '1px solid rgba(255,255,255,0.05)'
-                        }}>
+                        <div
+                            onClick={onOpenUpcomingList}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 8,
+                                marginTop: 16,
+                                background: 'rgba(255,255,255,0.05)',
+                                padding: '8px 16px',
+                                borderRadius: 100,
+                                border: '1px solid rgba(255,255,255,0.05)',
+                                cursor: 'pointer',
+                            }}>
                             <LuCalendarClock size={14} color="#94a3b8" />
                             <span style={{ fontSize: '12px', fontWeight: 600, color: '#cbd5e1' }}>Check upcoming fixtures</span>
                         </div>
