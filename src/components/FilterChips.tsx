@@ -16,7 +16,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
     const containerStyle: React.CSSProperties = {
         display: 'flex',
         alignItems: 'center',
-        gap: '6px', // Reduced gap for tighter lockup
+        gap: '12px', // Increased gap for better separation
         padding: '0 20px 12px 20px',
     };
 
