@@ -16,59 +16,22 @@ const GAP = 24;
 const PADDING_X = 20;
 
 const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSeriesClick, activeIndex, onIndexChange }) => {
-    const containerRef = useRef<HTMLDivElement>(null);
+    // Simplified: Just use activeIndex for X, relying on CSS padding for centering
+    const x = useMotionValue(-(activeIndex * (CARD_WIDTH + GAP)));
 
-    // Initial calculation to prevent jump
-    // We assume full width for mobile initially
-    const initialWidth = typeof window !== 'undefined' ? window.innerWidth : 390;
-    const initialOffset = (initialWidth - CARD_WIDTH) / 2;
-
-    const [centerOffset, setCenterOffset] = useState(initialOffset);
-
-    // Initialize X correctly so it doesn't animate from 0
-    const x = useMotionValue(-(activeIndex * (CARD_WIDTH + GAP)) + initialOffset);
-
-    // Update center on resize only. We trust initial window width for first render to avoid
-    // expensive forced reflow (300ms+) logic on mount.
-    useEffect(() => {
-        const updateCenter = () => {
-            if (containerRef.current) {
-                const width = containerRef.current.offsetWidth;
-                const newOffset = (width - CARD_WIDTH) / 2;
-                setCenterOffset(newOffset);
-                // We don't force x update here, standard animate loop will handle it gracefully if needed
-            }
-        };
-
-        window.addEventListener('resize', updateCenter);
-        return () => window.removeEventListener('resize', updateCenter);
-    }, []);
-
-    // Animate to position whenever index or offset changes
-    const isFirstRender = useRef(true);
-
+    // Animate to position whenever index changes
     useEffect(() => {
         const stride = CARD_WIDTH + GAP;
-        const targetX = -(activeIndex * stride) + centerOffset;
+        const targetX = -(activeIndex * stride);
 
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            // Immediate set without animation for first render
-            x.set(targetX);
-            return;
-        }
-
-        // Only animate if there is a meaningful difference to prevent micro-jitters
-        if (Math.abs(x.get() - targetX) > 1) {
-            animate(x, targetX, { type: "spring", stiffness: 300, damping: 30, bounce: 0.2 });
-        }
-    }, [activeIndex, centerOffset, x]);
+        animate(x, targetX, { type: "spring", stiffness: 300, damping: 30, bounce: 0.2 });
+    }, [activeIndex, x]);
 
     const handleDragEnd = (e: any, { offset, velocity }: any) => {
         const swipe = offset.x;
         let nextIndex = activeIndex;
 
-        // Tuning sensitivity
+        // Tuning sensitivity - stronger snap
         if (swipe < -40 || velocity.x < -400) {
             nextIndex = Math.min(matches.length - 1, activeIndex + 1);
         } else if (swipe > 40 || velocity.x > 400) {
@@ -79,7 +42,7 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
     };
 
     return (
-        <div ref={containerRef} style={{ width: '100%', overflow: 'hidden', position: 'relative', paddingTop: 10, paddingBottom: 10 }}>
+        <div style={{ width: '100%', overflow: 'hidden', position: 'relative', paddingTop: 10, paddingBottom: 10 }}>
             <motion.div
                 style={{
                     x,
@@ -87,15 +50,17 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
                     gap: GAP,
                     cursor: 'grab',
                     width: 'max-content',
-                    // No padding on the motion div itself, we use 'x' offset
-                    paddingLeft: 0,
-                    paddingRight: 0
+                    // CSS Centering: 50% of container - Half Card
+                    // This ensures layout engine handles the math instantly
+                    paddingLeft: `calc(50% - ${CARD_WIDTH / 2}px)`,
+                    paddingRight: `calc(50% - ${CARD_WIDTH / 2}px)`,
+                    boxSizing: 'border-box'
                 }}
                 drag="x"
                 dragConstraints={{
-                    // Allow dragging past bounds slightly (rubber band)
-                    left: -((matches.length * (CARD_WIDTH + GAP)) - centerOffset),
-                    right: centerOffset
+                    // Constraints relative to the padded container
+                    left: -((matches.length * (CARD_WIDTH + GAP)) - (CARD_WIDTH + GAP)),
+                    right: CARD_WIDTH
                 }}
                 onDragEnd={handleDragEnd}
                 whileTap={{ cursor: 'grabbing' }}
