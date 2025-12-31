@@ -358,6 +358,16 @@ export default function HomePage({
         return result;
     }, [processedUpcoming, upcomingTimeFilter, activeUpcomingChip]);
 
+    // Smart fallback: if category filter yields no results, expand time filter
+    useEffect(() => {
+        if (filteredUpcoming.length === 0 &&
+            activeUpcomingChip !== 'all' &&
+            upcomingTimeFilter !== 'all') {
+            // Expand to all dates to find results for this category
+            setUpcomingTimeFilter('all');
+        }
+    }, [filteredUpcoming.length, activeUpcomingChip, upcomingTimeFilter]);
+
     // Tournament Hub View
     if (selectedTournament) {
         return (
@@ -564,7 +574,10 @@ export default function HomePage({
                         .NEXT
                     </span>
 
-                    {/* Time Filter Dropdown */}
+                    {/* Spacer */}
+                    <div style={{ flex: 1 }} />
+
+                    {/* Time Filter Dropdown (right side) */}
                     <TimeFilter
                         value={upcomingTimeFilter}
                         onChange={setUpcomingTimeFilter}
@@ -602,11 +615,6 @@ export default function HomePage({
                             }}
                         >
                             {chip.label}
-                            {chip.id !== 'all' && (
-                                <span style={{ marginLeft: 3, opacity: 0.5, fontSize: 9 }}>
-                                    {chip.count}
-                                </span>
-                            )}
                         </div>
                     ))}
                 </div>
