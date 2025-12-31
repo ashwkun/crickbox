@@ -653,18 +653,7 @@ export default function HomePage({
                                 />
                             )
                         )}
-                        {/* Show All Dates chip when time filter is active */}
-                        {upcomingTimeFilter !== 'all' && (
-                            <button
-                                className="view-more-card"
-                                onClick={() => setUpcomingTimeFilter('all')}
-                                style={{ minWidth: 120, maxWidth: 120 }}
-                            >
-                                <span className="view-more-icon" style={{ fontSize: 16 }}>↻</span>
-                                <span className="view-more-text">Show All</span>
-                                <span className="view-more-count">{upcomingMatches.length} matches</span>
-                            </button>
-                        )}
+
                         {/* Full Calendar always visible */}
                         <button
                             className="view-more-card"
