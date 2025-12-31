@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
-import { LuMoonStar, LuCalendarClock } from "react-icons/lu";
+import { DislodgedWicketIcon } from './icons/DislodgedWicketIcon';
+import { LuCalendarClock } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
 import UpcomingCard from './UpcomingCard';
 import SeriesHub from './SeriesHub';
@@ -418,7 +419,7 @@ export default function HomePage({
                         }} />
 
                         {/* ... inside the component render */}
-                        <LuMoonStar size={42} color="rgba(255,255,255,0.4)" style={{ marginBottom: 12 }} />
+                        <DislodgedWicketIcon size={48} color="rgba(255,255,255,0.4)" style={{ marginBottom: 16 }} />
 
                         <h3 style={{
                             margin: '12px 0 4px',
