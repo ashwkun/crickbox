@@ -73,8 +73,8 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     const team1Id = (team1 && (typeof team1.id === 'string' || typeof team1.id === 'number')) ? String(team1.id) : undefined;
     const team2Id = (team2 && (typeof team2.id === 'string' || typeof team2.id === 'number')) ? String(team2.id) : undefined;
 
-    const seriesName = shortenSeriesName(match.series_name);
-    const matchFormat = normalizeFormat(match.event_format);
+    // Badge Text: Use specific event name (e.g. "2nd T20I") if available, else format
+    const badgeText = match.event_name || normalizeFormat(match.event_format);
 
     // Dynamic Team Colors for Dual Glow
     const color1 = getTeamColor(team1Name !== 'TBC' ? team1Name : undefined);
@@ -105,6 +105,19 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     };
 
     const hasAction = (showSeriesButton && onViewSeries) || (showTournamentButton && onViewTournament);
+
+    // Button Text Logic
+    let actionText = 'View Series';
+    if (showSeriesButton) {
+        if (matches && matches.length > 1) {
+            const moreCount = matches.length - 1;
+            actionText = `View ${moreCount} More`;
+        } else {
+            actionText = 'View Series';
+        }
+    } else if (showTournamentButton) {
+        actionText = 'View Tournament';
+    }
 
     return (
         <div
@@ -139,9 +152,9 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                 <div className="upcoming-date-pill">
                     {dateStr} • {time}
                 </div>
-                {matchFormat && (
+                {badgeText && (
                     <div className="upcoming-format-badge">
-                        {matchFormat}
+                        {badgeText}
                     </div>
                 )}
             </div>
@@ -198,7 +211,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
 
                 {hasAction && (
                     <button className="upcoming-action-btn" onClick={handleAction}>
-                        {showSeriesButton ? 'View Series' : 'View Hub'}
+                        {actionText}
                     </button>
                 )}
             </div>
