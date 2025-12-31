@@ -1,11 +1,13 @@
 import React from 'react';
 import WikiImage from './WikiImage';
 import { Match } from '../types';
+import { getTeamColor } from '../utils/teamColors';
 
 interface UpcomingCardProps {
     match: Match;
     matches?: Match[]; // For series view - array of all matches in the series
     onClick: (match: Match) => void;
+    //...
     // Series button (bilaterals)
     showSeriesButton?: boolean;
     onViewSeries?: (seriesId: string, matches?: Match[]) => void;
@@ -52,14 +54,34 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     showTournamentButton,
     onViewTournament
 }) => {
+    // Safety check: if match is missing/malformed, don't render
+    if (!match) return null;
+
     const startDate = new Date(match.start_date);
 
     const dateStr = startDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
     const time = startDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
 
     const teams = match.participants || [];
+
+    // Defensive checks for data integrity
+    const team1 = teams[0];
+    const team2 = teams[1];
+
+    const team1Name = (team1 && typeof team1.name === 'string') ? team1.name : 'TBC';
+    const team2Name = (team2 && typeof team2.name === 'string') ? team2.name : 'TBC';
+    const team1Id = (team1 && (typeof team1.id === 'string' || typeof team1.id === 'number')) ? String(team1.id) : undefined;
+    const team2Id = (team2 && (typeof team2.id === 'string' || typeof team2.id === 'number')) ? String(team2.id) : undefined;
+
     const seriesName = shortenSeriesName(match.series_name);
     const matchFormat = normalizeFormat(match.event_format);
+
+    // Dynamic Team Color for Background Glow
+    const homeTeamColor = getTeamColor(team1Name !== 'TBC' ? team1Name : undefined);
+    const cardStyle = homeTeamColor ? {
+        background: `radial-gradient(circle at top right, ${homeTeamColor}33, #0f0f13 70%)`, // 20% opacity color -> dark
+        borderColor: `${homeTeamColor}44`
+    } : {};
 
     const handleAction = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -76,13 +98,14 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
         <div
             className="upcoming-card"
             onClick={() => onClick(match)}
+            style={cardStyle}
         >
             {/* Background Watermark (Home Team Logo) */}
-            {teams[0] && (
+            {team1Name !== 'TBC' && (
                 <div className="upcoming-bg-logo">
                     <WikiImage
-                        name={teams[0].name}
-                        id={teams[0].id}
+                        name={team1Name}
+                        id={team1Id}
                         type="team"
                         style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     />
@@ -106,10 +129,10 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                 {/* Team A */}
                 <div className="upcoming-team-col">
                     <div className="upcoming-team-logo-wrapper">
-                        {teams[0] ? (
+                        {team1Name !== 'TBC' ? (
                             <WikiImage
-                                name={teams[0].name}
-                                id={teams[0].id}
+                                name={team1Name}
+                                id={team1Id}
                                 type="team"
                                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                             />
@@ -118,7 +141,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                         )}
                     </div>
                     <span className="upcoming-team-name">
-                        {teams[0]?.name || 'TBC'}
+                        {team1Name}
                     </span>
                 </div>
 
@@ -128,10 +151,10 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                 {/* Team B */}
                 <div className="upcoming-team-col">
                     <div className="upcoming-team-logo-wrapper">
-                        {teams[1] ? (
+                        {team2Name !== 'TBC' ? (
                             <WikiImage
-                                name={teams[1].name}
-                                id={teams[1].id}
+                                name={team2Name}
+                                id={team2Id}
                                 type="team"
                                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                             />
@@ -140,7 +163,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                         )}
                     </div>
                     <span className="upcoming-team-name">
-                        {teams[1]?.name || 'TBC'}
+                        {team2Name}
                     </span>
                 </div>
             </div>

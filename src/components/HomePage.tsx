@@ -547,7 +547,7 @@ export default function HomePage({
                 )}
             </section>
 
-            {/* Upcoming Section */}
+            {/* Upcoming Section - Gamer Design Pivot */}
             <section className="section">
                 {/* Header Row: .NEXT + TimeFilter (fixed, no scroll) */}
                 <div style={{
@@ -614,7 +614,7 @@ export default function HomePage({
                                 color: chip.id === activeUpcomingChip ? '#a5b4fc' : 'rgba(255,255,255,0.6)',
                             }}
                         >
-                            {chip.label}
+                            {typeof chip.label === 'string' ? chip.label : String(chip.label || '')}
                         </div>
                     ))}
                 </div>
@@ -626,7 +626,7 @@ export default function HomePage({
                 ) : filteredUpcoming.length > 0 ? (
                     <div className="horizontal-scroll" ref={upcomingScrollRef}>
                         {filteredUpcoming.slice(0, 8).map((item, idx) =>
-                            item.type === 'series' ? (
+                            item.type === 'series' && (item as ProcessedSeriesItem).matches?.[0] ? (
                                 <UpcomingCard
                                     key={(item as ProcessedSeriesItem).matches[0].game_id}
                                     match={(item as ProcessedSeriesItem).matches[0]}
@@ -635,7 +635,7 @@ export default function HomePage({
                                     showSeriesButton={true}
                                     onViewSeries={openSeries}
                                 />
-                            ) : item.type === 'tournament' ? (
+                            ) : item.type === 'tournament' && (item as ProcessedMatchItem).match ? (
                                 <UpcomingCard
                                     key={(item as ProcessedMatchItem).match.game_id}
                                     match={(item as ProcessedMatchItem).match}
@@ -653,7 +653,18 @@ export default function HomePage({
                                 />
                             )
                         )}
-
+                        {/* Show All Dates chip when time filter is active */}
+                        {upcomingTimeFilter !== 'all' && (
+                            <button
+                                className="view-more-card"
+                                onClick={() => setUpcomingTimeFilter('all')}
+                                style={{ minWidth: 120, maxWidth: 120 }}
+                            >
+                                <span className="view-more-icon" style={{ fontSize: 16 }}>↻</span>
+                                <span className="view-more-text">Show All</span>
+                                <span className="view-more-count">{upcomingMatches.length} matches</span>
+                            </button>
+                        )}
                         {/* Full Calendar always visible */}
                         <button
                             className="view-more-card"

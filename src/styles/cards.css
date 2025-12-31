@@ -313,9 +313,8 @@
 }
 
 .upcoming-card:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
-    border-color: rgba(99, 102, 241, 0.5);
+    /* No lift or shadow on hover per user request */
+    /* border-color: rgba(99, 102, 241, 0.5); - optional: do we keep border? "no hover highlighting" suggests no. */
 }
 
 .upcoming-card:hover::after {
@@ -337,11 +336,12 @@
 /* Background Team Logo (Watermark) */
 .upcoming-bg-logo {
     position: absolute;
-    right: -20px;
-    top: -20px;
-    width: 140px;
-    height: 140px;
-    opacity: 0.05;
+    right: -30px;
+    top: -30px;
+    width: 180px;
+    height: 180px;
+    opacity: 0.12;
+    /* Increased visibility */
     filter: grayscale(100%);
     transform: rotate(15deg);
     z-index: 0;
@@ -370,7 +370,7 @@
     font-weight: 700;
     color: #fff;
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* box-shadow removed */
 }
 
 .upcoming-format-badge {
@@ -383,7 +383,7 @@
     padding: 6px 10px;
     border-radius: 30px;
     letter-spacing: 1px;
-    box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+    /* box-shadow removed */
 }
 
 /* Content: Centered Battle Arena */
@@ -409,8 +409,8 @@
 }
 
 .upcoming-team-logo-wrapper {
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     /* No background box, just pure logo pop */
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
     transition: transform 0.3s ease;
