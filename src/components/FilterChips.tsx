@@ -17,7 +17,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         display: 'flex',
         alignItems: 'center',
         gap: '12px', // Increased gap for better separation
-        padding: '0 20px 12px 20px',
+        padding: '0 20px 8px 16px', // Reduced left/bottom to account for scroll padding
     };
 
     const liveTextStyle: React.CSSProperties = {
@@ -45,6 +45,8 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
         flex: 1,
+        padding: '4px', // Space for shadows
+        marginLeft: '-4px', // Offset padding visually
     };
 
     const chipStyle = (isActive: boolean): React.CSSProperties => ({
