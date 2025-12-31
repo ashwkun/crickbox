@@ -431,10 +431,14 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                         color: 'rgba(255, 255, 255, 0.8)',
                         fontWeight: 500,
                         textAlign: 'center',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '100%',
                     }}>
                         {match.series_name}
                     </span>
-                    {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)' }}>›</span>}
+                    {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)', flexShrink: 0 }}>›</span>}
                 </div>
 
                 {/* Row 2: Chips - Match format only */}
