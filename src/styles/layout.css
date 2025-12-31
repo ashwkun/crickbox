@@ -7,6 +7,18 @@
     max-width: 100%;
     min-height: 100vh;
     overflow-x: hidden;
+
+    /* Disable text selection for native app feel */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    /* Disable long-press context menu on mobile */
+    -webkit-touch-callout: none;
+
+    /* Remove tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Header */
