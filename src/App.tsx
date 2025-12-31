@@ -9,6 +9,7 @@ import { WallstreamData } from './utils/wallstreamApi';
 import { Match, Scorecard, Series, Tournament } from './types';
 // Stub wallstream data for forceLive testing
 import stubWallstream from '../api_samples/core/wallstream.json';
+import UpcomingListPage from './components/upcoming/UpcomingListPage';
 
 export default function App(): React.ReactElement {
     const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream } = useCricketData();
@@ -22,6 +23,7 @@ export default function App(): React.ReactElement {
     // Navigation State (Lifted from HomePage)
     const [selectedSeries, setSelectedSeries] = useState<Series | null>(null);
     const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
+    const [showUpcomingList, setShowUpcomingList] = useState(false);
 
     // Parse URL on initial load to get pending match ID
     useEffect(() => {
@@ -446,6 +448,7 @@ export default function App(): React.ReactElement {
                     onCloseSeries={handleCloseSeries}
                     onOpenTournament={handleOpenTournament}
                     onCloseTournament={handleCloseTournament}
+                    onOpenUpcomingList={() => setShowUpcomingList(true)}
                 />
             </main>
 
@@ -458,6 +461,19 @@ export default function App(): React.ReactElement {
                     onClose={handleCloseMatch}
                     onSeriesClick={handleOpenSeries}
                     setHeaderData={setHeaderData}
+                />
+            )}
+
+            {/* Upcoming List Page Overlay */}
+            {showUpcomingList && (
+                <UpcomingListPage
+                    matches={matches.filter(m => m.event_state === 'U')}
+                    onBack={() => setShowUpcomingList(false)}
+                    onMatchClick={(match) => {
+                        setShowUpcomingList(false);
+                        handleSelectMatch(match);
+                    }}
+                    onSeriesClick={handleOpenSeries}
                 />
             )}
 
