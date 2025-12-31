@@ -18,22 +18,40 @@ const PADDING_X = 20;
 const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSeriesClick, activeIndex, onIndexChange }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const x = useMotionValue(0);
+    const [centerOffset, setCenterOffset] = useState(0);
 
-    // Update x when activeIndex changes from outside (or internal snap)
+    // Measure container to calculate true center
+    useEffect(() => {
+        const updateCenter = () => {
+            if (containerRef.current) {
+                const width = containerRef.current.offsetWidth;
+                // Center = (Container Width / 2) - (Card Width / 2)
+                setCenterOffset((width - CARD_WIDTH) / 2);
+            }
+        };
+
+        updateCenter();
+        window.addEventListener('resize', updateCenter);
+        return () => window.removeEventListener('resize', updateCenter);
+    }, []);
+
+    // Animate to position whenever index or offset changes
     useEffect(() => {
         const stride = CARD_WIDTH + GAP;
-        const targetX = -(activeIndex * stride);
+        // Target = - (Index * Stride) + CenterOffset
+        const targetX = -(activeIndex * stride) + centerOffset;
+
         animate(x, targetX, { type: "spring", stiffness: 300, damping: 30, bounce: 0.2 });
-    }, [activeIndex, x]);
+    }, [activeIndex, centerOffset, x]);
 
     const handleDragEnd = (e: any, { offset, velocity }: any) => {
-        const swipe = offset.x; // Distance dragged
-
+        const swipe = offset.x;
         let nextIndex = activeIndex;
-        // Sensitivity tune
-        if (swipe < -50 || velocity.x < -200) {
+
+        // Tuning sensitivity
+        if (swipe < -40 || velocity.x < -400) {
             nextIndex = Math.min(matches.length - 1, activeIndex + 1);
-        } else if (swipe > 50 || velocity.x > 200) {
+        } else if (swipe > 40 || velocity.x > 400) {
             nextIndex = Math.max(0, activeIndex - 1);
         }
 
@@ -41,14 +59,7 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
     };
 
     return (
-        <div ref={containerRef} style={{
-            width: '100vw',
-            marginLeft: 'calc(50% - 50vw)',
-            overflow: 'hidden',
-            position: 'relative',
-            paddingTop: 10,
-            paddingBottom: 10
-        }}>
+        <div ref={containerRef} style={{ width: '100%', overflow: 'hidden', position: 'relative', paddingTop: 10, paddingBottom: 10 }}>
             <motion.div
                 style={{
                     x,
@@ -56,19 +67,15 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
                     gap: GAP,
                     cursor: 'grab',
                     width: 'max-content',
-                    // Use VW to ensure we rely on screen width, not parent width
-                    paddingLeft: `calc(50vw - ${CARD_WIDTH / 2}px)`,
-                    paddingRight: `calc(50vw - ${CARD_WIDTH / 2}px)`,
-                    boxSizing: 'border-box'
+                    // No padding on the motion div itself, we use 'x' offset
+                    paddingLeft: 0,
+                    paddingRight: 0
                 }}
                 drag="x"
                 dragConstraints={{
-                    // We allow dragging freely, the snap will handle the rest.
-                    // But we can limit it roughly:
-                    // Max left: -(TotalWidth) + WindowCenter
-                    // It's safer to loose constraints and let snap fix it.
-                    left: -((matches.length) * (CARD_WIDTH + GAP)),
-                    right: CARD_WIDTH
+                    // Allow dragging past bounds slightly (rubber band)
+                    left: -((matches.length * (CARD_WIDTH + GAP)) - centerOffset),
+                    right: centerOffset
                 }}
                 onDragEnd={handleDragEnd}
                 whileTap={{ cursor: 'grabbing' }}
