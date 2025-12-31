@@ -111,6 +111,7 @@ export default function HomePage({
     const [activeLiveIndex, setActiveLiveIndex] = useState(0);
     const [activeLiveChip, setActiveLiveChip] = useState('all');
     const [upcomingTimeFilter, setUpcomingTimeFilter] = useState<TimeFilterValue>('all');
+    const [activeUpcomingChip, setActiveUpcomingChip] = useState('all');
     const resultsScrollRef = useRef<HTMLDivElement>(null);
     const upcomingScrollRef = useRef<HTMLDivElement>(null);
     const liveScrollRef = useRef<HTMLDivElement>(null);
@@ -198,6 +199,9 @@ export default function HomePage({
             .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()),
         [matches]
     );
+
+    // Generate chips for upcoming section
+    const upcomingChips = useMemo(() => generateChips(upcomingMatches), [upcomingMatches]);
 
     const completedMatches = useMemo(() =>
         matches
@@ -293,23 +297,39 @@ export default function HomePage({
         return result.sort((a, b) => a.firstDate.getTime() - b.firstDate.getTime());
     }, [upcomingMatches, seriesGroups]);
 
-    // Apply time filter to processed upcoming
+    // Apply time AND category filters to processed upcoming
     const filteredUpcoming = useMemo(() => {
-        if (upcomingTimeFilter === 'all') return processedUpcoming;
+        let result = processedUpcoming;
 
-        return processedUpcoming.filter(item => {
-            // For series, check if any match in the series matches the time filter
-            if (item.type === 'series') {
-                const seriesItem = item as ProcessedSeriesItem;
-                const timeFiltered = filterByTime(seriesItem.matches, upcomingTimeFilter);
+        // Apply time filter
+        if (upcomingTimeFilter !== 'all') {
+            result = result.filter(item => {
+                if (item.type === 'series') {
+                    const seriesItem = item as ProcessedSeriesItem;
+                    const timeFiltered = filterByTime(seriesItem.matches, upcomingTimeFilter);
+                    return timeFiltered.length > 0;
+                }
+                const matchItem = item as ProcessedMatchItem;
+                const timeFiltered = filterByTime([matchItem.match], upcomingTimeFilter);
                 return timeFiltered.length > 0;
-            }
-            // For single/tournament, check the match itself
-            const matchItem = item as ProcessedMatchItem;
-            const timeFiltered = filterByTime([matchItem.match], upcomingTimeFilter);
-            return timeFiltered.length > 0;
-        });
-    }, [processedUpcoming, upcomingTimeFilter]);
+            });
+        }
+
+        // Apply category filter
+        if (activeUpcomingChip !== 'all') {
+            result = result.filter(item => {
+                if (item.type === 'series') {
+                    const seriesItem = item as ProcessedSeriesItem;
+                    // Check if any match in series matches the chip
+                    return seriesItem.matches.some(m => filterByChip([m], activeUpcomingChip).length > 0);
+                }
+                const matchItem = item as ProcessedMatchItem;
+                return filterByChip([matchItem.match], activeUpcomingChip).length > 0;
+            });
+        }
+
+        return result;
+    }, [processedUpcoming, upcomingTimeFilter, activeUpcomingChip]);
 
     // Tournament Hub View
     if (selectedTournament) {
@@ -500,6 +520,44 @@ export default function HomePage({
                     />
                     <div className="section-line" style={{ flex: 1, minWidth: 40 }}></div>
                 </div>
+                {/* Category Filter Chips */}
+                {upcomingChips.length > 1 && (
+                    <div style={{ padding: '0 20px 8px 20px' }}>
+                        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
+                            {upcomingChips.map(chip => (
+                                <div
+                                    key={chip.id}
+                                    onClick={() => setActiveUpcomingChip(chip.id)}
+                                    style={{
+                                        padding: '8px 16px',
+                                        borderRadius: 20,
+                                        fontSize: 13,
+                                        fontWeight: chip.id === activeUpcomingChip ? 600 : 500,
+                                        whiteSpace: 'nowrap',
+                                        cursor: 'pointer',
+                                        flexShrink: 0,
+                                        transition: 'all 0.2s ease',
+                                        background: chip.id === activeUpcomingChip
+                                            ? 'rgba(255, 255, 255, 0.15)'
+                                            : 'rgba(20, 20, 20, 0.4)',
+                                        backdropFilter: 'blur(16px)',
+                                        border: chip.id === activeUpcomingChip
+                                            ? '1px solid rgba(255, 255, 255, 0.4)'
+                                            : '1px solid rgba(255, 255, 255, 0.15)',
+                                        color: '#fff',
+                                    }}
+                                >
+                                    {chip.label}
+                                    {chip.id !== 'all' && (
+                                        <span style={{ marginLeft: 6, opacity: 0.6, fontSize: 11 }}>
+                                            {chip.count}
+                                        </span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 {loading && matches.length === 0 ? (
                     <div className="horizontal-scroll">
                         <SkeletonMatchCard />
