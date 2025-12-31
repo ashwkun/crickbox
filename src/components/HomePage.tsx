@@ -539,15 +539,12 @@ export default function HomePage({
 
             {/* Upcoming Section */}
             <section className="section">
-                {/* Unified Header: .NEXT + TimeFilter + Chips */}
+                {/* Header Row: .NEXT + TimeFilter (fixed, no scroll) */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 8,
-                    padding: '0 20px 12px 16px',
-                    overflowX: 'auto',
-                    overflowY: 'visible',
-                    scrollbarWidth: 'none',
+                    gap: 10,
+                    padding: '0 20px 8px 16px',
                     position: 'relative',
                     zIndex: 10,
                 }}>
@@ -567,20 +564,22 @@ export default function HomePage({
                         .NEXT
                     </span>
 
-                    {/* Divider */}
-                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.15)', flexShrink: 0 }} />
-
                     {/* Time Filter Dropdown */}
                     <TimeFilter
                         value={upcomingTimeFilter}
                         onChange={setUpcomingTimeFilter}
                     />
+                </div>
 
-                    {/* Divider */}
-                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.15)', flexShrink: 0 }} />
-
-                    {/* Category Chips inline */}
-                    {upcomingChips.slice(0, 6).map(chip => (
+                {/* Chips Row: horizontally scrollable */}
+                <div style={{
+                    display: 'flex',
+                    gap: 8,
+                    padding: '0 20px 12px 16px',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                }}>
+                    {upcomingChips.slice(0, 8).map(chip => (
                         <div
                             key={chip.id}
                             onClick={() => setActiveUpcomingChip(chip.id)}
@@ -595,7 +594,7 @@ export default function HomePage({
                                 transition: 'all 0.2s ease',
                                 background: chip.id === activeUpcomingChip
                                     ? 'rgba(99, 102, 241, 0.25)'
-                                    : 'transparent',
+                                    : 'rgba(20, 20, 20, 0.5)',
                                 border: chip.id === activeUpcomingChip
                                     ? '1px solid rgba(99, 102, 241, 0.5)'
                                     : '1px solid rgba(255, 255, 255, 0.08)',
