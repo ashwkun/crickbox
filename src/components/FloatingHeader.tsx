@@ -259,7 +259,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         backgroundSize: '200% 100%',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
-                                        animation: 'liveShimmer 2s ease-in-out infinite alternate'
+                                        animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.CRIC</span>
                                 )}
                             </div>
