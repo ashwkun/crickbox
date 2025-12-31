@@ -304,7 +304,7 @@
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     min-width: 290px;
     max-width: 290px;
-    height: 180px;
+    height: 220px;
     flex-shrink: 0;
     scroll-snap-align: center;
     overflow: hidden;
@@ -409,8 +409,8 @@
 }
 
 .upcoming-team-logo-wrapper {
-    width: 64px;
-    height: 64px;
+    width: 80px;
+    height: 80px;
     /* No background box, just pure logo pop */
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
     transition: transform 0.3s ease;
