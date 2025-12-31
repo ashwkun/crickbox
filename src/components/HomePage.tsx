@@ -552,7 +552,7 @@ export default function HomePage({
                                 cursor: 'pointer',
                             }}>
                             <LuCalendarClock size={14} color="#94a3b8" />
-                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#cbd5e1' }}>Check upcoming fixtures</span>
+                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#cbd5e1' }}>See what's .NEXT</span>
                         </div>
                     </div>
                 )}
