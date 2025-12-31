@@ -1006,3 +1006,14 @@
     background: var(--bg-secondary);
     color: var(--accent-secondary);
 }
+/* Sleepy Empty State Animations */
+@keyframes sleepyRock {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(8deg); }
+}
+
+@keyframes floatUp {
+    0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translate(10px, -20px) scale(1.2); opacity: 0; }
+}

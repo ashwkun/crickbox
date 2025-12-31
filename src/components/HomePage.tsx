@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
-import { DislodgedWicketIcon } from './icons/DislodgedWicketIcon';
-import { LuCalendarClock } from "react-icons/lu";
+import { LuMoonStar, LuCalendarClock } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
 import UpcomingCard from './UpcomingCard';
 import SeriesHub from './SeriesHub';
@@ -395,52 +394,75 @@ export default function HomePage({
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        padding: '30px 20px',
-                        background: 'linear-gradient(135deg, rgba(20,20,20,0.6) 0%, rgba(30,30,30,0.4) 100%)',
-                        borderRadius: '16px',
-                        border: '1px solid rgba(255,255,255,0.05)',
+                        padding: '40px 20px',
+                        background: 'linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(30,41,59,0.4) 100%)',
+                        borderRadius: '24px',
+                        border: '1px solid rgba(255,255,255,0.06)',
                         margin: '0 16px',
                         textAlign: 'center',
                         marginTop: 10,
                         position: 'relative',
                         overflow: 'hidden',
                         backdropFilter: 'blur(12px)',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                        minHeight: '220px',
                     }}>
-                        {/* Background Effect */}
-                        <div style={{
-                            position: 'absolute',
-                            top: '-50%',
-                            left: '-50%',
-                            width: '200%',
-                            height: '200%',
-                            background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 50%)',
-                            pointerEvents: 'none',
-                        }} />
+                        {/* Sleepy Animation Wrapper */}
+                        <div style={{ position: 'relative', marginBottom: 16 }}>
+                            {/* Rocking Moon */}
+                            <div style={{ animation: 'sleepyRock 4s ease-in-out infinite transform-origin-center' }}>
+                                <LuMoonStar size={56} color="rgba(148, 163, 184, 0.6)" />
+                            </div>
 
-                        {/* ... inside the component render */}
-                        <DislodgedWicketIcon size={48} color="rgba(255,255,255,0.4)" style={{ marginBottom: 16 }} />
+                            {/* Floating Zzzs */}
+                            <span style={{
+                                position: 'absolute', top: -5, right: -12,
+                                color: 'rgba(255,255,255,0.7)', fontWeight: 800, fontSize: '16px',
+                                animation: 'floatUp 3s ease-in infinite'
+                            }}>Z</span>
+                            <span style={{
+                                position: 'absolute', top: -20, right: -25,
+                                color: 'rgba(255,255,255,0.5)', fontWeight: 800, fontSize: '12px',
+                                animation: 'floatUp 3s ease-in infinite', animationDelay: '1s'
+                            }}>z</span>
+                            <span style={{
+                                position: 'absolute', top: -40, right: -15,
+                                color: 'rgba(255,255,255,0.3)', fontWeight: 800, fontSize: '10px',
+                                animation: 'floatUp 3s ease-in infinite', animationDelay: '2s'
+                            }}>z</span>
+                        </div>
 
                         <h3 style={{
-                            margin: '12px 0 4px',
-                            fontSize: '16px',
-                            fontWeight: 600,
-                            color: 'rgba(255,255,255,0.9)',
-                            letterSpacing: '0.5px'
+                            margin: '8px 0 6px',
+                            fontSize: '18px',
+                            fontWeight: 700,
+                            color: '#f1f5f9',
+                            letterSpacing: '-0.5px'
                         }}>
-                            Stumps
+                            Cricket is sleeping
                         </h3>
                         <p style={{
                             margin: 0,
                             fontSize: '13px',
-                            color: 'rgba(255,255,255,0.5)',
-                            lineHeight: '1.4'
+                            color: '#94a3b8',
+                            lineHeight: '1.5',
+                            maxWidth: '260px'
                         }}>
-                            The pitch is quiet. <br />
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                                <LuCalendarClock size={12} /> Check upcoming fixtures
-                            </span>
+                            Nothing happening right now.<br />The pitch is bored.
                         </p>
+
+                        <div style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            marginTop: 16,
+                            background: 'rgba(255,255,255,0.05)',
+                            padding: '8px 16px',
+                            borderRadius: 100,
+                            border: '1px solid rgba(255,255,255,0.05)'
+                        }}>
+                            <LuCalendarClock size={14} color="#94a3b8" />
+                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#cbd5e1' }}>Check upcoming fixtures</span>
+                        </div>
                     </div>
                 )}
             </section>
