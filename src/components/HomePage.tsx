@@ -552,7 +552,14 @@ export default function HomePage({
                                 cursor: 'pointer',
                             }}>
                             <LuCalendarClock size={14} color="#94a3b8" />
-                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#cbd5e1' }}>See what's .NEXT</span>
+                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8' }}>See what's </span>
+                            <span style={{
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                background: 'linear-gradient(90deg, #818cf8 0%, #a5b4fc 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                            }}>.NEXT</span>
                         </div>
                     </div>
                 )}
