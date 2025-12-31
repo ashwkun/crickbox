@@ -421,8 +421,8 @@
 }
 
 .upcoming-team-name {
-    font-family: 'Inter', sans-serif;
-    /* Use clean modern font */
+    font-family: inherit;
+    /* Inherits 'Outfit' from body */
     font-size: 13px;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.9);
