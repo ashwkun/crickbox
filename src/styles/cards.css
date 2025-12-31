@@ -394,8 +394,8 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    padding-top: 20px;
-    /* Space for header */
+    padding: 20px 0 40px 0;
+    /* Space for header (top) and footer (bottom) */
 }
 
 /* Team Columns */
