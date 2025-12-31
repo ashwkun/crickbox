@@ -42,7 +42,7 @@ const shortenSeriesName = (name: string | undefined): string => {
         .trim();
 };
 
-// Unified calendar-style card for upcoming matches
+// Unified 'Gamer/Esports' style card for upcoming matches
 const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     match,
     matches,
@@ -77,10 +77,22 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
             className="upcoming-card"
             onClick={() => onClick(match)}
         >
-            {/* Header: Date | Time | Format Badge */}
+            {/* Background Watermark (Home Team Logo) */}
+            {teams[0] && (
+                <div className="upcoming-bg-logo">
+                    <WikiImage
+                        name={teams[0].name}
+                        id={teams[0].id}
+                        type="team"
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                </div>
+            )}
+
+            {/* Header: Date Pill + Format Badge */}
             <div className="upcoming-card-header">
                 <div className="upcoming-date-pill">
-                    {dateStr} <span>•</span> {time}
+                    {dateStr}
                 </div>
                 {matchFormat && (
                     <div className="upcoming-format-badge">
@@ -89,11 +101,8 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                 )}
             </div>
 
-            {/* Content: Team A vs Team B */}
+            {/* Content: PRO Battle Arena */}
             <div className="upcoming-content">
-                {/* VS Badge Center */}
-                <div className="upcoming-vs-badge">VS</div>
-
                 {/* Team A */}
                 <div className="upcoming-team-col">
                     <div className="upcoming-team-logo-wrapper">
@@ -102,16 +111,19 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                                 name={teams[0].name}
                                 id={teams[0].id}
                                 type="team"
-                                style={{ maxHeight: 32, maxWidth: 32, width: 'auto', height: 'auto' }}
+                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                             />
                         ) : (
-                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
+                            <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
                         )}
                     </div>
                     <span className="upcoming-team-name">
                         {teams[0]?.name || 'TBC'}
                     </span>
                 </div>
+
+                {/* VS Badge */}
+                <div className="upcoming-vs-badge">VS</div>
 
                 {/* Team B */}
                 <div className="upcoming-team-col">
@@ -121,10 +133,10 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                                 name={teams[1].name}
                                 id={teams[1].id}
                                 type="team"
-                                style={{ maxHeight: 32, maxWidth: 32, width: 'auto', height: 'auto' }}
+                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                             />
                         ) : (
-                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
+                            <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
                         )}
                     </div>
                     <span className="upcoming-team-name">
@@ -133,15 +145,19 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                 </div>
             </div>
 
-            {/* Footer: Series Name or Action Button */}
+            {/* Footer: Series | Time/Action */}
             <div className="upcoming-card-footer">
+                <span className="upcoming-series-name">
+                    {seriesName}
+                </span>
+
                 {hasAction ? (
                     <button className="upcoming-action-btn" onClick={handleAction}>
-                        {showSeriesButton ? 'View Series →' : 'View Tournament →'}
+                        {showSeriesButton ? 'View Series' : 'View Hub'}
                     </button>
                 ) : (
-                    <span className="upcoming-series-name">
-                        {seriesName}
+                    <span className="upcoming-time">
+                        {time}
                     </span>
                 )}
             </div>
