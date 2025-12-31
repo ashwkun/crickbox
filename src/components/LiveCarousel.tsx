@@ -17,19 +17,27 @@ const PADDING_X = 20;
 
 const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSeriesClick, activeIndex, onIndexChange }) => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const x = useMotionValue(0);
-    const [centerOffset, setCenterOffset] = useState(0);
 
-    // Measure container to calculate true center
+    // Initial calculation to prevent jump
+    // We assume full width for mobile initially
+    const initialWidth = typeof window !== 'undefined' ? window.innerWidth : 390;
+    const initialOffset = (initialWidth - CARD_WIDTH) / 2;
+
+    const [centerOffset, setCenterOffset] = useState(initialOffset);
+
+    // Initialize X correctly so it doesn't animate from 0
+    const x = useMotionValue(-(activeIndex * (CARD_WIDTH + GAP)) + initialOffset);
+
+    // Update center more accurately after mount/resize
     useEffect(() => {
         const updateCenter = () => {
             if (containerRef.current) {
                 const width = containerRef.current.offsetWidth;
-                // Center = (Container Width / 2) - (Card Width / 2)
                 setCenterOffset((width - CARD_WIDTH) / 2);
             }
         };
 
+        // Don't run immediately if we trust window.innerWidth, but good to double check
         updateCenter();
         window.addEventListener('resize', updateCenter);
         return () => window.removeEventListener('resize', updateCenter);
