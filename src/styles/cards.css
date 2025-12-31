@@ -405,7 +405,7 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    width: 100px;
+    width: 120px;
 }
 
 .upcoming-team-logo-wrapper {
@@ -423,15 +423,16 @@
 .upcoming-team-name {
     font-family: inherit;
     /* Inherits 'Outfit' from body */
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.9);
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     line-height: 1.1;
-    max-width: 90px;
-    word-wrap: break-word;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: normal;
     /* Text Shadow for readability */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
