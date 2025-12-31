@@ -495,7 +495,7 @@
 .upcoming-action-btn {
     font-size: 9px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.5);
     background: rgba(255, 255, 255, 0.05);
     /* Very subtle */
     border: 1px solid rgba(255, 255, 255, 0.08);
