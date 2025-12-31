@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
+import LiveCarousel from './LiveCarousel';
 import { LuMoonStar, LuCalendarClock } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
 import UpcomingCard from './UpcomingCard';
@@ -339,54 +340,13 @@ export default function HomePage({
                     </div>
                 ) : liveMatches.length > 0 ? (
                     <>
-                        <div className="horizontal-scroll" ref={liveScrollRef} onScroll={handleLiveScroll}>
-                            {liveMatches.map(match => (
-                                <MatchCard
-                                    key={match.game_id}
-                                    match={match}
-                                    onClick={openMatch}
-                                    isHero={true}
-                                    onSeriesClick={(seriesId) => openSeries(seriesId, undefined)}
-                                />
-                            ))}
-                        </div>
-                        {/* Sliding Dot Indicators - max 10 visible, window shifts */}
-                        {liveMatches.length > 1 && (() => {
-                            const total = liveMatches.length;
-                            const maxVisible = Math.min(10, total);
-
-                            // Calculate sliding window: keep active dot roughly centered
-                            let startIndex = Math.max(0, activeLiveIndex - Math.floor(maxVisible / 2));
-                            if (startIndex + maxVisible > total) {
-                                startIndex = Math.max(0, total - maxVisible);
-                            }
-
-                            return (
-                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 4, marginTop: 10 }}>
-                                    {Array.from({ length: maxVisible }).map((_, idx) => {
-                                        const actualIndex = startIndex + idx;
-                                        const isActive = actualIndex === activeLiveIndex;
-                                        // Edge dots are smaller (fade effect)
-                                        const isEdge = idx === 0 || idx === maxVisible - 1;
-                                        const baseSize = isEdge && total > maxVisible ? 4 : 6;
-
-                                        return (
-                                            <div
-                                                key={actualIndex}
-                                                style={{
-                                                    width: isActive ? 16 : baseSize,
-                                                    height: baseSize,
-                                                    borderRadius: baseSize / 2,
-                                                    background: isActive ? '#fff' : 'rgba(255,255,255,0.3)',
-                                                    transition: 'all 0.2s ease',
-                                                    flexShrink: 0
-                                                }}
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            );
-                        })()}
+                        <LiveCarousel
+                            matches={liveMatches}
+                            onMatchClick={openMatch}
+                            onSeriesClick={(seriesId) => openSeries(seriesId, undefined)}
+                            activeIndex={activeLiveIndex}
+                            onIndexChange={setActiveLiveIndex}
+                        />
                     </>
                 ) : (
                     <div style={{
