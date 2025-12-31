@@ -57,7 +57,7 @@ const SERIES_FALLBACK = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3d
 // Get flag URL from FlagsCDN
 export const getFlagUrl = (teamName: string | undefined): string | null => {
     if (!teamName) return null;
-    const cleanName = teamName.toLowerCase().replace(/(-w|\sW$|women|women's|-u19|under-19)/gi, '').trim();
+    const cleanName = teamName.toLowerCase().replace(/(\s?u19|\s?under[- ]?19|women's|women|\sW$|\sA$|-w)/gi, '').trim();
     const code = COUNTRY_CODES[cleanName];
     if (code && code !== 'wi') {
         return `https://flagcdn.com/w80/${code}.png`;
