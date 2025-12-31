@@ -38,7 +38,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange }) => {
         alignItems: 'center',
         flexShrink: 0,
         transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        width: isShrunk ? '12px' : '60px',
+        width: isShrunk ? '12px' : '70px',
     };
 
     const textStyle: React.CSSProperties = {
