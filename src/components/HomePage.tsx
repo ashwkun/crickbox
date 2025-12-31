@@ -7,6 +7,8 @@ import UpcomingCard from './UpcomingCard';
 import SeriesHub from './SeriesHub';
 import TournamentHub from './TournamentHub';
 import FilterChips from './FilterChips';
+import TimeFilter, { TimeFilterValue } from './upcoming/TimeFilter';
+import { filterByTime } from '../utils/upcomingUtils';
 
 import SkeletonMatchCard from './SkeletonMatchCard';
 import { Match, Scorecard } from '../types';
@@ -88,6 +90,7 @@ interface HomePageProps {
     onCloseSeries: () => void;
     onOpenTournament: (seriesId: string) => void;
     onCloseTournament: () => void;
+    onOpenUpcomingList: () => void;
 }
 
 export default function HomePage({
@@ -100,12 +103,14 @@ export default function HomePage({
     onOpenSeries,
     onCloseSeries,
     onOpenTournament,
-    onCloseTournament
+    onCloseTournament,
+    onOpenUpcomingList
 }: HomePageProps): React.ReactElement {
     const [upcomingLimit, setUpcomingLimit] = useState(10);
     const [resultsLimit, setResultsLimit] = useState(8);
     const [activeLiveIndex, setActiveLiveIndex] = useState(0);
     const [activeLiveChip, setActiveLiveChip] = useState('all');
+    const [upcomingTimeFilter, setUpcomingTimeFilter] = useState<TimeFilterValue>('all');
     const resultsScrollRef = useRef<HTMLDivElement>(null);
     const upcomingScrollRef = useRef<HTMLDivElement>(null);
     const liveScrollRef = useRef<HTMLDivElement>(null);
@@ -288,6 +293,24 @@ export default function HomePage({
         return result.sort((a, b) => a.firstDate.getTime() - b.firstDate.getTime());
     }, [upcomingMatches, seriesGroups]);
 
+    // Apply time filter to processed upcoming
+    const filteredUpcoming = useMemo(() => {
+        if (upcomingTimeFilter === 'all') return processedUpcoming;
+
+        return processedUpcoming.filter(item => {
+            // For series, check if any match in the series matches the time filter
+            if (item.type === 'series') {
+                const seriesItem = item as ProcessedSeriesItem;
+                const timeFiltered = filterByTime(seriesItem.matches, upcomingTimeFilter);
+                return timeFiltered.length > 0;
+            }
+            // For single/tournament, check the match itself
+            const matchItem = item as ProcessedMatchItem;
+            const timeFiltered = filterByTime([matchItem.match], upcomingTimeFilter);
+            return timeFiltered.length > 0;
+        });
+    }, [processedUpcoming, upcomingTimeFilter]);
+
     // Tournament Hub View
     if (selectedTournament) {
         return (
@@ -469,18 +492,22 @@ export default function HomePage({
 
             {/* Upcoming Section */}
             <section className="section">
-                <div className="section-header">
+                <div className="section-header" style={{ flexWrap: 'wrap', gap: 12 }}>
                     <h3 className="section-title">Coming Up</h3>
-                    <div className="section-line"></div>
+                    <TimeFilter
+                        value={upcomingTimeFilter}
+                        onChange={setUpcomingTimeFilter}
+                    />
+                    <div className="section-line" style={{ flex: 1, minWidth: 40 }}></div>
                 </div>
                 {loading && matches.length === 0 ? (
                     <div className="horizontal-scroll">
                         <SkeletonMatchCard />
                         <SkeletonMatchCard />
                     </div>
-                ) : processedUpcoming.length > 0 ? (
+                ) : filteredUpcoming.length > 0 ? (
                     <div className="horizontal-scroll" ref={upcomingScrollRef}>
-                        {processedUpcoming.slice(0, upcomingLimit).map((item, idx) =>
+                        {filteredUpcoming.slice(0, 8).map((item, idx) =>
                             item.type === 'series' ? (
                                 <UpcomingCard
                                     key={(item as ProcessedSeriesItem).matches[0].game_id}
@@ -508,14 +535,14 @@ export default function HomePage({
                                 />
                             )
                         )}
-                        {upcomingLimit < processedUpcoming.length && (
+                        {filteredUpcoming.length > 8 && (
                             <button
                                 className="view-more-card"
-                                onClick={loadMoreUpcoming}
+                                onClick={onOpenUpcomingList}
                             >
-                                <span className="view-more-icon">+</span>
-                                <span className="view-more-text">View More</span>
-                                <span className="view-more-count">{processedUpcoming.length - upcomingLimit} more</span>
+                                <span className="view-more-icon">📅</span>
+                                <span className="view-more-text">Full Calendar</span>
+                                <span className="view-more-count">{filteredUpcoming.length} total</span>
                             </button>
                         )}
                     </div>
