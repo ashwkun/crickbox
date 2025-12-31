@@ -201,14 +201,14 @@ export default function HomePage({
         [matches]
     );
 
-    // Time-filtered upcoming matches (for accurate chip counts)
+    // Time-filtered upcoming matches (for cards only)
     const timeFilteredMatches = useMemo(() =>
         filterByTime(upcomingMatches, upcomingTimeFilter),
         [upcomingMatches, upcomingTimeFilter]
     );
 
-    // Generate chips for upcoming section (based on time-filtered matches)
-    const upcomingChips = useMemo(() => generateUpcomingChips(timeFilteredMatches), [timeFilteredMatches]);
+    // Generate chips for upcoming section (based on ALL matches - consistent chips)
+    const upcomingChips = useMemo(() => generateUpcomingChips(upcomingMatches), [upcomingMatches]);
 
     // Smart default for time filter: Today > Tomorrow > Week > All
     useEffect(() => {
@@ -539,70 +539,69 @@ export default function HomePage({
 
             {/* Upcoming Section */}
             <section className="section">
-                {/* Row 1: .NEXTUP + TimeFilter */}
+                {/* Unified Header: .NEXT + TimeFilter + Chips */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 12,
-                    padding: '0 20px 8px 16px',
+                    gap: 8,
+                    padding: '0 20px 12px 16px',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
                 }}>
-                    {/* .NEXTUP Branding */}
+                    {/* .NEXT Branding */}
                     <span style={{
                         fontFamily: '"BBH Bartle", sans-serif',
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: 600,
-                        letterSpacing: '1px',
-                        background: 'linear-gradient(90deg, #6366f1 0%, #6366f1 35%, #a5b4fc 50%, #6366f1 65%, #6366f1 100%)',
+                        letterSpacing: '0.5px',
+                        background: 'linear-gradient(90deg, #6366f1 0%, #a5b4fc 50%, #6366f1 100%)',
                         backgroundSize: '200% 100%',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         animation: 'liveShimmer 2s ease-in-out infinite alternate',
                         flexShrink: 0,
                     }}>
-                        .NEXTUP
+                        .NEXT
                     </span>
+
+                    {/* Divider */}
+                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.15)', flexShrink: 0 }} />
 
                     {/* Time Filter Dropdown */}
                     <TimeFilter
                         value={upcomingTimeFilter}
                         onChange={setUpcomingTimeFilter}
                     />
-                </div>
 
-                {/* Row 2: Category Chips (full width scrollable) */}
-                <div style={{
-                    display: 'flex',
-                    gap: 8,
-                    overflowX: 'auto',
-                    scrollbarWidth: 'none',
-                    padding: '0 20px 12px 16px',
-                }}>
-                    {upcomingChips.map(chip => (
+                    {/* Divider */}
+                    <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.15)', flexShrink: 0 }} />
+
+                    {/* Category Chips inline */}
+                    {upcomingChips.slice(0, 6).map(chip => (
                         <div
                             key={chip.id}
                             onClick={() => setActiveUpcomingChip(chip.id)}
                             style={{
-                                padding: '6px 12px',
-                                borderRadius: 16,
-                                fontSize: 12,
+                                padding: '5px 10px',
+                                borderRadius: 12,
+                                fontSize: 11,
                                 fontWeight: chip.id === activeUpcomingChip ? 600 : 500,
                                 whiteSpace: 'nowrap',
                                 cursor: 'pointer',
                                 flexShrink: 0,
                                 transition: 'all 0.2s ease',
                                 background: chip.id === activeUpcomingChip
-                                    ? 'rgba(99, 102, 241, 0.2)'
-                                    : 'rgba(20, 20, 20, 0.4)',
-                                backdropFilter: 'blur(12px)',
+                                    ? 'rgba(99, 102, 241, 0.25)'
+                                    : 'transparent',
                                 border: chip.id === activeUpcomingChip
                                     ? '1px solid rgba(99, 102, 241, 0.5)'
-                                    : '1px solid rgba(255, 255, 255, 0.1)',
-                                color: chip.id === activeUpcomingChip ? '#a5b4fc' : 'rgba(255,255,255,0.7)',
+                                    : '1px solid rgba(255, 255, 255, 0.08)',
+                                color: chip.id === activeUpcomingChip ? '#a5b4fc' : 'rgba(255,255,255,0.6)',
                             }}
                         >
                             {chip.label}
                             {chip.id !== 'all' && (
-                                <span style={{ marginLeft: 4, opacity: 0.5, fontSize: 10 }}>
+                                <span style={{ marginLeft: 3, opacity: 0.5, fontSize: 9 }}>
                                     {chip.count}
                                 </span>
                             )}
