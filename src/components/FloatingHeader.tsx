@@ -216,34 +216,43 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                         </>
                     ) : (
                         <>
-                            <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: '#fff' }}>{isUpcoming ? 'CRIC' : 'BOX'}</span>
-                            {isLive ? (
-                                <span style={{
-                                    fontFamily: '"BBH Bartle", sans-serif',
-                                    fontSize: '16px',
-                                    fontWeight: 600,
-                                    letterSpacing: '1px',
-                                    background: 'linear-gradient(90deg, #c53030 0%, #c53030 35%, #e87070 50%, #c53030 65%, #c53030 100%)',
-                                    backgroundSize: '200% 100%',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
-                                }}>.LIVE</span>
-                            ) : isUpcoming ? (
-                                <span style={{
-                                    fontFamily: '"BBH Bartle", sans-serif',
-                                    fontSize: '16px',
-                                    fontWeight: 600,
-                                    letterSpacing: '1px',
-                                    background: 'linear-gradient(90deg, #6366f1 0%, #6366f1 35%, #a5b4fc 50%, #6366f1 65%, #6366f1 100%)',
-                                    backgroundSize: '200% 100%',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
-                                }}>.NEXT</span>
-                            ) : (
-                                <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
-                            )}
+                            <div
+                                key={isLive ? 'live' : isUpcoming ? 'upcoming' : 'default'}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    animation: 'blurFocus 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                                }}
+                            >
+                                <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: '#fff' }}>{isUpcoming ? 'CRIC' : 'BOX'}</span>
+                                {isLive ? (
+                                    <span style={{
+                                        fontFamily: '"BBH Bartle", sans-serif',
+                                        fontSize: '16px',
+                                        fontWeight: 600,
+                                        letterSpacing: '1px',
+                                        background: 'linear-gradient(90deg, #c53030 0%, #c53030 35%, #e87070 50%, #c53030 65%, #c53030 100%)',
+                                        backgroundSize: '200% 100%',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
+                                    }}>.LIVE</span>
+                                ) : isUpcoming ? (
+                                    <span style={{
+                                        fontFamily: '"BBH Bartle", sans-serif',
+                                        fontSize: '16px',
+                                        fontWeight: 600,
+                                        letterSpacing: '1px',
+                                        background: 'linear-gradient(90deg, #6366f1 0%, #6366f1 35%, #a5b4fc 50%, #6366f1 65%, #6366f1 100%)',
+                                        backgroundSize: '200% 100%',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
+                                    }}>.NEXT</span>
+                                ) : (
+                                    <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: 'var(--accent-primary)' }}>.CRIC</span>
+                                )}
+                            </div>
                             <style>{`
                                 @keyframes liveShimmer {
                                     0% { background-position: 100% 0; }
