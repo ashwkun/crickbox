@@ -338,8 +338,8 @@
     position: absolute;
     width: 200px;
     height: 200px;
-    opacity: 0.06;
-    filter: grayscale(100%);
+    opacity: 0.04;
+    filter: grayscale(100%) blur(1px);
     z-index: 0;
     pointer-events: none;
 }
