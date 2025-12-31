@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
-import { LuMoonStar, LuCalendarClock, LuLoader } from "react-icons/lu";
+import { LuMoonStar, LuCalendarClock } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
 import UpcomingCard from './UpcomingCard';
 import SeriesHub from './SeriesHub';
@@ -390,9 +390,13 @@ export default function HomePage({
                     </>
                 ) : (
                     <div style={{
-                        background: 'linear-gradient(180deg, rgba(20,20,20,0.5) 0%, rgba(10,10,10,0.8) 100%)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '30px 20px',
+                        background: 'linear-gradient(135deg, rgba(20,20,20,0.6) 0%, rgba(30,30,30,0.4) 100%)',
                         borderRadius: '16px',
-                        padding: '40px 20px',
                         border: '1px solid rgba(255,255,255,0.05)',
                         margin: '0 16px',
                         textAlign: 'center',
@@ -402,48 +406,6 @@ export default function HomePage({
                         backdropFilter: 'blur(12px)',
                         boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
                     }}>
-                        {/* CSS Animation Styles */}
-                        <style>
-                            {`
-                            @keyframes tumbleRoll {
-                                0% {
-                                    transform: translateX(-60px) rotate(0deg);
-                                }
-                                100% {
-                                    transform: translateX(300px) rotate(720deg);
-                                }
-                            }
-                            @keyframes tumbleBounce {
-                                0%, 100% { transform: translateY(0); }
-                                50% { transform: translateY(-10px); }
-                            }
-                            `}
-                        </style>
-
-                        {/* Tumbleweed Layer */}
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '10px',
-                            left: '0',
-                            width: '100%',
-                            height: '60px',
-                            overflow: 'hidden',
-                            pointerEvents: 'none',
-                        }}>
-                            <div style={{
-                                display: 'inline-block',
-                                animation: 'tumbleRoll 6s linear infinite',
-                            }}>
-                                <LuLoader
-                                    size={32}
-                                    color="#C2B280" // Dried grass color
-                                    style={{
-                                        animation: 'tumbleBounce 0.8s ease-in-out infinite'
-                                    }}
-                                />
-                            </div>
-                        </div>
-
                         {/* Background Effect */}
                         <div style={{
                             position: 'absolute',
@@ -455,7 +417,7 @@ export default function HomePage({
                             pointerEvents: 'none',
                         }} />
 
-                        {/* Stumps / Moon Icon */}
+                        {/* ... inside the component render */}
                         <LuMoonStar size={42} color="rgba(255,255,255,0.4)" style={{ marginBottom: 12 }} />
 
                         <h3 style={{
