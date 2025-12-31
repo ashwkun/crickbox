@@ -394,7 +394,7 @@ export default function HomePage({
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        padding: '40px 20px',
+                        padding: '24px 20px',
                         background: 'linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(30,41,59,0.4) 100%)',
                         borderRadius: '24px',
                         border: '1px solid rgba(255,255,255,0.06)',
@@ -404,7 +404,7 @@ export default function HomePage({
                         position: 'relative',
                         overflow: 'hidden',
                         backdropFilter: 'blur(12px)',
-                        minHeight: '220px',
+                        minHeight: '160px',
                     }}>
                         {/* Sleepy Animation Wrapper */}
                         <div style={{ position: 'relative', marginBottom: 16 }}>
