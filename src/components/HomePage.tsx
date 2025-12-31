@@ -554,6 +554,7 @@ export default function HomePage({
                             <LuCalendarClock size={14} color="#94a3b8" />
                             <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8' }}>See what's </span>
                             <span style={{
+                                fontFamily: '"BBH Bartle", sans-serif',
                                 fontSize: '12px',
                                 fontWeight: 700,
                                 background: 'linear-gradient(90deg, #818cf8 0%, #a5b4fc 100%)',
