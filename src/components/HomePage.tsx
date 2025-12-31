@@ -329,23 +329,33 @@ export default function HomePage({
                                 />
                             ))}
                         </div>
-                        {/* Dot Indicators */}
-                        {liveMatches.length > 1 && (
-                            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
-                                {liveMatches.map((_, idx) => (
-                                    <div
-                                        key={idx}
-                                        style={{
-                                            width: activeLiveIndex === idx ? 18 : 6,
-                                            height: 6,
-                                            borderRadius: 3,
-                                            background: activeLiveIndex === idx ? '#fff' : 'rgba(255,255,255,0.3)',
-                                            transition: 'all 0.2s ease'
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        )}
+                        {/* Dot Indicators - max 10 dots */}
+                        {liveMatches.length > 1 && (() => {
+                            const maxDots = Math.min(10, liveMatches.length);
+                            const activeNormalized = Math.min(activeLiveIndex, maxDots - 1);
+                            return (
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 10, padding: '0 16px' }}>
+                                    {Array.from({ length: maxDots }).map((_, idx) => (
+                                        <div
+                                            key={idx}
+                                            style={{
+                                                width: activeNormalized === idx ? 18 : 6,
+                                                height: 6,
+                                                borderRadius: 3,
+                                                background: activeNormalized === idx ? '#fff' : 'rgba(255,255,255,0.3)',
+                                                transition: 'all 0.2s ease',
+                                                flexShrink: 0
+                                            }}
+                                        />
+                                    ))}
+                                    {liveMatches.length > 10 && (
+                                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginLeft: 4 }}>
+                                            +{liveMatches.length - 10}
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        })()}
                     </>
                 ) : (
                     <div className="empty-state">No live matches right now</div>
