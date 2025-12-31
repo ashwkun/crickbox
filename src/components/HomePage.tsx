@@ -8,7 +8,7 @@ import SeriesHub from './SeriesHub';
 import TournamentHub from './TournamentHub';
 import FilterChips from './FilterChips';
 import TimeFilter, { TimeFilterValue } from './upcoming/TimeFilter';
-import { filterByTime } from '../utils/upcomingUtils';
+import { filterByTime, isToday, isTomorrow, isThisWeek } from '../utils/upcomingUtils';
 
 import SkeletonMatchCard from './SkeletonMatchCard';
 import { Match, Scorecard } from '../types';
@@ -112,6 +112,7 @@ export default function HomePage({
     const [activeLiveChip, setActiveLiveChip] = useState('all');
     const [upcomingTimeFilter, setUpcomingTimeFilter] = useState<TimeFilterValue>('all');
     const [activeUpcomingChip, setActiveUpcomingChip] = useState('all');
+    const [hasInitializedTimeFilter, setHasInitializedTimeFilter] = useState(false);
     const resultsScrollRef = useRef<HTMLDivElement>(null);
     const upcomingScrollRef = useRef<HTMLDivElement>(null);
     const liveScrollRef = useRef<HTMLDivElement>(null);
@@ -200,8 +201,34 @@ export default function HomePage({
         [matches]
     );
 
-    // Generate chips for upcoming section
-    const upcomingChips = useMemo(() => generateUpcomingChips(upcomingMatches), [upcomingMatches]);
+    // Time-filtered upcoming matches (for accurate chip counts)
+    const timeFilteredMatches = useMemo(() =>
+        filterByTime(upcomingMatches, upcomingTimeFilter),
+        [upcomingMatches, upcomingTimeFilter]
+    );
+
+    // Generate chips for upcoming section (based on time-filtered matches)
+    const upcomingChips = useMemo(() => generateUpcomingChips(timeFilteredMatches), [timeFilteredMatches]);
+
+    // Smart default for time filter: Today > Tomorrow > Week > All
+    useEffect(() => {
+        if (hasInitializedTimeFilter || upcomingMatches.length === 0) return;
+
+        const hasToday = upcomingMatches.some(m => isToday(new Date(m.start_date)));
+        const hasTomorrow = upcomingMatches.some(m => isTomorrow(new Date(m.start_date)));
+        const hasThisWeek = upcomingMatches.some(m => isThisWeek(new Date(m.start_date)));
+
+        if (hasToday) {
+            setUpcomingTimeFilter('today');
+        } else if (hasTomorrow) {
+            setUpcomingTimeFilter('tomorrow');
+        } else if (hasThisWeek) {
+            setUpcomingTimeFilter('week');
+        }
+        // else keep 'all'
+
+        setHasInitializedTimeFilter(true);
+    }, [upcomingMatches, hasInitializedTimeFilter]);
 
     const completedMatches = useMemo(() =>
         matches
@@ -598,7 +625,7 @@ export default function HomePage({
                                 className="view-more-card"
                                 onClick={onOpenUpcomingList}
                             >
-                                <span className="view-more-icon">📅</span>
+                                <span className="view-more-icon">+</span>
                                 <span className="view-more-text">Full Calendar</span>
                                 <span className="view-more-count">{filteredUpcoming.length} total</span>
                             </button>
