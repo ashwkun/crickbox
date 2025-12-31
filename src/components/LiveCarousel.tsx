@@ -12,7 +12,7 @@ interface LiveCarouselProps {
 }
 
 const CARD_WIDTH = 300;
-const GAP = 16;
+const GAP = 24;
 const PADDING_X = 20;
 
 const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSeriesClick, activeIndex, onIndexChange }) => {
