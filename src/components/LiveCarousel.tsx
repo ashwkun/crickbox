@@ -29,15 +29,30 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
     const x = useMotionValue(-(activeIndex * (CARD_WIDTH + GAP)) + initialOffset);
 
     // Update center more accurately after mount/resize
-    useEffect(() => {
+    // Use useLayoutEffect to block paint until we measure, preventing the visual jump
+    React.useLayoutEffect(() => {
         const updateCenter = () => {
             if (containerRef.current) {
                 const width = containerRef.current.offsetWidth;
-                setCenterOffset((width - CARD_WIDTH) / 2);
+                const newOffset = (width - CARD_WIDTH) / 2;
+
+                console.log('[Carousel Debug] Resizing:', {
+                    windowWidth: window.innerWidth,
+                    containerWidth: width,
+                    oldOffset: centerOffset,
+                    newOffset,
+                    diff: newOffset - centerOffset
+                });
+
+                setCenterOffset(newOffset);
+                // Force X update immediately without animation for the initial correction
+                if (Math.abs(newOffset - centerOffset) > 1) { // Only if diff is significant
+                    x.set(-(activeIndex * (CARD_WIDTH + GAP)) + newOffset);
+                }
             }
         };
 
-        // Don't run immediately if we trust window.innerWidth, but good to double check
+        console.log('[Carousel Debug] Initial Render:', { initialWidth, initialOffset });
         updateCenter();
         window.addEventListener('resize', updateCenter);
         return () => window.removeEventListener('resize', updateCenter);
