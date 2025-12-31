@@ -134,10 +134,10 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                 </div>
             )}
 
-            {/* Header: Date Pill + Format Badge */}
+            {/* Header: Date + Time Pill + Format Badge */}
             <div className="upcoming-card-header">
                 <div className="upcoming-date-pill">
-                    {dateStr}
+                    {dateStr} • {time}
                 </div>
                 {matchFormat && (
                     <div className="upcoming-format-badge">
@@ -190,20 +190,16 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                 </div>
             </div>
 
-            {/* Footer: Series | Time/Action */}
+            {/* Footer: Series | Action */}
             <div className="upcoming-card-footer">
                 <span className="upcoming-series-name">
                     {seriesName}
                 </span>
 
-                {hasAction ? (
+                {hasAction && (
                     <button className="upcoming-action-btn" onClick={handleAction}>
                         {showSeriesButton ? 'View Series' : 'View Hub'}
                     </button>
-                ) : (
-                    <span className="upcoming-time">
-                        {time}
-                    </span>
                 )}
             </div>
         </div>
