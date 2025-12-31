@@ -101,8 +101,20 @@ export default function HomePage({
 }: HomePageProps): React.ReactElement {
     const [upcomingLimit, setUpcomingLimit] = useState(10);
     const [resultsLimit, setResultsLimit] = useState(8);
+    const [activeLiveIndex, setActiveLiveIndex] = useState(0);
     const resultsScrollRef = useRef<HTMLDivElement>(null);
     const upcomingScrollRef = useRef<HTMLDivElement>(null);
+    const liveScrollRef = useRef<HTMLDivElement>(null);
+
+    // Handle Live scroll to track active index for dot indicators
+    const handleLiveScroll = () => {
+        if (!liveScrollRef.current) return;
+        const container = liveScrollRef.current;
+        const cardWidth = container.firstElementChild?.clientWidth || 300;
+        const gap = 12; // matches CSS gap
+        const index = Math.round(container.scrollLeft / (cardWidth + gap));
+        setActiveLiveIndex(Math.max(0, index));
+    };
 
     const loadMoreUpcoming = () => {
         const currentScrollLeft = upcomingScrollRef.current?.scrollLeft || 0;
@@ -305,17 +317,36 @@ export default function HomePage({
                         <SkeletonMatchCard />
                     </div>
                 ) : liveMatches.length > 0 ? (
-                    <div className="horizontal-scroll">
-                        {liveMatches.map(match => (
-                            <MatchCard
-                                key={match.game_id}
-                                match={match}
-                                onClick={openMatch}
-                                isHero={true}
-                                onSeriesClick={(seriesId) => openSeries(seriesId, undefined)}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        <div className="horizontal-scroll" ref={liveScrollRef} onScroll={handleLiveScroll}>
+                            {liveMatches.map(match => (
+                                <MatchCard
+                                    key={match.game_id}
+                                    match={match}
+                                    onClick={openMatch}
+                                    isHero={true}
+                                    onSeriesClick={(seriesId) => openSeries(seriesId, undefined)}
+                                />
+                            ))}
+                        </div>
+                        {/* Dot Indicators */}
+                        {liveMatches.length > 1 && (
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
+                                {liveMatches.map((_, idx) => (
+                                    <div
+                                        key={idx}
+                                        style={{
+                                            width: activeLiveIndex === idx ? 18 : 6,
+                                            height: 6,
+                                            borderRadius: 3,
+                                            background: activeLiveIndex === idx ? '#fff' : 'rgba(255,255,255,0.3)',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <div className="empty-state">No live matches right now</div>
                 )}
