@@ -31,10 +31,11 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         WebkitTextFillColor: 'transparent',
         animation: 'liveShimmer 1.5s ease-in-out infinite alternate',
         flexShrink: 0,
-        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-        width: isShrunk ? '22px' : '48px', // Fixed widths for smooth transition
+        transition: 'width 0.4s cubic-bezier(0.2, 0, 0, 1)', // Smooth ease-out
+        width: isShrunk ? '20px' : '55px', // Increased expanded width to prevent cutoff
         overflow: 'hidden',
         whiteSpace: 'nowrap',
+        willChange: 'width',
     };
 
     const chipsScrollStyle: React.CSSProperties = {
@@ -71,10 +72,10 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollLeft = e.currentTarget.scrollLeft;
-        // Shrink after 20px of scroll
-        if (scrollLeft > 20 && !isShrunk) {
+        // Shrink after 10px to feel more responsive
+        if (scrollLeft > 10 && !isShrunk) {
             setIsShrunk(true);
-        } else if (scrollLeft <= 20 && isShrunk) {
+        } else if (scrollLeft <= 10 && isShrunk) {
             setIsShrunk(false);
         }
     };
@@ -92,10 +93,8 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
                 }
             `}</style>
 
-            {/* Frozen .LIVE text - Animates to .L */}
-            <span style={liveTextStyle}>
-                {isShrunk ? '.L' : '.LIVE'}
-            </span>
+            {/* Frozen .LIVE text - Animates via width clipping */}
+            <span style={liveTextStyle}>.LIVE</span>
 
             {/* Scrollable chips */}
             <div
