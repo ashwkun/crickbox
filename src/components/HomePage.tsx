@@ -5,9 +5,11 @@ import CompletedCard from './CompletedCard';
 import UpcomingCard from './UpcomingCard';
 import SeriesHub from './SeriesHub';
 import TournamentHub from './TournamentHub';
+import FilterChips from './FilterChips';
 
 import SkeletonMatchCard from './SkeletonMatchCard';
 import { Match, Scorecard } from '../types';
+import { sortByPriority, generateChips, filterByChip } from '../utils/matchPriority';
 
 // Types for processed items
 interface ProcessedSeriesItem {
@@ -102,6 +104,7 @@ export default function HomePage({
     const [upcomingLimit, setUpcomingLimit] = useState(10);
     const [resultsLimit, setResultsLimit] = useState(8);
     const [activeLiveIndex, setActiveLiveIndex] = useState(0);
+    const [activeLiveChip, setActiveLiveChip] = useState('all');
     const resultsScrollRef = useRef<HTMLDivElement>(null);
     const upcomingScrollRef = useRef<HTMLDivElement>(null);
     const liveScrollRef = useRef<HTMLDivElement>(null);
@@ -163,12 +166,23 @@ export default function HomePage({
     };
 
     // Memoized computations - purely API-driven by event_state
-    const liveMatches = useMemo(() =>
+    const liveMatchesRaw = useMemo(() =>
         matches
             .filter(m => m.event_state === 'U') // FLIPPED FOR TESTING
-            .filter(isInternationalMens)
-            .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()),
+            .filter(isInternationalMens),
         [matches]
+    );
+
+    // Apply priority sorting to live matches
+    const liveMatchesSorted = useMemo(() => sortByPriority(liveMatchesRaw), [liveMatchesRaw]);
+
+    // Generate chips for live section
+    const liveChips = useMemo(() => generateChips(liveMatchesSorted), [liveMatchesSorted]);
+
+    // Filter by active chip
+    const liveMatches = useMemo(() =>
+        filterByChip(liveMatchesSorted, activeLiveChip),
+        [liveMatchesSorted, activeLiveChip]
     );
 
     const upcomingMatches = useMemo(() =>
@@ -306,10 +320,23 @@ export default function HomePage({
                 <div className="section-header">
                     <h3 className="section-title">Live</h3>
                     <div className="section-line"></div>
-                    {liveMatches.length > 0 && (
-                        <span className="section-count">{liveMatches.length}</span>
+                    {liveMatchesSorted.length > 0 && (
+                        <span className="section-count">{liveMatchesSorted.length}</span>
                     )}
                 </div>
+
+                {/* Filter Chips */}
+                <FilterChips
+                    chips={liveChips}
+                    activeChip={activeLiveChip}
+                    onChipClick={(chipId) => {
+                        setActiveLiveChip(chipId);
+                        setActiveLiveIndex(0); // Reset scroll position
+                        if (liveScrollRef.current) {
+                            liveScrollRef.current.scrollLeft = 0;
+                        }
+                    }}
+                />
 
                 {loading && matches.length === 0 ? (
                     <div className="horizontal-scroll">
