@@ -388,7 +388,61 @@ export default function HomePage({
                         })()}
                     </>
                 ) : (
-                    <div className="empty-state">No live matches right now</div>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '30px 20px',
+                        background: 'linear-gradient(135deg, rgba(20,20,20,0.6) 0%, rgba(30,30,30,0.4) 100%)',
+                        borderRadius: '16px',
+                        border: '1px solid rgba(255,255,255,0.05)',
+                        margin: '0 16px',
+                        textAlign: 'center',
+                        marginTop: 10,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        backdropFilter: 'blur(12px)',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                    }}>
+                        {/* Background Effect */}
+                        <div style={{
+                            position: 'absolute',
+                            top: '-50%',
+                            left: '-50%',
+                            width: '200%',
+                            height: '200%',
+                            background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 50%)',
+                            pointerEvents: 'none',
+                        }} />
+
+                        {/* Stumps Icon */}
+                        <svg width="48" height="48" style={{ marginBottom: 12 }} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M8 21v-12" />
+                            <path d="M12 21v-12" />
+                            <path d="M16 21v-12" />
+                            <path d="M6 9h12" />
+                            <path d="M6 21h12" />
+                        </svg>
+
+                        <h3 style={{
+                            margin: '12px 0 4px',
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            color: 'rgba(255,255,255,0.9)',
+                            letterSpacing: '0.5px'
+                        }}>
+                            Stumps
+                        </h3>
+                        <p style={{
+                            margin: 0,
+                            fontSize: '13px',
+                            color: 'rgba(255,255,255,0.5)',
+                            lineHeight: '1.4'
+                        }}>
+                            No live matches at the moment.<br />Check upcoming fixtures below.
+                        </p>
+                    </div>
                 )}
             </section>
 
