@@ -115,9 +115,9 @@
     overflow-x: auto;
     padding: 8px 20px 20px 20px;
     scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    scroll-padding: 0 calc(50% - 150px);
-    /* Center snap for ~300px cards */
+    /* scroll-padding removed to allow natural centering */
 }
 
 /* View More Card (in horizontal scroll) */
