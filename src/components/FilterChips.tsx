@@ -31,11 +31,11 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         WebkitTextFillColor: 'transparent',
         animation: 'liveShimmer 1.5s ease-in-out infinite alternate',
         flexShrink: 0,
-        transition: 'width 0.4s cubic-bezier(0.2, 0, 0, 1)', // Smooth ease-out
-        width: isShrunk ? '20px' : '65px', // Increased to 65px to fit ".LIVE"
+        transition: 'max-width 0.4s cubic-bezier(0.2, 0, 0, 1)', // Smooth ease-out
+        maxWidth: isShrunk ? '20px' : '80px', // Use max-width for safer expansion
         overflow: 'hidden',
         whiteSpace: 'nowrap',
-        willChange: 'width',
+        willChange: 'max-width',
     };
 
     const chipsScrollStyle: React.CSSProperties = {
