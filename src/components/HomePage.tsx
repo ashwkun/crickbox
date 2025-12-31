@@ -546,7 +546,10 @@ export default function HomePage({
                     gap: 8,
                     padding: '0 20px 12px 16px',
                     overflowX: 'auto',
+                    overflowY: 'visible',
                     scrollbarWidth: 'none',
+                    position: 'relative',
+                    zIndex: 10,
                 }}>
                     {/* .NEXT Branding */}
                     <span style={{
