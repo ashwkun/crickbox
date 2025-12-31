@@ -90,7 +90,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                                         name={team.name}
                                         id={team.id}
                                         type="team"
-                                        style={{ maxHeight: 40, width: 'auto', height: 'auto', borderRadius: 10, background: '#1a1a1a', padding: 4 }}
+                                        style={{ maxHeight: 32, maxWidth: 32, width: 'auto', height: 'auto', borderRadius: 8, background: '#1a1a1a', padding: 4 }}
                                     />
                                     <span className="upcoming-team-name">{team.name}</span>
                                 </div>
