@@ -483,7 +483,11 @@ export default function HomePage({
                         alignItems: 'center',
                         justifyContent: 'center',
                         padding: '24px 20px',
-                        background: 'linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(30,41,59,0.4) 100%)',
+                        background: `
+                            conic-gradient(from 120deg at 0 0, rgba(255,255,255,0.08) 0deg, transparent 60deg),
+                            conic-gradient(from 180deg at 100% 0, rgba(255,255,255,0.08) 0deg, transparent 60deg),
+                            linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(30,41,59,0.4) 100%)
+                        `,
                         borderRadius: '24px',
                         border: '1px solid rgba(255,255,255,0.06)',
                         margin: '0 16px',
