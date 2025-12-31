@@ -20,7 +20,7 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
 
     const liveTextStyle: React.CSSProperties = {
         fontFamily: '"BBH Bartle", sans-serif',
-        fontSize: '16px',
+        fontSize: '14px',
         fontWeight: 600,
         letterSpacing: '1px',
         background: 'linear-gradient(90deg, #c53030 0%, #c53030 35%, #e87070 50%, #c53030 65%, #c53030 100%)',
@@ -76,8 +76,8 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
                 }
             `}</style>
 
-            {/* Frozen LIVE text */}
-            <span style={liveTextStyle}>LIVE</span>
+            {/* Frozen .LIVE text */}
+            <span style={liveTextStyle}>.LIVE</span>
 
             {/* Scrollable chips */}
             <div style={chipsScrollStyle} className="filter-chips-scroll">
