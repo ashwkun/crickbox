@@ -8,13 +8,15 @@ interface FilterChipsProps {
 }
 
 const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClick }) => {
+    const [isShrunk, setIsShrunk] = React.useState(false);
+
     // Don't render if only "All" chip exists (nothing to filter)
     if (chips.length <= 1) return null;
 
     const containerStyle: React.CSSProperties = {
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
+        gap: '6px', // Reduced gap for tighter lockup
         padding: '0 20px 12px 20px',
     };
 
@@ -29,6 +31,10 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         WebkitTextFillColor: 'transparent',
         animation: 'liveShimmer 1.5s ease-in-out infinite alternate',
         flexShrink: 0,
+        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        width: isShrunk ? '22px' : '48px', // Fixed widths for smooth transition
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
     };
 
     const chipsScrollStyle: React.CSSProperties = {
@@ -63,6 +69,16 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
             : '0 4px 16px rgba(0, 0, 0, 0.2)',
     });
 
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const scrollLeft = e.currentTarget.scrollLeft;
+        // Shrink after 20px of scroll
+        if (scrollLeft > 20 && !isShrunk) {
+            setIsShrunk(true);
+        } else if (scrollLeft <= 20 && isShrunk) {
+            setIsShrunk(false);
+        }
+    };
+
     return (
         <div style={containerStyle}>
             {/* Shimmer keyframes */}
@@ -76,11 +92,17 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
                 }
             `}</style>
 
-            {/* Frozen .LIVE text */}
-            <span style={liveTextStyle}>.LIVE</span>
+            {/* Frozen .LIVE text - Animates to .L */}
+            <span style={liveTextStyle}>
+                {isShrunk ? '.L' : '.LIVE'}
+            </span>
 
             {/* Scrollable chips */}
-            <div style={chipsScrollStyle} className="filter-chips-scroll">
+            <div
+                style={chipsScrollStyle}
+                className="filter-chips-scroll"
+                onScroll={handleScroll}
+            >
                 {chips.map(chip => (
                     <div
                         key={chip.id}
