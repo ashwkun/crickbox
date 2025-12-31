@@ -86,16 +86,7 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
     useEffect(() => {
         if (src) return; // Already resolved a source
 
-        // Strategy 0: For recognized national teams, use FlagCDN FIRST (high quality flags)
-        if (type === 'team' && errorCount === 0) {
-            const flagUrl = getFlagUrl(name);
-            if (flagUrl) {
-                setSrc(flagUrl);
-                return;
-            }
-        }
-
-        // Strategy 1: Wisden Asset (for franchises/non-national teams, or if flag wasn't available)
+        // Strategy 1: Wisden Asset (FIRST PRIORITY)
         if (id && errorCount === 0) {
             let url: string | undefined;
             if (type === 'player') url = `${WISDEN_PLAYER_IMG}${id}.png`;
@@ -106,6 +97,42 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
                 setSrc(url);
                 return;
             }
+        }
+
+        // Strategy 0: FlagCDN (Fallback for national teams)
+        // Try if Wisden failed (errorCount==1) OR if no ID (errorCount==0)
+        // But be careful not to override Wikipedia logic (Strategy 3) which runs later
+        // Let's make this run if we haven't found a source yet.
+        const shouldCheckFlag = (id && errorCount === 1) || (!id && errorCount === 0);
+
+        if (type === 'team' && shouldCheckFlag) {
+            const flagUrl = getFlagUrl(name);
+            if (flagUrl) {
+                setSrc(flagUrl);
+                return;
+            }
+            // If no flag found, proceed to next strategies (by letting errorCount increment or fall through? 
+            // Wait, if setSrc is not called, we do nothing. 
+            // But if we fail to find a flag, we want to go towards Wikipedia.
+            // If getFlagUrl returns null, we just continue.
+            // But 'continue' in useEffect means fall through to next if statements.
+            // But we need to ensure the NEXT strategies run. 
+            // If (id && errorCount === 1) runs this block, and fails, we need errorCount to increment to 2 to trigger fallback?
+            // Or trigger Wikipedia?
+
+            // Actually, Strategy 3 (Wikipedia) runs at: errorCount === (id ? 1 : 0).
+            // If id exists: Wisden(0) -> Error(1) -> Wiki(1)?
+            // If I insert Flag at (1), I delay Wiki to (2)?
+            // Yes.
+            // If flagUrl found -> setSrc -> Good.
+            // If flagUrl NOT found -> I must increment errorCount to skip to Wiki? 
+            // OR simply let Wiki run? 
+            // If (id && errorCount===1), and flagUrl is null.
+            // Then Wiki checks `errorCount === (id ? 1 : 0)`. i.e. 1.
+            // So Wiki ALSO runs?
+            // If multiple blocks run in one effect pass? No, setSrc triggers re-render if state changes.
+            // If setSrc NOT called, effect continues execution? Yes.
+            // So safely placing Flag logic before Wiki logic is fine.
         }
 
         // Strategy 2: LocalStorage Cache for Wiki
