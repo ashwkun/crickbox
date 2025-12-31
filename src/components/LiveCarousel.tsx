@@ -28,32 +28,18 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
     // Initialize X correctly so it doesn't animate from 0
     const x = useMotionValue(-(activeIndex * (CARD_WIDTH + GAP)) + initialOffset);
 
-    // Update center more accurately after mount/resize
-    // Use useLayoutEffect to block paint until we measure, preventing the visual jump
-    React.useLayoutEffect(() => {
+    // Update center on resize only. We trust initial window width for first render to avoid
+    // expensive forced reflow (300ms+) logic on mount.
+    useEffect(() => {
         const updateCenter = () => {
             if (containerRef.current) {
                 const width = containerRef.current.offsetWidth;
                 const newOffset = (width - CARD_WIDTH) / 2;
-
-                console.log('[Carousel Debug] Resizing:', {
-                    windowWidth: window.innerWidth,
-                    containerWidth: width,
-                    oldOffset: centerOffset,
-                    newOffset,
-                    diff: newOffset - centerOffset
-                });
-
                 setCenterOffset(newOffset);
-                // Force X update immediately without animation for the initial correction
-                if (Math.abs(newOffset - centerOffset) > 1) { // Only if diff is significant
-                    x.set(-(activeIndex * (CARD_WIDTH + GAP)) + newOffset);
-                }
+                // We don't force x update here, standard animate loop will handle it gracefully if needed
             }
         };
 
-        console.log('[Carousel Debug] Initial Render:', { initialWidth, initialOffset });
-        updateCenter();
         window.addEventListener('resize', updateCenter);
         return () => window.removeEventListener('resize', updateCenter);
     }, []);
@@ -61,10 +47,12 @@ const LiveCarousel: React.FC<LiveCarouselProps> = ({ matches, onMatchClick, onSe
     // Animate to position whenever index or offset changes
     useEffect(() => {
         const stride = CARD_WIDTH + GAP;
-        // Target = - (Index * Stride) + CenterOffset
         const targetX = -(activeIndex * stride) + centerOffset;
 
-        animate(x, targetX, { type: "spring", stiffness: 300, damping: 30, bounce: 0.2 });
+        // Only animate if there is a meaningful difference to prevent micro-jitters
+        if (Math.abs(x.get() - targetX) > 1) {
+            animate(x, targetX, { type: "spring", stiffness: 300, damping: 30, bounce: 0.2 });
+        }
     }, [activeIndex, centerOffset, x]);
 
     const handleDragEnd = (e: any, { offset, velocity }: any) => {
