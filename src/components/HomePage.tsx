@@ -167,12 +167,19 @@ export default function HomePage({
     };
 
     // Memoized computations - purely API-driven by event_state
-    const liveMatchesRaw = useMemo(() =>
-        matches
-            .filter(m => m.event_state === 'L') // Live Matches
-            .filter(isInternationalMens),
-        [matches]
-    );
+    const liveMatchesRaw = useMemo(() => {
+        const params = new URLSearchParams(window.location.search);
+        const forceLive = params.get('forceLive') === 'true';
+        const forceMatchId = params.get('match');
+
+        return matches
+            .filter(m => {
+                // Formatting "force live" condition
+                if (forceLive && forceMatchId && m.game_id === forceMatchId) return true;
+                return m.event_state === 'L';
+            })
+            .filter(isInternationalMens);
+    }, [matches]);
 
     // Apply priority sorting to live matches
     const liveMatchesSorted = useMemo(() => sortByPriority(liveMatchesRaw), [liveMatchesRaw]);
@@ -186,13 +193,20 @@ export default function HomePage({
         [liveMatchesSorted, activeLiveChip]
     );
 
-    const upcomingMatches = useMemo(() =>
-        matches
-            .filter(m => m.event_state === 'U') // Upcoming Matches
+    const upcomingMatches = useMemo(() => {
+        const params = new URLSearchParams(window.location.search);
+        const forceLive = params.get('forceLive') === 'true';
+        const forceMatchId = params.get('match');
+
+        return matches
+            .filter(m => {
+                // Exclude if forced to live
+                if (forceLive && forceMatchId && m.game_id === forceMatchId) return false;
+                return m.event_state === 'U';
+            }) // Upcoming Matches
             .filter(isInternationalMens)
-            .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()),
-        [matches]
-    );
+            .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+    }, [matches]);
 
     const completedMatches = useMemo(() =>
         matches
