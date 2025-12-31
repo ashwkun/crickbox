@@ -493,23 +493,27 @@
 }
 
 .upcoming-action-btn {
-    font-size: 11px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.7);
-    background: transparent;
-    border: none;
-    padding: 4px 8px;
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.05);
+    /* Very subtle */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 4px 10px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
     letter-spacing: 0.3px;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 .upcoming-action-btn:hover {
-    color: #fff;
-    transform: translateX(2px);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(0);
+    /* Remove slide, just bg shift */
 }
 
 .upcoming-format {
