@@ -458,14 +458,15 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 40px;
-    background: rgba(10, 10, 12, 0.6);
-    backdrop-filter: blur(8px);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    height: 44px;
+    background: rgba(5, 5, 8, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
+    padding: 0 20px;
     z-index: 3;
 }
 
@@ -492,17 +493,16 @@
 }
 
 .upcoming-action-btn {
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 600;
     color: #fff;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 4px 8px;
-    border-radius: 4px;
-    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px 14px;
+    border-radius: 20px;
     cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    letter-spacing: 0.3px;
 }
 
 .upcoming-action-btn:hover {
