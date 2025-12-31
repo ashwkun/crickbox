@@ -97,14 +97,14 @@ const FilterChips: React.FC<FilterChipsProps> = ({ chips, activeChip, onChipClic
         flexShrink: 0,
         transition: 'all 0.2s ease',
         background: isActive
-            ? 'rgba(255, 255, 255, 0.15)'
+            ? 'rgba(197, 48, 48, 0.2)'  // Red hue for Live
             : 'rgba(20, 20, 20, 0.4)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         border: isActive
-            ? '1px solid rgba(255, 255, 255, 0.4)'
+            ? '1px solid rgba(197, 48, 48, 0.4)'  // Red border
             : '1px solid rgba(255, 255, 255, 0.15)',
-        color: '#fff',
+        color: isActive ? '#fca5a5' : '#fff',  // Light red text when active
         boxShadow: isActive ? 'none' : '0 4px 16px rgba(0, 0, 0, 0.2)',
     });
 
