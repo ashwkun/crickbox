@@ -24,12 +24,12 @@ const MatchDetail: React.FC<MatchDetailProps> = ({ match, scorecard, wallstream,
     const forceLive = params.get('forceLive') === 'true';
 
     // Route to appropriate component based on match state
-    if (match.event_state === 'L') { // FLIPPED FOR TESTING
+    if (match.event_state === 'U') {
         return <UpcomingDetail match={match} onClose={onClose} onSeriesClick={onSeriesClick} />;
     }
 
     // Force LiveDetail for completed matches if forceLive=true
-    if (match.event_state === 'U' || forceLive) { // FLIPPED FOR TESTING
+    if (match.event_state === 'L' || forceLive) {
         return (
             <LiveDetail
                 match={match}
