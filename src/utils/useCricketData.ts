@@ -31,10 +31,10 @@ const formatDate = (date: Date): string => {
 // Team Name Sanitization Helper
 const sanitizeTeamName = (name: string): string => {
     if (!name) return name;
-    // user requested "Royal Challengers Bengaluru" -> "Royal Challengers"
     return name
         .replace(/Royal Challengers Bangalore/gi, 'Royal Challengers')
-        .replace(/Royal Challengers Bengaluru/gi, 'Royal Challengers');
+        .replace(/Royal Challengers Bengaluru/gi, 'Royal Challengers')
+        .replace(/\bWomen\b/g, 'W'); // e.g., "India Women" → "India W"
 };
 
 const sanitizeMatch = (m: Match): Match => {
