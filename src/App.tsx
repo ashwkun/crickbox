@@ -442,9 +442,34 @@ export default function App(): React.ReactElement {
                 // This ensures that if event_state changes (U -> L), the UI updates immediately
                 // instead of using the stale snapshot in the stack.
                 let activeData = view.data;
+
+                // For MATCH: Find by ID
                 if (view.type === 'MATCH') {
                     const found = matches.find(m => m.game_id === view.id);
                     if (found) activeData = found;
+                }
+
+                // For SERIES/TOURNAMENT: If data missing (deep link), derive from matches
+                if (view.type === 'SERIES' && (!activeData || !activeData.matches)) {
+                    const seriesMatches = matches.filter(m => m.series_id === view.id);
+                    if (seriesMatches.length > 0) {
+                        activeData = {
+                            seriesId: view.id,
+                            seriesName: seriesMatches[0].series_name,
+                            matches: seriesMatches
+                        };
+                    }
+                }
+
+                if (view.type === 'TOURNAMENT' && (!activeData || !activeData.matches)) {
+                    const tournamentMatches = matches.filter(m => m.series_id === view.id); // Tournament ID is series_id in Wisden
+                    if (tournamentMatches.length > 0) {
+                        activeData = {
+                            seriesId: view.id,
+                            tournamentName: tournamentMatches[0].series_name,
+                            matches: tournamentMatches
+                        };
+                    }
                 }
 
                 switch (view.type) {
@@ -464,11 +489,12 @@ export default function App(): React.ReactElement {
                             </div>
                         );
                     case 'SERIES':
+                        if (!activeData || !activeData.matches) return null; // Wait for matches to load
                         return (
                             <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-app)', overflowY: 'auto' }}>
                                 <SeriesHub
-                                    seriesName={view.data.seriesName}
-                                    matches={view.data.matches}
+                                    seriesName={activeData.seriesName}
+                                    matches={activeData.matches}
                                     onBack={handleCloseSeries}
                                     onMatchClick={handleSelectMatch}
                                     isVisible={isVisible}
@@ -477,11 +503,12 @@ export default function App(): React.ReactElement {
                             </div>
                         );
                     case 'TOURNAMENT':
+                        if (!activeData || !activeData.matches) return null; // Wait for matches to load
                         return (
                             <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-app)', overflowY: 'auto' }}>
                                 <TournamentHub
-                                    tournamentName={view.data.tournamentName}
-                                    matches={view.data.matches}
+                                    tournamentName={activeData.tournamentName}
+                                    matches={activeData.matches}
                                     onBack={handleCloseTournament}
                                     onMatchClick={handleSelectMatch}
                                     isVisible={isVisible}
