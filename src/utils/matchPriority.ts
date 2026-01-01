@@ -298,7 +298,7 @@ export function filterByChip(matches: Match[], chipId: string): Match[] {
  */
 export function filterJustFinished(matches: Match[]): Match[] {
     const now = Date.now();
-    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+    const TWELVE_HOURS = 1 * 60 * 60 * 1000; // CHANGED TO 1 HOUR FOR TESTING
 
     return matches.filter(match => {
         // 1. Must be completed
