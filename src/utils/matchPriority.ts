@@ -308,7 +308,10 @@ export function filterJustFinished(matches: Match[]): Match[] {
         // 2. High Priority Only
         // Top 10 Int'l (2) + ICC Events (1-3) + Premium Leagues (4-14)
         // Strictly exclude priority > 15 (Domestic, Lower Leagues)
-        if (getMatchPriority(match) > 15) return false;
+        // EXCEPTION: Always show India Women matches
+        const isIndiaWomen = match.participants?.some(p => p.name === 'India Women');
+
+        if (getMatchPriority(match) > 15 && !isIndiaWomen) return false;
 
         // 3. Recency Check
         // If end_date exists, use it. Otherwise skip (don't reliably know when it ended)
