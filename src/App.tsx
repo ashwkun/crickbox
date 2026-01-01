@@ -394,15 +394,17 @@ export default function App(): React.ReactElement {
 
     return (
         <div className="app-container">
-            {/* Floating Header */}
-            <FloatingHeader
-                showBack={viewStack.length > 1}
-                onBack={handleBack}
-                onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
-                data={headerData}
-                isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
-                isUpcoming={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U'}
-            />
+            {/* Floating Header (Global) - Only show for HOME and MATCH */}
+            {(currentView.type === 'HOME' || currentView.type === 'MATCH') && (
+                <FloatingHeader
+                    showBack={viewStack.length > 1}
+                    onBack={handleBack}
+                    onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
+                    data={headerData}
+                    isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
+                    isUpcoming={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U'}
+                />
+            )}
 
             {/* Base Layer: HomePage */}
             {/* We render HomePage if it's in the stack (index 0). 
