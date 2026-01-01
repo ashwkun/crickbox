@@ -23,7 +23,7 @@ const ALL_OPTIONS: { value: TimeFilterValue; label: string }[] = [
 ];
 
 const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters }) => {
-    const [isShrunk, setIsShrunk] = useState(false);
+    // Scroll and shrink logic removed as chips now fit on screen
 
     const containerStyle: React.CSSProperties = {
         display: 'flex',
@@ -31,15 +31,14 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters
         gap: '12px',
     };
 
-    // Collapsible .NEXT branding (same pattern as FilterChips .LIVE)
+    // Static .NEXT branding
     const nextContainerStyle: React.CSSProperties = {
         position: 'relative',
         height: '24px',
         display: 'flex',
         alignItems: 'center',
         flexShrink: 0,
-        transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        width: isShrunk ? '12px' : '80px',
+        width: '80px',
     };
 
     const textStyle: React.CSSProperties = {
@@ -55,48 +54,21 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters
         position: 'absolute',
         left: 0,
         whiteSpace: 'nowrap',
-        opacity: isShrunk ? 0 : 1,
-        transform: isShrunk ? 'scale(0.5) translateX(-20px)' : 'scale(1) translateX(0)',
-        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        opacity: 1,
+        transform: 'scale(1) translateX(0)',
         transformOrigin: 'left center',
     };
 
-    // Shrunk badge (indigo dot)
+    // Shrunk badge (Hidden now)
     const badgeStyle: React.CSSProperties = {
-        position: 'absolute',
-        left: 0,
-        width: '10px',
-        height: '10px',
-        borderRadius: '50%',
-        background: '#6366f1',
-        boxShadow: '0 0 10px rgba(99, 102, 241, 0.6)',
-        opacity: isShrunk ? 1 : 0,
-        transform: isShrunk ? 'scale(1)' : 'scale(0)',
-        transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s',
-    };
-
-    const pulseRingStyle: React.CSSProperties = {
-        position: 'absolute',
-        left: '-3px',
-        top: '-3px',
-        width: '16px',
-        height: '16px',
-        borderRadius: '50%',
-        border: '1px solid rgba(99, 102, 241, 0.5)',
-        opacity: isShrunk ? 1 : 0,
-        transform: isShrunk ? 'scale(1)' : 'scale(0.5)',
-        animation: isShrunk ? 'pulseRingIndigo 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none',
-        transition: 'opacity 0.3s ease',
+        display: 'none',
     };
 
     const chipsScrollStyle: React.CSSProperties = {
         display: 'flex',
         gap: '6px',
-        overflowX: 'auto',
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
         flex: 1,
-        padding: '4px 20px 4px 0',
+        padding: '4px 0 4px 0',
         marginLeft: '0',
     };
 
@@ -122,17 +94,6 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters
         ? ALL_OPTIONS.filter(opt => allowedFilters.includes(opt.value))
         : ALL_OPTIONS;
 
-    // Helper to determine if we should show the shrunk state
-    // We only shrink if we have enough items to scroll
-    const shouldEnableShrink = visibleOptions.length > 3;
-
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        if (!shouldEnableShrink) return;
-        const scrollLeft = e.currentTarget.scrollLeft;
-        if (scrollLeft > 10 && !isShrunk) setIsShrunk(true);
-        else if (scrollLeft <= 10 && isShrunk) setIsShrunk(false);
-    };
-
     return (
         <div style={containerStyle}>
             <style>{`
@@ -140,27 +101,15 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters
                     0% { background-position: 0% 50%; }
                     100% { background-position: 100% 50%; }
                 }
-                @keyframes pulseRingIndigo {
-                    0% { transform: scale(0.8); opacity: 0.8; }
-                    100% { transform: scale(2); opacity: 0; }
-                }
-                .time-filter-scroll::-webkit-scrollbar { display: none; }
             `}</style>
 
-            {/* Morpher Container - .NEXT */}
+            {/* Static .NEXT branding */}
             <div style={nextContainerStyle}>
                 <span style={textStyle}>.NEXT</span>
-                <div style={{ ...badgeStyle, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={pulseRingStyle} />
-                </div>
             </div>
 
-            {/* Chips */}
-            <div
-                style={chipsScrollStyle}
-                className="time-filter-scroll"
-                onScroll={handleScroll}
-            >
+            {/* Chips (No scroll) */}
+            <div style={chipsScrollStyle}>
                 {visibleOptions.map(option => (
                     <div
                         key={option.value}
