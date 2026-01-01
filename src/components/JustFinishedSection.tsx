@@ -261,10 +261,10 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
             {/* Header with Ticker */}
             <div style={headerStyle}>
                 {/* Static Dot */}
-                <span style={{ ...textBaseStyle, marginRight: '1px' }}>.</span>
+                <span style={{ ...textBaseStyle, marginRight: '0px' }}>.</span>
 
                 {/* Animated Word */}
-                <div style={tickerWrapperStyle}>
+                <div style={{ ...tickerWrapperStyle, marginLeft: '0px' }}>
                     {WORD_JUST.map((char, i) => (
                         <div key={i} style={charContainerStyle}>
                             {/* JUST letter (Leaves) */}
