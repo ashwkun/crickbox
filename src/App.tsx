@@ -147,7 +147,7 @@ export default function App(): React.ReactElement {
         const seriesId = params.get('series');
         const tournamentId = params.get('tournament');
         const upcoming = params.get('upcoming'); // check string 'true'
-        const isGuide = window.location.pathname === '/howitworks';
+        const isGuide = window.location.pathname.replace(/\/$/, '') === '/howitworks';
 
         const initialStack: ViewItem[] = [{ type: 'HOME' }];
 
@@ -186,7 +186,7 @@ export default function App(): React.ReactElement {
             const seriesId = params.get('series');
             const tournamentId = params.get('tournament');
             const upcoming = params.get('upcoming');
-            const isGuide = window.location.pathname === '/howitworks';
+            const isGuide = window.location.pathname.replace(/\/$/, '') === '/howitworks';
 
             setViewStack(prev => {
                 // If we are at Home URL
@@ -524,19 +524,29 @@ export default function App(): React.ReactElement {
                     case 'UPCOMING_LIST':
                         return (
                             <div key="upcoming" style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-app)', overflowY: 'auto' }}>
+                                {/* Spacer for FloatingHeader (UpcomingList needs it) */}
+                                <div style={{ height: 85 }}></div>
                                 <UpcomingListPage
                                     matches={matches}
                                     onBack={handleBack}
                                     onMatchClick={(m) => {
-                                        // When clicking match from LIST, we want to replace list? 
-                                        // Or push? Stack usually pushes.
-                                        // User logic: List should close?
-                                        // Let's standard Navigate(MATCH).
-                                        // UpcomingList is typically an overlay. MatchDetail over it is fine.
                                         handleSelectMatch(m);
                                     }}
                                     onSeriesClick={(sid, m) => handleOpenSeries(sid, m)}
                                     isVisible={isVisible}
+                                />
+                            </div>
+                        );
+                    case 'HOW_IT_WORKS':
+                        return (
+                            <div key="howitworks" style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-primary)', overflowY: 'auto' }}>
+                                <HowItWorks
+                                    isVisible={isVisible}
+                                    onHome={() => {
+                                        // Reset to Home
+                                        window.history.pushState({}, '', '/');
+                                        setViewStack([{ type: 'HOME' }]);
+                                    }}
                                 />
                             </div>
                         );
