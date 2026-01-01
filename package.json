@@ -1,6 +1,7 @@
 {
   "name": "boxcric",
   "version": "1.0.0",
+  "WARNING": "⚠️ DO NOT DEPLOY TO PRODUCTION! Use 'npm run deploy:dev' only. Ask Aswin before any production deployments.",
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html && cp src/sw.js dist/sw.js",
