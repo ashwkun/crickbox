@@ -233,6 +233,29 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
     }, [scorecard, preMatchProb, h2hPlayerData, overByOver]);
 
+    // 2b. Initialize Manhattan Innings Selection (based on scorecard, runs once per innings change)
+    useEffect(() => {
+        if (!scorecard?.Innings || scorecard.Innings.length === 0) return;
+        const currentInningsLen = scorecard.Innings.length;
+
+        // Only initialize if empty (first load or reset)
+        if (manhattanInnings.length === 0) {
+            let initialSelection = [currentInningsLen];
+
+            // If 2nd innings+, auto-select opponent's previous innings for comparison
+            if (currentInningsLen > 1) {
+                const currentTeam = scorecard.Innings[currentInningsLen - 1].Battingteam;
+                for (let i = currentInningsLen - 2; i >= 0; i--) {
+                    if (scorecard.Innings[i].Battingteam !== currentTeam) {
+                        initialSelection = [i + 1, currentInningsLen];
+                        break;
+                    }
+                }
+            }
+            setManhattanInnings(initialSelection);
+        }
+    }, [scorecard?.Innings?.length]); // Only trigger on innings length change
+
     // Helper to get Label/Color (Reused)
     const getInningsMeta = (inningIdx: number) => { // 0-based index input
         if (!scorecard?.Innings?.[inningIdx]) return { label: `INN ${inningIdx + 1}`, color: '#ccc' };
@@ -278,9 +301,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     setWagonWheelInnings(currentInningsLen);
                     setMatchupsInnings(currentInningsLen);
                     setPartnershipsInnings(currentInningsLen);
-                    if (manhattanInnings.length === 0) {
-                        setManhattanInnings([currentInningsLen]);
-                    }
+                    // Note: manhattanInnings initialized in dedicated useEffect
                 }
             });
 
@@ -290,14 +311,12 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                     setOverByOver(data);
                     setOverByOverMatchups(data);
 
-                    // Auto-update Manhattan for current innings
+                    // Manhattan OBO data update
                     if (scorecard?.Innings) {
-                        // Update existing entry if checks match, or add new
                         const idx = currentInningsLen;
                         const meta = getInningsMeta(idx - 1);
 
                         setManhattanData(prev => {
-                            // Replace or add current innings data
                             const filtered = prev.filter(p => p.id !== idx);
                             const newData = [...filtered, {
                                 data,
@@ -307,26 +326,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                             }].sort((a, b) => a.id - b.id);
                             return newData;
                         });
-
-                        // SMART INITIALIZATION: If 2nd innings (or later), auto-select previous opponent innings for comparison
-                        // FIXED: Only init if empty. Do NOT override if user has manually selected just one innings.
-                        if (manhattanInnings.length === 0) {
-                            let initialSelection = [currentInningsLen];
-
-                            if (currentInningsLen > 1) {
-                                const currentTeam = scorecard.Innings[currentInningsLen - 1].Battingteam;
-                                // Find last innings by opponent
-                                for (let i = currentInningsLen - 2; i >= 0; i--) {
-                                    if (scorecard.Innings[i].Battingteam !== currentTeam) {
-                                        // Found opponent innings (add to selection)
-                                        // Order: [Opponent, Current] so current is last (and focused)
-                                        initialSelection = [i + 1, currentInningsLen];
-                                        break;
-                                    }
-                                }
-                            }
-                            setManhattanInnings(initialSelection);
-                        }
+                        // Note: manhattanInnings initialized in dedicated useEffect
                     }
                 }
             });
