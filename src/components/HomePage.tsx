@@ -593,6 +593,7 @@ export default function HomePage({
                             setLastChangedFilter('time');
                             setUpcomingTimeFilter(v);
                         }}
+                        allowedFilters={['all', 'today', 'tomorrow', 'week']}
                     />
                 </div>
 
