@@ -92,6 +92,7 @@ const TYPE_FILTERS = [
     { id: 'major', label: 'Major Leagues' },
     { id: 'domestic', label: 'Domestic' },
     { id: 'women', label: 'Women' },
+    { id: 'u19', label: 'Under 19' },
 ];
 
 // Major league codes
@@ -102,6 +103,11 @@ const getMatchCategory = (match: Match): string[] => {
     const categories: string[] = [];
     const name = (match.series_name || '').toLowerCase();
     const leagueCode = match.league_code || '';
+
+    // Check for Under 19
+    if (name.includes('u19') || name.includes('under-19') || name.includes('under 19') || name.includes('youth')) {
+        categories.push('u19');
+    }
 
     // Check for women's cricket
     if (name.includes('women') || match.genders === 'female') {
