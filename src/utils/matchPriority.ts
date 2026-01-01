@@ -63,6 +63,20 @@ function isTopTeamMatch(match: Match): boolean {
     return teamIds.some(id => TOP_ICC_TEAMS.includes(id));
 }
 
+// Top Women's Teams (Sanitized Names)
+const TOP_WOMENS_TEAMS = [
+    'India W', 'Australia W', 'England W',
+    'South Africa W', 'New Zealand W'
+];
+
+/**
+ * Check if match involves a Top Women's team
+ */
+function isTopWomenTeamMatch(match: Match): boolean {
+    const teamNames = match.participants?.map(p => p.name) || [];
+    return teamNames.some(name => TOP_WOMENS_TEAMS.includes(name || ''));
+}
+
 /**
  * Get the chip category for a match
  */
@@ -137,18 +151,24 @@ export function getMatchPriority(match: Match): number {
         return PREMIUM_LEAGUES[parentSeries].priority;
     }
 
-    // 5. Use API event_priority if available
+    // 5. Top Women's Teams (Bilateral)
+    // Give them high priority (12) to ensure they show up in crucial sections
+    if (isTopWomenTeamMatch(match)) {
+        return 12;
+    }
+
+    // 6. Use API event_priority if available
     const apiPriority = parseInt(match.event_priority || '') || 999;
     if (apiPriority < 50) {
         return 15 + apiPriority; // Offset to keep below premium leagues
     }
 
-    // 6. League-based fallback
+    // 7. League-based fallback
     if (leagueCode === 'icc') return 20;
     if (leagueCode === 'womens_international') return 25;
     if (leagueCode === 'youth_international') return 30;
 
-    // 7. Domestic/Other
+    // 8. Domestic/Other
     return 100;
 }
 
@@ -308,10 +328,8 @@ export function filterJustFinished(matches: Match[]): Match[] {
         // 2. High Priority Only
         // Top 10 Int'l (2) + ICC Events (1-3) + Premium Leagues (4-14)
         // Strictly exclude priority > 15 (Domestic, Lower Leagues)
-        // EXCEPTION: Always show India Women matches (sanitized to "India W")
-        const isIndiaWomen = match.participants?.some(p => p.name === 'India W' || p.name === 'India Women');
-
-        if (getMatchPriority(match) > 15 && !isIndiaWomen) return false;
+        // Note: Top Women's Teams (India W, etc.) are now Priority 12 so they pass this check.
+        if (getMatchPriority(match) > 15) return false;
 
         // 3. Recency Check
         // If end_date exists, use it. Otherwise skip (don't reliably know when it ended)
