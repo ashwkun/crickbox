@@ -51,31 +51,42 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
         fontFamily: '"BBH Bartle", sans-serif',
         fontSize: '14px',
         fontWeight: 600,
-        letterSpacing: '1px',
+        letterSpacing: '0px', // Reset letter spacing since we control it via container width
         // Amber Gradient
         background: 'linear-gradient(90deg, #f59e0b 0%, #f59e0b 35%, #fbbf24 50%, #f59e0b 65%, #f59e0b 100%)',
         backgroundSize: '200% 100%',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         animation: 'amberShimmer 1.5s ease-in-out infinite alternate',
-        display: 'inline-block',
+        display: 'block', // Changed to block for better transform handling inside flex
+        lineHeight: '24px', // Explicit line height for alignment
+    };
+
+    // Main wrapper for . + Ticker
+    const brandWrapperStyle: React.CSSProperties = {
+        display: 'flex',
+        alignItems: 'center', // Align dot and letters vertically
+        height: '24px',
+        perspective: '400px',
     };
 
     // Container for the animated words
     const tickerWrapperStyle: React.CSSProperties = {
         position: 'relative',
-        display: 'inline-flex',
+        display: 'flex',
         height: '24px',
-        perspective: '400px',
-        marginLeft: '1px', // Gap after the dot
+        marginLeft: '2px', // Increased gap after the dot
     };
 
     // Individual character container
     const charContainerStyle: React.CSSProperties = {
         position: 'relative',
-        width: '9px', // Fixed width for monospaced look
+        width: '14px', // Increased from 11px to 14px to fix overlap
         height: '24px',
         transformStyle: 'preserve-3d',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
     };
 
     // Animated Letter Style
@@ -84,15 +95,17 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
         position: 'absolute',
         top: 0,
         left: 0,
+        width: '100%', // Fill container
+        textAlign: 'center',
         backfaceVisibility: 'hidden',
-        transition: `transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delayIndex * 0.05}s, opacity 0.4s ease ${delayIndex * 0.05}s`,
+        transition: `transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delayIndex * 0.06}s, opacity 0.3s ease ${delayIndex * 0.06}s`, // Slightly tweaked timing
         transform: isJust
             ? (showDone ? 'rotateX(-90deg)' : 'rotateX(0deg)')
             : (showDone ? 'rotateX(0deg)' : 'rotateX(90deg)'),
         opacity: isJust
             ? (showDone ? 0 : 1)
             : (showDone ? 1 : 0),
-        transformOrigin: 'center center', // Rotate around center
+        transformOrigin: 'center center',
     });
 
     // Match List Container (Horizontal Scroll)
@@ -248,7 +261,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
             {/* Header with Ticker */}
             <div style={headerStyle}>
                 {/* Static Dot */}
-                <span style={textBaseStyle}>.</span>
+                <span style={{ ...textBaseStyle, marginRight: '2px' }}>.</span>
 
                 {/* Animated Word */}
                 <div style={tickerWrapperStyle}>
