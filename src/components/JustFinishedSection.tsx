@@ -402,9 +402,17 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
                     fontWeight: 600,
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px',
-                    zIndex: 1
+                    zIndex: 1,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
                 }}>
-                    {displaySubHeader}
+                    <span style={{ maxWidth: '70%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {seriesName}
+                    </span>
+                    <span>
+                        {matchInfo}
+                    </span>
                 </div>
 
                 {/* Teams Row */}
@@ -457,7 +465,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
                         color: isDraw ? '#eab308' : '#f59e0b', // Amber
                         fontWeight: 600
                     }}>
-                        {match.short_event_status?.replace(' beat ', ' won by ')}
+                        {match.short_event_status}
                     </span>
                 </div>
             </div>
