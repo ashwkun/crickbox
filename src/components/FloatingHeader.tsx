@@ -224,7 +224,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                     animation: 'blurFocus 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                                 }}
                             >
-                                <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: '#fff' }}>{isUpcoming ? 'CRIC' : 'BOX'}</span>
+                                <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: '#fff' }}>BOX</span>
                                 {isLive ? (
                                     <span style={{
                                         fontFamily: '"BBH Bartle", sans-serif',
