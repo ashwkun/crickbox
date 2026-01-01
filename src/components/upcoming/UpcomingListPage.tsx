@@ -347,7 +347,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                             {/* Horizontal Scroll of UpcomingCards */}
                             <div style={{
                                 display: 'flex',
-                                gap: 12,
+                                gap: 16,
                                 overflowX: 'auto',
                                 scrollbarWidth: 'none',
                                 padding: '4px 16px 8px',
