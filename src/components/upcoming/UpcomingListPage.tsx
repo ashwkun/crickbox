@@ -16,6 +16,7 @@ interface UpcomingListPageProps {
     onBack: () => void;
     onMatchClick: (match: Match) => void;
     onSeriesClick?: (seriesId: string, matches?: Match[]) => void;
+    isVisible?: boolean;
 }
 
 // Generate time filter chips based on current date
@@ -91,6 +92,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     onBack,
     onMatchClick,
     onSeriesClick,
+    isVisible = true,
 }) => {
     const timeChips = useMemo(() => generateTimeChips(), []);
     const [selectedTime, setSelectedTime] = useState(timeChips[0]?.id || '');

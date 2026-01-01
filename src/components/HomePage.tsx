@@ -5,8 +5,7 @@ import { LuMoonStar, LuCalendarClock, LuCalendarDays } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
 import JustFinishedSection from './JustFinishedSection';
 import UpcomingCard from './UpcomingCard';
-import SeriesHub from './SeriesHub';
-import TournamentHub from './TournamentHub';
+import UpcomingCard from './UpcomingCard';
 import FilterChips from './FilterChips';
 import TimeFilter, { TimeFilterValue } from './upcoming/TimeFilter';
 import { filterByTime, isToday, isTomorrow, isThisWeek } from '../utils/upcomingUtils';
@@ -84,14 +83,14 @@ interface HomePageProps {
     loading: boolean;
     fetchExtendedResults: (chunks?: number) => Promise<Match[]>;
     onSelectMatch: (match: Match) => void;
-    // New props for lifted state
-    selectedSeries: SelectedSeries | null;
-    selectedTournament: SelectedTournament | null;
+    onSelectMatch: (match: Match) => void;
+    // New navigation callbacks
     onOpenSeries: (seriesId: string, seriesMatches?: Match[]) => void;
     onCloseSeries: () => void;
     onOpenTournament: (seriesId: string) => void;
     onCloseTournament: () => void;
     onOpenUpcomingList: () => void;
+    isVisible?: boolean;
 }
 
 export default function HomePage({
@@ -99,13 +98,12 @@ export default function HomePage({
     loading,
     fetchExtendedResults,
     onSelectMatch,
-    selectedSeries,
-    selectedTournament,
     onOpenSeries,
     onCloseSeries,
     onOpenTournament,
     onCloseTournament,
-    onOpenUpcomingList
+    onOpenUpcomingList,
+    isVisible = true
 }: HomePageProps): React.ReactElement {
     const [upcomingLimit, setUpcomingLimit] = useState(10);
     const [resultsLimit, setResultsLimit] = useState(8);
@@ -382,30 +380,6 @@ export default function HomePage({
             setLastChangedFilter(null);
         }
     }, [filteredUpcoming.length, lastChangedFilter, activeUpcomingChip, upcomingTimeFilter]);
-
-    // Tournament Hub View
-    if (selectedTournament) {
-        return (
-            <TournamentHub
-                tournamentName={selectedTournament.tournamentName}
-                matches={selectedTournament.matches}
-                onBack={closeTournament}
-                onMatchClick={openMatch}
-            />
-        );
-    }
-
-    // Series Hub View
-    if (selectedSeries) {
-        return (
-            <SeriesHub
-                seriesName={selectedSeries.seriesName}
-                matches={selectedSeries.matches}
-                onBack={closeSeries}
-                onMatchClick={openMatch}
-            />
-        );
-    }
 
     const heroMatch = liveMatches[0];
 
