@@ -298,7 +298,7 @@ export function filterByChip(matches: Match[], chipId: string): Match[] {
  */
 export function filterJustFinished(matches: Match[]): Match[] {
     const now = Date.now();
-    const TWELVE_HOURS = 1 * 60 * 60 * 1000; // CHANGED TO 1 HOUR FOR TESTING
+    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
 
     return matches.filter(match => {
         // 1. Must be completed
@@ -308,8 +308,8 @@ export function filterJustFinished(matches: Match[]): Match[] {
         // 2. High Priority Only
         // Top 10 Int'l (2) + ICC Events (1-3) + Premium Leagues (4-14)
         // Strictly exclude priority > 15 (Domestic, Lower Leagues)
-        // EXCEPTION: Always show India Women matches
-        const isIndiaWomen = match.participants?.some(p => p.name === 'India Women');
+        // EXCEPTION: Always show India Women matches (sanitized to "India W")
+        const isIndiaWomen = match.participants?.some(p => p.name === 'India W' || p.name === 'India Women');
 
         if (getMatchPriority(match) > 15 && !isIndiaWomen) return false;
 
