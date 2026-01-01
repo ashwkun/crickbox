@@ -6,7 +6,8 @@ import { H2HData, BatsmanSplitsResponse, OverByOverResponse, SquadData } from '.
 import { WallstreamData, BallData, extractMatchId } from './wallstreamApi';
 
 const CACHE_KEY = 'wisden_matches_v5';
-const LIVE_INTERVAL = 15000; // 15 seconds for live scores
+const LIVE_INTERVAL_FAST = 15000; // 15 seconds when live matches exist
+const LIVE_INTERVAL_SLOW = 60000; // 60 seconds when no live matches
 const FULL_REFRESH_INTERVAL = 300000; // 5 minutes for schedule/results
 
 // Extend Window interface for preload data
@@ -231,23 +232,48 @@ export default function useCricketData(): UseCricketDataReturn {
             }
         });
 
-        // Set up intervals for refreshing (these always use fresh fetches)
-        const liveTimer = setInterval(fetchLive, LIVE_INTERVAL);
+        // ADAPTIVE POLLING: Adjust interval based on live match count
+        let liveTimerId: ReturnType<typeof setTimeout> | null = null;
+
+        const scheduleNextLivePoll = () => {
+            const hasLiveMatches = bucketsRef.current.live.length > 0;
+            const interval = hasLiveMatches ? LIVE_INTERVAL_FAST : LIVE_INTERVAL_SLOW;
+
+            console.log(`[Engine A] Next poll in ${interval / 1000}s (${hasLiveMatches ? 'FAST: live matches exist' : 'SLOW: no live matches'})`);
+
+            liveTimerId = setTimeout(() => {
+                fetchLive();
+                scheduleNextLivePoll(); // Schedule next poll after this one completes
+            }, interval);
+        };
+
+        // Start adaptive polling
+        scheduleNextLivePoll();
+
+        // Heavy refresh stays on fixed interval
         const heavyTimer = setInterval(() => fetchHeavy(false), FULL_REFRESH_INTERVAL);
 
         // VISIBILITY HANDLER: Refresh match list when app returns from background
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-                // PWA visibility refresh
+                console.log('[Engine A] Visibility change detected - fetching immediately');
+                // PWA visibility refresh - always fetch immediately
                 fetchLive();
+                // Reschedule polling with fresh interval check
+                if (liveTimerId) clearTimeout(liveTimerId);
+                scheduleNextLivePoll();
             }
         };
 
         const handlePageShow = (event: PageTransitionEvent) => {
             if (event.persisted) {
+                console.log('[Engine A] PageShow (BFCache) detected - fetching immediately');
                 // PWA BFCache refresh
                 fetchLive();
                 fetchHeavy(false);
+                // Reschedule polling
+                if (liveTimerId) clearTimeout(liveTimerId);
+                scheduleNextLivePoll();
             }
         };
 
@@ -255,12 +281,13 @@ export default function useCricketData(): UseCricketDataReturn {
         window.addEventListener('pageshow', handlePageShow);
 
         return () => {
-            clearInterval(liveTimer);
+            if (liveTimerId) clearTimeout(liveTimerId);
             clearInterval(heavyTimer);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('pageshow', handlePageShow);
         };
     }, []);
+
 
     // Always bypass cache for live scorecard data
     const fetchScorecard = async (gameId: string): Promise<Scorecard | null> => {

@@ -71,8 +71,10 @@ const HowItWorks: React.FC<{ isVisible: boolean, onHome: () => void }> = ({ isVi
 ├────────────────────────┬────────────────────────────────────────┤
 │   ENGINE A (Global)    │           ENGINE B (Active)            │
 │   useCricketData.ts    │           App.tsx                      │
-│   Poll: Every 15s      │           Poll: Every 10s              │
-│   Scope: All Matches   │           Scope: ONE Match             │
+│   ADAPTIVE POLLING:    │           Poll: Every 10s              │
+│   - 15s if live games  │           Scope: ONE Match             │
+│   - 60s if no live     │                                        │
+│   Scope: All Matches   │                                        │
 └──────────┬─────────────┴─────────────┬──────────────────────────┘
            │                           │
            ▼                           ▼
@@ -87,6 +89,31 @@ const HowItWorks: React.FC<{ isVisible: boolean, onHome: () => void }> = ({ isVi
 │  Wisden API      │ │ Wisden Static  │ │  Supabase                │
 │  (Live Data)     │ │ (JSON Assets)  │ │  (Historical)            │
 └──────────────────┘ └────────────────┘ └──────────────────────────┘
+`}</pre>
+
+                <h3 style={h3}>Adaptive Polling (Engine A)</h3>
+                <pre style={pre}>{`
+LOGIC: setTimeout + recursive scheduling (not setInterval)
+
+const scheduleNextLivePoll = () => {
+    const hasLiveMatches = bucketsRef.current.live.length > 0;
+    const interval = hasLiveMatches ? 15000 : 60000;
+    
+    liveTimerId = setTimeout(() => {
+        fetchLive();
+        scheduleNextLivePoll();  // Re-evaluate interval
+    }, interval);
+};
+
+WHY THIS WORKS:
+- Interval is checked AFTER each fetch
+- When a match goes live → bucket updates → next poll uses 15s
+- When match ends → bucket empties → switches back to 60s
+
+TRIGGERS:
+- App launch: Initial fetch immediately
+- Visibility change: Immediate fetch when tab returns to foreground
+- PageShow (BFCache): Immediate fetch when restored from back/forward cache
 `}</pre>
 
                 {/* ========== SECTION 2 ========== */}
