@@ -1103,3 +1103,77 @@
         opacity: 0;
     }
 }
+
+/* View More Card (Full Calendar) */
+.view-more-card {
+    min-width: 140px;
+    height: 220px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    color: var(--text-secondary);
+    position: relative;
+    overflow: hidden;
+    scroll-snap-align: center;
+    flex-shrink: 0;
+}
+
+.view-more-card:hover {
+    background: rgba(99, 102, 241, 0.08);
+    /* Indigo tint */
+    border-color: rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+}
+
+.view-more-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.view-more-card:hover .view-more-icon {
+    background: #6366f1;
+    /* Indigo-500 */
+    color: #fff;
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+}
+
+.view-more-text {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: 80px;
+    line-height: 1.4;
+}
+
+.view-more-card:hover .view-more-text {
+    color: #a5b4fc;
+    /* Indigo-300 */
+}
+
+.view-more-count {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-top: 4px;
+}
