@@ -7,6 +7,8 @@ interface TournamentHubProps {
     matches: Match[];
     onBack: () => void;
     onMatchClick: (match: Match) => void;
+    isVisible?: boolean;
+    style?: React.CSSProperties;
 }
 
 // Shorten series name for display
@@ -23,7 +25,7 @@ const shortenSeriesName = (name: string | undefined): string => {
 };
 
 // Tournament Hub - Shows all matches in a tournament
-const TournamentHub: React.FC<TournamentHubProps> = ({ tournamentName, matches, onBack, onMatchClick }) => {
+const TournamentHub: React.FC<TournamentHubProps> = ({ tournamentName, matches, onBack, onMatchClick, style, isVisible = true }) => {
     // Sort matches by date
     const sortedMatches = [...matches].sort((a, b) =>
         new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
@@ -61,7 +63,7 @@ const TournamentHub: React.FC<TournamentHubProps> = ({ tournamentName, matches, 
     });
 
     return (
-        <div className="tournament-hub">
+        <div className="tournament-hub" style={style}>
             {/* Header */}
             <div className="tournament-hub-header">
                 <button className="back-button" onClick={onBack}>

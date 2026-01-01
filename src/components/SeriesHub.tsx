@@ -7,6 +7,8 @@ interface SeriesHubProps {
     matches: Match[];
     onBack: () => void;
     onMatchClick: (match: Match) => void;
+    isVisible?: boolean;
+    style?: React.CSSProperties;
 }
 
 interface Standings {
@@ -117,7 +119,7 @@ const SeriesHub: React.FC<SeriesHubProps> = ({ seriesName, matches, onBack, onMa
     };
 
     return (
-        <div className="series-hub">
+        <div className="series-hub" style={style}>
             {/* Header */}
             <div className="series-hub-header">
                 <button className="back-button" onClick={onBack}>
