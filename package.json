@@ -6,6 +6,7 @@
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html && cp src/sw.js dist/sw.js",
     "deploy:dev": "npm run build && firebase deploy --only hosting:dev",
+    "ship": "npm run build && firebase deploy --only hosting:prod && git add . && git commit -m \"Auto Update $(date)\" && git push origin main",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
