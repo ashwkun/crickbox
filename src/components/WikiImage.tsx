@@ -87,11 +87,13 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
         if (src) return; // Already resolved a source
 
         // Strategy 1: Wisden Asset (FIRST PRIORITY)
-        if (id && errorCount === 0) {
+        // For teams, default to ID '0' which returns a proper TBC placeholder from Wisden
+        const effectiveId = id || (type === 'team' ? '0' : undefined);
+        if (effectiveId && errorCount === 0) {
             let url: string | undefined;
-            if (type === 'player') url = `${WISDEN_PLAYER_IMG}${id}.png`;
-            else if (type === 'team') url = `${WISDEN_TEAM_IMG}${id}.png`;
-            else if (type === 'series' || type === 'tournament') url = `${WISDEN_SERIES_IMG}${id}.png`;
+            if (type === 'player') url = `${WISDEN_PLAYER_IMG}${effectiveId}.png`;
+            else if (type === 'team') url = `${WISDEN_TEAM_IMG}${effectiveId}.png`;
+            else if (type === 'series' || type === 'tournament') url = `${WISDEN_SERIES_IMG}${effectiveId}.png`;
 
             if (url) {
                 setSrc(url);

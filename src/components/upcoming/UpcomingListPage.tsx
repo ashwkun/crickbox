@@ -1,22 +1,132 @@
 /**
- * UpcomingListPage - Full calendar view with user-friendly navigation
- * Features: Date jump pills, sticky day headers, compact match rows
- * Uses FloatingHeader (no custom header)
+ * UpcomingListPage - Full calendar view with:
+ * Row 1: Time filters (Custom + months + quarters + next year)
+ * Row 2: Type filters (All/International/Major Leagues/Domestic/Women)
+ * Body: Series-centric layout with horizontal UpcomingCard scrolls
  */
 
-import React, { useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Match } from '../../types';
-import { LuCalendarDays, LuClock, LuChevronRight } from 'react-icons/lu';
-import { getDayLabel } from '../../utils/upcomingUtils';
-import { getTeamColor } from '../../utils/teamColors';
-import WikiImage from '../WikiImage';
+import { LuCalendarDays, LuCalendarPlus, LuChevronRight, LuX } from 'react-icons/lu';
+import UpcomingCard from '../UpcomingCard';
 
 interface UpcomingListPageProps {
     matches: Match[];
     onBack: () => void;
     onMatchClick: (match: Match) => void;
-    onSeriesClick?: (seriesId: string) => void;
+    onSeriesClick?: (seriesId: string, matches?: Match[]) => void;
 }
+
+// Generate time filter chips based on current date
+const generateTimeChips = (): { id: string; label: string; startMonth: number; startYear: number; endMonth: number; endYear: number }[] => {
+    const now = new Date();
+    const currentMonth = now.getMonth(); // 0-11
+    const currentYear = now.getFullYear();
+
+    const chips: { id: string; label: string; startMonth: number; startYear: number; endMonth: number; endYear: number }[] = [];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    let month = currentMonth;
+    let year = currentYear;
+
+    // Add first 4 individual months
+    for (let i = 0; i < 4 && month <= 11; i++) {
+        chips.push({
+            id: `${year}-${month}`,
+            label: monthNames[month],
+            startMonth: month,
+            startYear: year,
+            endMonth: month,
+            endYear: year,
+        });
+        month++;
+    }
+
+    // Add quarterly groups until December
+    while (month <= 11) {
+        const startMonth = month;
+        // End at either +2 months or December, whichever is first
+        const endMonth = Math.min(month + 2, 11);
+
+        if (startMonth === endMonth) {
+            // Single month
+            chips.push({
+                id: `${year}-${startMonth}`,
+                label: monthNames[startMonth],
+                startMonth,
+                startYear: year,
+                endMonth,
+                endYear: year,
+            });
+        } else {
+            // Range
+            chips.push({
+                id: `${year}-${startMonth}-${endMonth}`,
+                label: `${monthNames[startMonth]}-${monthNames[endMonth]}`,
+                startMonth,
+                startYear: year,
+                endMonth,
+                endYear: year,
+            });
+        }
+        month = endMonth + 1;
+    }
+
+    // Add next year
+    chips.push({
+        id: `${currentYear + 1}`,
+        label: `${currentYear + 1}`,
+        startMonth: 0,
+        startYear: currentYear + 1,
+        endMonth: 11,
+        endYear: currentYear + 1,
+    });
+
+    return chips;
+};
+
+// Type filter options
+const TYPE_FILTERS = [
+    { id: 'all', label: 'All' },
+    { id: 'international', label: 'International' },
+    { id: 'major', label: 'Major Leagues' },
+    { id: 'domestic', label: 'Domestic' },
+    { id: 'women', label: 'Women' },
+];
+
+// Major league codes
+const MAJOR_LEAGUES = ['IPL', 'BBL', 'PSL', 'CPL', 'SA20', 'ILT20', 'LPL', 'BPL', 'MLC', 'THE_HUNDRED'];
+
+// Categorize match type
+const getMatchCategory = (match: Match): string[] => {
+    const categories: string[] = [];
+    const name = (match.series_name || '').toLowerCase();
+    const leagueCode = match.league_code || '';
+
+    // Check for women's cricket
+    if (name.includes('women') || match.genders === 'female') {
+        categories.push('women');
+    }
+
+    // Check for international (country vs country)
+    const intlKeywords = ['test', 'odi', 't20i', 'world cup', 'asia cup', 'champions trophy'];
+    if (intlKeywords.some(k => name.includes(k))) {
+        categories.push('international');
+    }
+
+    // Check for major leagues
+    if (MAJOR_LEAGUES.includes(leagueCode.toUpperCase()) ||
+        MAJOR_LEAGUES.some(l => name.includes(l.toLowerCase()))) {
+        categories.push('major');
+    }
+
+    // Domestic (if not international and not major league)
+    if (!categories.includes('international') && !categories.includes('major')) {
+        categories.push('domestic');
+    }
+
+    return categories;
+};
 
 const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     matches,
@@ -24,53 +134,100 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     onMatchClick,
     onSeriesClick,
 }) => {
+    const timeChips = useMemo(() => generateTimeChips(), []);
+    const [selectedTime, setSelectedTime] = useState(timeChips[0]?.id || '');
+    const [selectedType, setSelectedType] = useState('all');
+    const [showCustomPicker, setShowCustomPicker] = useState(false);
+    const [customRange, setCustomRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null });
+
     const contentRef = useRef<HTMLDivElement>(null);
-    const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-    // Group matches by day
-    const groupedMatches = useMemo(() => {
-        const groups: { label: string; date: Date; matches: Match[] }[] = [];
-        const dateMap = new Map<string, Match[]>();
+    // Filter matches by time
+    const timeFilteredMatches = useMemo(() => {
+        const chip = timeChips.find(c => c.id === selectedTime);
+        if (!chip) return matches;
 
-        const sorted = [...matches].sort((a, b) =>
+        return matches.filter(match => {
+            const matchDate = new Date(match.start_date);
+            const matchMonth = matchDate.getMonth();
+            const matchYear = matchDate.getFullYear();
+
+            if (matchYear < chip.startYear || matchYear > chip.endYear) return false;
+            if (matchYear === chip.startYear && matchMonth < chip.startMonth) return false;
+            if (matchYear === chip.endYear && matchMonth > chip.endMonth) return false;
+
+            return true;
+        });
+    }, [matches, selectedTime, timeChips]);
+
+    // Filter matches by type
+    const filteredMatches = useMemo(() => {
+        if (selectedType === 'all') return timeFilteredMatches;
+
+        return timeFilteredMatches.filter(match => {
+            const categories = getMatchCategory(match);
+            return categories.includes(selectedType);
+        });
+    }, [timeFilteredMatches, selectedType]);
+
+    // Group matches by series
+    const seriesGroups = useMemo(() => {
+        const groups = new Map<string, { seriesName: string; seriesId: string; matches: Match[] }>();
+
+        // Sort by date first
+        const sorted = [...filteredMatches].sort((a, b) =>
             new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
         );
 
         sorted.forEach(match => {
-            const date = new Date(match.start_date);
-            const label = getDayLabel(date);
-
-            if (!dateMap.has(label)) {
-                dateMap.set(label, []);
+            const seriesId = match.series_id;
+            if (!groups.has(seriesId)) {
+                groups.set(seriesId, {
+                    seriesName: match.series_name || 'Unknown Series',
+                    seriesId,
+                    matches: [],
+                });
             }
-            dateMap.get(label)!.push(match);
+            groups.get(seriesId)!.matches.push(match);
         });
 
-        dateMap.forEach((dayMatches, label) => {
-            groups.push({
-                label,
-                date: new Date(dayMatches[0].start_date),
-                matches: dayMatches,
-            });
-        });
+        // Sort groups by earliest match date
+        return Array.from(groups.values()).sort((a, b) =>
+            new Date(a.matches[0].start_date).getTime() - new Date(b.matches[0].start_date).getTime()
+        );
+    }, [filteredMatches]);
 
-        return groups.sort((a, b) => a.date.getTime() - b.date.getTime());
-    }, [matches]);
+    const chipStyle = (isSelected: boolean): React.CSSProperties => ({
+        padding: '6px 14px',
+        borderRadius: 20,
+        fontSize: 12,
+        fontWeight: 600,
+        whiteSpace: 'nowrap',
+        cursor: 'pointer',
+        flexShrink: 0,
+        background: isSelected
+            ? 'rgba(99, 102, 241, 0.2)'
+            : 'rgba(255, 255, 255, 0.05)',
+        border: isSelected
+            ? '1px solid rgba(99, 102, 241, 0.4)'
+            : '1px solid rgba(255, 255, 255, 0.08)',
+        color: isSelected ? '#a5b4fc' : 'rgba(255, 255, 255, 0.6)',
+        transition: 'all 0.2s ease',
+    });
 
-    // Jump to date section
-    const scrollToDate = (label: string) => {
-        const section = sectionRefs.current.get(label);
-        if (section && contentRef.current) {
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    };
-
-    const formatTime = (dateStr: string): string => {
-        return new Date(dateStr).toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
+    const stickyChipStyle: React.CSSProperties = {
+        padding: '6px 12px',
+        borderRadius: 20,
+        fontSize: 12,
+        fontWeight: 600,
+        cursor: 'pointer',
+        flexShrink: 0,
+        background: 'rgba(99, 102, 241, 0.15)',
+        border: '1px solid rgba(99, 102, 241, 0.3)',
+        color: '#a5b4fc',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
     };
 
     return (
@@ -89,196 +246,202 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
             {/* Spacer for FloatingHeader */}
             <div style={{ height: 84 }} />
 
-            {/* Date Jump Bar */}
+            {/* Row 1: Time Filter */}
             <div style={{
                 display: 'flex',
+                alignItems: 'center',
                 gap: 8,
+                padding: '8px 16px',
+                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                flexShrink: 0,
+            }}>
+                {/* Sticky Custom Chip */}
+                <div
+                    style={stickyChipStyle}
+                    onClick={() => setShowCustomPicker(true)}
+                >
+                    <LuCalendarPlus size={14} />
+                    Custom
+                </div>
+
+                {/* Scrollable Time Chips */}
+                <div style={{
+                    display: 'flex',
+                    gap: 6,
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                    flex: 1,
+                    paddingRight: 8,
+                }}>
+                    <style>{`.time-chips::-webkit-scrollbar { display: none; }`}</style>
+                    {timeChips.map(chip => (
+                        <div
+                            key={chip.id}
+                            style={chipStyle(selectedTime === chip.id)}
+                            onClick={() => setSelectedTime(chip.id)}
+                        >
+                            {chip.label}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Row 2: Type Filter */}
+            <div style={{
+                display: 'flex',
+                gap: 6,
                 padding: '8px 16px 12px',
                 overflowX: 'auto',
                 scrollbarWidth: 'none',
                 borderBottom: '1px solid var(--border-color)',
                 flexShrink: 0,
             }}>
-                <style>{`.date-jump-bar::-webkit-scrollbar { display: none; }`}</style>
-                {groupedMatches.slice(0, 10).map(group => (
-                    <button
-                        key={group.label}
-                        onClick={() => scrollToDate(group.label)}
-                        style={{
-                            padding: '6px 12px',
-                            borderRadius: 8,
-                            fontSize: 11,
-                            fontWeight: 600,
-                            whiteSpace: 'nowrap',
-                            cursor: 'pointer',
-                            flexShrink: 0,
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            color: 'rgba(255, 255, 255, 0.7)',
-                            transition: 'all 0.15s',
-                        }}
+                {TYPE_FILTERS.map(filter => (
+                    <div
+                        key={filter.id}
+                        style={chipStyle(selectedType === filter.id)}
+                        onClick={() => setSelectedType(filter.id)}
                     >
-                        {group.label}
-                        <span style={{ marginLeft: 6, opacity: 0.5 }}>{group.matches.length}</span>
-                    </button>
+                        {filter.label}
+                    </div>
                 ))}
             </div>
 
-            {/* Content */}
+            {/* Body: Series-Centric Content */}
             <div
                 ref={contentRef}
                 style={{
                     flex: 1,
                     overflowY: 'auto',
-                    padding: '0 16px 40px',
+                    padding: '12px 0 40px',
                 }}
             >
-                {groupedMatches.length === 0 ? (
+                {seriesGroups.length === 0 ? (
                     <div style={{
                         textAlign: 'center',
                         padding: '80px 20px',
                         color: 'var(--text-muted)',
                     }}>
                         <LuCalendarDays size={48} style={{ opacity: 0.3, marginBottom: 16 }} />
-                        <p style={{ fontSize: 14 }}>No upcoming matches</p>
+                        <p style={{ fontSize: 14 }}>No matches in this period</p>
                     </div>
                 ) : (
-                    groupedMatches.map(group => (
-                        <div
-                            key={group.label}
-                            ref={el => el && sectionRefs.current.set(group.label, el)}
-                            style={{ marginBottom: 8 }}
-                        >
-                            {/* Sticky Day Header */}
-                            <div style={{
-                                position: 'sticky',
-                                top: 0,
-                                fontSize: 12,
-                                fontWeight: 700,
-                                color: 'var(--text-secondary)',
-                                padding: '12px 4px 8px',
-                                letterSpacing: '0.5px',
-                                background: 'var(--bg-primary)',
-                                zIndex: 10,
-                            }}>
-                                {group.label}
+                    seriesGroups.map(group => (
+                        <div key={group.seriesId} style={{ marginBottom: 24 }}>
+                            {/* Series Header */}
+                            <div
+                                onClick={() => onSeriesClick?.(group.seriesId, group.matches)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: '8px 16px',
+                                    cursor: onSeriesClick ? 'pointer' : 'default',
+                                }}
+                            >
+                                <h3 style={{
+                                    fontSize: 13,
+                                    fontWeight: 700,
+                                    color: 'var(--text-secondary)',
+                                    margin: 0,
+                                    letterSpacing: '0.3px',
+                                    textTransform: 'uppercase',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    flex: 1,
+                                }}>
+                                    {group.seriesName}
+                                </h3>
+                                {onSeriesClick && (
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 4,
+                                        color: 'var(--text-muted)',
+                                        fontSize: 11,
+                                        flexShrink: 0,
+                                    }}>
+                                        {group.matches.length} matches
+                                        <LuChevronRight size={14} />
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Match Rows */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                {group.matches.map(match => {
-                                    const team1 = match.participants?.[0];
-                                    const team2 = match.participants?.[1];
-                                    const color1 = getTeamColor(team1?.name || '');
-                                    const color2 = getTeamColor(team2?.name || '');
-
-                                    return (
-                                        <div
-                                            key={match.game_id}
-                                            onClick={() => onMatchClick(match)}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 12,
-                                                padding: '12px 14px',
-                                                background: 'var(--bg-card)',
-                                                border: '1px solid var(--border-color)',
-                                                borderRadius: 14,
-                                                cursor: 'pointer',
-                                                position: 'relative',
-                                                overflow: 'hidden',
-                                            }}
-                                        >
-                                            {/* Team Color Bar */}
-                                            <div style={{
-                                                position: 'absolute',
-                                                left: 0,
-                                                top: 0,
-                                                bottom: 0,
-                                                width: 4,
-                                                background: `linear-gradient(180deg, ${color1} 0%, ${color2} 100%)`,
-                                            }} />
-
-                                            {/* Team Logos */}
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: -8, marginLeft: 8 }}>
-                                                <WikiImage
-                                                    name={team1?.name || 'TBD'}
-                                                    wikiTitle={team1?.name || undefined}
-                                                    type="team"
-                                                    style={{
-                                                        width: 28,
-                                                        height: 28,
-                                                        borderRadius: 6,
-                                                        border: '2px solid var(--bg-card)',
-                                                        position: 'relative',
-                                                        zIndex: 2,
-                                                    }}
-                                                    fallbackStyle={{ fontSize: 10 }}
-                                                />
-                                                <WikiImage
-                                                    name={team2?.name || 'TBD'}
-                                                    wikiTitle={team2?.name || undefined}
-                                                    type="team"
-                                                    style={{
-                                                        width: 28,
-                                                        height: 28,
-                                                        borderRadius: 6,
-                                                        border: '2px solid var(--bg-card)',
-                                                        marginLeft: -8,
-                                                        position: 'relative',
-                                                        zIndex: 1,
-                                                    }}
-                                                    fallbackStyle={{ fontSize: 10 }}
-                                                />
-                                            </div>
-
-                                            {/* Match Info */}
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{
-                                                    fontSize: 13,
-                                                    fontWeight: 600,
-                                                    color: '#fff',
-                                                    marginBottom: 2,
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap',
-                                                }}>
-                                                    {team1?.short_name || 'TBD'} vs {team2?.short_name || 'TBD'}
-                                                </div>
-                                                <div style={{
-                                                    fontSize: 11,
-                                                    color: 'var(--text-muted)',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap',
-                                                }}>
-                                                    {match.event_name}
-                                                </div>
-                                            </div>
-
-                                            {/* Time */}
-                                            <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 4,
-                                                fontSize: 11,
-                                                fontWeight: 600,
-                                                color: 'var(--text-secondary)',
-                                                flexShrink: 0,
-                                            }}>
-                                                <LuClock size={11} />
-                                                {formatTime(match.start_date)}
-                                            </div>
-
-                                            <LuChevronRight size={16} style={{ color: 'rgba(255,255,255,0.2)', flexShrink: 0 }} />
-                                        </div>
-                                    );
-                                })}
+                            {/* Horizontal Scroll of UpcomingCards */}
+                            <div style={{
+                                display: 'flex',
+                                gap: 12,
+                                overflowX: 'auto',
+                                scrollbarWidth: 'none',
+                                padding: '4px 16px 8px',
+                            }}>
+                                <style>{`.series-cards::-webkit-scrollbar { display: none; }`}</style>
+                                {group.matches.map(match => (
+                                    <div key={match.game_id} style={{ flexShrink: 0, width: 280 }}>
+                                        <UpcomingCard
+                                            match={match}
+                                            matches={group.matches}
+                                            onClick={onMatchClick}
+                                        />
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     ))
                 )}
             </div>
+
+            {/* Custom Date Picker Modal (Placeholder) */}
+            {showCustomPicker && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.8)',
+                    zIndex: 3000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 20,
+                }} onClick={() => setShowCustomPicker(false)}>
+                    <div
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            background: 'var(--bg-card)',
+                            borderRadius: 16,
+                            padding: 24,
+                            maxWidth: 320,
+                            width: '100%',
+                            border: '1px solid var(--border-color)',
+                        }}
+                    >
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: 20,
+                        }}>
+                            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Custom Date Range</h3>
+                            <LuX
+                                size={20}
+                                style={{ cursor: 'pointer', opacity: 0.6 }}
+                                onClick={() => setShowCustomPicker(false)}
+                            />
+                        </div>
+                        <p style={{
+                            color: 'var(--text-muted)',
+                            fontSize: 13,
+                            textAlign: 'center',
+                            padding: '40px 0',
+                        }}>
+                            Coming soon: Select specific dates, months, or ranges
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
