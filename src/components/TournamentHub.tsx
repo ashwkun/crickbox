@@ -65,6 +65,7 @@ const TournamentHub: React.FC<TournamentHubProps> = ({ tournamentName, matches, 
     return (
         <div className="tournament-hub" style={style}>
             {/* Header */}
+            {/* Header */}
             <div className="tournament-hub-header">
                 <button className="back-button" onClick={onBack}>
                     ← Back

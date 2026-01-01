@@ -121,6 +121,7 @@ const SeriesHub: React.FC<SeriesHubProps> = ({ seriesName, matches, onBack, onMa
     return (
         <div className="series-hub" style={style}>
             {/* Header */}
+            {/* Header */}
             <div className="series-hub-header">
                 <button className="back-button" onClick={onBack}>
                     ← Back

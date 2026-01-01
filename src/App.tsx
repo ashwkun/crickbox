@@ -395,16 +395,15 @@ export default function App(): React.ReactElement {
     return (
         <div className="app-container">
             {/* Floating Header (Global) - Only show for HOME, MATCH, and UPCOMING_LIST */}
-            {(currentView.type === 'HOME' || currentView.type === 'MATCH' || currentView.type === 'UPCOMING_LIST') && (
-                <FloatingHeader
-                    showBack={viewStack.length > 1}
-                    onBack={handleBack}
-                    onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
-                    data={headerData}
-                    isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
-                    isUpcoming={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U'}
-                />
-            )}
+            {/* Floating Header (Global) - Always Visible per User Request */}
+            <FloatingHeader
+                showBack={currentView.type !== 'HOME'}
+                onBack={handleBack}
+                onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
+                data={headerData}
+                isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
+                isUpcoming={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U'}
+            />
 
             {/* Base Layer: HomePage */}
             {/* We render HomePage if it's in the stack (index 0). 
@@ -494,13 +493,15 @@ export default function App(): React.ReactElement {
                         if (!activeData || !activeData.matches) return null; // Wait for matches to load
                         return (
                             <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-primary)', overflowY: 'auto' }}>
+                                {/* Spacer for FloatingHeader */}
+                                <div style={{ height: 85 }}></div>
                                 <SeriesHub
                                     seriesName={activeData.seriesName}
                                     matches={activeData.matches}
                                     onBack={handleCloseSeries}
                                     onMatchClick={handleSelectMatch}
                                     isVisible={isVisible}
-                                    style={{ minHeight: '100%' }}
+                                    style={{ minHeight: 'calc(100% - 85px)' }}
                                 />
                             </div>
                         );
@@ -508,13 +509,15 @@ export default function App(): React.ReactElement {
                         if (!activeData || !activeData.matches) return null; // Wait for matches to load
                         return (
                             <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-primary)', overflowY: 'auto' }}>
+                                {/* Spacer for FloatingHeader */}
+                                <div style={{ height: 85 }}></div>
                                 <TournamentHub
                                     tournamentName={activeData.tournamentName}
                                     matches={activeData.matches}
                                     onBack={handleCloseTournament}
                                     onMatchClick={handleSelectMatch}
                                     isVisible={isVisible}
-                                    style={{ minHeight: '100%' }}
+                                    style={{ minHeight: 'calc(100% - 85px)' }}
                                 />
                             </div>
                         );
