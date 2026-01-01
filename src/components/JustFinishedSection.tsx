@@ -47,40 +47,53 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
     };
 
     // Shared Text Style (Matches TimeFilter.tsx .NEXT style exactly)
-    const textStyle: React.CSSProperties = {
+    const textBaseStyle: React.CSSProperties = {
         fontFamily: '"BBH Bartle", sans-serif',
         fontSize: '14px',
         fontWeight: 600,
         letterSpacing: '1px',
-        // Amber Gradient (matching the 0-35-50-65-100 pattern)
+        // Amber Gradient
         background: 'linear-gradient(90deg, #f59e0b 0%, #f59e0b 35%, #fbbf24 50%, #f59e0b 65%, #f59e0b 100%)',
         backgroundSize: '200% 100%',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         animation: 'amberShimmer 1.5s ease-in-out infinite alternate',
         display: 'inline-block',
+    };
+
+    // Container for the animated words
+    const tickerWrapperStyle: React.CSSProperties = {
+        position: 'relative',
+        display: 'inline-flex',
+        height: '24px',
+        perspective: '400px',
+        marginLeft: '1px', // Gap after the dot
+    };
+
+    // Individual character container
+    const charContainerStyle: React.CSSProperties = {
+        position: 'relative',
+        width: '9px', // Fixed width for monospaced look
+        height: '24px',
+        transformStyle: 'preserve-3d',
+    };
+
+    // Animated Letter Style
+    const letterStyle = (isJust: boolean, delayIndex: number): React.CSSProperties => ({
+        ...textBaseStyle,
         position: 'absolute',
         top: 0,
         left: 0,
-        transition: 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease',
-        transformOrigin: 'center bottom',
         backfaceVisibility: 'hidden',
-    };
-
-    // Style for the visible suffix
-    const activeSuffixStyle: React.CSSProperties = {
-        ...textStyle,
-        opacity: 1,
-        transform: 'rotateX(0deg)',
-    };
-
-    // Style for the hidden suffix
-    const hiddenSuffixStyle: React.CSSProperties = {
-        ...textStyle,
-        opacity: 0,
-        transform: 'rotateX(-90deg)',
-    };
-
+        transition: `transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delayIndex * 0.05}s, opacity 0.4s ease ${delayIndex * 0.05}s`,
+        transform: isJust
+            ? (showDone ? 'rotateX(-90deg)' : 'rotateX(0deg)')
+            : (showDone ? 'rotateX(0deg)' : 'rotateX(90deg)'),
+        opacity: isJust
+            ? (showDone ? 0 : 1)
+            : (showDone ? 1 : 0),
+        transformOrigin: 'center center', // Rotate around center
+    });
 
     // Match List Container (Horizontal Scroll)
     const listStyle: React.CSSProperties = {
@@ -219,6 +232,9 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
         );
     };
 
+    const WORD_JUST = ['J', 'U', 'S', 'T'];
+    const WORD_DONE = ['D', 'O', 'N', 'E'];
+
     return (
         <div style={containerStyle}>
             <style>{`
@@ -231,16 +247,24 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
 
             {/* Header with Ticker */}
             <div style={headerStyle}>
-                <div style={tickerContainer}>
-                    {/* .JUST */}
-                    <span style={!showDone ? activeSuffixStyle : hiddenSuffixStyle}>
-                        .JUST
-                    </span>
+                {/* Static Dot */}
+                <span style={textBaseStyle}>.</span>
 
-                    {/* .DONE */}
-                    <span style={showDone ? activeSuffixStyle : hiddenSuffixStyle}>
-                        .DONE
-                    </span>
+                {/* Animated Word */}
+                <div style={tickerWrapperStyle}>
+                    {WORD_JUST.map((char, i) => (
+                        <div key={i} style={charContainerStyle}>
+                            {/* JUST letter (Leaves) */}
+                            <span style={letterStyle(true, i)}>
+                                {char}
+                            </span>
+
+                            {/* DONE letter (Enters) */}
+                            <span style={letterStyle(false, i)}>
+                                {WORD_DONE[i]}
+                            </span>
+                        </div>
+                    ))}
                 </div>
             </div>
 
