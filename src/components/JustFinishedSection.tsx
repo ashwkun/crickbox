@@ -81,7 +81,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
     // Individual character container
     const charContainerStyle: React.CSSProperties = {
         position: 'relative',
-        width: '14px', // Increased from 11px to 14px to fix overlap
+        width: '18px', // Increased from 14px to 18px as requested
         height: '24px',
         transformStyle: 'preserve-3d',
         display: 'flex',
