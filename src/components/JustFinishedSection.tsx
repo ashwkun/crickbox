@@ -249,7 +249,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
 
             {/* Match List */}
             <div className="just-finished-scroll" style={listStyle}>
-                {matches.slice(0, 20).map((match) => (
+                {matches.map((match) => (
                     <Card key={match.game_id} match={match} onMatchClick={onMatchClick} />
                 ))}
             </div>
