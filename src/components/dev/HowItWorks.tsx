@@ -1,257 +1,624 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-// Hardcoded content from documentation artifacts
-const SECTIONS = [
-    { id: 'arch', label: 'Architecture' },
-    { id: 'flows', label: 'API Flows' },
-    { id: 'api', label: 'API Reference' },
-    { id: 'optimize', label: 'Optimization' }
-];
+/**
+ * BoxCric Technical Specification v2.0
+ * Complete Engineering Documentation
+ * 
+ * Sections:
+ * 1. System Overview
+ * 2. API Inventory
+ * 3. Page → API Mapping
+ * 4. Data Flow Diagrams
+ * 5. Priority Algorithm
+ * 6. Win Probability Model
+ * 7. Dynamic Filter Logic
+ * 8. Deep Parameter Tracing
+ * 9. File Role Matrix
+ */
 
 const HowItWorks: React.FC<{ isVisible: boolean, onHome: () => void }> = ({ isVisible, onHome }) => {
-    const [activeSection, setActiveSection] = useState('arch');
-
     if (!isVisible) return null;
 
+    // Styles
+    const containerStyle: React.CSSProperties = {
+        position: 'fixed',
+        inset: 0,
+        background: '#ffffff',
+        color: '#111111',
+        overflowY: 'auto',
+        fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        zIndex: 2000,
+        lineHeight: '1.6',
+        userSelect: 'text',
+        WebkitUserSelect: 'text',
+    };
+
+    const contentStyle: React.CSSProperties = {
+        maxWidth: '900px',
+        margin: '0 auto',
+        padding: '100px 40px 100px',
+    };
+
+    const h1 = { fontSize: '32px', fontWeight: 700, marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '16px' };
+    const h2 = { fontSize: '22px', fontWeight: 600, marginTop: '60px', marginBottom: '16px', borderBottom: '1px solid #ccc', paddingBottom: '8px' };
+    const h3 = { fontSize: '17px', fontWeight: 600, marginTop: '30px', marginBottom: '10px', color: '#333' };
+    const p = { fontSize: '15px', marginBottom: '16px', color: '#333' };
+    const code = { background: '#f5f5f5', padding: '2px 6px', borderRadius: '3px', fontFamily: 'monospace', fontSize: '13px' };
+    const pre = { background: '#f5f5f5', padding: '16px', borderRadius: '4px', fontFamily: 'monospace', fontSize: '12px', overflowX: 'auto' as const, border: '1px solid #ddd', marginBottom: '20px', whiteSpace: 'pre' as const };
+    const table = { width: '100%', borderCollapse: 'collapse' as const, marginTop: '16px', marginBottom: '30px', fontSize: '13px' };
+    const th = { textAlign: 'left' as const, borderBottom: '2px solid #000', padding: '10px 8px', fontWeight: 600 };
+    const td = { borderBottom: '1px solid #ddd', padding: '10px 8px', color: '#333', verticalAlign: 'top' as const };
+
     return (
-        <div style={{
-            position: 'fixed',
-            inset: 0,
-            background: '#0f172a',
-            color: '#e2e8f0',
-            overflowY: 'auto',
-            padding: '20px',
-            fontFamily: 'Inter, sans-serif',
-            zIndex: 9999
-        }}>
-            {/* Header */}
-            <div style={{
-                maxWidth: '800px',
-                margin: '0 auto',
-                borderBottom: '1px solid #334155',
-                paddingBottom: '20px',
-                marginBottom: '20px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-            }}>
-                <div>
-                    <h1 style={{ margin: 0, fontSize: '24px', color: '#38bdf8' }}>BoxCric Developer Guide</h1>
-                    <p style={{ margin: '5px 0 0', color: '#94a3b8' }}>Polling Architecture & API Reference</p>
-                </div>
-                <button
-                    onClick={onHome}
-                    style={{
-                        background: '#334155',
-                        border: 'none',
-                        color: 'white',
-                        padding: '8px 16px',
-                        borderRadius: '6px',
-                        cursor: 'pointer'
-                    }}
-                >
-                    Close Guide
-                </button>
-            </div>
+        <div style={containerStyle}>
+            <div style={contentStyle}>
 
-            {/* Navigation */}
-            <div style={{ maxWidth: '800px', margin: '0 auto 30px', display: 'flex', gap: '10px' }}>
-                {SECTIONS.map(s => (
-                    <button
-                        key={s.id}
-                        onClick={() => setActiveSection(s.id)}
-                        style={{
-                            background: activeSection === s.id ? '#38bdf8' : '#1e293b',
-                            color: activeSection === s.id ? '#0f172a' : '#94a3b8',
-                            border: 'none',
-                            padding: '10px 20px',
-                            borderRadius: '20px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            transition: 'all 0.2s'
-                        }}
-                    >
-                        {s.label}
-                    </button>
-                ))}
-            </div>
+                <h1 style={h1}>BoxCric Technical Specification</h1>
+                <p style={p}><strong>Version:</strong> 2.0 &nbsp;|&nbsp; <strong>Generated:</strong> {new Date().toLocaleDateString()}</p>
+                <p style={p}>
+                    This document provides an exhaustive technical breakdown of the BoxCric application architecture,
+                    including all API endpoints, data flows, cascade triggers, algorithms, and file responsibilities.
+                </p>
 
-            {/* Content Container */}
-            <div style={{ maxWidth: '800px', margin: '0 auto', lineHeight: '1.6' }}>
+                {/* ========== SECTION 1 ========== */}
+                <h2 style={h2}>1. System Overview</h2>
+                <p style={p}>The application uses a <strong>Dual-Engine Polling Architecture</strong> to separate
+                    global match awareness from focused live match data.</p>
 
-                {/* 1. ARCHITECTURE */}
-                {activeSection === 'arch' && (
-                    <div>
-                        <h2 style={{ color: '#bae6fd' }}>The "TV News" Architecture</h2>
-                        <p>The app uses a <b>Dual-Engine Polling</b> strategy to balance freshness with performance.</p>
+                <pre style={pre}>{`
+┌─────────────────────────────────────────────────────────────────┐
+│                       CLIENT LAYER                              │
+├────────────────────────┬────────────────────────────────────────┤
+│   ENGINE A (Global)    │           ENGINE B (Active)            │
+│   useCricketData.ts    │           App.tsx                      │
+│   Poll: Every 15s      │           Poll: Every 10s              │
+│   Scope: All Matches   │           Scope: ONE Match             │
+└──────────┬─────────────┴─────────────┬──────────────────────────┘
+           │                           │
+           ▼                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    NETWORK LAYER                                │
+│          Cloudflare Worker (CORS Proxy)                         │
+│          cricket-proxy.boxboxcric.workers.dev                   │
+└──────────┬─────────────┬─────────────┬──────────────────────────┘
+           │             │             │
+           ▼             ▼             ▼
+┌──────────────────┐ ┌────────────────┐ ┌──────────────────────────┐
+│  Wisden API      │ │ Wisden Static  │ │  Supabase                │
+│  (Live Data)     │ │ (JSON Assets)  │ │  (Historical)            │
+└──────────────────┘ └────────────────┘ └──────────────────────────┘
+`}</pre>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', margin: '30px 0' }}>
-                            <div style={{ background: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #01579b' }}>
-                                <h3 style={{ margin: '0 0 10px', color: '#7dd3fc' }}>📺 Engine A: "News Ticker"</h3>
-                                <p style={{ fontSize: '14px', color: '#cbd5e1' }}>
-                                    <b>Job:</b> Updates the Home Page list.<br />
-                                    <b>Speed:</b> Slow (15s)<br />
-                                    <b>State:</b> Always On<br />
-                                    <b>File:</b> <code>useCricketData.ts</code>
-                                </p>
-                            </div>
-                            <div style={{ background: '#1e293b', padding: '20px', borderRadius: '12px', border: '1px solid #ea580c' }}>
-                                <h3 style={{ margin: '0 0 10px', color: '#fdba74' }}>🎥 Engine B: "Live Broadcast"</h3>
-                                <p style={{ fontSize: '14px', color: '#cbd5e1' }}>
-                                    <b>Job:</b> Updates ONE active match.<br />
-                                    <b>Speed:</b> Fast (10s)<br />
-                                    <b>State:</b> On Demand (Only when visible)<br />
-                                    <b>File:</b> <code>App.tsx</code>
-                                </p>
-                            </div>
-                        </div>
+                {/* ========== SECTION 2 ========== */}
+                <h2 style={h2}>2. Complete API Inventory</h2>
+                <p style={p}>Every endpoint used by the application, with trigger conditions and consumers.</p>
 
-                        <div style={{ background: '#334155', padding: '20px', borderRadius: '8px', borderLeft: '4px solid #4ade80' }}>
-                            <h4 style={{ margin: '0 0 5px', color: '#4ade80' }}>💡 The Safety Switch</h4>
-                            <p style={{ margin: 0, fontSize: '14px' }}>
-                                If you navigate away from a match (e.g. open a Series page), Engine B <b>STOPS immediately</b>.
-                                It only restarts when the match becomes the top-most view again.
-                            </p>
-                        </div>
-                    </div>
-                )}
+                <table style={table}>
+                    <thead>
+                        <tr>
+                            <th style={th}>Endpoint</th>
+                            <th style={th}>Trigger</th>
+                            <th style={th}>Consumer</th>
+                            <th style={th}>Frequency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={td}><code style={code}>/default.aspx?methodtype=3&gamestate=1</code></td>
+                            <td style={td}>App Mount + Timer</td>
+                            <td style={td}>useCricketData.ts → HomePage</td>
+                            <td style={td}>Every 15s</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><code style={code}>/default.aspx?methodtype=3&gamestate=2</code></td>
+                            <td style={td}>App Mount + Timer</td>
+                            <td style={td}>useCricketData.ts → UpcomingListPage</td>
+                            <td style={td}>Every 5min</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><code style={code}>/cricket/v1/game/scorecard?game_id=X</code></td>
+                            <td style={td}>Match Click + Timer</td>
+                            <td style={td}>App.tsx → LiveDetail</td>
+                            <td style={td}>Every 10s (Live)</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><code style={code}>/functions/wallstream/?match_id=X</code></td>
+                            <td style={td}>Match Click + Timer</td>
+                            <td style={td}>App.tsx → LiveDetail → FloatingHeader</td>
+                            <td style={td}>Every 10s (Live)</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><code style={code}>/cricket/v1/game/head-to-head?game_id=X</code></td>
+                            <td style={td}>LiveDetail Mount</td>
+                            <td style={td}>LiveDetail → LiveInsights, WinProbability (cached)</td>
+                            <td style={td}>Once (cached in state)</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><code style={code}>/cricket/live/json/X_overbyover_N.json</code></td>
+                            <td style={td}>Scorecard Update (Overs change)</td>
+                            <td style={td}>LiveDetail → WormChart, ManhattanChart</td>
+                            <td style={td}>On Ball Update</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><code style={code}>/cricket/live/json/X_batsman_splits_N.json</code></td>
+                            <td style={td}>Scorecard Update (Overs change)</td>
+                            <td style={td}>LiveDetail → WagonWheel, BatsmanBowlerMatchups</td>
+                            <td style={td}>On Ball Update</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><code style={code}>Supabase: SELECT * FROM matches</code></td>
+                            <td style={td}>LiveDetail Mount</td>
+                            <td style={td}>matchDatabase.ts → DualTeamRecentForm</td>
+                            <td style={td}>Once</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-                {/* 2. FLOWS (Visualized) */}
-                {activeSection === 'flows' && (
-                    <div>
-                        <h2 style={{ color: '#bae6fd' }}>Data Flow Visualization</h2>
+                {/* ========== SECTION 3 ========== */}
+                <h2 style={h2}>3. Page → API Mapping</h2>
 
-                        <h3 style={{ marginTop: '30px' }}>1. The Active Loop</h3>
-                        <div style={{
-                            background: '#1e293b',
-                            padding: '30px',
-                            borderRadius: '12px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '15px'
-                        }}>
-                            <div style={{ padding: '10px 20px', background: '#0f172a', borderRadius: '8px', border: '1px solid #334155' }}>App.tsx (Check Stack)</div>
-                            <div style={{ fontSize: '20px' }}>⬇️ (Is Top View?)</div>
-                            <div style={{ display: 'flex', gap: '20px' }}>
-                                <div style={{ padding: '15px', background: '#0c4a6e', borderRadius: '8px', textAlign: 'center' }}>
-                                    <div style={{ fontWeight: 'bold', color: '#7dd3fc' }}>Fetch Scorecard</div>
-                                    <div style={{ fontSize: '12px' }}>scorecard_v2.json</div>
-                                </div>
-                                <div style={{ padding: '15px', background: '#0c4a6e', borderRadius: '8px', textAlign: 'center' }}>
-                                    <div style={{ fontWeight: 'bold', color: '#7dd3fc' }}>Fetch Commentary</div>
-                                    <div style={{ fontSize: '12px' }}>wallstream_v2.json</div>
-                                </div>
-                            </div>
-                            <div style={{ fontSize: '20px' }}>⬇️ (Props Pass)</div>
-                            <div style={{ padding: '10px 20px', background: '#334155', borderRadius: '8px', width: '100%', textAlign: 'center', fontWeight: 'bold' }}>
-                                LiveDetail Component
-                            </div>
-                            <div style={{ fontSize: '20px' }}>⬇️ (Reactive Trigger)</div>
-                            <div style={{ display: 'flex', gap: '20px' }}>
-                                <div style={{ padding: '10px', background: '#3f6212', borderRadius: '6px', fontSize: '13px' }}>Charts (OBO)</div>
-                                <div style={{ padding: '10px', background: '#3f6212', borderRadius: '6px', fontSize: '13px' }}>Wagon Wheel</div>
-                            </div>
-                        </div>
+                <h3 style={h3}>HomePage.tsx</h3>
+                <pre style={pre}>{`
+DATA SOURCE: useCricketData.ts (imported as hook)
+RECEIVES: matches[] (already merged from Live + Upcoming + Completed buckets)
 
-                        <h3 style={{ marginTop: '30px' }}>2. The Sleep State</h3>
-                        <div style={{ background: '#1e293b', padding: '20px', borderRadius: '12px' }}>
-                            <p><b>User Action:</b> Open Series Page over Match</p>
-                            <code style={{ display: 'block', padding: '15px', background: '#0f172a', borderRadius: '8px', color: '#f87171' }}>
-                                App.tsx -> MatchView.isVisible = FALSE<br />
-                                App.tsx -> setScorecard(NULL)<br /><br />
-                                // Downstream Effect:<br />
-                                LiveDetail -> Hooks DEPEND on scorecard<br />
-                                LiveDetail -> Hooks STOP FIRING 🛑
-                            </code>
-                        </div>
-                    </div>
-                )}
+INTERNAL LOGIC:
+  - Calls sortByPriority(matches) from matchPriority.ts
+  - Calls generateChips(matches) for filter chips
+  - Calls filterByChip(matches, activeChip) when user selects a chip
+  - Calls filterJustFinished(matches) for "Just Finished" section
 
-                {/* 3. API REFERENCE */}
-                {activeSection === 'api' && (
-                    <div>
-                        <h2 style={{ color: '#bae6fd' }}>Wisden API Reference</h2>
-                        <p style={{ fontSize: '14px', color: '#94a3b8' }}>Base: <code>https://www.wisden.com/</code> via Proxy</p>
+TRIGGERS NAVIGATION:
+  - onSelectMatch(match) → Opens LiveDetail
+  - onOpenSeries(seriesId) → Opens SeriesHub
+  - onOpenUpcomingList() → Opens UpcomingListPage
+`}</pre>
 
-                        <div style={{ display: 'grid', gap: '20px', marginTop: '20px' }}>
-                            <ApiCard
-                                method="GET"
-                                name="Matches List"
-                                endpoint="/default.aspx?gamestate={1/2}"
-                                desc="Live & Upcoming matches. Polled globally."
-                            />
-                            <ApiCard
-                                method="GET"
-                                name="Scorecard"
-                                endpoint="/cricket/v1/game/scorecard?game_id=..."
-                                desc="Full stats. Polled every 10s via Active Engine."
-                            />
-                            <ApiCard
-                                method="GET"
-                                name="Wallstream"
-                                endpoint="/functions/wallstream/?match_id=..."
-                                desc="Ball-by-ball commentary. Synced with Scorecard."
-                            />
-                            <ApiCard
-                                method="GET"
-                                name="Over-by-Over"
-                                endpoint="/cricket/live/json/{id}_overbyover_{inn}.json"
-                                desc="Static JSON for Manhattan/Worm charts."
-                            />
-                            <ApiCard
-                                method="GET"
-                                name="Batsman Splits"
-                                endpoint="/cricket/live/json/{id}_batsman_splits_{inn}.json"
-                                desc="Static JSON for Wagon Wheel."
-                            />
-                            <ApiCard
-                                method="GET"
-                                name="Head-to-Head"
-                                endpoint="/cricket/v1/game/head-to-head?game_id=..."
-                                desc="Historic stats for Win Probability."
-                            />
-                        </div>
-                    </div>
-                )}
+                <h3 style={h3}>LiveDetail.tsx</h3>
+                <pre style={pre}>{`
+DATA SOURCE: Props from App.tsx (scorecard, wallstream)
 
-                {/* 4. OPTIMIZATION */}
-                {activeSection === 'optimize' && (
-                    <div>
-                        <h2 style={{ color: '#bae6fd' }}>Optimization Strategies</h2>
-                        <p>Cost-saving measures implemented or planned.</p>
+DOES NOT POLL. Receives live data via props.
 
-                        <ul style={{ listStyle: 'none', padding: 0 }}>
-                            <li style={{ marginBottom: '20px', background: '#1e293b', padding: '15px', borderRadius: '8px' }}>
-                                <strong style={{ color: '#a7f3d0' }}>Dynamic Global Poll</strong><br />
-                                If NO matches are live, the global poll slows from 15s to 2 minutes.
-                            </li>
-                            <li style={{ marginBottom: '20px', background: '#1e293b', padding: '15px', borderRadius: '8px' }}>
-                                <strong style={{ color: '#a7f3d0' }}>Event-Driven Insights</strong><br />
-                                Chart APIs are only fetched when the Over Count changes, not on every ball. Saves ~80%.
-                            </li>
-                            <li style={{ marginBottom: '20px', background: '#1e293b', padding: '15px', borderRadius: '8px' }}>
-                                <strong style={{ color: '#a7f3d0' }}>HTTP Caching</strong><br />
-                                Proxy passes <code>If-None-Match</code> headers to utilize edge caching.
-                            </li>
-                        </ul>
-                    </div>
-                )}
+ON MOUNT (useEffect):
+  1. fetchH2H(match.game_id) → setH2hData, setH2hPlayerData
+     ↳ H2H is CACHED in state, reused for all probability calculations
+  2. getTeamForm(teamId) from Supabase → For pre-match probability
+
+ON SCORECARD UPDATE (useEffect dependency: currentOversStr):
+  - Cascade Trigger!
+  - fetchBatsmanSplits(gameId, innings) → setBatsmanSplits, setBatsmanSplitsMatchups
+     ↳ Used by: WagonWheel, BatsmanBowlerMatchups
+  - fetchOverByOver(gameId, innings) → setOverByOver, setManhattanData, setOverByOverMatchups
+     ↳ Used by: WormChart, ManhattanChart, BatsmanBowlerMatchups (wickets)
+  - Recalculates wormPrimary/wormSecondary
+
+ON MANHATTAN INNINGS TOGGLE (useEffect dependency: manhattanInnings):
+  - Fetches missing OBO data for newly selected innings
+
+WIN PROBABILITY:
+  - calculatePreMatchProbability() on mount (uses h2hPlayerData)
+  - calculateLiveProbability() on every scorecard update
+     ↳ REUSES cached h2hPlayerData (no refetch)
+
+VISIBILITY REFRESH (App.tsx):
+  - document.addEventListener('visibilitychange')
+  - window.addEventListener('pageshow')
+  - When page becomes visible again → loadDataRef.current() called
+  - Immediately refetches scorecard + wallstream
+`}</pre>
+
+
+                <h3 style={h3}>UpcomingListPage.tsx</h3>
+                <pre style={pre}>{`
+DATA SOURCE: Props from App.tsx (matches[])
+
+NO API CALLS. Pure derived state.
+
+TIME CHIPS: Generated dynamically from current date
+  - generateTimeChips() creates month/quarter chips
+
+TYPE CHIPS: Generated from filtered matches
+  - generateUpcomingChips(timeFilteredMatches)
+  - Chips sorted by: Priority Tier → Earliest Date
+
+FILTER CASCADE:
+  1. User selects Time Chip → timeFilteredMatches computed
+  2. typeChips regenerated from timeFilteredMatches
+  3. User selects Type Chip → filteredMatches computed
+  4. seriesGroups derived from filteredMatches
+`}</pre>
+
+                {/* ========== SECTION 4 ========== */}
+                <h2 style={h2}>4. Data Flow Diagrams</h2>
+
+                <h3 style={h3}>4.1 Home Page Load Sequence</h3>
+                <pre style={pre}>{`
+┌──────────────────┐    ┌─────────────────────┐    ┌───────────────┐
+│     Browser      │    │   useCricketData    │    │   Wisden API  │
+└────────┬─────────┘    └──────────┬──────────┘    └───────┬───────┘
+         │                         │                       │
+         │  1. App Mount           │                       │
+         ├────────────────────────>│                       │
+         │                         │  2. GET gamestate=1   │
+         │                         ├──────────────────────>│
+         │                         │  3. Live Matches[]    │
+         │                         │<──────────────────────┤
+         │                         │                       │
+         │                         │  4. GET gamestate=2   │
+         │                         ├──────────────────────>│
+         │                         │  5. Upcoming[]        │
+         │                         │<──────────────────────┤
+         │                         │                       │
+         │  6. setMatches(merged)  │                       │
+         │<────────────────────────┤                       │
+         │                         │                       │
+         │  7. HomePage renders    │                       │
+         │                         │                       │
+`}</pre>
+
+                <h3 style={h3}>4.2 Match Click → LiveDetail Cascade</h3>
+                <pre style={pre}>{`
+┌────────┐  ┌─────────┐  ┌────────────┐  ┌───────────────┐  ┌─────────┐
+│HomePage│  │ App.tsx │  │ LiveDetail │  │   Wisden API  │  │Supabase │
+└───┬────┘  └────┬────┘  └─────┬──────┘  └───────┬───────┘  └────┬────┘
+    │            │             │                 │               │
+    │ 1. Click   │             │                 │               │
+    ├───────────>│             │                 │               │
+    │            │             │                 │               │
+    │ 2. Push MATCH to viewStack                 │               │
+    │            │─────────────│                 │               │
+    │            │             │                 │               │
+    │ 3. Start 10s Timer       │                 │               │
+    │            ├─────────────│                 │               │
+    │            │             │                 │               │
+    │ 4. fetchScorecard        │                 │               │
+    │            ├─────────────────────────────->│               │
+    │            │             │                 │               │
+    │            │ 5. scorecard                  │               │
+    │            │<─────────────────────────────-│               │
+    │            │             │                 │               │
+    │ 6. Pass props            │                 │               │
+    │            ├────────────>│                 │               │
+    │            │             │                 │               │
+    │            │ 7. Mount: fetchH2H            │               │
+    │            │             ├────────────────>│               │
+    │            │             │                 │               │
+    │            │ 8. Mount: getTeamForm         │               │
+    │            │             ├─────────────────────────────────>
+    │            │             │                 │               │
+    │            │ 9. currentOversStr changes    │               │
+    │            │             │ (CASCADE)       │               │
+    │            │             ├────────────────>│ fetchOBO      │
+    │            │             ├────────────────>│ fetchSplits   │
+    │            │             │                 │               │
+`}</pre>
+
+                <h3 style={h3}>4.3 Background Pause/Resume</h3>
+                <pre style={pre}>{`
+SCENARIO: User clicks "View Series" while watching a live match
+
+┌─────────┐  ┌─────────┐  ┌────────────┐  ┌───────────┐
+│LiveDetail│  │ App.tsx │  │ SeriesHub  │  │ Wisden API│
+└────┬─────┘  └────┬────┘  └─────┬──────┘  └─────┬─────┘
+     │             │             │               │
+     │ 1. Click    │             │               │
+     ├────────────>│             │               │
+     │             │             │               │
+     │ 2. Push SERIES to viewStack               │
+     │             ├────────────>│               │
+     │             │             │               │
+     │ 3. currentView.type !== 'MATCH'           │
+     │             ├─────X       │               │
+     │             │ STOP TIMER  │               │
+     │             │             │               │
+     │ 4. LiveDetail still mounted but receives NO new props
+     │             │             │               │
+     │ 5. User clicks Back       │               │
+     │             │<────────────┤               │
+     │             │             │               │
+     │ 6. Pop viewStack          │               │
+     │             ├─────────────│               │
+     │             │             │               │
+     │ 7. currentView.type === 'MATCH'           │
+     │             │ RESTART TIMER               │
+     │             ├─────────────────────────────>
+     │             │             │               │
+`}</pre>
+
+                {/* ========== SECTION 5 ========== */}
+                <h2 style={h2}>5. Priority Algorithm (Bucket Merge)</h2>
+                <p style={p}>Located in <code style={code}>useCricketData.ts</code>. The <code style={code}>recomputeMatches()</code>
+                    function merges three buckets into a single array.</p>
+
+                <pre style={pre}>{`
+BUCKET STRUCTURE:
+  bucketsRef = {
+    live: Match[],          // Overwritten every 15s
+    upcoming: Match[],      // Overwritten every 5min
+    completed: Map<game_id, Match>  // Merged/Appended
+  }
+
+MERGE LOGIC (Priority Order):
+  1. Start with Completed (lowest priority)
+  2. Add Upcoming (overwrites Completed if collision)
+  3. Add Live (overwrites everything - Source of Truth)
+
+RESULT: Single matches[] array with no duplicates.
+
+WHY THIS MATTERS:
+  - Prevents "ghost" matches (old data persisting)
+  - Ensures Live data is always freshest
+  - Completed uses Map for efficient pagination merging
+`}</pre>
+
+                <h3 style={h3}>Match Priority Scoring</h3>
+                <p style={p}>Located in <code style={code}>matchPriority.ts</code>. Used for sorting and chip generation.</p>
+
+                <table style={table}>
+                    <thead>
+                        <tr>
+                            <th style={th}>Category</th>
+                            <th style={th}>Priority</th>
+                            <th style={th}>Examples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style={td}>ICC World Cups</td><td style={td}>1</td><td style={td}>T20 WC, ODI WC, Champions Trophy</td></tr>
+                        <tr><td style={td}>Top 10 Int'l Bilaterals</td><td style={td}>2</td><td style={td}>IND vs AUS, ENG vs NZ</td></tr>
+                        <tr><td style={td}>Asia Cup</td><td style={td}>3</td><td style={td}>Asia Cup T20</td></tr>
+                        <tr><td style={td}>IPL</td><td style={td}>4</td><td style={td}>IPL 2025</td></tr>
+                        <tr><td style={td}>WPL</td><td style={td}>5</td><td style={td}>WPL 2025</td></tr>
+                        <tr><td style={td}>BBL</td><td style={td}>6</td><td style={td}>BBL 2025</td></tr>
+                        <tr><td style={td}>Other Premium</td><td style={td}>7-14</td><td style={td}>The Hundred, SA20, PSL</td></tr>
+                        <tr><td style={td}>Top Women's</td><td style={td}>15</td><td style={td}>India W vs Australia W</td></tr>
+                        <tr><td style={td}>Other Int'l</td><td style={td}>20+</td><td style={td}>Lower-ranked teams</td></tr>
+                        <tr><td style={td}>Domestic</td><td style={td}>100</td><td style={td}>Ranji Trophy, County</td></tr>
+                    </tbody>
+                </table>
+
+                {/* ========== SECTION 6 ========== */}
+                <h2 style={h2}>6. Win Probability Model</h2>
+                <p style={p}>Located in <code style={code}>winProbability.ts</code>. Calculates probability based on match phase.</p>
+
+                <h3 style={h3}>6.1 Pre-Match (Before Ball 1)</h3>
+                <pre style={pre}>{`
+FACTORS (International):
+  - ICC Ranking: 20%
+  - H2H Record: 20%
+  - Recent Form (Last 5): 15%
+  - Venue Stats: 10%
+  - Pitch Type: 15%
+  - Home Advantage: 10%
+
+FACTORS (Franchise):
+  - H2H Record: 25%
+  - Recent Form: 25%
+  - Venue Stats: 15%
+  - Pitch Type: 15%
+  - Home Advantage: 10%
+  - Pedigree: 10%
+
+OUTPUT: WinProbabilityResult { team1: {name, probability}, team2: {...} }
+`}</pre>
+
+                <h3 style={h3}>6.2 Live - 1st Innings</h3>
+                <pre style={pre}>{`
+MODEL: Projected Score vs Dynamic Par
+
+CALCULATION:
+  ResourceFactor = 1 - (Wickets × 0.08 to 0.12)
+  Projected = Runs + (CRR × OversLeft × ResourceFactor)
+  
+  DynamicPar = BasePar + PitchAdj + StrengthDiff
+    - BasePar: T20=165, ODI=270
+    - PitchAdj: Batting=+15, Bowling=-15
+    - StrengthDiff: (BattingTeam - BowlingTeam) / 5
+
+  Delta = Projected - DynamicPar
+  LiveProb = 50 + (Delta × 0.5)
+
+ADJUSTMENTS:
+  - Partnership Momentum: +5 to +15% for big stands
+  - OBO Momentum: +/-10% based on last 3 overs vs match rate
+`}</pre>
+
+                <h3 style={h3}>6.3 Live - 2nd Innings (Chase)</h3>
+                <pre style={pre}>{`
+MODEL: RRR Pressure Matrix
+
+RRR THRESHOLDS (T20):
+  RRR > 13: 5% Win Prob (Near Impossible)
+  RRR > 12: 10% Win Prob
+  RRR > 10: 20% Win Prob
+  RRR > 9: 35% Win Prob
+  RRR > 8: 45% Win Prob
+  RRR < 6: 80% Win Prob
+
+WICKET PENALTY:
+  < 3 wickets left: Multiply by 0.2
+  < 5 wickets left: Multiply by 0.5
+  < 7 wickets left: Multiply by 0.8
+
+DEATH OVERS (< 5 overs left):
+  Runs/Ball > 2.5: Multiply by 0.1
+  Runs/Ball > 2.0: Multiply by 0.2
+  Runs/Ball > 1.5: Multiply by 0.4
+  Runs/Ball < 0.5: Multiply by 1.3 (Cruise)
+`}</pre>
+
+                {/* ========== SECTION 7 ========== */}
+                <h2 style={h2}>7. Dynamic Filter Logic</h2>
+
+                <h3 style={h3}>Time Chips (UpcomingListPage)</h3>
+                <pre style={pre}>{`
+GENERATION: generateTimeChips()
+  1. Start from current month
+  2. Add 4 individual months
+  3. Add quarterly groups until December
+  4. Add next year
+
+EXAMPLE (if today is January 2026):
+  [Jan] [Feb] [Mar] [Apr] [May-Jul] [Aug-Oct] [Nov-Dec] [2027]
+`}</pre>
+
+                <h3 style={h3}>Type Chips (Dynamic)</h3>
+                <pre style={pre}>{`
+GENERATION: generateUpcomingChips(matches)
+  1. For each match, extract chipId via getMatchChip(match)
+  2. Track earliest date and priority tier for each chip
+  3. Sort chips by: Priority Tier → Earliest Date
+
+FILTER CASCADE:
+  timeFilteredMatches = filter by selected time chip
+  typeChips = generateUpcomingChips(timeFilteredMatches)  ← Regenerated!
+  filteredMatches = filterByChip(timeFilteredMatches, selectedTypeChip)
+`}</pre>
+
+                {/* ========== SECTION 8 ========== */}
+                <h2 style={h2}>8. Deep Parameter Tracing</h2>
+
+                <h3 style={h3}>8.1 Scorecard Object Journey</h3>
+                <pre style={pre}>{`
+[ORIGIN]        App.tsx → fetchScorecard(gameId) via useCricketData
+                ↓
+[TRANSFORM 1]   useCricketData.ts → sanitizeScorecard()
+                - Renames "Royal Challengers Bangalore" → "Royal Challengers"
+                ↓
+[STORE]         App.tsx → setScorecard(sc)
+                ↓
+[CONSUMER 1]    LiveDetail.tsx receives via props
+                - Extracts: Innings[], Teams{}, Matchdetail{}
+                ↓
+[CONSUMER 2]    LiveDetail → Passes to LiveInsights
+                - Used for: WormChart, ManhattanChart, Partnerships
+                ↓
+[CONSUMER 3]    winProbability.ts → calculateLiveProbability(scorecard)
+                - Reads: Innings[].Total, Overs, Wickets, Target
+                ↓
+[CONSUMER 4]    FloatingHeader gets derived data via setHeaderData()
+                - Computes: score, overs, batsman name from wallstream
+`}</pre>
+
+                <h3 style={h3}>8.2 matches[] Array Journey</h3>
+                <pre style={pre}>{`
+[ORIGIN]        useCricketData.ts → fetchLive(), fetchHeavy()
+                ↓
+[TRANSFORM 1]   sanitizeMatch() called on each match
+                ↓
+[STORE]         bucketsRef.current.live/upcoming/completed
+                ↓
+[MERGE]         recomputeMatches() → setMatches(merged)
+                ↓
+[CONSUMER 1]    App.tsx → passes to HomePage
+                ↓
+[CONSUMER 2]    HomePage → sortByPriority(matches)
+                → filterJustFinished(matches) for "Just Finished"
+                → generateChips(matches) for filter UI
+                ↓
+[CONSUMER 3]    UpcomingListPage → receives matches prop
+                → Filters by time/type chips
+                → Groups by series
+`}</pre>
+
+                {/* ========== SECTION 9 ========== */}
+                <h2 style={h2}>9. File Role Matrix</h2>
+
+                <table style={table}>
+                    <thead>
+                        <tr>
+                            <th style={th}>File</th>
+                            <th style={th}>Layer</th>
+                            <th style={th}>Responsibility</th>
+                            <th style={th}>Inputs</th>
+                            <th style={th}>Outputs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style={td}><strong>api.ts</strong></td>
+                            <td style={td}>Util</td>
+                            <td style={td}>CORS Proxy config, base URLs</td>
+                            <td style={td}>None</td>
+                            <td style={td}>proxyFetch(), WISDEN_* constants</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>useCricketData.ts</strong></td>
+                            <td style={td}>Hook</td>
+                            <td style={td}>Global polling, bucket merge, all fetch functions</td>
+                            <td style={td}>None (self-polls)</td>
+                            <td style={td}>matches[], fetchScorecard, fetchH2H, fetchOBO</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>App.tsx</strong></td>
+                            <td style={td}>Main</td>
+                            <td style={td}>View stack, Active Match Timer, Route handling</td>
+                            <td style={td}>useCricketData output</td>
+                            <td style={td}>scorecard, wallstream to views</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>HomePage.tsx</strong></td>
+                            <td style={td}>View</td>
+                            <td style={td}>Match list display, filter chips, navigation triggers</td>
+                            <td style={td}>matches[], callbacks</td>
+                            <td style={td}>Renders MatchCard, UpcomingCard</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>LiveDetail.tsx</strong></td>
+                            <td style={td}>View</td>
+                            <td style={td}>Match detail renderer, H2H/Chart fetching on mount</td>
+                            <td style={td}>scorecard, wallstream, match</td>
+                            <td style={td}>Renders LiveInsights, Charts, WinProb</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>LiveInsights.tsx</strong></td>
+                            <td style={td}>View</td>
+                            <td style={td}>Chart container, displays WormChart, Manhattan, WagonWheel</td>
+                            <td style={td}>All chart data props</td>
+                            <td style={td}>Renders chart components</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>BatsmanBowlerMatchups.tsx</strong></td>
+                            <td style={td}>View</td>
+                            <td style={td}>Per-matchup win/loss verdict for batsman vs bowler</td>
+                            <td style={td}>batsmanSplits, overByOver</td>
+                            <td style={td}>Renders matchup cards with verdict badges</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>matchPriority.ts</strong></td>
+                            <td style={td}>Util</td>
+                            <td style={td}>Priority scoring, chip generation, filtering</td>
+                            <td style={td}>Match[]</td>
+                            <td style={td}>Sorted matches, Chip[], filtered matches</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>winProbability.ts</strong></td>
+                            <td style={td}>Util</td>
+                            <td style={td}>Pre-match + Live probability calculation</td>
+                            <td style={td}>Scorecard, H2H, Form</td>
+                            <td style={td}>WinProbabilityResult</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>matchDatabase.ts</strong></td>
+                            <td style={td}>Util</td>
+                            <td style={td}>Supabase queries for historical data</td>
+                            <td style={td}>Team IDs</td>
+                            <td style={td}>Form array, H2H history</td>
+                        </tr>
+                        <tr>
+                            <td style={td}><strong>FloatingHeader.tsx</strong></td>
+                            <td style={td}>View</td>
+                            <td style={td}>Global header with back button and live score ticker</td>
+                            <td style={td}>headerData from App</td>
+                            <td style={td}>Renders score, ball info, LIVE pill</td>
+                        </tr>
+                    </tbody>
+                </table>
+
 
             </div>
         </div>
     );
 };
-
-const ApiCard = ({ method, name, endpoint, desc }: { method: string, name: string, endpoint: string, desc: string }) => (
-    <div style={{ background: '#1e293b', padding: '15px', borderRadius: '8px', borderLeft: '4px solid #38bdf8' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-            <strong style={{ color: '#e2e8f0' }}>{name}</strong>
-            <span style={{ fontSize: '12px', background: '#0f172a', padding: '2px 6px', borderRadius: '4px', color: '#94a3b8' }}>{method}</span>
-        </div>
-        <code style={{ display: 'block', fontSize: '12px', color: '#7dd3fc', marginBottom: '8px', wordBreak: 'break-all' }}>{endpoint}</code>
-        <div style={{ fontSize: '13px', color: '#cbd5e1' }}>{desc}</div>
-    </div>
-);
 
 export default HowItWorks;

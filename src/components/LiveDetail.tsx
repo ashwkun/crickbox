@@ -23,9 +23,10 @@ interface LiveDetailProps {
     onClose: () => void;
     onSeriesClick?: (seriesId: string, seriesMatches?: any[]) => void;
     setHeaderData: (data: HeaderDisplayData | null) => void;
+    isVisible?: boolean;
 }
 
-const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderData }) => {
+const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, onClose, onSeriesClick, setHeaderData, isVisible = true }) => {
     const { fetchH2H, fetchBatsmanSplits, fetchOverByOver } = useCricketData();
     const [selectedSquadIdx, setSelectedSquadIdx] = React.useState(0);
 
@@ -1088,6 +1089,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
 
     // Sticky Header Effect
     useEffect(() => {
+        if (!isVisible) {
+            setHeaderData(null);
+            return;
+        }
+
         if (!showStickyHeader) {
             setHeaderData(null);
             return;
@@ -1138,7 +1144,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         return () => {
             setHeaderData(null);
         };
-    }, [showStickyHeader, team1Score, team2Score, isTeam1Batting, isTeam2Batting, team1, team2, latestBall]);
+    }, [showStickyHeader, team1Score, team2Score, isTeam1Batting, isTeam2Batting, team1, team2, latestBall, isVisible]);
 
     return (
         <div className="upcoming-detail" onScroll={handleScroll}>
