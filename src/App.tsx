@@ -394,8 +394,8 @@ export default function App(): React.ReactElement {
 
     return (
         <div className="app-container">
-            {/* Floating Header (Global) - Only show for HOME and MATCH */}
-            {(currentView.type === 'HOME' || currentView.type === 'MATCH') && (
+            {/* Floating Header (Global) - Only show for HOME, MATCH, and UPCOMING_LIST */}
+            {(currentView.type === 'HOME' || currentView.type === 'MATCH' || currentView.type === 'UPCOMING_LIST') && (
                 <FloatingHeader
                     showBack={viewStack.length > 1}
                     onBack={handleBack}
