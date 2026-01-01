@@ -504,10 +504,15 @@ export default function App(): React.ReactElement {
                         }
                     }}
                     onMatchClick={(match) => {
+                        // Close list first
+                        setShowUpcomingList(false);
                         // Navigate to match (will push new history entry)
                         handleSelectMatch(match);
                     }}
-                    onSeriesClick={handleOpenSeries}
+                    onSeriesClick={(seriesId, matches) => {
+                        setShowUpcomingList(false);
+                        handleOpenSeries(seriesId, matches);
+                    }}
                 />
             )}
 
