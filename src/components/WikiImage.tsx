@@ -99,11 +99,9 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
             }
         }
 
-        // Strategy 0: FlagCDN (Fallback for national teams)
-        // Try if Wisden failed (errorCount==1) OR if no ID (errorCount==0)
-        // But be careful not to override Wikipedia logic (Strategy 3) which runs later
-        // Let's make this run if we haven't found a source yet.
-        const shouldCheckFlag = (id && errorCount === 1) || (!id && errorCount === 0);
+        // Strategy 2: FlagCDN (Fallback for national teams only)
+        // Check if Wisden failed (errorCount >= 1) OR if no ID was provided
+        const shouldCheckFlag = (id && errorCount >= 1) || (!id && errorCount === 0);
 
         if (type === 'team' && shouldCheckFlag) {
             const flagUrl = getFlagUrl(name);
@@ -111,47 +109,16 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
                 setSrc(flagUrl);
                 return;
             }
-            // If no flag found, proceed to next strategies (by letting errorCount increment or fall through? 
-            // Wait, if setSrc is not called, we do nothing. 
-            // But if we fail to find a flag, we want to go towards Wikipedia.
-            // If getFlagUrl returns null, we just continue.
-            // But 'continue' in useEffect means fall through to next if statements.
-            // But we need to ensure the NEXT strategies run. 
-            // If (id && errorCount === 1) runs this block, and fails, we need errorCount to increment to 2 to trigger fallback?
-            // Or trigger Wikipedia?
-
-            // Actually, Strategy 3 (Wikipedia) runs at: errorCount === (id ? 1 : 0).
-            // If id exists: Wisden(0) -> Error(1) -> Wiki(1)?
-            // If I insert Flag at (1), I delay Wiki to (2)?
-            // Yes.
-            // If flagUrl found -> setSrc -> Good.
-            // If flagUrl NOT found -> I must increment errorCount to skip to Wiki? 
-            // OR simply let Wiki run? 
-            // If (id && errorCount===1), and flagUrl is null.
-            // Then Wiki checks `errorCount === (id ? 1 : 0)`. i.e. 1.
-            // So Wiki ALSO runs?
-            // If multiple blocks run in one effect pass? No, setSrc triggers re-render if state changes.
-            // If setSrc NOT called, effect continues execution? Yes.
-            // So safely placing Flag logic before Wiki logic is fine.
+            // If Flag not found, we want to trigger fallback.
+            // But we can't "increment" errorCount indefinitely here without logic loop.
+            // If we are here, and no flag found, we proceed to fallback below.
         }
 
-        // Strategy 2: LocalStorage Cache for Wiki
-        if (!id && errorCount === 0) {
-            const cacheKey = `wiki_img_v5_${name}`;
-            const cached = localStorage.getItem(cacheKey);
-            if (cached && cached !== 'PLACEHOLDER') {
-                setSrc(cached);
-                return;
-            }
-        }
-
-        // Strategy 3: Fetch from Wikipedia (if no ID or Wisden failed)
-        if (errorCount === (id ? 1 : 0)) {
-            fetchWiki(name, type);
-        }
-
-        // Strategy 4: Fallback placeholder
-        if ((errorCount === 2 && id) || (errorCount === 1 && !id)) {
+        // Strategy 3: Final Fallback
+        // Triggers if:
+        // - ID provided, Wisden failed, and (Flag failed or skipped)
+        // - No ID provided, and (Flag failed or skipped)
+        if (!src && ((id && errorCount >= 1) || (!id))) {
             if (type === 'team') {
                 setSrc(TEAM_FALLBACK);
             } else if (type === 'series' || type === 'tournament') {
@@ -163,58 +130,9 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
 
     }, [name, id, type, errorCount, src]);
 
-    const fetchWiki = async (name: string | undefined, type: string) => {
-        if (!name) {
-            setErrorCount(prev => prev + 1);
-            return;
-        }
-
-        try {
-            // Step 1: Clean the name
-            const cleanName = type === 'team' ? name.replace(/(-W|\sW$|Women|Women's)/gi, '').trim() : name;
-
-            // Step 2: Construct primary query (suffixed)
-            let query = cleanName;
-            if (type === 'team' && !cleanName.toLowerCase().includes('team')) query += ' cricket team';
-            else if (type === 'player') query += ' cricketer';
-            else if ((type === 'series' || type === 'tournament') && !cleanName.toLowerCase().includes('cup') && !cleanName.toLowerCase().includes('trophy') && !cleanName.toLowerCase().includes('league')) query += ' cricket';
-
-            // Step 3: Fetch
-            let url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-            let res = await fetch(url);
-
-            // Step 4: Retry with raw cleanName if 404 (e.g. "Brisbane Heat cricket team" -> "Brisbane Heat")
-            if (!res.ok && res.status === 404 && query !== cleanName) {
-                // Try the raw name without suffixes
-                url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanName)}`;
-                res = await fetch(url);
-            }
-
-            // Retry for national teams: "India cricket team" -> "India national cricket team"
-            if (!res.ok && res.status === 404 && type === 'team' && !query.includes('national')) {
-                const nationalQuery = cleanName + ' national cricket team';
-                url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(nationalQuery)}`;
-                res = await fetch(url);
-            }
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-            const data = await res.json();
-            const thumb = data.thumbnail?.source;
-
-            if (thumb) {
-                setSrc(thumb);
-                const cacheKey = `wiki_img_v5_${name}`;
-                safeSetItem(cacheKey, thumb);
-            } else {
-                setErrorCount(prev => prev + 1);
-            }
-        } catch (e) {
-            setErrorCount(prev => prev + 1);
-        }
-    };
-
     const handleError = () => {
+        // If current src is a Wisden asset, this will increment errorCount to 1,
+        // triggering the Effect again to try Flag or Fallback.
         setSrc(null);
         setErrorCount(prev => prev + 1);
     };
