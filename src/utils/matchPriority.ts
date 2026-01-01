@@ -152,9 +152,9 @@ export function getMatchPriority(match: Match): number {
     }
 
     // 5. Top Women's Teams (Bilateral)
-    // Give them high priority (12) to ensure they show up in crucial sections
+    // Give them border-line priority (15) so they appear in Just Finished but sort below leagues
     if (isTopWomenTeamMatch(match)) {
-        return 12;
+        return 15;
     }
 
     // 6. Use API event_priority if available
