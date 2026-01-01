@@ -213,12 +213,12 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
                 {/* Background Watermarks */}
                 {team1Name !== 'TBC' && (
                     <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '50%', height: '50%', opacity: 0.05, pointerEvents: 'none', filter: 'grayscale(100%)' }}>
-                        <WikiImage name={team1Name} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        <WikiImage name={team1Name} id={team1?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                 )}
                 {team2Name !== 'TBC' && (
                     <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '50%', height: '50%', opacity: 0.05, pointerEvents: 'none', filter: 'grayscale(100%)' }}>
-                        <WikiImage name={team2Name} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        <WikiImage name={team2Name} id={team2?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                 )}
 
@@ -242,6 +242,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <WikiImage
                                 name={team1?.name}
+                                id={team1?.id}
                                 type="team"
                                 style={{ width: '20px', height: '20px', borderRadius: '4px' }}
                             />
@@ -261,6 +262,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <WikiImage
                                 name={team2?.name}
+                                id={team2?.id}
                                 type="team"
                                 style={{ width: '20px', height: '20px', borderRadius: '4px' }}
                             />
