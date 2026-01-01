@@ -899,6 +899,6 @@ export const calculateLiveProbability = (
         },
         phase: phase, // Fix: explicitly return the calculated phase
         details: details,
-        message: isTeam1Batting ? `${battingTeam} Batting` : `Chase On`
+        message: currentInningIndex === 0 ? `${battingTeam} Batting` : `Chase On`
     };
 };
