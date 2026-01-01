@@ -235,9 +235,10 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                     overflowX: 'auto',
                     scrollbarWidth: 'none',
                     flex: 1,
-                    paddingRight: 8,
+                    paddingRight: 16,
+                    marginRight: -16,
                 }}>
-                    <style>{`.time-chips::-webkit-scrollbar { display: none; }`}</style>
+                    <style>{`div::-webkit-scrollbar { display: none; }`}</style>
                     {timeChips.map(chip => (
                         <div
                             key={chip.id}
