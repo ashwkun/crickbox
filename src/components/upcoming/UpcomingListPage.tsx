@@ -1,7 +1,7 @@
 /**
  * UpcomingListPage - Full calendar view with:
  * Row 1: Time filters (Custom + months + quarters + next year)
- * Row 2: Type filters (All/International/Major Leagues/Domestic/Women)
+ * Row 2: Dynamic type chips from matchPriority utilities
  * Body: Series-centric layout with horizontal UpcomingCard scrolls
  */
 
@@ -9,6 +9,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { Match } from '../../types';
 import { LuCalendarDays, LuCalendarPlus, LuChevronRight, LuX } from 'react-icons/lu';
 import UpcomingCard from '../UpcomingCard';
+import { generateUpcomingChips, filterByChip, getMatchChip } from '../../utils/matchPriority';
 
 interface UpcomingListPageProps {
     matches: Match[];
@@ -85,55 +86,6 @@ const generateTimeChips = (): { id: string; label: string; startMonth: number; s
     return chips;
 };
 
-// Type filter options
-const TYPE_FILTERS = [
-    { id: 'all', label: 'All' },
-    { id: 'international', label: 'International' },
-    { id: 'major', label: 'Major Leagues' },
-    { id: 'domestic', label: 'Domestic' },
-    { id: 'women', label: 'Women' },
-    { id: 'u19', label: 'Under 19' },
-];
-
-// Major league codes
-const MAJOR_LEAGUES = ['IPL', 'BBL', 'PSL', 'CPL', 'SA20', 'ILT20', 'LPL', 'BPL', 'MLC', 'THE_HUNDRED'];
-
-// Categorize match type
-const getMatchCategory = (match: Match): string[] => {
-    const categories: string[] = [];
-    const name = (match.series_name || '').toLowerCase();
-    const leagueCode = match.league_code || '';
-
-    // Check for Under 19
-    if (name.includes('u19') || name.includes('under-19') || name.includes('under 19') || name.includes('youth')) {
-        categories.push('u19');
-    }
-
-    // Check for women's cricket
-    if (name.includes('women') || match.genders === 'female') {
-        categories.push('women');
-    }
-
-    // Check for international (country vs country)
-    const intlKeywords = ['test', 'odi', 't20i', 'world cup', 'asia cup', 'champions trophy'];
-    if (intlKeywords.some(k => name.includes(k))) {
-        categories.push('international');
-    }
-
-    // Check for major leagues
-    if (MAJOR_LEAGUES.includes(leagueCode.toUpperCase()) ||
-        MAJOR_LEAGUES.some(l => name.includes(l.toLowerCase()))) {
-        categories.push('major');
-    }
-
-    // Domestic (if not international and not major league)
-    if (!categories.includes('international') && !categories.includes('major')) {
-        categories.push('domestic');
-    }
-
-    return categories;
-};
-
 const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     matches,
     onBack,
@@ -142,9 +94,8 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
 }) => {
     const timeChips = useMemo(() => generateTimeChips(), []);
     const [selectedTime, setSelectedTime] = useState(timeChips[0]?.id || '');
-    const [selectedType, setSelectedType] = useState('all');
+    const [selectedTypeChip, setSelectedTypeChip] = useState('all');
     const [showCustomPicker, setShowCustomPicker] = useState(false);
-    const [customRange, setCustomRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null });
 
     const contentRef = useRef<HTMLDivElement>(null);
 
@@ -166,15 +117,22 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
         });
     }, [matches, selectedTime, timeChips]);
 
-    // Filter matches by type
-    const filteredMatches = useMemo(() => {
-        if (selectedType === 'all') return timeFilteredMatches;
+    // Generate dynamic type chips based on time-filtered matches
+    const typeChips = useMemo(() => {
+        return generateUpcomingChips(timeFilteredMatches);
+    }, [timeFilteredMatches]);
 
-        return timeFilteredMatches.filter(match => {
-            const categories = getMatchCategory(match);
-            return categories.includes(selectedType);
-        });
-    }, [timeFilteredMatches, selectedType]);
+    // Reset type selection if chip no longer exists
+    useMemo(() => {
+        if (selectedTypeChip !== 'all' && !typeChips.find(c => c.id === selectedTypeChip)) {
+            setSelectedTypeChip('all');
+        }
+    }, [typeChips, selectedTypeChip]);
+
+    // Filter matches by type chip
+    const filteredMatches = useMemo(() => {
+        return filterByChip(timeFilteredMatches, selectedTypeChip);
+    }, [timeFilteredMatches, selectedTypeChip]);
 
     // Group matches by series
     const seriesGroups = useMemo(() => {
@@ -292,7 +250,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                 </div>
             </div>
 
-            {/* Row 2: Type Filter */}
+            {/* Row 2: Dynamic Type Filter */}
             <div style={{
                 display: 'flex',
                 gap: 6,
@@ -302,13 +260,22 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                 borderBottom: '1px solid var(--border-color)',
                 flexShrink: 0,
             }}>
-                {TYPE_FILTERS.map(filter => (
+                {typeChips.map(chip => (
                     <div
-                        key={filter.id}
-                        style={chipStyle(selectedType === filter.id)}
-                        onClick={() => setSelectedType(filter.id)}
+                        key={chip.id}
+                        style={chipStyle(selectedTypeChip === chip.id)}
+                        onClick={() => setSelectedTypeChip(chip.id)}
                     >
-                        {filter.label}
+                        {chip.label}
+                        {chip.count > 0 && (
+                            <span style={{
+                                marginLeft: 4,
+                                opacity: 0.5,
+                                fontSize: 10,
+                            }}>
+                                {chip.count}
+                            </span>
+                        )}
                     </div>
                 ))}
             </div>
