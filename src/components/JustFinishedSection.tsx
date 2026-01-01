@@ -120,89 +120,140 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
 
     // --- SLEEK CARD ---
 
+    // Helper to shorten series name
+    const shortenSeriesName = (name: string | undefined): string => {
+        if (!name) return '';
+        const bilateralMatch = name.match(/(\d+)\s*(T20I?|ODI|Test|Youth ODI|Youth T20I)/i);
+        if (bilateralMatch) {
+            return `${bilateralMatch[1]} ${bilateralMatch[2].toUpperCase()}`;
+        }
+        return name
+            .replace(/,?\s*\d{4}(\/\d{2,4})?/g, '')
+            .replace(/\s+Series$/i, '')
+            .trim();
+    };
+
     const Card: React.FC<{ match: Match }> = ({ match }) => {
         const team1 = match.participants[0];
         const team2 = match.participants[1];
 
-        // Find winner for highlighting
-        // Result code: W = Win, T = Tie, D = Draw, N = No Result
-        // We can check match.result_sub_code or parsing status, but simpler:
-        // usually API doesn't give clean winner ID in match list, so we rely on text or simple heuristics?
-        // Actually match.result usually has winner text.
-        // Let's rely on simple text check for better performance or just render neutral if unsure.
-        // Actually CompletedCard.tsx logic: `winnerId = match.participants?.find(p => p.highlight === 'true')?.id`
+        const team1Name = (team1 && typeof team1.name === 'string') ? team1.name : 'TBC';
+        const team2Name = (team2 && typeof team2.name === 'string') ? team2.name : 'TBC';
+
+        // Dynamic Team Colors for Dual Glow (copied from UpcomingCard)
+        const color1 = getTeamColor(team1Name !== 'TBC' ? team1Name : undefined);
+        const color2 = getTeamColor(team2Name !== 'TBC' ? team2Name : undefined);
+
+        let background = '#0f0f13';
+        const borderColor = 'rgba(255, 255, 255, 0.08)';
+
+        if (color1 && color2) {
+            background = `radial-gradient(circle at top left, ${color1}40, transparent 55%), radial-gradient(circle at bottom right, ${color2}40, transparent 55%), #0f0f13`;
+        } else if (color1) {
+            background = `radial-gradient(circle at top left, ${color1}33, #0f0f13 70%)`;
+        }
+
+        // Winner Logic
         const winnerId = match.participants?.find(p => p.highlight === 'true')?.id ||
             (match.short_event_status?.includes(team1?.short_name || 'ZZZ') ? team1?.id :
                 match.short_event_status?.includes(team2?.short_name || 'ZZZ') ? team2?.id : null);
 
-        const isT1Winner = team1?.id === winnerId;
-        const isT2Winner = team2?.id === winnerId;
+        const isDraw = match.result_code === 'D';
+        const isT1Winner = !isDraw && team1?.id === winnerId;
+        const isT2Winner = !isDraw && team2?.id === winnerId;
+
+        // Header Info
+        const seriesName = shortenSeriesName(match.series_name);
+        const matchInfo = match.event_name || ''; // e.g. "3rd Test" or "Match 4"
+        const displaySubHeader = matchInfo ? `${seriesName} • ${matchInfo}` : seriesName;
+
+        // Score Renderer (handles multi-innings)
+        const renderScore = (score: string | undefined, isWinner: boolean) => {
+            if (!score) return <span style={{ color: 'rgba(255,255,255,0.3)' }}>-</span>;
+            const cleanScore = score.replace(/\s*\([^)]*\)/g, ''); // Remove overs
+
+            if (cleanScore.includes('&')) {
+                // Multi-innings (Test)
+                const parts = cleanScore.split('&').map(s => s.trim());
+                return (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: 1.1 }}>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: isWinner ? '#fff' : 'rgba(255,255,255,0.6)' }}>
+                            {parts[1] || parts[0]}
+                        </span>
+                        {parts[1] && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>{parts[0]}</span>}
+                    </div>
+                );
+            }
+            // Single innings
+            return (
+                <span style={{ fontSize: '13px', fontWeight: 700, color: isWinner ? '#fff' : 'rgba(255,255,255,0.6)' }}>
+                    {cleanScore}
+                </span>
+            );
+        };
 
         return (
             <div
                 onClick={() => onMatchClick(match)}
                 style={{
                     minWidth: '260px',
-                    background: 'rgba(20, 20, 20, 0.6)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    background,
+                    border: `1px solid ${borderColor}`,
                     borderRadius: '16px',
                     padding: '12px 14px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '10px',
+                    justifyContent: 'space-between',
                     position: 'relative',
                     overflow: 'hidden',
                     cursor: 'pointer',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
                 }}
             >
-                {/* Glow Effect for Winner (Subtle Amber) */}
-                <div style={{
-                    position: 'absolute',
-                    top: '-50%',
-                    left: '-50%',
-                    width: '200%',
-                    height: '200%',
-                    background: 'radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.06) 0%, transparent 60%)',
-                    pointerEvents: 'none',
-                }} />
+                {/* Background Watermarks */}
+                {team1Name !== 'TBC' && (
+                    <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '50%', height: '50%', opacity: 0.05, pointerEvents: 'none', filter: 'grayscale(100%)' }}>
+                        <WikiImage name={team1Name} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    </div>
+                )}
+                {team2Name !== 'TBC' && (
+                    <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '50%', height: '50%', opacity: 0.05, pointerEvents: 'none', filter: 'grayscale(100%)' }}>
+                        <WikiImage name={team2Name} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    </div>
+                )}
 
-                {/* Header: Series Name + Time Ago */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>
-                    <span style={{ maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        {match.parent_series_name || match.series_name?.split(',')[0]}
-                    </span>
-                    <span>FINISHED</span>
+                {/* Header: Series/Match Info */}
+                <div style={{
+                    marginBottom: '10px',
+                    fontSize: '10px',
+                    color: 'rgba(255,255,255,0.5)',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    zIndex: 1
+                }}>
+                    {displaySubHeader}
                 </div>
 
                 {/* Teams Row */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 1 }}>
                     {/* Team 1 */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <WikiImage
                                 name={team1?.name}
                                 type="team"
-                                style={{ width: '20px', height: '20px', borderRadius: '4px', opacity: isT2Winner ? 0.6 : 1 }}
+                                style={{ width: '20px', height: '20px', borderRadius: '4px' }}
                             />
                             <span style={{
                                 fontSize: '13px',
                                 fontWeight: isT1Winner ? 700 : 500,
-                                color: isT1Winner ? '#fff' : isT2Winner ? 'rgba(255,255,255,0.5)' : '#ddd',
-                                textDecoration: isT2Winner ? 'none' : 'none'
+                                color: isT1Winner ? '#fff' : 'rgba(255,255,255,0.7)',
                             }}>
                                 {team1?.name}
                             </span>
                         </div>
-                        <span style={{
-                            fontSize: '13px',
-                            fontWeight: isT1Winner ? 700 : 500,
-                            color: isT1Winner ? '#fff' : isT2Winner ? 'rgba(255,255,255,0.5)' : '#ddd'
-                        }}>
-                            {team1?.value?.split('(')[0]?.trim() || '-'}
-                        </span>
+                        {renderScore(team1?.value, isT1Winner || false)}
                     </div>
 
                     {/* Team 2 */}
@@ -211,31 +262,25 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
                             <WikiImage
                                 name={team2?.name}
                                 type="team"
-                                style={{ width: '20px', height: '20px', borderRadius: '4px', opacity: isT1Winner ? 0.6 : 1 }}
+                                style={{ width: '20px', height: '20px', borderRadius: '4px' }}
                             />
                             <span style={{
                                 fontSize: '13px',
                                 fontWeight: isT2Winner ? 700 : 500,
-                                color: isT2Winner ? '#fff' : isT1Winner ? 'rgba(255,255,255,0.5)' : '#ddd',
+                                color: isT2Winner ? '#fff' : 'rgba(255,255,255,0.7)',
                             }}>
                                 {team2?.name}
                             </span>
                         </div>
-                        <span style={{
-                            fontSize: '13px',
-                            fontWeight: isT2Winner ? 700 : 500,
-                            color: isT2Winner ? '#fff' : isT1Winner ? 'rgba(255,255,255,0.5)' : '#ddd'
-                        }}>
-                            {team2?.value?.split('(')[0]?.trim() || '-'}
-                        </span>
+                        {renderScore(team2?.value, isT2Winner || false)}
                     </div>
                 </div>
 
-                {/* Result Pill */}
-                <div style={{ marginTop: '2px' }}>
+                {/* Result Text */}
+                <div style={{ marginTop: '10px', zIndex: 1 }}>
                     <span style={{
                         fontSize: '11px',
-                        color: '#f59e0b', // Amber text
+                        color: isDraw ? '#eab308' : '#f59e0b', // Amber
                         fontWeight: 600
                     }}>
                         {match.short_event_status?.replace(' beat ', ' won by ')}
