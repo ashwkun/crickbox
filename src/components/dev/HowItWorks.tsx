@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LuServer, LuDatabase, LuWorkflow, LuLayers, LuCpu, LuNetwork, LuShield, LuZap } from 'react-icons/lu';
+import { LuServer, LuDatabase, LuWorkflow, LuLayers, LuCpu, LuNetwork, LuShield, LuZap, LuGitBranch, LuCalculator, LuFilter } from 'react-icons/lu';
 
 const HowItWorks: React.FC<{ isVisible: boolean, onHome: () => void }> = ({ isVisible, onHome }) => {
     if (!isVisible) return null;
@@ -65,158 +65,194 @@ const HowItWorks: React.FC<{ isVisible: boolean, onHome: () => void }> = ({ isVi
                     <div style={{
                         fontSize: '12px', fontWeight: 600, color: '#3b82f6', letterSpacing: '0.05em',
                         textTransform: 'uppercase', marginBottom: '12px'
-                    }}>Technical Specification</div>
+                    }}>Deep Dive Specification</div>
                     <h1 style={{ fontSize: '40px', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: '1.1' }}>
-                        BoxCric Architecture
+                        BoxCric Engineering Core
                     </h1>
                     <p style={{ fontSize: '18px', color: '#a1a1aa', marginTop: '16px', maxWidth: '600px' }}>
-                        Deep dive into the dual-engine polling system, proxy infrastructure, and data tiers powering the application.
+                        Comprehensive breakdown of the polling engines, priority algorithms, and win probability mathematics.
                     </p>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
-                        <Tag label="v1.2.0" color="#3b82f6" />
-                        <Tag label="React 18" color="#a1a1aa" />
-                        <Tag label="Cloudflare Workers" color="#f59e0b" />
-                        <Tag label="Supabase" color="#10b981" />
+                        <Tag label="v1.3.0" color="#3b82f6" />
+                        <Tag label="Dual Engine" color="#10b981" />
+                        <Tag label="Algorithm" color="#f59e0b" />
                     </div>
                 </div>
 
-                {/* 1. High Level Architecture */}
+                {/* 1. Component Responsibility */}
                 <section>
                     <div style={sectionHeaderStyle}>
                         <LuLayers color="#3b82f6" size={24} />
-                        <h2 style={h2Style}>System Architecture</h2>
+                        <h2 style={h2Style}>Component Responsibility</h2>
                     </div>
                     <p style={pStyle}>
-                        The application implements a <b>split-state architecture</b> to isolate high-frequency match polling from global application state. This ensures "background" matches do not consume resources while keeping the main navigation responsive.
+                        Contrary to typical patterns, <code>LiveDetail.tsx</code> is a <b>dumb consumer</b>. It does NOT poll the API itself.
+                        This inversion of control is critical for the "Background Pause" feature.
                     </p>
 
-                    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '32px', margin: '32px 0' }}>
-                        <div style={{ marginBottom: '24px', textAlign: 'center', fontSize: '13px', color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Data Flow Diagram</div>
-                        {/* CSS Drawing of Architecture */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', alignItems: 'center', position: 'relative' }}>
-                            {/* Client Layer */}
-                            <div style={{ display: 'flex', gap: '40px', width: '100%', justifyContent: 'center' }}>
-                                <NodeBox title="Engine A: Global" sub="useCricketData.ts" color="#3b82f6" />
-                                <NodeBox title="Engine B: Active" sub="LiveDetail.tsx" color="#f59e0b" />
+                    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '0', overflow: 'hidden', margin: '32px 0' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                            <thead style={{ background: '#27272a', color: '#fff' }}>
+                                <tr>
+                                    <th style={{ padding: '12px 20px', textAlign: 'left' }}>Component</th>
+                                    <th style={{ padding: '12px 20px', textAlign: 'left' }}>Role</th>
+                                    <th style={{ padding: '12px 20px', textAlign: 'left' }}>Polling Responsibility</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style={{ borderBottom: '1px solid #27272a' }}>
+                                    <td style={{ padding: '16px 20px', color: '#60a5fa', fontWeight: 600 }}>App.tsx</td>
+                                    <td style={{ padding: '16px 20px', color: '#d4d4d8' }}>The Orchestrator</td>
+                                    <td style={{ padding: '16px 20px', color: '#a1a1aa' }}>
+                                        <b>Runs the Timer.</b> Fetches Scorecard & Wallstream every 10s. Passes data *down* to LiveDetail.
+                                    </td>
+                                </tr>
+                                <tr style={{ borderBottom: '1px solid #27272a' }}>
+                                    <td style={{ padding: '16px 20px', color: '#f59e0b', fontWeight: 600 }}>LiveDetail.tsx</td>
+                                    <td style={{ padding: '16px 20px', color: '#d4d4d8' }}>The Renderer</td>
+                                    <td style={{ padding: '16px 20px', color: '#a1a1aa' }}>
+                                        <b>Passive.</b> Only fetches static assets (H2H, Charts) <i>once</i> on mount. Does NOT poll.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style={{ padding: '16px 20px', color: '#10b981', fontWeight: 600 }}>useCricketData.ts</td>
+                                    <td style={{ padding: '16px 20px', color: '#d4d4d8' }}>The Store</td>
+                                    <td style={{ padding: '16px 20px', color: '#a1a1aa' }}>
+                                        <b>Background Worker.</b> Polls the Global Match List (Engine A) every 15s.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                {/* 2. Priority Algorithm */}
+                <section>
+                    <div style={sectionHeaderStyle}>
+                        <LuGitBranch color="#8b5cf6" size={24} />
+                        <h2 style={h2Style}>Match Priority Algorithm</h2>
+                    </div>
+                    <p style={pStyle}>
+                        The <code>recomputeMatches()</code> function uses a <b>Bucket Merge Strategy</b> to ensure data consistency without "ghost" records.
+                    </p>
+
+                    <div style={gridStyle}>
+                        <LogicCard
+                            title="Priority 1: LIVE (Source of Truth)"
+                            desc="Matches with state 'Live' or 'In Progress' overwrite everything else. This bucket is flushed and replaced every 15s."
+                        />
+                        <LogicCard
+                            title="Priority 2: UPCOMING"
+                            desc="Fetched with gamestate=2. Overwrites 'Completed' data if there is an ID collision (e.g. a match moved from scheduled to delay)."
+                        />
+                        <LogicCard
+                            title="Priority 3: COMPLETED"
+                            desc="The base layer. Fetched infrequently (5 mins). Contains results. If a match exists here but also in 'Live', 'Live' wins."
+                        />
+                    </div>
+                </section>
+
+                {/* 3. Logic: Win Probability */}
+                <section>
+                    <div style={sectionHeaderStyle}>
+                        <LuCalculator color="#ef4444" size={24} />
+                        <h2 style={h2Style}>Win Probability Logic</h2>
+                    </div>
+                    <p style={pStyle}>
+                        Calculations in <code>winProbability.ts</code>. The model switches modes based on the innings.
+                    </p>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', background: '#18181b', padding: '24px', borderRadius: '8px', border: '1px solid #27272a' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '20px', alignItems: 'start', borderBottom: '1px solid #27272a', paddingBottom: '20px' }}>
+                            <div style={{ color: '#60a5fa', fontWeight: 600 }}>1st Innings</div>
+                            <div>
+                                <div style={{ color: '#fff', fontWeight: 500, marginBottom: '4px' }}>Dynamic Par Score Model</div>
+                                <div style={{ color: '#a1a1aa', fontSize: '14px' }}>
+                                    <code>Projected Score = Current Runs + (CRR × OversRemaining × ResourceFactor)</code>
+                                    <br /><br />
+                                    We compare Projected vs <b>Dynamic Par</b>.
+                                    <br />
+                                    <i>Dynamic Par = Base (165) + Pitch Adj + (Batting Strength - Bowling Strength)</i>
+                                </div>
                             </div>
+                        </div>
 
-                            {/* Network Layer */}
-                            <div style={{ width: '2px', height: '40px', background: '#27272a' }}></div>
-                            <NodeBox title="CORS Proxy" sub="Cloudflare Worker" color="#8b5cf6" wide />
-
-                            {/* Service Layer */}
-                            <div style={{ width: '2px', height: '40px', background: '#27272a' }}></div>
-                            <div style={{ display: 'flex', gap: '40px', width: '100%', justifyContent: 'center' }}>
-                                <NodeBox title="Wisden API" sub="Primary Data Source" color="#10b981" />
-                                <NodeBox title="Supabase" sub="Historical / Form" color="#ec4899" />
+                        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '20px', alignItems: 'start' }}>
+                            <div style={{ color: '#f59e0b', fontWeight: 600 }}>2nd Innings</div>
+                            <div>
+                                <div style={{ color: '#fff', fontWeight: 500, marginBottom: '4px' }}>RRR Pressure Matrix</div>
+                                <div style={{ color: '#a1a1aa', fontSize: '14px' }}>
+                                    Probability is defined by Required Run Rate thresholds:
+                                    <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                                        <li>RRR &gt; 13.0 (T20) → <b>5% Win Prob</b></li>
+                                        <li>RRR &gt; 10.0 (T20) → <b>20% Win Prob</b></li>
+                                        <li>RRR &lt; 6.0 (T20) → <b>80% Win Prob</b></li>
+                                    </ul>
+                                    <div style={{ marginTop: '8px', color: '#ef4444' }}>
+                                        <b>Death Penalty:</b> If overs &lt; 5 and RRR &gt; 12, probability decays exponentially.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* 2. API Service Layer */}
+                {/* 4. Dynamic Chips */}
                 <section>
                     <div style={sectionHeaderStyle}>
-                        <LuNetwork color="#8b5cf6" size={24} />
-                        <h2 style={h2Style}>API Service Layer</h2>
+                        <LuFilter color="#10b981" size={24} />
+                        <h2 style={h2Style}>Dynamic Filter Chips</h2>
                     </div>
                     <p style={pStyle}>
-                        The application aggregates data from two primary upstream services. All requests are routed through a managed CORS proxy to handle headers and caching.
+                        Inside <code>UpcomingListPage.tsx</code>, filter chips are not hardcoded. They are <b>Derived State</b>.
                     </p>
+                    <CodeBlock
+                        label="Generation Logic"
+                        code={`
+// 1. Filter Matches by selected Month (Time Chip)
+const validMatches = matches.filter(m => m.date === selectedMonth);
 
-                    <div style={gridStyle}>
-                        <ServiceCard
-                            icon={<LuDatabase size={20} color="#10b981" />}
-                            title="Wisden (Live)"
-                            desc="Real-time match data, scorecards, and commentary."
-                        >
-                            <Endpoint method="GET" path="/default.aspx" desc="Method: 3 (Matches)" />
-                            <Endpoint method="GET" path="/cricket/v1/game/scorecard" desc="Full Scorecard JSON" />
-                            <Endpoint method="GET" path="/functions/wallstream" desc="Ball-by-Ball Commentary" />
-                            <Endpoint method="GET" path="/cricket/live/json/*" desc="Static JSON Assets (Charts)" />
-                        </ServiceCard>
+// 2. Iterate valid matches and extract unique properties
+const types = new Set();
+validMatches.forEach(m => {
+   types.add(m.LeagueName);   // e.g. "IPL"
+   types.add(m.Team1);        // e.g. "India"
+   types.add(m.MatchFormat);  // e.g. "T20"
+});
 
-                        <ServiceCard
-                            icon={<LuShield size={20} color="#ec4899" />}
-                            title="Supabase (History)"
-                            desc="Long-term storage for team form, H2H, and league stats."
-                        >
-                            <Endpoint method="SELECT" path="matches" desc="Team Form (Last 5)" />
-                            <Endpoint method="SELECT" path="matches" desc="Head-to-Head Records" />
-                            <Endpoint method="SELECT" path="matches" desc="League Filtering" />
-                        </ServiceCard>
-                    </div>
+// 3. Render Chips
+// Result: Users only see chips relevant to the *current* month.
+`}
+                    />
                 </section>
 
-                {/* 3. Data Models */}
+                {/* 5. API Clarification */}
                 <section>
                     <div style={sectionHeaderStyle}>
-                        <LuCode color="#f59e0b" size={24} />
-                        <h2 style={h2Style}>Core Data Models</h2>
+                        <LuNetwork color="#ec4899" size={24} />
+                        <h2 style={h2Style}>API "Gamestate" Clarified</h2>
                     </div>
                     <p style={pStyle}>
-                        TypeScript definitions ensuring type safety across the dual-engine boundary.
+                        The app uses <b>Method Types</b> (Wisden legacy param) to request different datasets.
                     </p>
 
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', textAlign: 'left' }}>
-                        <thead>
-                            <tr style={{ borderBottom: '1px solid #27272a' }}>
-                                <th style={{ padding: '12px 0', color: '#71717a', fontWeight: 500 }}>Interface</th>
-                                <th style={{ padding: '12px 0', color: '#71717a', fontWeight: 500 }}>Key Properties</th>
-                                <th style={{ padding: '12px 0', color: '#71717a', fontWeight: 500 }}>Usage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <ModelRow
-                                name="Match"
-                                props="game_id, event_state, participants, status_text"
-                                usage="Global List, Home Page"
-                            />
-                            <ModelRow
-                                name="Scorecard"
-                                props="Innings[], Teams{}, Players{}"
-                                usage="LiveDetail, Score Views"
-                            />
-                            <ModelRow
-                                name="WallstreamData"
-                                props="balls[], latestBall, commentary"
-                                usage="Commentary Feed, Header Ticker"
-                            />
-                            <ModelRow
-                                name="H2HData"
-                                props="team.head_to_head, venue_stats"
-                                usage="Match Insights, Pre-game Analysis"
-                            />
-                        </tbody>
-                    </table>
-                </section>
-
-                {/* 4. Logic & Optimization */}
-                <section>
-                    <div style={sectionHeaderStyle}>
-                        <LuCpu color="#ef4444" size={24} />
-                        <h2 style={h2Style}>Logic & Optimization</h2>
-                    </div>
-
-                    <div style={gridStyle}>
-                        <LogicCard
-                            title="Viewport Throttling"
-                            desc="Engine B (Live) subscribes to the browser's Page Visibility API. If the tab is backgrounded or the user navigates to a Series view, the poll halts immediately (App.tsx:304)."
-                        />
-                        <LogicCard
-                            title="Event-Driven Charts"
-                            desc="Static assets like Wagon Wheels are not polled on a timer. They are fetched only when the 'Over Count' increments in the Scorecard stream, reducing redundant calls by ~90%."
-                        />
-                        <LogicCard
-                            title="Preload Injection"
-                            desc="Critical match data is pre-fetched server-side (or via script injection) into window.__preloadData, allowing the React hydration to skip the initial RTT."
-                        />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div style={{ background: '#1f2937', padding: '16px', borderRadius: '6px', border: '1px solid #374151' }}>
+                            <div style={{ color: '#9ca3af', fontSize: '12px', textTransform: 'uppercase' }}>Method Type 3</div>
+                            <div style={{ color: '#fff', fontWeight: 600, marginTop: '4px' }}>Global Match List</div>
+                            <div style={{ color: '#6b7280', fontSize: '12px', marginTop: '4px' }}>The master list of all matches.</div>
+                        </div>
+                        <div style={{ background: '#1f2937', padding: '16px', borderRadius: '6px', border: '1px solid #374151' }}>
+                            <div style={{ color: '#9ca3af', fontSize: '12px', textTransform: 'uppercase' }}>Gamestate Param</div>
+                            <div style={{ color: '#fff', fontWeight: 600, marginTop: '4px' }}>1=Live, 2=Upcoming, 3=Result</div>
+                            <div style={{ color: '#6b7280', fontSize: '12px', marginTop: '4px' }}>Filters the global list response.</div>
+                        </div>
                     </div>
                 </section>
 
                 {/* Footer */}
                 <div style={{ marginTop: '80px', borderTop: '1px solid #27272a', paddingTop: '40px', fontSize: '13px', color: '#52525b', display: 'flex', justifyContent: 'space-between' }}>
-                    <div>BoxCric Engineering</div>
+                    <div>BoxCric Engineering Core v1.3</div>
                     <div>Generated: {new Date().toLocaleDateString()}</div>
                 </div>
 
@@ -234,52 +270,23 @@ const Tag = ({ label, color }: any) => (
     }}>{label}</div>
 );
 
-const NodeBox = ({ title, sub, color, wide }: any) => (
-    <div style={{
-        width: wide ? '240px' : '180px', padding: '16px', background: '#18181b',
-        border: `1px solid ${color || '#52525b'}`, borderRadius: '8px', textAlign: 'center',
-        boxShadow: `0 4px 20px -10px ${color}30`
-    }}>
-        <div style={{ fontWeight: 600, color: '#fff', fontSize: '14px' }}>{title}</div>
-        <div style={{ fontSize: '12px', color: '#71717a', marginTop: '4px' }}>{sub}</div>
-    </div>
-);
-
-const ServiceCard = ({ title, desc, icon, children }: any) => (
-    <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            {icon}
-            <div style={{ fontWeight: 600, color: '#fff' }}>{title}</div>
-        </div>
-        <div style={{ fontSize: '13px', color: '#a1a1aa', marginBottom: '24px' }}>{desc}</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {children}
-        </div>
-    </div>
-);
-
-const Endpoint = ({ method, path, desc }: any) => (
-    <div style={{ fontSize: '12px', display: 'grid', gridTemplateColumns: '40px 1fr', gap: '8px', alignItems: 'baseline' }}>
-        <span style={{ color: '#71717a', fontWeight: 600 }}>{method}</span>
-        <div>
-            <div style={{ fontFamily: 'monospace', color: '#e4e4e7' }}>{path}</div>
-            <div style={{ color: '#52525b' }}>{desc}</div>
-        </div>
-    </div>
-);
-
-const ModelRow = ({ name, props, usage }: any) => (
-    <tr style={{ borderBottom: '1px solid #27272a' }}>
-        <td style={{ padding: '16px 0', fontFamily: 'monospace', color: '#f59e0b' }}>{name}</td>
-        <td style={{ padding: '16px 0', color: '#d4d4d8', fontSize: '13px', fontFamily: 'monospace' }}>{props}</td>
-        <td style={{ padding: '16px 0', color: '#a1a1aa', fontSize: '13px' }}>{usage}</td>
-    </tr>
-);
-
 const LogicCard = ({ title, desc }: any) => (
     <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '20px' }}>
         <div style={{ color: '#e4e4e7', fontWeight: 600, marginBottom: '8px', fontSize: '14px' }}>{title}</div>
         <div style={{ color: '#a1a1aa', fontSize: '13px', lineHeight: '1.6' }}>{desc}</div>
+    </div>
+);
+
+const CodeBlock = ({ label, code }: any) => (
+    <div style={{ marginTop: '20px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #334155' }}>
+        <div style={{ background: '#1e293b', padding: '8px 16px', fontSize: '12px', color: '#cbd5e1', borderBottom: '1px solid #334155' }}>
+            {label}
+        </div>
+        <div style={{ background: '#0f172a', padding: '16px', overflowX: 'auto' }}>
+            <pre style={{ margin: 0, fontFamily: 'monospace', fontSize: '13px', color: '#a5b4fc', lineHeight: '1.5' }}>
+                {code.trim()}
+            </pre>
+        </div>
     </div>
 );
 
