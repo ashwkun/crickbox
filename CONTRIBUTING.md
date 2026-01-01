@@ -84,46 +84,6 @@ boxcric/
 
 ---
 
-## ⚠️ Handling Merge Conflicts
-
-If you get conflicts when merging or rebasing:
-
-### 1. Update Your Branch
-```bash
-git fetch origin
-git rebase origin/main
-```
-
-### 2. If Conflicts Appear
-Git will show which files have conflicts. Open them and look for:
-```
-<<<<<<< HEAD
-your changes
-=======
-their changes
->>>>>>> main
-```
-
-### 3. Resolve Conflicts
-- Keep the code you want (or combine both)
-- Remove the conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
-- Save the file
-
-### 4. Continue the Rebase
-```bash
-git add .
-git rebase --continue
-```
-
-### 5. Force Push Your Branch
-```bash
-git push origin feature/your-feature-name --force
-```
-
-> 💡 **Tip:** If things get messy, you can abort with `git rebase --abort` and ask for help!
-
----
-
 ## ❓ Need Help?
 
 Reach out to the project owner if you have questions!
