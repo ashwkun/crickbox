@@ -320,8 +320,10 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                                     letterSpacing: '0.3px',
                                     textTransform: 'uppercase',
                                     overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    lineHeight: 1.4,
                                     flex: 1,
                                 }}>
                                     {group.seriesName}
