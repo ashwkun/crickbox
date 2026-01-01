@@ -81,7 +81,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
     // Individual character container
     const charContainerStyle: React.CSSProperties = {
         position: 'relative',
-        width: '18px', // Increased from 14px to 18px as requested
+        width: '19px', // Set to 19px as requested
         height: '24px',
         transformStyle: 'preserve-3d',
         display: 'flex',
