@@ -1129,7 +1129,6 @@
     background: rgba(99, 102, 241, 0.08);
     /* Indigo tint */
     border-color: rgba(99, 102, 241, 0.4);
-    transform: translateY(-2px);
 }
 
 .view-more-icon {
@@ -1149,8 +1148,6 @@
     background: #6366f1;
     /* Indigo-500 */
     color: #fff;
-    transform: scale(1.1) rotate(90deg);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
 }
 
 .view-more-text {
