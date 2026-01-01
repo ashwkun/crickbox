@@ -692,13 +692,13 @@ export default function HomePage({
             <div
                 onClick={onOpenUpcomingList}
                 style={{
-                    margin: '0 20px 24px',
+                    margin: '-8px 20px 12px', // Tighter spacing (pull up 8px, reduce bottom)
                 }}
             >
                 <div style={{
                     height: '1px',
                     background: 'linear-gradient(90deg, #6366f1 0%, rgba(99, 102, 241, 0) 100%)',
-                    marginBottom: '12px',
+                    marginBottom: '8px', // Reduced from 12px
                     opacity: 0.8
                 }} />
                 <div style={{
