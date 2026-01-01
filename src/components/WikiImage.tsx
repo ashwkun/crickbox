@@ -170,15 +170,33 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
         }
 
         try {
+            // Step 1: Clean the name
             const cleanName = type === 'team' ? name.replace(/(-W|\sW$|Women|Women's)/gi, '').trim() : name;
-            let query = cleanName;
 
+            // Step 2: Construct primary query (suffixed)
+            let query = cleanName;
             if (type === 'team' && !cleanName.toLowerCase().includes('team')) query += ' cricket team';
             else if (type === 'player') query += ' cricketer';
             else if ((type === 'series' || type === 'tournament') && !cleanName.toLowerCase().includes('cup') && !cleanName.toLowerCase().includes('trophy') && !cleanName.toLowerCase().includes('league')) query += ' cricket';
 
-            const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-            const res = await fetch(url);
+            // Step 3: Fetch
+            let url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+            let res = await fetch(url);
+
+            // Step 4: Retry with raw cleanName if 404 (e.g. "Brisbane Heat cricket team" -> "Brisbane Heat")
+            if (!res.ok && res.status === 404 && query !== cleanName) {
+                // Try the raw name without suffixes
+                url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanName)}`;
+                res = await fetch(url);
+            }
+
+            // Retry for national teams: "India cricket team" -> "India national cricket team"
+            if (!res.ok && res.status === 404 && type === 'team' && !query.includes('national')) {
+                const nationalQuery = cleanName + ' national cricket team';
+                url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(nationalQuery)}`;
+                res = await fetch(url);
+            }
+
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
             const data = await res.json();
