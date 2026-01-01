@@ -465,27 +465,27 @@ export default function App(): React.ReactElement {
                         );
                     case 'SERIES':
                         return (
-                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex }}>
+                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-app)', overflowY: 'auto' }}>
                                 <SeriesHub
                                     seriesName={view.data.seriesName}
                                     matches={view.data.matches}
                                     onBack={handleCloseSeries}
                                     onMatchClick={handleSelectMatch}
                                     isVisible={isVisible}
-                                    style={{ zIndex }}
+                                    style={{ minHeight: '100%' }}
                                 />
                             </div>
                         );
                     case 'TOURNAMENT':
                         return (
-                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex }}>
+                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-app)', overflowY: 'auto' }}>
                                 <TournamentHub
                                     tournamentName={view.data.tournamentName}
                                     matches={view.data.matches}
                                     onBack={handleCloseTournament}
                                     onMatchClick={handleSelectMatch}
                                     isVisible={isVisible}
-                                    style={{ zIndex }}
+                                    style={{ minHeight: '100%' }}
                                 />
                             </div>
                         );
