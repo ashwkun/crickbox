@@ -594,6 +594,7 @@ export default function HomePage({
                             setUpcomingTimeFilter(v);
                         }}
                         allowedFilters={['all', 'today', 'tomorrow', 'week']}
+                        onNextClick={onOpenUpcomingList}
                     />
                 </div>
 
@@ -686,6 +687,42 @@ export default function HomePage({
                     <div className="empty-state">No upcoming matches</div>
                 )}
             </section>
+
+            {/* Gradient Accent Banner Entry Point */}
+            <div
+                onClick={onOpenUpcomingList}
+                style={{
+                    margin: '0 20px 24px',
+                }}
+            >
+                <div style={{
+                    height: '1px',
+                    background: 'linear-gradient(90deg, #6366f1 0%, rgba(99, 102, 241, 0) 100%)',
+                    marginBottom: '12px',
+                    opacity: 0.8
+                }} />
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer'
+                }}>
+                    <span style={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        letterSpacing: '0.3px'
+                    }}>
+                        View all {upcomingMatches.length} upcoming matches
+                    </span>
+                    <span style={{
+                        fontSize: '16px',
+                        color: '#6366f1',
+                        fontWeight: 300,
+                        transform: 'translateY(-1px)'
+                    }}>→</span>
+                </div>
+            </div>
 
             {/* Results Section */}
             <section className="section">
