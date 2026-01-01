@@ -438,7 +438,16 @@ export default function App(): React.ReactElement {
             <FloatingHeader
                 showBack={!!selectedMatch || !!selectedSeries || !!selectedTournament || showUpcomingList}
                 onBack={() => {
-                    if (showUpcomingList) setShowUpcomingList(false);
+                    if (showUpcomingList) {
+                        setShowUpcomingList(false);
+                        if (window.history.state?.upcoming) {
+                            window.history.back();
+                        } else {
+                            // If direct load/refresh, manually clear URL param
+                            const newUrl = window.location.pathname + window.location.search.replace(/(\?|&)upcoming=true/, '');
+                            window.history.replaceState(null, '', newUrl || '/');
+                        }
+                    }
                     else if (selectedMatch) handleCloseMatch();
                     else if (selectedSeries) handleCloseSeries();
                     else if (selectedTournament) handleCloseTournament();
