@@ -465,27 +465,29 @@ export default function App(): React.ReactElement {
                         );
                     case 'SERIES':
                         return (
-                            <SeriesHub
-                                key={view.id}
-                                seriesName={view.data.seriesName}
-                                matches={view.data.matches}
-                                onBack={handleCloseSeries}
-                                onMatchClick={handleSelectMatch}
-                                isVisible={isVisible}
-                                style={{ zIndex }}
-                            />
+                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex }}>
+                                <SeriesHub
+                                    seriesName={view.data.seriesName}
+                                    matches={view.data.matches}
+                                    onBack={handleCloseSeries}
+                                    onMatchClick={handleSelectMatch}
+                                    isVisible={isVisible}
+                                    style={{ zIndex }}
+                                />
+                            </div>
                         );
                     case 'TOURNAMENT':
                         return (
-                            <TournamentHub
-                                key={view.id}
-                                tournamentName={view.data.tournamentName}
-                                matches={view.data.matches}
-                                onBack={handleCloseTournament}
-                                onMatchClick={handleSelectMatch}
-                                isVisible={isVisible}
-                                style={{ zIndex }}
-                            />
+                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex }}>
+                                <TournamentHub
+                                    tournamentName={view.data.tournamentName}
+                                    matches={view.data.matches}
+                                    onBack={handleCloseTournament}
+                                    onMatchClick={handleSelectMatch}
+                                    isVisible={isVisible}
+                                    style={{ zIndex }}
+                                />
+                            </div>
                         );
                     case 'UPCOMING_LIST':
                         return (
