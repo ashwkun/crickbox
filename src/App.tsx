@@ -491,7 +491,7 @@ export default function App(): React.ReactElement {
                     case 'SERIES':
                         if (!activeData || !activeData.matches) return null; // Wait for matches to load
                         return (
-                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-app)', overflowY: 'auto' }}>
+                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-primary)', overflowY: 'auto' }}>
                                 <SeriesHub
                                     seriesName={activeData.seriesName}
                                     matches={activeData.matches}
@@ -505,7 +505,7 @@ export default function App(): React.ReactElement {
                     case 'TOURNAMENT':
                         if (!activeData || !activeData.matches) return null; // Wait for matches to load
                         return (
-                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-app)', overflowY: 'auto' }}>
+                            <div key={view.id} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-primary)', overflowY: 'auto' }}>
                                 <TournamentHub
                                     tournamentName={activeData.tournamentName}
                                     matches={activeData.matches}
