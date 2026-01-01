@@ -121,7 +121,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
             <div
                 className="upcoming-card upcoming-card--knockout"
                 onClick={() => onClick(match)}
-                style={{ background, borderColor, position: 'relative', overflow: 'hidden' }}
+                style={{ background, borderColor, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
             >
                 {/* Shimmer Animation Overlay */}
                 <div style={{
