@@ -193,8 +193,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
     };
 
     const headerStyle: React.CSSProperties = {
-        padding: '0 20px',
-        marginBottom: '12px',
+        padding: '0 20px 12px 16px', // Matched with .NEXT and .LIVE
         display: 'flex',
         alignItems: 'center',
         height: '24px',
@@ -220,7 +219,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
         display: 'flex',
         gap: '12px',
         overflowX: 'auto',
-        padding: '0 20px',
+        padding: '0 20px 0 16px', // Matched with .NEXT and .LIVE
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
     };
