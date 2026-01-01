@@ -96,8 +96,8 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
         flex: 1,
-        padding: '4px',
-        marginLeft: '-4px',
+        padding: '4px 20px 4px 0',
+        marginLeft: '0',
     };
 
     const chipStyle = (isSelected: boolean): React.CSSProperties => ({
