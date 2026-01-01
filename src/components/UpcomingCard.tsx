@@ -174,7 +174,9 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: '20px 0',
-                    position: 'relative',
+                    width: '100%',
+                    flex: 1,
+                    textAlign: 'center',
                 }}>
                     {/* Trophy Icon */}
                     <GiTrophy
