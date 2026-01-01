@@ -3,6 +3,7 @@ import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
 import { LuMoonStar, LuCalendarClock } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
+import JustFinishedSection from './JustFinishedSection';
 import UpcomingCard from './UpcomingCard';
 import SeriesHub from './SeriesHub';
 import TournamentHub from './TournamentHub';
@@ -12,7 +13,7 @@ import { filterByTime, isToday, isTomorrow, isThisWeek } from '../utils/upcoming
 
 import SkeletonMatchCard from './SkeletonMatchCard';
 import { Match, Scorecard } from '../types';
-import { sortByPriority, generateChips, generateUpcomingChips, filterByChip } from '../utils/matchPriority';
+import { sortByPriority, generateChips, generateUpcomingChips, filterByChip, filterJustFinished } from '../utils/matchPriority';
 
 // Types for processed items
 interface ProcessedSeriesItem {
@@ -237,6 +238,12 @@ export default function HomePage({
             .filter(isInternationalMens)
             .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())
             .slice(0, 50),
+        [matches]
+    );
+
+    // Look for Just Finished matches (high priority, recently completed)
+    const justFinishedMatches = useMemo(() =>
+        filterJustFinished(matches),
         [matches]
     );
 
@@ -565,6 +572,12 @@ export default function HomePage({
                     </div>
                 )}
             </section>
+
+            {/* Just Finished Section (.JUST / .DONE) */}
+            <JustFinishedSection
+                matches={justFinishedMatches}
+                onMatchClick={openMatch}
+            />
 
             {/* Upcoming Section - Gamer Design Pivot */}
             <section className="section">

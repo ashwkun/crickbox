@@ -16,7 +16,8 @@ export interface Match {
     series_id: string;
     series_name: string;
     start_date: string;
-    event_state: 'U' | 'L' | 'C'; // Upcoming, Live, Completed
+    end_date?: string; // ISO date string for completed matches
+    event_state: 'U' | 'L' | 'C' | 'R'; // Upcoming, Live, Completed, Results
     event_status: string;
     event_sub_status?: string;
     event_format?: string;
