@@ -25,7 +25,7 @@ npm install
 
 ### 4. Run Locally
 ```bash
-npm run dev
+npm start
 ```
 
 ---
@@ -55,13 +55,15 @@ git push origin feature/your-feature-name
 
 ## 🔥 Firebase Deployment
 
-### Testing with Preview Channels
-Deploy to a temporary preview URL (recommended for testing):
+### Deploy to Dev Environment
+Always deploy to the dev site for testing:
 ```bash
-firebase hosting:channel:deploy my-feature --expires 7d
+npm run deploy:dev
 ```
 
-This creates a URL like `boxboxcric--my-feature-abc123.web.app`.
+This deploys to **boxcric-dev.web.app** (not production).
+
+> ⚠️ **Never use `npm run ship`** - that deploys to production!
 
 ### First Time Setup
 1. Install Firebase CLI: `npm install -g firebase-tools`

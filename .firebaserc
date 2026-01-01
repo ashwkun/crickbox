@@ -7,6 +7,9 @@
       "hosting": {
         "prod": [
           "theboxcric"
+        ],
+        "dev": [
+          "boxcric-dev"
         ]
       }
     }
