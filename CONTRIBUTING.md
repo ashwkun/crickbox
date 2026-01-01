@@ -61,9 +61,7 @@ Always deploy to the dev site for testing:
 npm run deploy:dev
 ```
 
-This deploys to **boxcric-dev.web.app** (not production).
-
-> ⚠️ **Never use `npm run ship`** - that deploys to production!
+This deploys to **boxcric-dev.web.app**.
 
 ### First Time Setup
 1. Install Firebase CLI: `npm install -g firebase-tools`
