@@ -73,7 +73,7 @@ const HowItWorks: React.FC<{ isVisible: boolean, onHome: () => void }> = ({ isVi
 │   useCricketData.ts    │           App.tsx                      │
 │   ADAPTIVE POLLING:    │           Poll: Every 10s              │
 │   - 15s if live games  │           Scope: ONE Match             │
-│   - 60s if no live     │                                        │
+│   - 120s if no live    │                                        │
 │   Scope: All Matches   │                                        │
 └──────────┬─────────────┴─────────────┬──────────────────────────┘
            │                           │
