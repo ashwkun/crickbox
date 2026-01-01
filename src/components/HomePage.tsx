@@ -177,7 +177,7 @@ export default function HomePage({
     // Memoized computations - purely API-driven by event_state
     const liveMatchesRaw = useMemo(() =>
         matches
-            .filter(m => m.event_state !== 'L' && m.event_state !== 'U') // FLIPPED: Show completed in Live for testing
+            .filter(m => m.event_state === 'L') // Live Matches
             .filter(isInternationalMens),
         [matches]
     );
@@ -233,7 +233,7 @@ export default function HomePage({
 
     const completedMatches = useMemo(() =>
         matches
-            .filter(m => m.event_state === 'L') // FLIPPED: Show live in Results for testing
+            .filter(m => m.event_state !== 'L' && m.event_state !== 'U')
             .filter(isInternationalMens)
             .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())
             .slice(0, 50),
