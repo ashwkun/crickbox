@@ -42,35 +42,26 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
     const tickerContainer: React.CSSProperties = {
         position: 'relative',
         height: '24px',
-        width: '100px', // Enough for .DONE / .JUST
+        width: '60px', // Exact width for .JUST/.DONE
         perspective: '400px',
     };
 
-    // Common style for .BOX prefix
-    const prefixStyle: React.CSSProperties = {
+    // Shared Text Style (Matches TimeFilter.tsx .NEXT style exactly)
+    const textStyle: React.CSSProperties = {
         fontFamily: '"BBH Bartle", sans-serif',
         fontSize: '14px',
         fontWeight: 600,
         letterSpacing: '1px',
-        color: '#fff', // White prefix
-        marginRight: '2px',
-    };
-
-    // The animated suffix text (.JUST / .DONE)
-    const suffixStyle: React.CSSProperties = {
-        fontFamily: '"BBH Bartle", sans-serif',
-        fontSize: '14px',
-        fontWeight: 600,
-        letterSpacing: '1px',
-        background: 'linear-gradient(90deg, #f59e0b 0%, #fbbf24 50%, #f59e0b 100%)', // Amber/Orange Gradient
-        backgroundSize: '200% auto',
+        // Amber Gradient (matching the 0-35-50-65-100 pattern)
+        background: 'linear-gradient(90deg, #f59e0b 0%, #f59e0b 35%, #fbbf24 50%, #f59e0b 65%, #f59e0b 100%)',
+        backgroundSize: '200% 100%',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
-        animation: 'amberShimmer 2s linear infinite',
+        animation: 'amberShimmer 1.5s ease-in-out infinite alternate',
         display: 'inline-block',
         position: 'absolute',
         top: 0,
-        left: '36px', // Offset after "BOX"
+        left: 0,
         transition: 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease',
         transformOrigin: 'center bottom',
         backfaceVisibility: 'hidden',
@@ -78,14 +69,14 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
 
     // Style for the visible suffix
     const activeSuffixStyle: React.CSSProperties = {
-        ...suffixStyle,
+        ...textStyle,
         opacity: 1,
         transform: 'rotateX(0deg)',
     };
 
     // Style for the hidden suffix
     const hiddenSuffixStyle: React.CSSProperties = {
-        ...suffixStyle,
+        ...textStyle,
         opacity: 0,
         transform: 'rotateX(-90deg)',
     };
@@ -232,8 +223,8 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
         <div style={containerStyle}>
             <style>{`
                 @keyframes amberShimmer {
-                    0% { background-position: 100% 0; }
-                    100% { background-position: -100% 0; }
+                    0% { background-position: 0% 50%; }
+                    100% { background-position: 100% 50%; }
                 }
                 .just-finished-scroll::-webkit-scrollbar { display: none; }
             `}</style>
@@ -241,8 +232,6 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
             {/* Header with Ticker */}
             <div style={headerStyle}>
                 <div style={tickerContainer}>
-                    <span style={prefixStyle}>BOX</span>
-
                     {/* .JUST */}
                     <span style={!showDone ? activeSuffixStyle : hiddenSuffixStyle}>
                         .JUST
