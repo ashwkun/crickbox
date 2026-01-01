@@ -11,6 +11,7 @@ interface TimeFilterProps {
     value: TimeFilterValue;
     onChange: (value: TimeFilterValue) => void;
     allowedFilters?: TimeFilterValue[];
+    onNextClick?: () => void; // Optional: callback when .NEXT is tapped
 }
 
 const ALL_OPTIONS: { value: TimeFilterValue; label: string }[] = [
@@ -22,7 +23,7 @@ const ALL_OPTIONS: { value: TimeFilterValue; label: string }[] = [
     { value: '60d', label: '60 Days' },
 ];
 
-const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters }) => {
+const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters, onNextClick }) => {
     // Scroll and shrink logic removed as chips now fit on screen
 
     const containerStyle: React.CSSProperties = {
@@ -31,7 +32,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters
         gap: '12px',
     };
 
-    // Static .NEXT branding
+    // Static .NEXT branding - now tappable
     const nextContainerStyle: React.CSSProperties = {
         position: 'relative',
         height: '24px',
@@ -39,6 +40,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters
         alignItems: 'center',
         flexShrink: 0,
         width: '80px',
+        cursor: onNextClick ? 'pointer' : 'default',
     };
 
     const textStyle: React.CSSProperties = {
@@ -104,8 +106,8 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters
                 }
             `}</style>
 
-            {/* Static .NEXT branding */}
-            <div style={nextContainerStyle}>
+            {/* Static .NEXT branding - tappable */}
+            <div style={nextContainerStyle} onClick={onNextClick}>
                 <span style={textStyle}>.NEXT</span>
             </div>
 
