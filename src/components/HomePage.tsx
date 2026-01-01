@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
-import { LuMoonStar, LuCalendarClock } from "react-icons/lu";
+import { LuMoonStar, LuCalendarClock, LuCalendarDays } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
 import JustFinishedSection from './JustFinishedSection';
 import UpcomingCard from './UpcomingCard';
@@ -675,7 +675,9 @@ export default function HomePage({
                             className="view-more-card"
                             onClick={onOpenUpcomingList}
                         >
-                            <span className="view-more-icon">+</span>
+                            <div className="view-more-icon">
+                                <LuCalendarDays size={24} />
+                            </div>
                             <span className="view-more-text">Full Calendar</span>
                             <span className="view-more-count">{upcomingMatches.length} total</span>
                         </button>
