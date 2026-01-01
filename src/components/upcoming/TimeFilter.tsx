@@ -10,9 +10,10 @@ export type TimeFilterValue = 'all' | 'today' | 'tomorrow' | 'week' | 'month' | 
 interface TimeFilterProps {
     value: TimeFilterValue;
     onChange: (value: TimeFilterValue) => void;
+    allowedFilters?: TimeFilterValue[];
 }
 
-const OPTIONS: { value: TimeFilterValue; label: string }[] = [
+const ALL_OPTIONS: { value: TimeFilterValue; label: string }[] = [
     { value: 'all', label: 'All' },
     { value: 'today', label: 'Today' },
     { value: 'tomorrow', label: 'Tomorrow' },
@@ -21,7 +22,7 @@ const OPTIONS: { value: TimeFilterValue; label: string }[] = [
     { value: '60d', label: '60 Days' },
 ];
 
-const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange }) => {
+const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters }) => {
     const [isShrunk, setIsShrunk] = useState(false);
 
     const containerStyle: React.CSSProperties = {
@@ -117,7 +118,16 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange }) => {
         flexShrink: 0,
     });
 
+    const visibleOptions = allowedFilters
+        ? ALL_OPTIONS.filter(opt => allowedFilters.includes(opt.value))
+        : ALL_OPTIONS;
+
+    // Helper to determine if we should show the shrunk state
+    // We only shrink if we have enough items to scroll
+    const shouldEnableShrink = visibleOptions.length > 3;
+
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        if (!shouldEnableShrink) return;
         const scrollLeft = e.currentTarget.scrollLeft;
         if (scrollLeft > 10 && !isShrunk) setIsShrunk(true);
         else if (scrollLeft <= 10 && isShrunk) setIsShrunk(false);
@@ -151,7 +161,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange }) => {
                 className="time-filter-scroll"
                 onScroll={handleScroll}
             >
-                {OPTIONS.map(option => (
+                {visibleOptions.map(option => (
                     <div
                         key={option.value}
                         style={chipStyle(option.value === value)}
