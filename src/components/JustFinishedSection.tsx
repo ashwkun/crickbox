@@ -261,7 +261,7 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
             {/* Header with Ticker */}
             <div style={headerStyle}>
                 {/* Static Dot */}
-                <span style={{ ...textBaseStyle, marginRight: '2px' }}>.</span>
+                <span style={{ ...textBaseStyle, marginRight: '1px' }}>.</span>
 
                 {/* Animated Word */}
                 <div style={tickerWrapperStyle}>
