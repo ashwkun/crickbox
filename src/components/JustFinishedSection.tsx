@@ -175,7 +175,7 @@ const Card: React.FC<{ match: Match; onMatchClick: (match: Match) => void }> = R
             </div>
 
             {/* Result Text */}
-            <div style={{ marginTop: '10px', zIndex: 1 }}>
+            <div style={{ marginTop: '10px', zIndex: 1, textAlign: 'center' }}>
                 <span style={{
                     fontSize: '11px',
                     color: isDraw ? '#eab308' : '#f59e0b', // Amber
