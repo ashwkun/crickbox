@@ -70,6 +70,7 @@ const TimeFilter: React.FC<TimeFilterProps> = ({ value, onChange, allowedFilters
         flex: 1,
         padding: '4px 0 4px 0',
         marginLeft: '0',
+        justifyContent: 'flex-end',
     };
 
     const chipStyle = (isSelected: boolean): React.CSSProperties => ({
