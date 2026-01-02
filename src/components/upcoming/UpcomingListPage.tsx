@@ -125,41 +125,8 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
 
     const contentRef = useRef<HTMLDivElement>(null);
 
-    // Collapsible filter state
+    // Collapsible filter state (toggle only, no scroll detection)
     const [showFilters, setShowFilters] = useState(false);
-    const showFiltersRef = useRef(showFilters);
-    const lastScrollY = useRef(0);
-    const scrollAccumulator = useRef(0);
-
-    // Keep ref in sync with state
-    showFiltersRef.current = showFilters;
-
-    // Handle scroll for auto-hide/reveal filters
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        const currentScrollY = e.currentTarget.scrollTop;
-        const delta = currentScrollY - lastScrollY.current;
-
-        // Accumulate scroll direction
-        if (Math.sign(delta) === Math.sign(scrollAccumulator.current)) {
-            scrollAccumulator.current += delta;
-        } else {
-            scrollAccumulator.current = delta; // Reset on direction change
-        }
-
-        // Collapse: very sensitive - any 5px scroll down hides filters
-        if (scrollAccumulator.current > 5 && showFiltersRef.current) {
-            setShowFilters(false);
-            scrollAccumulator.current = 0;
-        }
-
-        // Reveal: scroll up 30px to show filters (anywhere in the list)
-        if (scrollAccumulator.current < -30 && !showFiltersRef.current) {
-            setShowFilters(true);
-            scrollAccumulator.current = 0;
-        }
-
-        lastScrollY.current = currentScrollY;
-    };
 
     // Filter matches by time
     const timeFilteredMatches = useMemo(() => {
@@ -459,7 +426,6 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
             {/* Body: Series-Centric Content */}
             <div
                 ref={contentRef}
-                onScroll={handleScroll}
                 style={{
                     flex: 1,
                     overflowY: 'auto',
