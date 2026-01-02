@@ -185,7 +185,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     const teamChips = useMemo(() => {
         const teamCounts = new Map<string, { name: string; shortName: string; count: number }>();
 
-        timeFilteredMatches.forEach(match => {
+        typeFilteredMatches.forEach(match => {
             match.participants?.forEach(p => {
                 const name = p.name || '';
                 const shortName = p.short_name || name.slice(0, 3).toUpperCase();
@@ -216,7 +216,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
             { id: 'all', label: 'All Teams', count: 0 },
             ...sorted.map(t => ({ id: t.name, label: t.shortName, count: t.count }))
         ];
-    }, [timeFilteredMatches]);
+    }, [typeFilteredMatches]);
 
     // Reset team selection if chip no longer exists
     useMemo(() => {
