@@ -104,9 +104,12 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     // Filter matches by time
     const timeFilteredMatches = useMemo(() => {
         const chip = timeChips.find(c => c.id === selectedTime);
-        if (!chip) return matches;
+        if (!chip) return matches.filter(m => m.event_state === 'U');
 
         return matches.filter(match => {
+            // Only show upcoming matches
+            if (match.event_state !== 'U') return false;
+
             const matchDate = new Date(match.start_date);
             const matchMonth = matchDate.getMonth();
             const matchYear = matchDate.getFullYear();
