@@ -141,7 +141,7 @@ async function fetchAllMatches() {
  * Fetch scorecard for a single match
  */
 async function fetchScorecard(gameId) {
-    const url = `https://www.wisden.com/cricket/v1/scorecard?game_id=${gameId}&lang=en&feed_format=json&client_id=${CLIENT_SCORECARD}`;
+    const url = `https://www.wisden.com/cricket/v1/game/scorecard?game_id=${gameId}&lang=en&feed_format=json&client_id=${CLIENT_SCORECARD}`;
     const proxyUrl = `${WISDEN_API}${encodeURIComponent(url)}`;
 
     try {
