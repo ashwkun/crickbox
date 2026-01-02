@@ -131,11 +131,11 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                     width: '200%',
                     height: '100%',
                     background: `linear-gradient(90deg, transparent 0%, ${knockoutGold}10 45%, ${knockoutGold}25 50%, ${knockoutGold}10 55%, transparent 100%)`,
-                    animation: 'shimmer 3s infinite',
+                    animation: 'knockoutShimmer 3s infinite',
                     pointerEvents: 'none',
                 }} />
                 <style>{`
-                    @keyframes shimmer {
+                    @keyframes knockoutShimmer {
                         0% { transform: translateX(-50%); }
                         100% { transform: translateX(50%); }
                     }
