@@ -7,7 +7,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Match } from '../../types';
-import { LuCalendarDays, LuCalendarPlus, LuChevronRight, LuX } from 'react-icons/lu';
+import { LuFilter, LuChevronRight, LuX } from 'react-icons/lu';
 import UpcomingCard from '../UpcomingCard';
 import { generateUpcomingChips, filterByChip, getMatchChip } from '../../utils/matchPriority';
 
@@ -125,8 +125,46 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
 
     const contentRef = useRef<HTMLDivElement>(null);
 
-    // Collapsible filter state (toggle only, no scroll detection)
+
+    // Collapsible filter state
     const [showFilters, setShowFilters] = useState(false);
+
+    // We use a ref to track filter state for the scroll handler to avoid closure staleness
+    const showFiltersRef = useRef(false);
+    const lastScrollY = useRef(0);
+    const scrollAccumulator = useRef(0);
+
+    // Sync ref with state
+    useEffect(() => {
+        showFiltersRef.current = showFilters;
+    }, [showFilters]);
+
+    // Handle scroll for auto-hide/reveal filters
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const currentScrollY = e.currentTarget.scrollTop;
+        const delta = currentScrollY - lastScrollY.current;
+
+        // Accumulate scroll direction
+        if (Math.sign(delta) === Math.sign(scrollAccumulator.current)) {
+            scrollAccumulator.current += delta;
+        } else {
+            scrollAccumulator.current = delta; // Reset on direction change
+        }
+
+        // Collapse: very sensitive - any 5px scroll down hides filters
+        if (scrollAccumulator.current > 5 && showFiltersRef.current) {
+            setShowFilters(false);
+            scrollAccumulator.current = 0;
+        }
+
+        // Reveal: scroll up 30px to show filters (anywhere in the list)
+        if (scrollAccumulator.current < -30 && !showFiltersRef.current) {
+            setShowFilters(true);
+            scrollAccumulator.current = 0;
+        }
+
+        lastScrollY.current = currentScrollY;
+    };
 
     // Filter matches by time
     const timeFilteredMatches = useMemo(() => {
@@ -324,8 +362,8 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                     }}
                     onClick={() => setShowFilters(!showFilters)}
                 >
-                    <LuCalendarDays size={14} />
-                    More
+                    <LuFilter size={14} />
+                    Filters
                     <span style={{
                         fontSize: 8,
                         marginLeft: 2,
@@ -428,6 +466,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
             {/* Body: Series-Centric Content */}
             <div
                 ref={contentRef}
+                onScroll={handleScroll}
                 style={{
                     flex: 1,
                     overflowY: 'auto',
