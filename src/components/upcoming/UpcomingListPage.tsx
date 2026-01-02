@@ -7,7 +7,7 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Match } from '../../types';
-import { LuFilter, LuChevronRight, LuX } from 'react-icons/lu';
+import { LuFilter, LuChevronRight, LuX, LuCalendarDays } from 'react-icons/lu';
 import UpcomingCard from '../UpcomingCard';
 import { generateUpcomingChips, filterByChip, getMatchChip } from '../../utils/matchPriority';
 
