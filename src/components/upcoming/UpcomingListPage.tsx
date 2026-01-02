@@ -104,6 +104,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     // Collapsible filter state
     const [showFilters, setShowFilters] = useState(false);
     const lastScrollY = useRef(0);
+    const scrollAccumulator = useRef(0);
 
     // Invalid team names to filter out
     const INVALID_TEAMS = ['TBC', 'TBD', 'D1', 'D2', 'Winner', 'Loser', 'Qualifier', 'Eliminator'];
@@ -111,16 +112,27 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     // Handle scroll for auto-hide/reveal filters
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const currentScrollY = e.currentTarget.scrollTop;
-        const isScrollingDown = currentScrollY > lastScrollY.current;
+        const delta = currentScrollY - lastScrollY.current;
 
-        // Only toggle if scrolled more than 10px to avoid jitter
-        if (Math.abs(currentScrollY - lastScrollY.current) > 10) {
-            if (isScrollingDown && showFilters) {
-                setShowFilters(false); // Hide on scroll down
-            } else if (!isScrollingDown && currentScrollY < 50) {
-                setShowFilters(true); // Show when near top and scrolling up
-            }
+        // Accumulate scroll direction
+        if (Math.sign(delta) === Math.sign(scrollAccumulator.current)) {
+            scrollAccumulator.current += delta;
+        } else {
+            scrollAccumulator.current = delta; // Reset on direction change
         }
+
+        // Collapse: very sensitive - any 5px scroll down hides filters
+        if (scrollAccumulator.current > 5 && showFilters) {
+            setShowFilters(false);
+            scrollAccumulator.current = 0;
+        }
+
+        // Reveal: scroll up 30px to show filters (anywhere in the list)
+        if (scrollAccumulator.current < -30 && !showFilters) {
+            setShowFilters(true);
+            scrollAccumulator.current = 0;
+        }
+
         lastScrollY.current = currentScrollY;
     };
 
