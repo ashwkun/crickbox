@@ -1,8 +1,6 @@
 name: Sync Tournament Stats to Supabase
 
 on:
-  push:
-    branches: [ main ]
   schedule:
     - cron: '30 */12 * * *'  # Every 12 hours (offset from main sync)
   workflow_dispatch:  # Manual trigger
