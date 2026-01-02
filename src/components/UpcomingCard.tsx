@@ -3,8 +3,7 @@ import WikiImage from './WikiImage';
 import { Match } from '../types';
 import { getTeamColor } from '../utils/teamColors';
 import { isTBCMatch, getKnockoutLabel, hasUndeterminedTeams } from '../utils/tbcMatch';
-import { GiTrophy } from 'react-icons/gi';
-import { LuSparkles } from 'react-icons/lu';
+
 
 interface UpcomingCardProps {
     match: Match;
@@ -84,13 +83,9 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     let borderColor = 'rgba(255, 255, 255, 0.08)';
 
     if (bothTeamsUndetermined) {
-        // Premium gold gradient for fully TBC matches
-        background = `
-            radial-gradient(ellipse at 50% 0%, ${knockoutGold}30, transparent 50%),
-            radial-gradient(ellipse at 50% 100%, ${knockoutGold}15, transparent 40%),
-            linear-gradient(180deg, #1a1a20 0%, #0f0f13 100%)
-        `;
-        borderColor = `${knockoutGold}60`;
+        // Subtle dark card with gold hints
+        background = '#0f0f13';
+        borderColor = `${knockoutGold}40`;
     } else if (color1 && color2) {
         background = `radial-gradient(circle at top left, ${color1}40, transparent 55%), radial-gradient(circle at bottom right, ${color2}40, transparent 55%), #0f0f13`;
     } else if (color1) {
@@ -115,108 +110,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
         actionText = 'View Tournament';
     }
 
-    // ========== TBC ARTWORK CARD ==========
-    if (bothTeamsUndetermined) {
-        return (
-            <div
-                className="upcoming-card upcoming-card--knockout"
-                onClick={() => onClick(match)}
-                style={{ background, borderColor, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
-            >
-                {/* Shimmer Animation Overlay */}
-                <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: '-100%',
-                    width: '200%',
-                    height: '100%',
-                    background: `linear-gradient(90deg, transparent 0%, ${knockoutGold}10 45%, ${knockoutGold}25 50%, ${knockoutGold}10 55%, transparent 100%)`,
-                    animation: 'knockoutShimmer 3s infinite',
-                    pointerEvents: 'none',
-                }} />
-                <style>{`
-                    @keyframes knockoutShimmer {
-                        0% { transform: translateX(-50%); }
-                        100% { transform: translateX(50%); }
-                    }
-                    @keyframes trophyGlow {
-                        0%, 100% { filter: drop-shadow(0 0 8px ${knockoutGold}60); }
-                        50% { filter: drop-shadow(0 0 20px ${knockoutGold}90); }
-                    }
-                `}</style>
 
-                {/* Header */}
-                <div className="upcoming-card-header">
-                    <div className="upcoming-date-pill">{dateStr} • {time}</div>
-                    <div style={{
-                        background: `linear-gradient(135deg, ${knockoutGold}, ${knockoutGoldLight})`,
-                        color: '#000',
-                        fontWeight: 800,
-                        fontSize: 10,
-                        padding: '4px 10px',
-                        borderRadius: 12,
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 4,
-                        boxShadow: `0 2px 12px ${knockoutGold}50`,
-                    }}>
-                        <LuSparkles size={10} />
-                        {badgeText}
-                    </div>
-                </div>
-
-                {/* Trophy Hero Section */}
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '20px 0',
-                    width: '100%',
-                    flex: 1,
-                    textAlign: 'center',
-                }}>
-                    {/* Trophy Icon */}
-                    <GiTrophy
-                        size={64}
-                        style={{
-                            color: knockoutGold,
-                        }}
-                    />
-
-                    {/* Teams TBD */}
-                    <span style={{
-                        marginTop: 12,
-                        fontSize: 11,
-                        color: 'rgba(255,255,255,0.5)',
-                        letterSpacing: '0.5px',
-                    }}>
-                        Teams to be decided
-                    </span>
-                </div>
-
-                {/* Footer */}
-                <div className="upcoming-card-footer">
-                    <span className="upcoming-series-name" style={{
-                        color: knockoutGoldLight,
-                        fontWeight: 600,
-                    }}>
-                        {seriesName}
-                    </span>
-                    {hasAction && (
-                        <button className="upcoming-action-btn" onClick={handleAction} style={{
-                            borderColor: `${knockoutGold}40`,
-                            color: knockoutGold,
-                        }}>
-                            {actionText} <span style={{ opacity: 0.6 }}>›</span>
-                        </button>
-                    )}
-                </div>
-            </div>
-        );
-    }
 
     // ========== REGULAR CARD (or partial TBC) ==========
     return (
@@ -251,21 +145,47 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                 )}
             </div>
 
-            {/* Teams */}
-            <div className="upcoming-content">
-                <div className="upcoming-team-col">
-                    <div className="upcoming-team-logo-wrapper">
-                        <WikiImage name={team1Name} id={team1Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            {/* Teams or TBC Context */}
+            <div className="upcoming-content" style={{ justifyContent: bothTeamsUndetermined ? 'center' : 'space-between' }}>
+                {bothTeamsUndetermined ? (
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 0' }}>
+                        <h3 style={{
+                            margin: 0,
+                            fontSize: 18,
+                            fontWeight: 800,
+                            color: knockoutGold, // Use gold for the context text
+                            letterSpacing: 1,
+                            textTransform: 'uppercase'
+                        }}>
+                            {badgeText || 'MATCH ' + match.id}
+                        </h3>
+                        <span style={{
+                            fontSize: 10,
+                            fontWeight: 600,
+                            color: 'rgba(255,255,255,0.4)',
+                            textTransform: 'uppercase',
+                            letterSpacing: 2
+                        }}>
+                            TEAMS TO BE DECIDED
+                        </span>
                     </div>
-                    <span className="upcoming-team-name">{team1Id === '0' ? 'TBD' : team1Name}</span>
-                </div>
-                <div className="upcoming-vs-badge">VS</div>
-                <div className="upcoming-team-col">
-                    <div className="upcoming-team-logo-wrapper">
-                        <WikiImage name={team2Name} id={team2Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                    </div>
-                    <span className="upcoming-team-name">{team2Id === '0' ? 'TBD' : team2Name}</span>
-                </div>
+                ) : (
+                    <>
+                        <div className="upcoming-team-col">
+                            <div className="upcoming-team-logo-wrapper">
+                                <WikiImage name={team1Name} id={team1Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            </div>
+                            <span className="upcoming-team-name">{team1Id === '0' ? 'TBD' : team1Name}</span>
+                        </div>
+                        <div className="upcoming-vs-badge">VS</div>
+                        <div className="upcoming-team-col">
+                            <div className="upcoming-team-logo-wrapper">
+                                <WikiImage name={team2Name} id={team2Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            </div>
+                            <span className="upcoming-team-name">{team2Id === '0' ? 'TBD' : team2Name}</span>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Footer */}
