@@ -320,16 +320,33 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                 alignItems: 'center',
                 gap: 8,
                 padding: '8px 16px',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                borderBottom: showFilters ? 'none' : '1px solid rgba(255,255,255,0.05)',
                 flexShrink: 0,
             }}>
-                {/* Sticky Custom Chip */}
+                {/* More Filters Toggle */}
                 <div
-                    style={stickyChipStyle}
-                    onClick={() => setShowCustomPicker(true)}
+                    style={{
+                        ...stickyChipStyle,
+                        background: showFilters || selectedTypeChip !== 'all' || selectedTeamChip !== 'all'
+                            ? 'rgba(99, 102, 241, 0.2)'
+                            : stickyChipStyle.background,
+                        borderColor: showFilters || selectedTypeChip !== 'all' || selectedTeamChip !== 'all'
+                            ? 'rgba(99, 102, 241, 0.4)'
+                            : stickyChipStyle.borderColor,
+                        color: showFilters || selectedTypeChip !== 'all' || selectedTeamChip !== 'all'
+                            ? '#6366f1'
+                            : stickyChipStyle.color,
+                    }}
+                    onClick={() => setShowFilters(!showFilters)}
                 >
-                    <LuCalendarPlus size={14} />
-                    Custom
+                    <LuCalendarDays size={14} />
+                    More
+                    <span style={{
+                        fontSize: 8,
+                        marginLeft: 2,
+                        transform: showFilters ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s ease',
+                    }}>▼</span>
                 </div>
 
                 {/* Scrollable Time Chips */}
@@ -355,36 +372,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                 </div>
             </div>
 
-            {/* Filters Toggle Button */}
-            <div
-                style={{
-                    padding: '8px 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    cursor: 'pointer',
-                    borderBottom: showFilters ? 'none' : '1px solid var(--border-color)',
-                }}
-                onClick={() => setShowFilters(!showFilters)}
-            >
-                <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
-                    Filters
-                </span>
-                <span style={{
-                    fontSize: 10,
-                    transform: showFilters ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s ease',
-                    color: 'rgba(255,255,255,0.4)'
-                }}>▼</span>
-                {(selectedTypeChip !== 'all' || selectedTeamChip !== 'all') && (
-                    <span style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        background: '#6366f1',
-                    }} />
-                )}
-            </div>
+
 
             {/* Collapsible Filter Rows */}
             <div style={{
