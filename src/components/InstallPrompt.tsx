@@ -20,12 +20,7 @@ const InstallPrompt: React.FC<InstallPromptProps> = ({ forceShow = false, onClos
         setIsStandalone(standalone);
 
         // If already standalone, don't show prompt
-        if (standalone) {
-            console.log('[PWA] App is running in STANDALONE mode. Prompt suppressed.');
-            return;
-        }
-
-        console.log('[PWA] InstallPrompt Mounted. Checking logic...');
+        if (standalone) return;
 
         // Check if iOS
         const ua = navigator.userAgent;
@@ -39,7 +34,6 @@ const InstallPrompt: React.FC<InstallPromptProps> = ({ forceShow = false, onClos
 
         // For Android/Chrome - listen for beforeinstallprompt
         const handleBeforeInstall = (e) => {
-            console.log('[PWA] beforeinstallprompt fired!');
             e.preventDefault();
             setDeferredPrompt(e);
             setShowPrompt(true);
