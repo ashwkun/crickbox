@@ -27,16 +27,50 @@ const KNOCKOUT_NAME_PATTERNS = [
     /super\s?(6|8|six|eight)/i,
     /challenger/i,
     /knockout/i,
-    /plate\s?final/i
+    /plate\s?final/i,
+    /preliminary/i
 ];
+
+// Regex patterns for TBC/Placeholder team names
+// Used for filtering and image fallback
+export const TBC_NAME_PATTERNS = [
+    /^(A|B|C|D)[1-4]$/i,      // A1, B2, D4 etc.
+    /^(AD|BC)[1-2]$/i,        // AD1, BC2
+    /^Qualifier(\s?\d+)?$/i,  // Qualifier, Qualifier 1
+    /^Eliminator(\s?\d+)?$/i, // Eliminator, Eliminator 2
+    /^Winner\s.*$/i,          // Winner ...
+    /^Loser\s.*$/i,           // Loser ...
+    /^T\.?B\.?C\.?$/i,        // TBC, T.B.C.
+    /^T\.?B\.?D\.?$/i,        // TBD, T.B.D.
+    /^Unknown$/i
+];
+
+/**
+ * Check if a team name indicates a TBC/Placeholder team
+ */
+export const isTBCName = (name: string | undefined): boolean => {
+    if (!name) return false;
+    return TBC_NAME_PATTERNS.some(pattern => pattern.test(name));
+};
 
 /**
  * Check if either team has undetermined ID (id === "0")
  */
+/**
+ * Check if either team has undetermined ID (id === "0") or TBC name
+ */
 export const hasUndeterminedTeams = (match: Match): boolean => {
     const team1Id = match.participants?.[0]?.id;
     const team2Id = match.participants?.[1]?.id;
-    return team1Id === "0" || team2Id === "0";
+    const team1Name = match.participants?.[0]?.name;
+    const team2Name = match.participants?.[1]?.name;
+
+    return (
+        team1Id === "0" ||
+        team2Id === "0" ||
+        isTBCName(team1Name) ||
+        isTBCName(team2Name)
+    );
 };
 
 /**
