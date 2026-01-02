@@ -67,10 +67,11 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     // TBC Detection
     const isTBC = isTBCMatch(match);
 
-    // Check if both teams are undetermined (via ID '0', missing ID, or TBC name pattern)
-    // This ensures consistent "Clean Layout" even if API behaves oddly
-    const isTeam1TBC = team1Id === '0' || !team1Id || isTBCName(team1Name);
-    const isTeam2TBC = team2Id === '0' || !team2Id || isTBCName(team2Name);
+    // Check if both teams are undetermined
+    // STRICTER LOGIC: Must match TBC pattern AND have invalid ID (0 or missing)
+    // This prevents valid teams with weird names from being hidden
+    const isTeam1TBC = (team1Id === '0' || !team1Id) && isTBCName(team1Name);
+    const isTeam2TBC = (team2Id === '0' || !team2Id) && isTBCName(team2Name);
     const bothTeamsUndetermined = isTeam1TBC && isTeam2TBC;
 
     const knockoutLabel = getKnockoutLabel(match);
