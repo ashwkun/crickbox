@@ -161,6 +161,11 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
         }
     }, [typeChips, selectedTypeChip]);
 
+    // Filter matches by type chip
+    const typeFilteredMatches = useMemo(() => {
+        return filterByChip(timeFilteredMatches, selectedTypeChip);
+    }, [timeFilteredMatches, selectedTypeChip]);
+
     // Team filter state
     const [selectedTeamChip, setSelectedTeamChip] = useState('all');
 
@@ -208,10 +213,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
         }
     }, [teamChips, selectedTeamChip]);
 
-    // Filter matches by type chip
-    const typeFilteredMatches = useMemo(() => {
-        return filterByChip(timeFilteredMatches, selectedTypeChip);
-    }, [timeFilteredMatches, selectedTypeChip]);
+
 
     // Filter matches by team chip
     const filteredMatches = useMemo(() => {
