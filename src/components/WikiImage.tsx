@@ -65,6 +65,24 @@ export const getFlagUrl = (teamName: string | undefined): string | null => {
     return null;
 };
 
+// Regex patterns for TBC/Placeholder team names
+const TBC_NAME_PATTERNS = [
+    /^(A|B|C|D)[1-4]$/i,      // A1, B2, D4 etc.
+    /^(AD|BC)[1-2]$/i,        // AD1, BC2
+    /^Qualifier(\s?\d+)?$/i,  // Qualifier, Qualifier 1
+    /^Eliminator(\s?\d+)?$/i, // Eliminator, Eliminator 2
+    /^Winner\s.*$/i,          // Winner ...
+    /^Loser\s.*$/i,           // Loser ...
+    /^T\.?B\.?C\.?$/i,        // TBC, T.B.C.
+    /^T\.?B\.?D\.?$/i,        // TBD, T.B.D.
+    /^Unknown$/i
+];
+
+const isTBCName = (name: string | undefined): boolean => {
+    if (!name) return false;
+    return TBC_NAME_PATTERNS.some(pattern => pattern.test(name));
+};
+
 // WikiImage Component (Wisden Assets -> Wikipedia -> Flag -> Placeholder)
 const WikiImage: React.FC<WikiImageProps> = React.memo(({
     name,
@@ -88,7 +106,10 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
 
         // Strategy 1: Wisden Asset (FIRST PRIORITY)
         // For teams, default to ID '0' which returns a proper TBC placeholder from Wisden
-        const effectiveId = id || (type === 'team' ? '0' : undefined);
+        // Also force ID '0' if the name is detected as a TBC pattern
+        const shouldUseTBCImage = isTBCName(name);
+        const effectiveId = shouldUseTBCImage ? '0' : (id || (type === 'team' ? '0' : undefined));
+
         if (effectiveId && errorCount === 0) {
             let url: string | undefined;
             if (type === 'player') url = `${WISDEN_PLAYER_IMG}${effectiveId}.png`;

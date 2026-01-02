@@ -88,7 +88,22 @@ const generateTimeChips = (): { id: string; label: string; startMonth: number; s
 };
 
 // Invalid team names to filter out (moved outside component to avoid hoisting issues)
-const INVALID_TEAMS = ['TBC', 'TBD', 'D1', 'D2', 'Winner', 'Loser', 'Qualifier', 'Eliminator'];
+// Regex patterns for invalid/placeholder teams
+const INVALID_TEAM_PATTERNS = [
+    /^(A|B|C|D)[1-4]$/i,      // A1, B2, D4 etc.
+    /^(AD|BC)[1-2]$/i,        // AD1, BC2
+    /^Qualifier(\s?\d+)?$/i,  // Qualifier, Qualifier 1
+    /^Eliminator(\s?\d+)?$/i, // Eliminator, Eliminator 2
+    /^Winner\s.*$/i,          // Winner ...
+    /^Loser\s.*$/i,           // Loser ...
+    /^T\.?B\.?C\.?$/i,        // TBC, T.B.C.
+    /^T\.?B\.?D\.?$/i,        // TBD, T.B.D.
+    /^Unknown$/i
+];
+
+const IS_INVALID_TEAM = (name: string): boolean => {
+    return INVALID_TEAM_PATTERNS.some(pattern => pattern.test(name));
+};
 
 // Team priority for chip ordering (moved outside component to avoid hoisting issues)
 const TEAM_PRIORITY: Record<string, number> = {
@@ -224,9 +239,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                 const shortName = p.short_name || name.slice(0, 3).toUpperCase();
 
                 // Skip invalid teams: no ID, empty name, or placeholder names
-                if (!p.id || !name || INVALID_TEAMS.some(inv =>
-                    name.toUpperCase().includes(inv) || shortName.toUpperCase().includes(inv)
-                )) return;
+                if (!p.id || !name || IS_INVALID_TEAM(name) || IS_INVALID_TEAM(shortName)) return;
 
                 const existing = teamCounts.get(name);
                 if (existing) {
