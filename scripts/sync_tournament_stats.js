@@ -124,8 +124,17 @@ async function fetchAllMatches() {
     const response = await fetch(proxyUrl);
     const data = await response.json();
 
-    console.log(`Fetched ${data.matches?.length || 0} total matches`);
-    return data.matches || [];
+    const allMatches = data.matches || [];
+    console.log(`Fetched ${allMatches.length} total matches`);
+
+    // Filter matches before 2022-01-01
+    const cutoffDate = '2022-01-01';
+    const recentMatches = allMatches.filter(m => {
+        return m.start_date && m.start_date >= cutoffDate;
+    });
+
+    console.log(`Filtered to ${recentMatches.length} matches since ${cutoffDate}`);
+    return recentMatches;
 }
 
 /**
