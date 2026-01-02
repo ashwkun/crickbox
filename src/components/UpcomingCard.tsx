@@ -2,7 +2,7 @@ import React from 'react';
 import WikiImage from './WikiImage';
 import { Match } from '../types';
 import { getTeamColor } from '../utils/teamColors';
-import { isTBCMatch, getKnockoutLabel, hasUndeterminedTeams } from '../utils/tbcMatch';
+import { isTBCMatch, getKnockoutLabel, hasUndeterminedTeams, isTBCName } from '../utils/tbcMatch';
 
 
 interface UpcomingCardProps {
@@ -64,8 +64,15 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     const team2Id = (team2 && (typeof team2.id === 'string' || typeof team2.id === 'number')) ? String(team2.id) : undefined;
 
     // TBC Detection
+    // TBC Detection
     const isTBC = isTBCMatch(match);
-    const bothTeamsUndetermined = hasUndeterminedTeams(match) && team1Id === '0' && team2Id === '0';
+
+    // Check if both teams are undetermined (via ID '0', missing ID, or TBC name pattern)
+    // This ensures consistent "Clean Layout" even if API behaves oddly
+    const isTeam1TBC = team1Id === '0' || !team1Id || isTBCName(team1Name);
+    const isTeam2TBC = team2Id === '0' || !team2Id || isTBCName(team2Name);
+    const bothTeamsUndetermined = isTeam1TBC && isTeam2TBC;
+
     const knockoutLabel = getKnockoutLabel(match);
 
     const badgeText = isTBC && knockoutLabel
