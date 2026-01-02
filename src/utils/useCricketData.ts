@@ -116,11 +116,8 @@ export default function useCricketData(): UseCricketDataReturn {
         const sanitized = newMatches.map(sanitizeMatch);
 
         if (type === 'live') {
-            console.log(`[Data] Overwriting LIVE bucket with ${sanitized.length} matches (Ghosts purged)`);
             bucketsRef.current.live = sanitized;
         } else if (type === 'upcoming') {
-            const previousCount = bucketsRef.current.upcoming.length;
-            console.log(`[Data] Overwriting UPCOMING bucket: Old=${previousCount} -> New=${sanitized.length} (Ghosts purged)`);
             bucketsRef.current.upcoming = sanitized;
         } else if (type === 'completed') {
             // For completed, we MERGE because of pagination/history
@@ -229,8 +226,6 @@ export default function useCricketData(): UseCricketDataReturn {
 
                     bucketsRef.current.live = cachedLive;
                     bucketsRef.current.upcoming = cachedUpcoming;
-
-                    console.log(`[Data] Hydrated from Cache: Live=${cachedLive.length}, Upcoming=${cachedUpcoming.length} (Ready to be overwritten)`);
 
                     setMatches(parsed);
                     setLoading(false);
