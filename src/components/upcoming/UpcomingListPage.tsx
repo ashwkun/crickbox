@@ -101,6 +101,29 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
 
     const contentRef = useRef<HTMLDivElement>(null);
 
+    // Collapsible filter state
+    const [showFilters, setShowFilters] = useState(false);
+    const lastScrollY = useRef(0);
+
+    // Invalid team names to filter out
+    const INVALID_TEAMS = ['TBC', 'TBD', 'D1', 'D2', 'Winner', 'Loser', 'Qualifier', 'Eliminator'];
+
+    // Handle scroll for auto-hide/reveal filters
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const currentScrollY = e.currentTarget.scrollTop;
+        const isScrollingDown = currentScrollY > lastScrollY.current;
+
+        // Only toggle if scrolled more than 10px to avoid jitter
+        if (Math.abs(currentScrollY - lastScrollY.current) > 10) {
+            if (isScrollingDown && showFilters) {
+                setShowFilters(false); // Hide on scroll down
+            } else if (!isScrollingDown && currentScrollY < 50) {
+                setShowFilters(true); // Show when near top and scrolling up
+            }
+        }
+        lastScrollY.current = currentScrollY;
+    };
+
     // Filter matches by time
     const timeFilteredMatches = useMemo(() => {
         const chip = timeChips.find(c => c.id === selectedTime);
@@ -166,6 +189,12 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
             match.participants?.forEach(p => {
                 const name = p.name || '';
                 const shortName = p.short_name || name.slice(0, 3).toUpperCase();
+
+                // Skip invalid teams: no ID, empty name, or placeholder names
+                if (!p.id || !name || INVALID_TEAMS.some(inv =>
+                    name.toUpperCase().includes(inv) || shortName.toUpperCase().includes(inv)
+                )) return;
+
                 const existing = teamCounts.get(name);
                 if (existing) {
                     existing.count++;
@@ -326,87 +355,107 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                 </div>
             </div>
 
-            {/* Row 2: Dynamic Type Filter */}
-            <div style={{
-                display: 'flex',
-                gap: 6,
-                padding: '8px 16px 12px',
-                overflowX: 'auto',
-                scrollbarWidth: 'none',
-                borderBottom: '1px solid var(--border-color)',
-                flexShrink: 0,
-            }}>
-                {typeChips.map(chip => (
-                    <div
-                        key={chip.id}
-                        style={chipStyle(selectedTypeChip === chip.id)}
-                        onClick={() => setSelectedTypeChip(chip.id)}
-                    >
-                        {chip.label}
-                        {chip.count > 0 && (
-                            <span style={{
-                                marginLeft: 4,
-                                opacity: 0.5,
-                                fontSize: 10,
-                            }}>
-                                {chip.count}
-                            </span>
-                        )}
-                    </div>
-                ))}
+            {/* Filters Toggle Button */}
+            <div
+                style={{
+                    padding: '8px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    cursor: 'pointer',
+                    borderBottom: showFilters ? 'none' : '1px solid var(--border-color)',
+                }}
+                onClick={() => setShowFilters(!showFilters)}
+            >
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
+                    Filters
+                </span>
+                <span style={{
+                    fontSize: 10,
+                    transform: showFilters ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease',
+                    color: 'rgba(255,255,255,0.4)'
+                }}>▼</span>
+                {(selectedTypeChip !== 'all' || selectedTeamChip !== 'all') && (
+                    <span style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: '#6366f1',
+                    }} />
+                )}
             </div>
 
-            {/* Row 3: Dynamic Team Filter */}
+            {/* Collapsible Filter Rows */}
             <div style={{
-                display: 'flex',
-                gap: 6,
-                padding: '8px 16px 12px',
-                overflowX: 'auto',
-                scrollbarWidth: 'none',
-                borderBottom: '1px solid var(--border-color)',
-                flexShrink: 0,
+                maxHeight: showFilters ? '200px' : '0px',
+                overflow: 'hidden',
+                transition: 'max-height 0.3s ease',
             }}>
-                {teamChips.map(chip => (
-                    <div
-                        key={chip.id}
-                        style={{
-                            padding: '6px 14px',
-                            borderRadius: 20,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            whiteSpace: 'nowrap',
-                            cursor: 'pointer',
-                            flexShrink: 0,
-                            background: selectedTeamChip === chip.id
-                                ? 'rgba(34, 197, 94, 0.2)'
-                                : 'rgba(255, 255, 255, 0.05)',
-                            border: selectedTeamChip === chip.id
-                                ? '1px solid rgba(34, 197, 94, 0.4)'
-                                : '1px solid transparent',
-                            color: selectedTeamChip === chip.id
-                                ? '#22c55e'
-                                : 'rgba(255, 255, 255, 0.6)',
-                            transition: 'all 0.2s ease',
-                        }}
-                        onClick={() => setSelectedTeamChip(chip.id)}
-                    >
-                        {chip.label}
-                        {chip.count > 0 && (
-                            <span style={{
-                                marginLeft: 4,
-                                opacity: 0.5,
-                                fontSize: 10,
-                            }}>
-                                {chip.count}
-                            </span>
-                        )}
-                    </div>
-                ))}
+                {/* Row 2: Dynamic Type Filter */}
+                <div style={{
+                    display: 'flex',
+                    gap: 6,
+                    padding: '8px 16px 12px',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                    flexShrink: 0,
+                }}>
+                    {typeChips.map(chip => (
+                        <div
+                            key={chip.id}
+                            style={chipStyle(selectedTypeChip === chip.id)}
+                            onClick={() => setSelectedTypeChip(chip.id)}
+                        >
+                            {chip.label}
+                            {chip.count > 0 && (
+                                <span style={{
+                                    marginLeft: 4,
+                                    opacity: 0.5,
+                                    fontSize: 10,
+                                }}>
+                                    {chip.count}
+                                </span>
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Row 3: Dynamic Team Filter */}
+                <div style={{
+                    display: 'flex',
+                    gap: 6,
+                    padding: '8px 16px 12px',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                    borderBottom: '1px solid var(--border-color)',
+                    flexShrink: 0,
+                }}>
+                    {teamChips.map(chip => (
+                        <div
+                            key={chip.id}
+                            style={chipStyle(selectedTeamChip === chip.id)}
+                            onClick={() => setSelectedTeamChip(chip.id)}
+                        >
+                            {chip.label}
+                            {chip.count > 0 && (
+                                <span style={{
+                                    marginLeft: 4,
+                                    opacity: 0.5,
+                                    fontSize: 10,
+                                }}>
+                                    {chip.count}
+                                </span>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Body: Series-Centric Content */}
             <div
                 ref={contentRef}
+                onScroll={handleScroll}
                 style={{
                     flex: 1,
                     overflowY: 'auto',
