@@ -131,6 +131,10 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
 
     // We use a ref to track filter state for the scroll handler to avoid closure staleness
     const showFiltersRef = useRef(false);
+
+    // New ref to track if user has manually activated filters (enabling scroll behavior)
+    const isScrollActiveRef = useRef(false);
+
     const lastScrollY = useRef(0);
     const scrollAccumulator = useRef(0);
 
@@ -141,6 +145,9 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
 
     // Handle scroll for auto-hide/reveal filters
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        // Only handle scroll if filters were manually activated
+        if (!isScrollActiveRef.current) return;
+
         const currentScrollY = e.currentTarget.scrollTop;
         const delta = currentScrollY - lastScrollY.current;
 
@@ -360,7 +367,17 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                             ? '#6366f1'
                             : stickyChipStyle.color,
                     }}
-                    onClick={() => setShowFilters(!showFilters)}
+                    onClick={() => {
+                        if (showFilters) {
+                            // Manual Close: Disable scroll auto-hide/reveal
+                            setShowFilters(false);
+                            isScrollActiveRef.current = false;
+                        } else {
+                            // Manual Open: Enable scroll auto-hide/reveal
+                            setShowFilters(true);
+                            isScrollActiveRef.current = true;
+                        }
+                    }}
                 >
                     <LuFilter size={14} />
                     Filters
