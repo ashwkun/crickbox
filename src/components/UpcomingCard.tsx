@@ -131,24 +131,29 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
                 </div>
             )}
 
-            {/* Header */}
-            <div className="upcoming-card-header">
-                <div className="upcoming-date-pill">{dateStr} • {time}</div>
-                {badgeText && !bothTeamsUndetermined && (
-                    <div className="upcoming-format-badge" style={isTBC ? {
-                        background: `linear-gradient(135deg, ${knockoutGold}, ${knockoutGoldLight})`,
-                        color: '#000',
-                        fontWeight: 700,
-                    } : undefined}>
-                        {badgeText}
-                    </div>
-                )}
-            </div>
+            {/* Header (Hidden for TBC cards as info is in body) */}
+            {!bothTeamsUndetermined && (
+                <div className="upcoming-card-header">
+                    <div className="upcoming-date-pill">{dateStr} • {time}</div>
+                    {badgeText && (
+                        <div className="upcoming-format-badge" style={isTBC ? {
+                            background: `linear-gradient(135deg, ${knockoutGold}, ${knockoutGoldLight})`,
+                            color: '#000',
+                            fontWeight: 700,
+                        } : undefined}>
+                            {badgeText}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Teams or TBC Context */}
             <div className="upcoming-content" style={{ justifyContent: bothTeamsUndetermined ? 'center' : 'space-between' }}>
                 {bothTeamsUndetermined ? (
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 0' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px 0' }}>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.6)', letterSpacing: 1, textTransform: 'uppercase' }}>
+                            {dateStr} • {time}
+                        </span>
                         <h3 style={{
                             margin: 0,
                             fontSize: 18,
