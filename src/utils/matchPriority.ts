@@ -82,26 +82,30 @@ function isTopWomenTeamMatch(match: Match): boolean {
  */
 export function getMatchChip(match: Match): string {
     const parentSeries = match.parent_series_name || '';
+    const seriesName = match.series_name || '';
     const championship = match.championship_name || '';
     const leagueCode = match.league_code || '';
+    const searchFields = [parentSeries, seriesName, championship];
 
     // 1. Check ICC World Cups
     for (const [name, config] of Object.entries(ICC_WORLD_CUPS)) {
-        if (parentSeries.includes(name) || championship.includes(name)) {
+        if (searchFields.some(f => f.includes(name))) {
             return config.chip;
         }
     }
 
     // 2. Check Secondary ICC Events
     for (const [name, config] of Object.entries(ICC_EVENTS)) {
-        if (parentSeries.includes(name)) {
+        if (searchFields.some(f => f.includes(name))) {
             return config.chip;
         }
     }
 
-    // 3. Check Premium Leagues (exact match for parent_series_name)
-    if (PREMIUM_LEAGUES[parentSeries]) {
-        return PREMIUM_LEAGUES[parentSeries].chip;
+    // 3. Check Premium Leagues (partial match on parent_series_name or series_name)
+    for (const [name, config] of Object.entries(PREMIUM_LEAGUES)) {
+        if (searchFields.some(f => f.includes(name))) {
+            return config.chip;
+        }
     }
 
     // 4. Categorize by league_code
@@ -124,12 +128,27 @@ export function getMatchChip(match: Match): string {
  */
 export function getMatchPriority(match: Match): number {
     const parentSeries = match.parent_series_name || '';
+    const seriesName = match.series_name || '';
     const championship = match.championship_name || '';
     const leagueCode = match.league_code || '';
+    const searchFields = [parentSeries, seriesName, championship];
+    const combined = searchFields.join(' ').toLowerCase();
+
+    // EARLY DEMOTION: Warm-ups and Qualifiers get lower priority
+    // They should appear in the app but sort below actual tournaments
+    const isWarmupOrQualifier = combined.includes('warm-up') ||
+        combined.includes('warm up') ||
+        combined.includes('qualifier') ||
+        combined.includes('warm up matches');
+
+    // If warm-up/qualifier, return priority 18 (above domestic P100, below premium leagues P4-14)
+    if (isWarmupOrQualifier) {
+        return 18;
+    }
 
     // 1. ICC World Cups = highest priority
     for (const [name, config] of Object.entries(ICC_WORLD_CUPS)) {
-        if (parentSeries.includes(name) || championship.includes(name)) {
+        if (searchFields.some(f => f.includes(name))) {
             return config.priority;
         }
     }
@@ -141,14 +160,16 @@ export function getMatchPriority(match: Match): number {
 
     // 3. Secondary ICC events (Asia Cup, etc.)
     for (const [name, config] of Object.entries(ICC_EVENTS)) {
-        if (parentSeries.includes(name)) {
+        if (searchFields.some(f => f.includes(name))) {
             return config.priority;
         }
     }
 
-    // 4. Premium Leagues
-    if (PREMIUM_LEAGUES[parentSeries]) {
-        return PREMIUM_LEAGUES[parentSeries].priority;
+    // 4. Premium Leagues (partial match on parent_series_name or series_name)
+    for (const [name, config] of Object.entries(PREMIUM_LEAGUES)) {
+        if (searchFields.some(f => f.includes(name))) {
+            return config.priority;
+        }
     }
 
     // 5. Top Women's Teams (Bilateral)

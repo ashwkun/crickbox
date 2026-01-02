@@ -1,0 +1,25 @@
+name: Sync Tournament Stats to Supabase
+
+on:
+  schedule:
+    - cron: '30 */12 * * *'  # Every 12 hours (offset from main sync)
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js
+        
+      - name: Sync tournament stats to Supabase
+        run: node scripts/sync_tournament_stats.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
