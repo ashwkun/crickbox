@@ -5,7 +5,7 @@
  * Body: Series-centric layout with horizontal UpcomingCard scrolls
  */
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Match } from '../../types';
 import { LuCalendarDays, LuCalendarPlus, LuChevronRight, LuX } from 'react-icons/lu';
 import UpcomingCard from '../UpcomingCard';
@@ -188,7 +188,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     }, [timeFilteredMatches]);
 
     // Reset type selection if chip no longer exists
-    useMemo(() => {
+    useEffect(() => {
         if (selectedTypeChip !== 'all' && !typeChips.find(c => c.id === selectedTypeChip)) {
             setSelectedTypeChip('all');
         }
@@ -235,7 +235,7 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     }, [typeFilteredMatches]);
 
     // Reset team selection if chip no longer exists
-    useMemo(() => {
+    useEffect(() => {
         if (selectedTeamChip !== 'all' && !teamChips.find(c => c.id === selectedTeamChip)) {
             setSelectedTeamChip('all');
         }
