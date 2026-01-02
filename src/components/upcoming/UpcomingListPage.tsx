@@ -103,8 +103,12 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
 
     // Collapsible filter state
     const [showFilters, setShowFilters] = useState(false);
+    const showFiltersRef = useRef(showFilters);
     const lastScrollY = useRef(0);
     const scrollAccumulator = useRef(0);
+
+    // Keep ref in sync with state
+    showFiltersRef.current = showFilters;
 
     // Invalid team names to filter out
     const INVALID_TEAMS = ['TBC', 'TBD', 'D1', 'D2', 'Winner', 'Loser', 'Qualifier', 'Eliminator'];
@@ -122,13 +126,13 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
         }
 
         // Collapse: very sensitive - any 5px scroll down hides filters
-        if (scrollAccumulator.current > 5 && showFilters) {
+        if (scrollAccumulator.current > 5 && showFiltersRef.current) {
             setShowFilters(false);
             scrollAccumulator.current = 0;
         }
 
         // Reveal: scroll up 30px to show filters (anywhere in the list)
-        if (scrollAccumulator.current < -30 && !showFilters) {
+        if (scrollAccumulator.current < -30 && !showFiltersRef.current) {
             setShowFilters(true);
             scrollAccumulator.current = 0;
         }
