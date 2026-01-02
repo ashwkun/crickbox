@@ -5,7 +5,7 @@ import { Match, Scorecard, MatchesResponse } from '../types';
 import { H2HData, BatsmanSplitsResponse, OverByOverResponse, SquadData } from './h2hApi';
 import { WallstreamData, BallData, extractMatchId } from './wallstreamApi';
 
-const CACHE_KEY = 'wisden_matches_v5';
+const CACHE_KEY = 'wisden_matches_v6';
 const LIVE_INTERVAL_FAST = 15000; // 15 seconds when live matches exist
 const LIVE_INTERVAL_SLOW = 120000; // 2 minutes when no live matches
 const FULL_REFRESH_INTERVAL = 300000; // 5 minutes for schedule/results
