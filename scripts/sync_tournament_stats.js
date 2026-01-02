@@ -321,9 +321,9 @@ async function main() {
         const allBattingInnings = [];
         const allBowlingInnings = [];
 
-        // Limit to 100 matches per run to avoid API rate limits
-        const matchesToProcess = newMatches.slice(0, 100);
-        console.log(`Processing ${matchesToProcess.length} matches...`);
+        // Process all new matches (User requested one-off full sync)
+        const matchesToProcess = newMatches;
+        console.log(`Processing all ${matchesToProcess.length} matches...`);
 
         for (let i = 0; i < matchesToProcess.length; i++) {
             const match = matchesToProcess[i];
