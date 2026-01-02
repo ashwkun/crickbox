@@ -34,15 +34,15 @@ const KNOCKOUT_NAME_PATTERNS = [
 // Regex patterns for TBC/Placeholder team names
 // Used for filtering and image fallback
 export const TBC_NAME_PATTERNS = [
-    /^(A|B|C|D)[1-4]$/i,      // A1, B2, D4 etc.
-    /^(AD|BC)[1-2]$/i,        // AD1, BC2
-    /^Qualifier(\s?\d+)?$/i,  // Qualifier, Qualifier 1
-    /^Eliminator(\s?\d+)?$/i, // Eliminator, Eliminator 2
-    /^Winner\s.*$/i,          // Winner ...
-    /^Loser\s.*$/i,           // Loser ...
-    /^T\.?B\.?C\.?$/i,        // TBC, T.B.C.
-    /^T\.?B\.?D\.?$/i,        // TBD, T.B.D.
-    /^Unknown$/i
+    /^\s*(A|B|C|D)[1-4]\s*$/i,      // A1, B2, D4 etc.
+    /^\s*(AD|BC)[1-2]\s*$/i,        // AD1, BC2
+    /^\s*Qualifier(\s?\d+)?\s*$/i,  // Qualifier, Qualifier 1
+    /^\s*Eliminator(\s?\d+)?\s*$/i, // Eliminator, Eliminator 2
+    /^\s*Winner\s.*$/i,             // Winner ...
+    /^\s*Loser\s.*$/i,              // Loser ...
+    /^\s*T\.?B\.?C\.?\s*$/i,        // TBC, T.B.C.
+    /^\s*T\.?B\.?D\.?\s*$/i,        // TBD, T.B.D.
+    /^\s*Unknown\s*$/i
 ];
 
 /**
