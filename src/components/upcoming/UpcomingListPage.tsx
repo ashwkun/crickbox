@@ -158,14 +158,14 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
             scrollAccumulator.current = delta; // Reset on direction change
         }
 
-        // Collapse: very sensitive - any 5px scroll down hides filters
-        if (scrollAccumulator.current > 5 && showFiltersRef.current) {
+        // Collapse: require significant downward scroll (50px accumulated) to hide
+        if (scrollAccumulator.current > 50 && showFiltersRef.current) {
             setShowFilters(false);
             scrollAccumulator.current = 0;
         }
 
-        // Reveal: scroll up 30px to show filters (anywhere in the list)
-        if (scrollAccumulator.current < -30 && !showFiltersRef.current) {
+        // Reveal: require significant upward scroll (50px accumulated) to show
+        if (scrollAccumulator.current < -50 && !showFiltersRef.current) {
             setShowFilters(true);
             scrollAccumulator.current = 0;
         }
