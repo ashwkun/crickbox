@@ -15,7 +15,7 @@ if (container) {
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
         // --- CACHE NUKE LOGIC ---
-        const CURRENT_VERSION = '3.2'; // Start fresh
+        const CURRENT_VERSION = '3.3'; // Start fresh
         const CACHE_NAME = `boxcric-v${CURRENT_VERSION}`;
         const storedVersion = localStorage.getItem('sw_version');
 
