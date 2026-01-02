@@ -129,16 +129,12 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
         >
             {/* Background Watermarks */}
             {/* Background Watermarks */}
-            {team1Name !== 'TBC' && team1Name !== 'T.B.C.' && (
-                <div className="upcoming-bg-logo home">
-                    <WikiImage name={team1Name} id={team1Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                </div>
-            )}
-            {team2Name !== 'TBC' && team2Name !== 'T.B.C.' && (
-                <div className="upcoming-bg-logo away">
-                    <WikiImage name={team2Name} id={team2Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                </div>
-            )}
+            <div className="upcoming-bg-logo home">
+                <WikiImage name={team1Name} id={team1Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+            <div className="upcoming-bg-logo away">
+                <WikiImage name={team2Name} id={team2Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
 
             {/* Header (Hidden for TBC cards as info is in body) */}
             {!bothTeamsUndetermined && (
