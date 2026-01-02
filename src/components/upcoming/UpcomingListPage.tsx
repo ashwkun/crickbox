@@ -87,6 +87,30 @@ const generateTimeChips = (): { id: string; label: string; startMonth: number; s
     return chips;
 };
 
+// Invalid team names to filter out (moved outside component to avoid hoisting issues)
+const INVALID_TEAMS = ['TBC', 'TBD', 'D1', 'D2', 'Winner', 'Loser', 'Qualifier', 'Eliminator'];
+
+// Team priority for chip ordering (moved outside component to avoid hoisting issues)
+const TEAM_PRIORITY: Record<string, number> = {
+    // India first
+    'India': 1, 'IND': 1,
+    'India Women': 2, 'IND-W': 2, 'India W': 2,
+    // Major Test nations
+    'England': 3, 'ENG': 3,
+    'Australia': 4, 'AUS': 4,
+    // IPL franchises
+    'Chennai Super Kings': 5, 'CSK': 5,
+    'Mumbai Indians': 6, 'MI': 6,
+    'Royal Challengers': 7, 'RCB': 7,
+    'Kolkata Knight Riders': 8, 'KKR': 8,
+    'Gujarat Titans': 9, 'GT': 9,
+    'Rajasthan Royals': 10, 'RR': 10,
+    'Lucknow Super Giants': 11, 'LSG': 11,
+    'Delhi Capitals': 12, 'DC': 12,
+    'Sunrisers Hyderabad': 13, 'SRH': 13,
+    'Punjab Kings': 14, 'PBKS': 14,
+};
+
 const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
     matches,
     onBack,
@@ -109,9 +133,6 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
 
     // Keep ref in sync with state
     showFiltersRef.current = showFilters;
-
-    // Invalid team names to filter out
-    const INVALID_TEAMS = ['TBC', 'TBD', 'D1', 'D2', 'Winner', 'Loser', 'Qualifier', 'Eliminator'];
 
     // Handle scroll for auto-hide/reveal filters
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -175,27 +196,6 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
 
     // Team filter state
     const [selectedTeamChip, setSelectedTeamChip] = useState('all');
-
-    // Team priority for chip ordering
-    const TEAM_PRIORITY: Record<string, number> = {
-        // India first
-        'India': 1, 'IND': 1,
-        'India Women': 2, 'IND-W': 2, 'India W': 2,
-        // Major Test nations
-        'England': 3, 'ENG': 3,
-        'Australia': 4, 'AUS': 4,
-        // IPL franchises
-        'Chennai Super Kings': 5, 'CSK': 5,
-        'Mumbai Indians': 6, 'MI': 6,
-        'Royal Challengers': 7, 'RCB': 7,
-        'Kolkata Knight Riders': 8, 'KKR': 8,
-        'Gujarat Titans': 9, 'GT': 9,
-        'Rajasthan Royals': 10, 'RR': 10,
-        'Lucknow Super Giants': 11, 'LSG': 11,
-        'Delhi Capitals': 12, 'DC': 12,
-        'Sunrisers Hyderabad': 13, 'SRH': 13,
-        'Punjab Kings': 14, 'PBKS': 14,
-    };
 
     // Generate team chips from matches
     const teamChips = useMemo(() => {
