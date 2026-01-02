@@ -209,12 +209,23 @@ export default function useCricketData(): UseCricketDataReturn {
             try {
                 const parsed: Match[] = JSON.parse(cached);
                 if (parsed.length > 0) {
-                    // Populate buckets heuristically from flat cache?
-                    // Better to just set Matches directly for instant load, then let API update buckets.
-                    // But we need bucketsRef to be populated to support future merges.
+                    // Smart Hydration: Distribute to correct buckets
+                    // This allows auto-clearing of ghosts when API updates specific buckets
+                    const cachedLive: Match[] = [];
+                    const cachedUpcoming: Match[] = [];
 
-                    // Simple strategy: Put everything in Completed for now, then let Live/Upcoming overwrite.
-                    parsed.forEach(m => bucketsRef.current.completed.set(m.game_id, m));
+                    parsed.forEach(m => {
+                        if (m.event_state === 'L' || m.event_state === 'I') {
+                            cachedLive.push(m);
+                        } else if (m.event_state === 'U') {
+                            cachedUpcoming.push(m);
+                        } else {
+                            bucketsRef.current.completed.set(m.game_id, m);
+                        }
+                    });
+
+                    bucketsRef.current.live = cachedLive;
+                    bucketsRef.current.upcoming = cachedUpcoming;
 
                     setMatches(parsed);
                     setLoading(false);
