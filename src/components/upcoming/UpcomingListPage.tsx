@@ -134,10 +134,80 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
         }
     }, [typeChips, selectedTypeChip]);
 
+    // Team filter state
+    const [selectedTeamChip, setSelectedTeamChip] = useState('all');
+
+    // Team priority for chip ordering
+    const TEAM_PRIORITY: Record<string, number> = {
+        // India first
+        'India': 1, 'IND': 1,
+        'India Women': 2, 'IND-W': 2, 'India W': 2,
+        // Major Test nations
+        'England': 3, 'ENG': 3,
+        'Australia': 4, 'AUS': 4,
+        // IPL franchises
+        'Chennai Super Kings': 5, 'CSK': 5,
+        'Mumbai Indians': 6, 'MI': 6,
+        'Royal Challengers': 7, 'RCB': 7,
+        'Kolkata Knight Riders': 8, 'KKR': 8,
+        'Gujarat Titans': 9, 'GT': 9,
+        'Rajasthan Royals': 10, 'RR': 10,
+        'Lucknow Super Giants': 11, 'LSG': 11,
+        'Delhi Capitals': 12, 'DC': 12,
+        'Sunrisers Hyderabad': 13, 'SRH': 13,
+        'Punjab Kings': 14, 'PBKS': 14,
+    };
+
+    // Generate team chips from matches
+    const teamChips = useMemo(() => {
+        const teamCounts = new Map<string, { name: string; shortName: string; count: number }>();
+
+        timeFilteredMatches.forEach(match => {
+            match.participants?.forEach(p => {
+                const name = p.name || '';
+                const shortName = p.short_name || name.slice(0, 3).toUpperCase();
+                const existing = teamCounts.get(name);
+                if (existing) {
+                    existing.count++;
+                } else {
+                    teamCounts.set(name, { name, shortName, count: 1 });
+                }
+            });
+        });
+
+        // Sort by priority, then by count
+        const sorted = Array.from(teamCounts.values()).sort((a, b) => {
+            const priorityA = TEAM_PRIORITY[a.name] || TEAM_PRIORITY[a.shortName] || 100;
+            const priorityB = TEAM_PRIORITY[b.name] || TEAM_PRIORITY[b.shortName] || 100;
+            if (priorityA !== priorityB) return priorityA - priorityB;
+            return b.count - a.count; // Higher count first if same priority
+        });
+
+        return [
+            { id: 'all', label: 'All Teams', count: 0 },
+            ...sorted.map(t => ({ id: t.name, label: t.shortName, count: t.count }))
+        ];
+    }, [timeFilteredMatches]);
+
+    // Reset team selection if chip no longer exists
+    useMemo(() => {
+        if (selectedTeamChip !== 'all' && !teamChips.find(c => c.id === selectedTeamChip)) {
+            setSelectedTeamChip('all');
+        }
+    }, [teamChips, selectedTeamChip]);
+
     // Filter matches by type chip
-    const filteredMatches = useMemo(() => {
+    const typeFilteredMatches = useMemo(() => {
         return filterByChip(timeFilteredMatches, selectedTypeChip);
     }, [timeFilteredMatches, selectedTypeChip]);
+
+    // Filter matches by team chip
+    const filteredMatches = useMemo(() => {
+        if (selectedTeamChip === 'all') return typeFilteredMatches;
+        return typeFilteredMatches.filter(match =>
+            match.participants?.some(p => p.name === selectedTeamChip)
+        );
+    }, [typeFilteredMatches, selectedTeamChip]);
 
     // Group matches by series
     const seriesGroups = useMemo(() => {
@@ -271,6 +341,54 @@ const UpcomingListPage: React.FC<UpcomingListPageProps> = ({
                         key={chip.id}
                         style={chipStyle(selectedTypeChip === chip.id)}
                         onClick={() => setSelectedTypeChip(chip.id)}
+                    >
+                        {chip.label}
+                        {chip.count > 0 && (
+                            <span style={{
+                                marginLeft: 4,
+                                opacity: 0.5,
+                                fontSize: 10,
+                            }}>
+                                {chip.count}
+                            </span>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            {/* Row 3: Dynamic Team Filter */}
+            <div style={{
+                display: 'flex',
+                gap: 6,
+                padding: '8px 16px 12px',
+                overflowX: 'auto',
+                scrollbarWidth: 'none',
+                borderBottom: '1px solid var(--border-color)',
+                flexShrink: 0,
+            }}>
+                {teamChips.map(chip => (
+                    <div
+                        key={chip.id}
+                        style={{
+                            padding: '6px 14px',
+                            borderRadius: 20,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            whiteSpace: 'nowrap',
+                            cursor: 'pointer',
+                            flexShrink: 0,
+                            background: selectedTeamChip === chip.id
+                                ? 'rgba(34, 197, 94, 0.2)'
+                                : 'rgba(255, 255, 255, 0.05)',
+                            border: selectedTeamChip === chip.id
+                                ? '1px solid rgba(34, 197, 94, 0.4)'
+                                : '1px solid transparent',
+                            color: selectedTeamChip === chip.id
+                                ? '#22c55e'
+                                : 'rgba(255, 255, 255, 0.6)',
+                            transition: 'all 0.2s ease',
+                        }}
+                        onClick={() => setSelectedTeamChip(chip.id)}
                     >
                         {chip.label}
                         {chip.count > 0 && (
