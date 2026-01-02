@@ -402,7 +402,7 @@ export default function App(): React.ReactElement {
                 onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
                 data={headerData}
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
-                isUpcoming={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U'}
+                isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
             />
 
             {/* Base Layer: HomePage */}
