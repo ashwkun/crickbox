@@ -134,7 +134,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
             {/* Header */}
             <div className="upcoming-card-header">
                 <div className="upcoming-date-pill">{dateStr} • {time}</div>
-                {badgeText && (
+                {badgeText && !bothTeamsUndetermined && (
                     <div className="upcoming-format-badge" style={isTBC ? {
                         background: `linear-gradient(135deg, ${knockoutGold}, ${knockoutGoldLight})`,
                         color: '#000',
