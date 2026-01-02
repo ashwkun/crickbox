@@ -561,6 +561,8 @@ export default function App(): React.ReactElement {
                     ⚡
                 </div>
             )}
+
+            <InstallPrompt />
         </div>
     );
 }
