@@ -5,6 +5,7 @@ import TournamentStats from './TournamentStats';
 import { Match } from '../types';
 import useCricketData from '../utils/useCricketData';
 import { getTournamentAbbreviation, getMatchFormat } from '../utils/tournamentAbbreviations';
+import { getLeagueLogo } from '../utils/leagueLogos';
 import '../styles/TournamentHub.css';
 
 interface TournamentHubProps {
@@ -40,8 +41,17 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
     const [activeTab, setActiveTab] = useState<Tab>('fixtures');
     const [pointsData, setPointsData] = useState<any[]>([]);
     const [loadingTable, setLoadingTable] = useState(false);
-    const [logoLoaded, setLogoLoaded] = useState(false);
     const { fetchSeriesInfo } = useCricketData();
+
+    // Check if we have a logo available from TheSportsDB
+    const hasLogo = useMemo(() => {
+        const logoData = getLeagueLogo(tournamentName);
+        return logoData?.badge ? true : false;
+    }, [tournamentName]);
+
+    // Get abbreviation and format for fallback hero
+    const abbreviation = getTournamentAbbreviation(tournamentName);
+    const format = getMatchFormat(tournamentName);
 
     // Fetch Points Table when tab changes to 'table'
     useEffect(() => {
@@ -90,10 +100,6 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
         };
     }, [matches]);
 
-    // Get abbreviation and format for fallback hero
-    const abbreviation = getTournamentAbbreviation(tournamentName);
-    const format = getMatchFormat(tournamentName);
-
     // Format helpers
     const formatDate = (dateStr: string): string => {
         const d = new Date(dateStr);
@@ -127,25 +133,19 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                 <div className="th-hero-content">
                     {/* Logo or Typography Fallback */}
                     <div className="th-hero-logo-container">
-                        <WikiImage
-                            name={tournamentName}
-                            id={seriesId}
-                            type="tournament"
-                            className="th-hero-logo"
-                            style={{
-                                width: 72,
-                                height: 72,
-                                objectFit: 'contain',
-                                display: logoLoaded ? 'block' : 'none'
-                            }}
-                        />
-                        {/* Typography Fallback (shown when logo fails) */}
-                        <div
-                            className="th-hero-abbreviation"
-                            style={{ display: logoLoaded ? 'none' : 'flex' }}
-                        >
-                            {abbreviation}
-                        </div>
+                        {hasLogo ? (
+                            <WikiImage
+                                name={tournamentName}
+                                id={seriesId}
+                                type="tournament"
+                                className="th-hero-logo"
+                                style={{ width: 64, height: 64, objectFit: 'contain' }}
+                            />
+                        ) : (
+                            <div className="th-hero-abbreviation">
+                                {abbreviation}
+                            </div>
+                        )}
                     </div>
 
                     <div className="th-hero-text">
