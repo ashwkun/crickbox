@@ -58,31 +58,46 @@ const TournamentStats: React.FC<TournamentStatsProps> = ({ seriesId, seriesName 
             setError(null);
 
             try {
+                // Check if supabase is available
+                if (!supabase) {
+                    setError('Database connection unavailable');
+                    setLoading(false);
+                    return;
+                }
+
                 // Fetch top run scorers for this series
-                const { data: runData, error: runError } = await supabase
+                const runResult = await supabase
                     .from('top_run_scorers')
                     .select('*')
                     .eq('series_id', seriesId)
                     .order('total_runs', { ascending: false })
                     .limit(10);
 
-                if (runError) throw runError;
-                setBatters(runData || []);
+                if (runResult.error) {
+                    console.warn('top_run_scorers query failed:', runResult.error.message);
+                    // Don't throw - view might not exist yet
+                } else {
+                    setBatters(runResult.data || []);
+                }
 
                 // Fetch top wicket takers for this series
-                const { data: wicketData, error: wicketError } = await supabase
+                const wicketResult = await supabase
                     .from('top_wicket_takers')
                     .select('*')
                     .eq('series_id', seriesId)
                     .order('total_wickets', { ascending: false })
                     .limit(10);
 
-                if (wicketError) throw wicketError;
-                setBowlers(wicketData || []);
+                if (wicketResult.error) {
+                    console.warn('top_wicket_takers query failed:', wicketResult.error.message);
+                    // Don't throw - view might not exist yet
+                } else {
+                    setBowlers(wicketResult.data || []);
+                }
 
             } catch (err: any) {
                 console.error('Failed to fetch tournament stats:', err);
-                setError('Failed to load stats');
+                // Don't show error to user - just show empty state
             } finally {
                 setLoading(false);
             }
