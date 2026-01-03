@@ -1,15 +1,9 @@
 /**
- * Cricket Match Database Client
- * Fetches team form and match data from Supabase
+ * Match Database - Supabase Operations
+ * Handles caching and persistence of match data.
  */
 
-import { createClient } from '@supabase/supabase-js';
-
-// Supabase configuration
-const SUPABASE_URL = 'https://ycumznofytwntinxlxkc.supabase.co';
-const SUPABASE_ANON_KEY = '***REMOVED***';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { supabase } from './supabaseClient';
 
 export interface Match {
     id: string;
@@ -23,7 +17,7 @@ export interface Match {
     league: string;
     series_id: string;
     match_type?: string;
-    event_format?: string; // Optional, for API compatibility
+    event_format?: string;
 }
 
 export type FormResult = 'W' | 'L' | 'D';
@@ -41,8 +35,6 @@ export async function getTeamForm(teamId: string, count = 5, matchType?: string)
         .or(`teama_id.eq.${teamId},teamb_id.eq.${teamId}`);
 
     if (matchType) {
-        // Normalize format (e.g. 't20' -> 't20')
-        // Our DB likely stores 't20', 'odi', 'test' lowercase
         query = query.eq('match_type', matchType.toLowerCase());
     }
 
@@ -57,15 +49,13 @@ export async function getTeamForm(teamId: string, count = 5, matchType?: string)
 
     return data.map(m => {
         if (m.winner_id === teamId) return 'W';
-        if (m.winner_id === null) return 'D'; // Draw or no result
+        if (m.winner_id === null) return 'D';
         return 'L';
     });
 }
 
 /**
  * Get recent matches for a team
- * @param teamId Team ID
- * @param limit Number of matches
  */
 export async function getTeamMatches(teamId: string, limit = 50): Promise<Match[]> {
     const { data, error } = await supabase
@@ -85,9 +75,6 @@ export async function getTeamMatches(teamId: string, limit = 50): Promise<Match[
 
 /**
  * Get head-to-head matches between two teams
- * @param teamAId First team ID
- * @param teamBId Second team ID
- * @param limit Number of matches
  */
 export async function getH2HMatches(
     teamAId: string,
@@ -111,8 +98,6 @@ export async function getH2HMatches(
 
 /**
  * Get matches by league
- * @param league League code (e.g., "ipl", "icc", "indian_domestic")
- * @param limit Number of matches
  */
 export async function getMatchesByLeague(league: string, limit = 50): Promise<Match[]> {
     const { data, error } = await supabase
