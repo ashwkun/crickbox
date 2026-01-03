@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import WikiImage from './WikiImage';
 import PointsTable from './PointsTable';
 import TournamentStats from './TournamentStats';
 import { Match } from '../types';
 import useCricketData from '../utils/useCricketData';
-import '../styles/PointsTable.css';
+import { getTournamentAbbreviation, getMatchFormat } from '../utils/tournamentAbbreviations';
+import '../styles/TournamentHub.css';
 
 interface TournamentHubProps {
     tournamentName: string;
@@ -13,25 +14,20 @@ interface TournamentHubProps {
     onMatchClick: (match: Match) => void;
     isVisible?: boolean;
     style?: React.CSSProperties;
-    seriesId?: string; // Need seriesId to fetch points table
+    seriesId?: string;
 }
 
 type Tab = 'fixtures' | 'table' | 'stats';
 
-// Shorten series name for display
+// Shorten series name for display (remove year)
 const shortenSeriesName = (name: string | undefined): string => {
     if (!name) return '';
-    const bilateralMatch = name.match(/(\d+)\s*(T20I?|ODI|Test|Youth ODI|Youth T20I)/i);
-    if (bilateralMatch) {
-        return `${bilateralMatch[1]} ${bilateralMatch[2].toUpperCase()}`;
-    }
     return name
-        .replace(/,?\s*\d{4}(\/\d{2,4})?/g, '')
+        .replace(/,?\s*\d{4}(-\d{2,4})?\/?(\d{2,4})?/g, '')
         .replace(/\s+Series$/i, '')
         .trim();
 };
 
-// Tournament Hub - Shows matches, points table, and stats
 const TournamentHub: React.FC<TournamentHubProps> = ({
     tournamentName,
     matches,
@@ -44,6 +40,7 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
     const [activeTab, setActiveTab] = useState<Tab>('fixtures');
     const [pointsData, setPointsData] = useState<any[]>([]);
     const [loadingTable, setLoadingTable] = useState(false);
+    const [logoLoaded, setLogoLoaded] = useState(false);
     const { fetchSeriesInfo } = useCricketData();
 
     // Fetch Points Table when tab changes to 'table'
@@ -53,8 +50,6 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                 setLoadingTable(true);
                 try {
                     const data = await fetchSeriesInfo(seriesId);
-                    // API returns: data[0].teams (array of team objects)
-                    // Each team has: id, name, short_name, matches, wins, loss, etc.
                     const seriesData = Array.isArray(data) ? data[0] : data;
                     const teams = seriesData?.teams || [];
                     setPointsData(teams);
@@ -68,10 +63,38 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
     }, [activeTab, seriesId]);
 
     // Sort matches by date
-    const sortedMatches = [...matches].sort((a, b) =>
-        new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
-    );
+    const sortedMatches = useMemo(() =>
+        [...matches].sort((a, b) =>
+            new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+        ), [matches]);
 
+    // Compute stats
+    const stats = useMemo(() => {
+        const uniqueTeams = new Set<string>();
+        let completed = 0;
+        let upcoming = 0;
+        let live = 0;
+
+        matches.forEach(m => {
+            m.participants?.forEach(p => uniqueTeams.add(p.id));
+            if (m.event_state === 'R' || m.event_state === 'C') completed++;
+            else if (m.event_state === 'U') upcoming++;
+            else if (m.event_state === 'L') live++;
+        });
+
+        return {
+            teams: uniqueTeams.size,
+            total: matches.length,
+            completed,
+            remaining: upcoming + live
+        };
+    }, [matches]);
+
+    // Get abbreviation and format for fallback hero
+    const abbreviation = getTournamentAbbreviation(tournamentName);
+    const format = getMatchFormat(tournamentName);
+
+    // Format helpers
     const formatDate = (dateStr: string): string => {
         const d = new Date(dateStr);
         return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
@@ -97,91 +120,113 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
         return match.short_event_status || 'Completed';
     };
 
-    // Get unique teams count
-    const uniqueTeams = new Set<string>();
-    matches.forEach(m => {
-        m.participants?.forEach(p => uniqueTeams.add(p.short_name));
-    });
-
     return (
         <div className="tournament-hub" style={style}>
-            {/* Header */}
-            <div className="tournament-hub-header">
-                <button className="back-button" onClick={onBack}>
-                    ← Back
-                </button>
-            </div>
+            {/* HERO SECTION */}
+            <div className="th-hero">
+                <div className="th-hero-content">
+                    {/* Logo or Typography Fallback */}
+                    <div className="th-hero-logo-container">
+                        <WikiImage
+                            name={tournamentName}
+                            id={seriesId}
+                            type="tournament"
+                            className="th-hero-logo"
+                            style={{
+                                width: 72,
+                                height: 72,
+                                objectFit: 'contain',
+                                display: logoLoaded ? 'block' : 'none'
+                            }}
+                        />
+                        {/* Typography Fallback (shown when logo fails) */}
+                        <div
+                            className="th-hero-abbreviation"
+                            style={{ display: logoLoaded ? 'none' : 'flex' }}
+                        >
+                            {abbreviation}
+                        </div>
+                    </div>
 
-            {/* Tournament Info */}
-            <div className="tournament-hub-info">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
-                    <WikiImage
-                        name={tournamentName}
-                        id={seriesId}
-                        type="tournament"
-                        style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'contain' }}
-                    />
-                    <div>
-                        <h1 className="tournament-hub-title">{shortenSeriesName(tournamentName)}</h1>
-                        <div className="tournament-hub-meta">{uniqueTeams.size} teams · {matches.length} matches</div>
+                    <div className="th-hero-text">
+                        <h1 className="th-hero-title">{shortenSeriesName(tournamentName)}</h1>
+                        <div className="th-hero-subtitle">
+                            <span className="th-format-badge">{format}</span>
+                            <span className="th-hero-dot">·</span>
+                            <span>{stats.teams} Teams</span>
+                        </div>
                     </div>
                 </div>
-
-                {/* Tabs */}
-                {seriesId && (
-                    <div className="tournament-tabs">
-                        <button
-                            className={`tab-item ${activeTab === 'fixtures' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('fixtures')}
-                        >
-                            Fixtures
-                        </button>
-                        <button
-                            className={`tab-item ${activeTab === 'table' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('table')}
-                        >
-                            Table
-                        </button>
-                        <button
-                            className={`tab-item ${activeTab === 'stats' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('stats')}
-                        >
-                            Stats
-                        </button>
-                    </div>
-                )}
             </div>
 
-            {/* Content Area */}
-            <div className="tournament-content">
+            {/* QUICK STATS */}
+            <div className="th-stats-row">
+                <div className="th-stat-card">
+                    <span className="th-stat-value">{stats.teams}</span>
+                    <span className="th-stat-label">Teams</span>
+                </div>
+                <div className="th-stat-card">
+                    <span className="th-stat-value">{stats.total}</span>
+                    <span className="th-stat-label">Matches</span>
+                </div>
+                <div className="th-stat-card">
+                    <span className="th-stat-value">{stats.completed}</span>
+                    <span className="th-stat-label">Done</span>
+                </div>
+                <div className="th-stat-card">
+                    <span className="th-stat-value">{stats.remaining}</span>
+                    <span className="th-stat-label">Left</span>
+                </div>
+            </div>
 
-                {/* 1. FIXTURES TAB */}
+            {/* TABS */}
+            {seriesId && (
+                <div className="th-tabs">
+                    <button
+                        className={`th-tab ${activeTab === 'fixtures' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('fixtures')}
+                    >
+                        Fixtures
+                    </button>
+                    <button
+                        className={`th-tab ${activeTab === 'table' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('table')}
+                    >
+                        Table
+                    </button>
+                    <button
+                        className={`th-tab ${activeTab === 'stats' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('stats')}
+                    >
+                        Stats
+                    </button>
+                </div>
+            )}
+
+            {/* TAB CONTENT */}
+            <div className="th-content">
+                {/* FIXTURES TAB */}
                 {activeTab === 'fixtures' && (
-                    <div className="tournament-hub-matches">
-                        <div className="section-header" style={{ padding: '0 0 16px 0' }}>
-                            <h3 className="section-title">Fixtures</h3>
-                            <div className="section-line"></div>
-                        </div>
-
+                    <div className="th-fixtures">
                         {sortedMatches.map((match, idx) => {
                             const status = getMatchStatus(match);
                             const teams = match.participants || [];
                             return (
                                 <div
                                     key={match.game_id || idx}
-                                    className={`tournament-match-row ${status}`}
+                                    className={`th-match-row ${status}`}
                                     onClick={() => onMatchClick(match)}
                                 >
-                                    <div className="tournament-match-date">
-                                        <span className="tournament-date">{formatDate(match.start_date)}</span>
+                                    <div className="th-match-date">
+                                        {formatDate(match.start_date)}
                                     </div>
-                                    <div className="tournament-match-teams">
-                                        <span className="tournament-team">{teams[0]?.short_name || '?'}</span>
-                                        <span className="tournament-vs">vs</span>
-                                        <span className="tournament-team">{teams[1]?.short_name || '?'}</span>
+                                    <div className="th-match-teams">
+                                        <span>{teams[0]?.short_name || '?'}</span>
+                                        <span className="th-vs">vs</span>
+                                        <span>{teams[1]?.short_name || '?'}</span>
                                     </div>
-                                    <div className={`tournament-match-result ${status}`}>
-                                        {status === 'live' && <span className="live-dot"></span>}
+                                    <div className={`th-match-result ${status}`}>
+                                        {status === 'live' && <span className="th-live-dot"></span>}
                                         {getResultText(match)}
                                     </div>
                                 </div>
@@ -190,36 +235,26 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                     </div>
                 )}
 
-                {/* 2. POINTS TABLE TAB */}
+                {/* TABLE TAB */}
                 {activeTab === 'table' && (
-                    <div className="tournament-table-view">
-                        <div className="section-header">
-                            <h3 className="section-title">Points Table</h3>
-                            <div className="section-line"></div>
-                        </div>
-
+                    <div className="th-table">
                         {loadingTable ? (
-                            <div className="loading-spinner">Loading table...</div>
+                            <div className="th-loading">Loading table...</div>
                         ) : (
                             <PointsTable standings={pointsData} matches={matches} />
                         )}
                     </div>
                 )}
 
-                {/* 3. STATS TAB */}
+                {/* STATS TAB */}
                 {activeTab === 'stats' && seriesId && (
-                    <div className="tournament-stats-view">
-                        <div className="section-header">
-                            <h3 className="section-title">Player Stats</h3>
-                            <div className="section-line"></div>
-                        </div>
+                    <div className="th-stats">
                         <TournamentStats
                             seriesId={seriesId}
                             seriesName={tournamentName}
                         />
                     </div>
                 )}
-
             </div>
         </div>
     );
