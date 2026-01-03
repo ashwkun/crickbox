@@ -66,7 +66,25 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
             if (i < sortedMatches.length) {
                 const match = sortedMatches[i];
                 // Determine if this team won
-                const winnerId = match.winning_team_id || (match as any).winner_id;
+                // Determine winner from participants highlight flag (string "true" or boolean true)
+                let winnerId: string | null = null;
+                if (match.participants) {
+                    const winner = match.participants.find(p => String(p.highlight) === 'true');
+                    if (winner) {
+                        winnerId = winner.id;
+                    }
+                }
+
+                // Fallback: search status text
+                if (!winnerId && (match.short_event_status || match.event_sub_status)) {
+                    const status = (match.short_event_status || match.event_sub_status || '').toLowerCase();
+                    const winningParticipant = match.participants?.find(p =>
+                        status.startsWith(p.short_name.toLowerCase()) ||
+                        status.startsWith(p.name.toLowerCase())
+                    );
+                    if (winningParticipant) winnerId = winningParticipant.id;
+                }
+
                 const hasWinner = winnerId && winnerId !== '';
 
                 if (!hasWinner) {
