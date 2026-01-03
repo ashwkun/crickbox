@@ -11,9 +11,10 @@ import WikiImage from './WikiImage';
 import '../styles/TournamentStats.css';
 
 // Supabase Client (using public anon key for read-only access)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
+// These are safe to expose - anon key only allows public reads via RLS
+const SUPABASE_URL = 'https://ycumznofytwntinxlxkc.supabase.co';
+const SUPABASE_ANON_KEY = '***REMOVED***';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface TournamentStatsProps {
     seriesId: string;
@@ -58,12 +59,6 @@ const TournamentStats: React.FC<TournamentStatsProps> = ({ seriesId, seriesName 
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!supabase) {
-            setError('Stats unavailable (database not configured)');
-            setLoading(false);
-            return;
-        }
-
         const fetchStats = async () => {
             setLoading(true);
             setError(null);
