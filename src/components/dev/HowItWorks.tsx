@@ -712,6 +712,31 @@ FILTER CASCADE:
           </div>
         </section>
 
+        <section style={{ marginTop: 40 }}>
+          <h3 style={h3}>👤 Players: Assets Available!</h3>
+          <p style={p}>
+            Unlike teams, Player assets ARE available on the Free Tier!
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 20 }}>
+            {/* Thumb */}
+            <div style={{ background: '#f5f5f5', padding: 10, borderRadius: 12, border: '1px solid #ddd' }}>
+              <div style={{ marginBottom: 8, fontSize: 12, opacity: 0.5 }}>Thumb (strThumb)</div>
+              <img
+                src="https://r2.thesportsdb.com/images/media/player/thumb/tvnmqc1700659399.jpg"
+                style={{ width: '100%', height: 'auto', borderRadius: 8 }}
+              />
+            </div>
+            {/* Cutout */}
+            <div style={{ background: '#f5f5f5', padding: 10, borderRadius: 12, border: '1px solid #ddd' }}>
+              <div style={{ marginBottom: 8, fontSize: 12, opacity: 0.5 }}>Cutout (strCutout)</div>
+              <img
+                src="https://r2.thesportsdb.com/images/media/player/cutout/hkbzt11700659454.png"
+                style={{ width: '100%', height: 'auto' }}
+              />
+            </div>
+          </div>
+        </section>
+
         <p style={{ marginTop: 40 }}>
           <button onClick={onHome} style={{ padding: '12px 24px', background: '#000', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 16 }}>
             CLOSE DOCS
