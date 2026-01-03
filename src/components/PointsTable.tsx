@@ -68,23 +68,16 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                 const nrrMap: Record<string, number> = {};
                 data.forEach((stat: any) => {
                     // NRR = (Runs Scored / Overs Faced) - (Runs Conceded / Overs Bowled)
+                    // The view now returns balls (pre-adjusted for all-out scenarios)
 
-                    // Helper to convert decimal overs (e.g. 19.4) to actual balls or float overs
-                    // But our view returns raw balls_faced for batting, and raw decimal overs for bowling.
-
-                    // 1. Batting Rate
+                    // 1. Batting Rate: balls_faced is actual balls OR alloted_balls if all out
                     const ballsFaced = stat.balls_faced || 1;
                     const oversFaced = ballsFaced / 6;
                     const battingRate = (stat.runs_scored || 0) / oversFaced;
 
-                    // 2. Bowling Rate
-                    // We need to convert 3.4 overs to 3.666
-                    const rawOvers = stat.overs_bowled_decimal || 0;
-                    const wholeOvers = Math.floor(rawOvers);
-                    const ballsPart = (rawOvers - wholeOvers) * 10; // .4 becomes 4
-                    const totalBallsBowled = (wholeOvers * 6) + ballsPart;
-                    const oversBowled = totalBallsBowled / 6 || 1;
-
+                    // 2. Bowling Rate: overs_bowled_decimal is now actually total balls bowled (adjusted)
+                    const ballsBowled = stat.overs_bowled_decimal || 1;
+                    const oversBowled = ballsBowled / 6;
                     const bowlingRate = (stat.runs_conceded || 0) / oversBowled;
 
                     nrrMap[stat.team_id] = battingRate - bowlingRate;
