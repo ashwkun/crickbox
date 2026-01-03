@@ -6,6 +6,7 @@ import { Match } from '../types';
 import useCricketData from '../utils/useCricketData';
 import { getTournamentAbbreviation, getMatchFormat } from '../utils/tournamentAbbreviations';
 import { getLeagueLogo } from '../utils/leagueLogos';
+import { getTournamentColor } from '../utils/tournamentColors';
 import '../styles/TournamentHub.css';
 
 interface TournamentHubProps {
@@ -126,8 +127,19 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
         return match.short_event_status || 'Completed';
     };
 
+    // Get tournament accent color for dynamic theming
+    const accentColor = getTournamentColor(tournamentName);
+
     return (
-        <div className="tournament-hub" style={style}>
+        <div
+            className="tournament-hub"
+            style={{
+                ...style,
+                '--th-accent': accentColor,
+                '--th-accent-light': `${accentColor}33`,
+                '--th-accent-glow': `${accentColor}22`,
+            } as React.CSSProperties}
+        >
             {/* HERO SECTION */}
             <div className="th-hero">
                 <div className="th-hero-content">
