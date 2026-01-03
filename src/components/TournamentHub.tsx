@@ -201,7 +201,7 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                         {loadingTable ? (
                             <div className="loading-spinner">Loading table...</div>
                         ) : (
-                            <PointsTable standings={pointsData} />
+                            <PointsTable standings={pointsData} matches={matches} />
                         )}
                     </div>
                 )}
