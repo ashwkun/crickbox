@@ -113,28 +113,40 @@ function filterPremiumTournaments(matches) {
 }
 
 /**
- * Fetch all historical matches (gamestate=3)
+ * Format date as DDMMYYYY for Wisden API
  */
-async function fetchAllMatches() {
-    console.log('Fetching matches from Wisden...');
+function formatDateForWisden(date) {
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}${mm}${yyyy}`;
+}
 
-    const url = `https://www.wisden.com/default.aspx?methodtype=3&client=${CLIENT_MATCHES}&sport=1&league=0&timezone=0530&language=en&gamestate=3`;
+/**
+ * Fetch recent completed matches using daterange (last N days)
+ * Uses daterange parameter instead of gamestate=3 for incremental sync
+ */
+async function fetchRecentMatches(daysBack = 2) {
+    console.log(`Fetching matches from last ${daysBack} days...`);
+
+    const today = new Date();
+    const past = new Date();
+    past.setDate(today.getDate() - daysBack);
+
+    const dateRange = `${formatDateForWisden(past)}-${formatDateForWisden(today)}`;
+    console.log(`Date range: ${dateRange}`);
+
+    // Note: No gamestate param - daterange alone returns completed matches
+    const url = `https://www.wisden.com/default.aspx?methodtype=3&client=${CLIENT_MATCHES}&sport=1&league=0&timezone=0530&language=en&daterange=${dateRange}`;
     const proxyUrl = `${WISDEN_API}${encodeURIComponent(url)}`;
 
     const response = await fetch(proxyUrl);
     const data = await response.json();
 
-    const allMatches = data.matches || [];
-    console.log(`Fetched ${allMatches.length} total matches`);
+    const matches = data.matches || [];
+    console.log(`Fetched ${matches.length} completed matches`);
 
-    // Filter matches before 2022-01-01
-    const cutoffDate = '2022-01-01';
-    const recentMatches = allMatches.filter(m => {
-        return m.start_date && m.start_date >= cutoffDate;
-    });
-
-    console.log(`Filtered to ${recentMatches.length} matches since ${cutoffDate}`);
-    return recentMatches;
+    return matches;
 }
 
 /**
@@ -295,8 +307,8 @@ async function main() {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
-        // 1. Fetch all matches
-        const allMatches = await fetchAllMatches();
+        // 1. Fetch recent completed matches (last 2 days)
+        const allMatches = await fetchRecentMatches(2);
 
         // 2. Filter to premium tournaments
         const premiumMatches = filterPremiumTournaments(allMatches);

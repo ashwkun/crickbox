@@ -2,7 +2,7 @@ name: Sync Tournament Stats to Supabase
 
 on:
   schedule:
-    - cron: '30 */12 * * *'  # Every 12 hours (offset from main sync)
+    - cron: '*/30 * * * *'  # Every 30 minutes for incremental sync
   workflow_dispatch:  # Manual trigger
 
 jobs:
