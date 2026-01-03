@@ -95,6 +95,18 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
         const shouldUseTBCImage = isTBCName(name);
         const effectiveId = shouldUseTBCImage ? '0' : (id || (type === 'team' ? '0' : undefined));
 
+        // Strategy 0: League Logo (High Priority for Series/Tournaments)
+        if ((type === 'series' || type === 'tournament') && name) {
+            // Dynamically import to avoid circular dependencies if any (though utils are safe)
+            // But we already imported it at top level (need to add import)
+            const { getLeagueLogo } = require('../utils/leagueLogos');
+            const logoData = getLeagueLogo(name);
+            if (logoData?.badge) {
+                setSrc(logoData.badge);
+                return;
+            }
+        }
+
         if (effectiveId && errorCount === 0) {
             let url: string | undefined;
             if (type === 'player') url = `${WISDEN_PLAYER_IMG}${effectiveId}.png`;
