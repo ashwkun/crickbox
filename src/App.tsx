@@ -518,6 +518,7 @@ export default function App(): React.ReactElement {
                                     onMatchClick={handleSelectMatch}
                                     isVisible={isVisible}
                                     style={{ minHeight: 'calc(100% - 85px)' }}
+                                    seriesId={view.id}
                                 />
                             </div>
                         );

@@ -11,17 +11,20 @@ These APIs were discovered while investigating how Wisden displays the **Form Gu
 ## Working APIs ✅
 
 ### 1. Team Profile
+
 **Endpoint:** `/cricket/v1/team`
 
 **Purpose:** Get detailed team information including coach, social media, trophy cabinet, and team writeup.
 
 **Parameters:**
+
 - `team_id`: Team identifier (e.g., `1126` for India Women)
 - `lang`: `en`
 - `feed_format`: `json`
 - `client_id`: `430fdd0d`
 
 **Example:**
+
 ```bash
 curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden.com%2Fcricket%2Fv1%2Fteam%3Fteam_id%3D1126%26lang%3Den%26feed_format%3Djson%26client_id%3D430fdd0d"
 ```
@@ -29,6 +32,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 **Sample:** `team_profile.json` (313KB)
 
 **Key Data:**
+
 - Team names (full, short, display)
 - Gender, nationality, home venue
 - Coach/staff details
@@ -39,11 +43,13 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ---
 
 ### 2. Team Schedule
+
 **Endpoint:** `/cricket/v1/schedule`
 
 **Purpose:** Get recent or upcoming matches for a specific team.
 
 **Parameters:**
+
 - `team_id`: Team identifier
 - `is_recent`: `true` (for recent matches) or `false` (for upcoming)
 - `page_size`: Number of matches (e.g., `10`)
@@ -52,6 +58,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 - `client_id`: `430fdd0d`
 
 **Example:**
+
 ```bash
 curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden.com%2Fcricket%2Fv1%2Fschedule%3Fis_recent%3Dtrue%26team_id%3D1126%26page_size%3D10%26lang%3Den%26feed_format%3Djson%26client_id%3D430fdd0d"
 ```
@@ -59,6 +66,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 **Sample:** `team_schedule.json` (41KB)
 
 **Key Data:**
+
 - Match details (teams, venue, date/time)
 - Match status and result
 - Series information
@@ -70,16 +78,18 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ---
 
 ### 3. Rankings
+
 **Endpoint:** `/cricket/v1/ranking`
 
 **Purpose:** Get ICC rankings for teams or players by format and type.
 
 **Parameters:**
+
 - `comp_type`: Competition type
   - `1` = Test
   - `2` = ODI
   - `3` = T20I
-- `gender`: 
+- `gender`:
   - `1` = Men
   - `2` = Women
 - `type`: Ranking type
@@ -92,6 +102,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 - `client_id`: `430fdd0d`
 
 **Examples:**
+
 ```bash
 # Men's T20I Team Rankings
 curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden.com%2Fcricket%2Fv1%2Franking%3Fcomp_type%3D3%26gender%3D1%26type%3D1%26lang%3Den%26feed_format%3Djson%26client_id%3D430fdd0d"
@@ -101,6 +112,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ```
 
 **Samples:**
+
 - `rankings_test.json` (47KB) - Men's Test team rankings
 - `rankings_odi.json` (48KB) - Men's ODI team rankings
 - `rankings_t20i.json` (47KB) - Men's T20I team rankings
@@ -110,6 +122,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 - `rankings_t20i_allrounder.json` (37KB) - Men's T20I all-rounder rankings
 
 **Key Data:**
+
 - Current ranking position
 - Points
 - Career best ranking
@@ -119,17 +132,20 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ---
 
 ### 4. Player Profile
+
 **Endpoint:** `/cricket/v1/player`
 
 **Purpose:** Get comprehensive player information including biography, stats, and social media.
 
 **Parameters:**
+
 - `player_id`: Player identifier (e.g., `66799` for Abhishek Sharma)
 - `lang`: `en`
 - `feed_format`: `json`
 - `client_id`: `430fdd0d`
 
 **Example:**
+
 ```bash
 curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden.com%2Fcricket%2Fv1%2Fplayer%3Fplayer_id%3D66799%26lang%3Den%26feed_format%3Djson%26client_id%3D430fdd0d"
 ```
@@ -137,6 +153,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 **Sample:** `player_profile.json` (412KB)
 
 **Key Data:**
+
 - Full name, DOB, nationality
 - Playing role, batting/bowling style
 - Detailed biography/writeup
@@ -147,17 +164,20 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ---
 
 ### 5. Venue
+
 **Endpoint:** `/cricket/v1/venue`
 
 **Purpose:** Get detailed venue information including history, statistics, and records.
 
 **Parameters:**
+
 - `venue_id`: Venue identifier (e.g., `89` for Lord's)
 - `lang`: `en`
 - `feed_format`: `json`
 - `client_id`: `430fdd0d`
 
 **Example:**
+
 ```bash
 curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden.com%2Fcricket%2Fv1%2Fvenue%3Fvenue_id%3D89%26lang%3Den%26feed_format%3Djson%26client_id%3D430fdd0d"
 ```
@@ -165,6 +185,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 **Sample:** `venue.json` (316KB)
 
 **Key Data:**
+
 - Venue name, city, country
 - Capacity, floodlights, established date
 - Venue ends
@@ -180,17 +201,20 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ---
 
 ### 6. Series
+
 **Endpoint:** `/cricket/v1/series`
 
 **Purpose:** Get series information including participating teams and results.
 
 **Parameters:**
+
 - `series_id`: Series identifier
 - `lang`: `en`
 - `feed_format`: `json`
 - `client_id`: `430fdd0d`
 
 **Example:**
+
 ```bash
 curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden.com%2Fcricket%2Fv1%2Fseries%3Fseries_id%3D13452%26lang%3Den%26feed_format%3Djson%26client_id%3D430fdd0d"
 ```
@@ -198,6 +222,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 **Sample:** `series.json` (2.1KB)
 
 **Key Data:**
+
 - Series name, dates
 - Competition type (Test/ODI/T20I)
 - Tour information
@@ -211,11 +236,13 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ## Non-Working / Empty Response APIs ❌
 
 ### 7. Team Form ⚠️
+
 **Endpoint:** `/cricket/v1/team/form`
 
 **Status:** Returns empty/404 response
 
 **Parameters:**
+
 - `team_id`: Team identifier
 - `lang`: `en`
 - `feed_format`: `json`
@@ -228,6 +255,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ---
 
 ### 8. Squad
+
 **Endpoint:** `/cricket/v1/game/squad`
 
 **Status:** Returns empty response for tested match
@@ -237,6 +265,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ---
 
 ### 9. Match Details
+
 **Endpoint:** `/cricket/v1/game/match-details`
 
 **Status:** Returns empty response for tested match
@@ -246,6 +275,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ---
 
 ### 10. Series Standings
+
 **Endpoint:** `/cricket/v1/series/standings`
 
 **Status:** Returns empty response for tested series
@@ -257,6 +287,7 @@ curl "https://cricket-proxy.boxboxcric.workers.dev/?url=https%3A%2F%2Fwww.wisden
 ## Key Findings
 
 ### Form Guide Implementation
+
 The **Form Guide** feature on Wisden match pages was the original target of this investigation. Key findings:
 
 1. **Intended Endpoint:** `/cricket/v1/team/form` exists but returns no data (404/empty)
@@ -264,11 +295,15 @@ The **Form Guide** feature on Wisden match pages was the original target of this
 3. **Alternative:** You can fetch last 5-10 matches for a team and calculate W/L/D form yourself
 
 ### All APIs Use Same Client ID
+
 All these v1 cricket APIs use the same `client_id` as the scorecard and H2H APIs:
+
 - `client_id`: `430fdd0d` (documented as `CLIENT_SCORECARD` in `wisdenConfig.ts`)
 
 ### Common Parameters
+
 Most APIs share these parameters:
+
 - `lang`: `en` (language)
 - `feed_format`: `json` (response format)
 - `client_id`: `430fdd0d` (authentication)
@@ -286,14 +321,17 @@ Most APIs share these parameters:
    - Series
 
 2. **Implement Form Guide** using the Team Schedule API:
+
    ```typescript
    // Pseudo-code
-   const response = await fetch(schedule_api + "?is_recent=true&team_id=1126&page_size=5");
-   const form = response.matches.map(m => {
-     if (m.winning_team_id === teamId) return 'W';
-     if (m.match_status.includes('Tied')) return 'T';
-     if (m.match_status.includes('Draw')) return 'D';
-     return 'L';
+   const response = await fetch(
+     schedule_api + "?is_recent=true&team_id=1126&page_size=5",
+   );
+   const form = response.matches.map((m) => {
+     if (m.winning_team_id === teamId) return "W";
+     if (m.match_status.includes("Tied")) return "T";
+     if (m.match_status.includes("Draw")) return "D";
+     return "L";
    });
    ```
 
@@ -309,7 +347,8 @@ All URLs must be encoded and passed through the CORS proxy:
 
 ```typescript
 const CORS_PROXY = "https://cricket-proxy.boxboxcric.workers.dev/?url=";
-const apiUrl = "https://www.wisden.com/cricket/v1/team?team_id=1126&lang=en&feed_format=json&client_id=430fdd0d";
+const apiUrl =
+  "https://www.wisden.com/cricket/v1/team?team_id=1126&lang=en&feed_format=json&client_id=430fdd0d";
 const finalUrl = `${CORS_PROXY}${encodeURIComponent(apiUrl)}`;
 ```
 
@@ -317,15 +356,15 @@ const finalUrl = `${CORS_PROXY}${encodeURIComponent(apiUrl)}`;
 
 ## Summary Table
 
-| API | Endpoint | Status | Sample Size | Primary Use |
-|:----|:---------|:-------|:------------|:------------|
-| Team Profile | `/cricket/v1/team` | ✅ Working | 313KB | Team info, coach, history |
-| Team Schedule | `/cricket/v1/schedule` | ✅ Working | 41KB | Recent/upcoming matches, **form calculation** |
-| Rankings | `/cricket/v1/ranking` | ✅ Working | 37-48KB | ICC rankings (teams/players) |
-| Player Profile | `/cricket/v1/player` | ✅ Working | 412KB | Player bio, stats, socials |
-| Venue | `/cricket/v1/venue` | ✅ Working | 316KB | Venue info, stats, records |
-| Series | `/cricket/v1/series` | ✅ Working | 2.1KB | Series info, results |
-| Team Form | `/cricket/v1/team/form` | ❌ Empty | 0B | Intended for form guide |
-| Squad | `/cricket/v1/game/squad` | ❌ Empty | 0B | Match squads |
-| Match Details | `/cricket/v1/game/match-details` | ❌ Empty | 0B | Match metadata |
-| Series Standings | `/cricket/v1/series/standings` | ❌ Empty | 0B | Points table |
+| API              | Endpoint                         | Status     | Sample Size | Primary Use                                   |
+| :--------------- | :------------------------------- | :--------- | :---------- | :-------------------------------------------- |
+| Team Profile     | `/cricket/v1/team`               | ✅ Working | 313KB       | Team info, coach, history                     |
+| Team Schedule    | `/cricket/v1/schedule`           | ✅ Working | 41KB        | Recent/upcoming matches, **form calculation** |
+| Rankings         | `/cricket/v1/ranking`            | ✅ Working | 37-48KB     | ICC rankings (teams/players)                  |
+| Player Profile   | `/cricket/v1/player`             | ✅ Working | 412KB       | Player bio, stats, socials                    |
+| Venue            | `/cricket/v1/venue`              | ✅ Working | 316KB       | Venue info, stats, records                    |
+| Series           | `/cricket/v1/series`             | ✅ Working | 2.1KB       | Series info, results                          |
+| Team Form        | `/cricket/v1/team/form`          | ❌ Empty   | 0B          | Intended for form guide                       |
+| Squad            | `/cricket/v1/game/squad`         | ❌ Empty   | 0B          | Match squads                                  |
+| Match Details    | `/cricket/v1/game/match-details` | ❌ Empty   | 0B          | Match metadata                                |
+| Series Standings | `/cricket/v1/series/standings`   | ❌ Empty   | 0B          | Points table                                  |

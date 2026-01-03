@@ -5,17 +5,20 @@ This document tracks known limitations and issues with Wisden Cricket APIs.
 ## 🚨 Critical Issues
 
 ### 1. Schedule API Returns Incorrect Data
+
 **Affected Endpoint:** `/cricket/v1/schedule`
 
 **Issue:** When querying by `series_id` or `team_id`, the API frequently returns data from completely different series/teams.
 
 **Examples:**
+
 - **IPL 2025** (`series_id=8307`): Returns Australian Women's cricket data from 2009
 - **India Women** (`team_id=1126`): Returns data from wrong teams/series
 
 **Status:** ❌ **BROKEN** - Do not use this endpoint
 
 **Workarounds:**
+
 1. **For Team Recent Matches:** Use the `/cricket/v1/team?series_id={ID}` endpoint which includes a `matches` array for each team
 2. **For Series Fixtures:** Use the general matches list API with filters:
    ```
@@ -28,22 +31,26 @@ This document tracks known limitations and issues with Wisden Cricket APIs.
 ---
 
 ### 2. Player Statistics API Not Available
+
 **Affected Endpoint:** `/cricket/v1/stats/player_level_stats`
 
 **Issue:** Returns error: `"The requested resource does not exist in the database"`
 
 **Tested Scenarios:**
+
 - IPL 2025 (`comp_type_id=6`, various `stat_id` values)
 - All stat types (Most Runs, Most Wickets, Orange Cap, Purple Cap)
 
 **Status:** ❌ **NOT WORKING** for completed tournaments
 
 **Theory:** This endpoint may only work for:
+
 - Currently live/ongoing tournaments
 - Specific championship structures
 - May require different parameter combinations not yet discovered
 
 **Workarounds:**
+
 - **For Orange/Purple Cap:** Web scraping or alternative data sources
 - **For Player Stats:** Aggregate from individual match scorecards
 
@@ -52,18 +59,22 @@ This document tracks known limitations and issues with Wisden Cricket APIs.
 ---
 
 ### 3. Standings/Points Table API Not Available
+
 **Affected Endpoints:**
+
 - `/cricket/v1/standings`
 - `/cricket/v1/series/standings`
 
 **Issue:** Returns empty response (0 bytes)
 
 **Tested Scenarios:**
+
 - IPL 2025 (`series_id=8307`)
 
 **Status:** ❌ **EMPTY RESPONSE**
 
 **Workarounds:**
+
 - Use `/cricket/v1/series?series_id={ID}` which includes:
   ```json
   {
@@ -90,6 +101,7 @@ This document tracks known limitations and issues with Wisden Cricket APIs.
 ## ⚠️ Partial Issues
 
 ### 4. Team Form Endpoint
+
 **Affected Endpoint:** `/cricket/v1/team/form`
 
 **Issue:** Returns 404/empty for most teams, especially women's cricket
@@ -101,6 +113,7 @@ This document tracks known limitations and issues with Wisden Cricket APIs.
 ---
 
 ### 5. Squad Endpoint
+
 **Affected Endpoint:** `/cricket/v1/game/squad`
 
 **Issue:** Returns empty for tested matches
@@ -130,6 +143,7 @@ The following endpoints have been verified to work correctly:
 ## Recommended Approach
 
 ### For Tournament Data:
+
 ```
 1. Series Info → Get teams, dates, winner
 2. Team Profile → Get team details, recent matches
@@ -138,6 +152,7 @@ The following endpoints have been verified to work correctly:
 ```
 
 ### For Live Matches:
+
 ```
 1. Matches List → Find live matches
 2. Scorecard → Get current scores
@@ -146,6 +161,7 @@ The following endpoints have been verified to work correctly:
 ```
 
 ### DON'T Use:
+
 - ❌ `/cricket/v1/schedule` - Returns wrong data
 - ❌ `/cricket/v1/stats/player_level_stats` - Not available
 - ❌ `/cricket/v1/standings` - Empty response
@@ -154,9 +170,11 @@ The following endpoints have been verified to work correctly:
 ---
 
 ## Last Updated
+
 December 28, 2025
 
 ## Notes
+
 - These limitations were discovered during IPL 2025 API investigation
 - Wisden's API documentation is not public; endpoints discovered through reverse engineering
 - API behavior may change without notice

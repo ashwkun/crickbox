@@ -1,0 +1,107 @@
+/* Glassmorphism Points Table */
+.points-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 16px;
+}
+
+.points-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.points-table th {
+    text-align: center;
+    padding: 12px 8px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+}
+
+.points-table td {
+    padding: 12px 8px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.pt-row:last-child td {
+    border-bottom: none;
+}
+
+/* Columns */
+.pt-rank {
+    width: 30px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 11px;
+}
+
+.pt-team {
+    text-align: left !important;
+}
+
+.pt-team-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left !important;
+}
+
+.pt-team-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px;
+}
+
+.pt-team-name {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.pt-stat {
+    width: 30px;
+    font-feature-settings: "tnum";
+}
+
+.pt-win {
+    color: #4ade80;
+    /* Green-400 */
+}
+
+.pt-loss {
+    color: #f87171;
+    /* Red-400 */
+}
+
+.pt-nrr {
+    font-family: monospace;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+}
+
+.pt-points {
+    font-weight: 700;
+    color: #fff;
+    width: 40px;
+    font-size: 14px;
+}
+
+.points-table-empty {
+    padding: 32px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+}
