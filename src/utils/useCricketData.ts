@@ -79,6 +79,7 @@ interface UseCricketDataReturn {
     fetchSquad: (teamId: string, seriesId: string) => Promise<SquadData | null>;
     fetchBatsmanSplits: (gameId: string, innings: number) => Promise<BatsmanSplitsResponse | null>;
     fetchOverByOver: (gameId: string, innings: number) => Promise<OverByOverResponse | null>;
+    fetchSeriesInfo: (seriesId: string) => Promise<any | null>;
 }
 
 export default function useCricketData(): UseCricketDataReturn {
@@ -509,6 +510,26 @@ export default function useCricketData(): UseCricketDataReturn {
         }
     }, []);
 
+    // Series Info - for Points Table
+    const fetchSeriesInfo = useCallback(async (seriesId: string): Promise<any | null> => {
+        try {
+            const url = `https://www.wisden.com/cricket/v1/series?series_id=${seriesId}&lang=en&feed_format=json&client_id=${CLIENT_SCORECARD}`;
+            const response = await proxyFetch(url);
+
+            // Sanitize team names in the response
+            if (response?.data?.teams?.team) {
+                response.data.teams.team.forEach((t: any) => {
+                    if (t.name) t.name = sanitizeTeamName(t.name);
+                });
+            }
+
+            return response?.data || null;
+        } catch (error) {
+            console.error('Failed to fetch series info:', error);
+            return null;
+        }
+    }, []);
+
     return {
         matches,
         loading,
@@ -518,7 +539,8 @@ export default function useCricketData(): UseCricketDataReturn {
         fetchH2H,
         fetchSquad,
         fetchBatsmanSplits,
-        fetchOverByOver
+        fetchOverByOver,
+        fetchSeriesInfo
     };
 }
 
