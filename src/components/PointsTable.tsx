@@ -53,6 +53,7 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, style }) => {
                             <td className="pt-team-cell">
                                 <WikiImage
                                     name={team.name}
+                                    id={String(team.id)}
                                     type="team"
                                     className="pt-team-logo"
                                 />
