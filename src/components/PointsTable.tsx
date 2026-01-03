@@ -22,13 +22,14 @@ interface PointsTableProps {
 }
 
 const PointsTable: React.FC<PointsTableProps> = ({ standings, style }) => {
-    if (!standings || standings.length === 0) {
+    // Defensive check: ensure standings is an array
+    if (!standings || !Array.isArray(standings) || standings.length === 0) {
         return <div className="points-table-empty">No standings available</div>;
     }
 
     // Sort by position (just in case API returns unsorted)
     const sorted = [...standings].sort((a, b) =>
-        parseInt(a.position) - parseInt(b.position)
+        parseInt(a.position || '0') - parseInt(b.position || '0')
     );
 
     return (
