@@ -35,8 +35,80 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
         return a.matches - b.matches; // Fewer matches = better if same wins
     });
 
+    // State for NRR data
+    const [nrrData, setNrrData] = React.useState<Record<string, number>>({});
+
+    // Fetch NRR data on mount
+    React.useEffect(() => {
+        const fetchNRR = async () => {
+            // We need seriesId to fetch specific stats. 
+            // Currently matches[0].series_id is the best proxy if not passed explicitly?
+            // Ideally parent should pass seriesId. relying on matches for now.
+            if (matches.length === 0) return;
+
+            const seriesId = matches[0].series_id;
+            if (!seriesId) return;
+
+            try {
+                const { createClient } = await import('@supabase/supabase-js');
+                const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://ycumznofytwntinxlxkc.supabase.co';
+                const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '***REMOVED***';
+                const supabase = createClient(supabaseUrl, supabaseKey);
+
+                const { data, error } = await supabase
+                    .from('team_tournament_stats')
+                    .select('*')
+                    .eq('series_id', seriesId);
+
+                if (error) {
+                    console.error('Failed to fetch NRR:', error);
+                    return;
+                }
+
+                const nrrMap: Record<string, number> = {};
+                data.forEach((stat: any) => {
+                    // NRR = (Runs Scored / Overs Faced) - (Runs Conceded / Overs Bowled)
+
+                    // Helper to convert decimal overs (e.g. 19.4) to actual balls or float overs
+                    // But our view returns raw balls_faced for batting, and raw decimal overs for bowling.
+
+                    // 1. Batting Rate
+                    const ballsFaced = stat.balls_faced || 1;
+                    const oversFaced = ballsFaced / 6;
+                    const battingRate = (stat.runs_scored || 0) / oversFaced;
+
+                    // 2. Bowling Rate
+                    // We need to convert 3.4 overs to 3.666
+                    const rawOvers = stat.overs_bowled_decimal || 0;
+                    const wholeOvers = Math.floor(rawOvers);
+                    const ballsPart = (rawOvers - wholeOvers) * 10; // .4 becomes 4
+                    const totalBallsBowled = (wholeOvers * 6) + ballsPart;
+                    const oversBowled = totalBallsBowled / 6 || 1;
+
+                    const bowlingRate = (stat.runs_conceded || 0) / oversBowled;
+
+                    nrrMap[stat.team_id] = battingRate - bowlingRate;
+                });
+
+                setNrrData(nrrMap);
+
+            } catch (e) {
+                console.error('NRR fetch error:', e);
+            }
+        };
+
+        fetchNRR();
+    }, [matches]);
+
     // Calculate points (2 per win, 1 per tie/NR)
     const getPoints = (team: TeamStanding) => (team.wins * 2) + (team.tied || 0);
+
+    // Render helper
+    const getNRRDisplay = (teamId: number) => {
+        const nrr = nrrData[String(teamId)];
+        if (nrr === undefined) return '-';
+        return (nrr > 0 ? '+' : '') + nrr.toFixed(3);
+    };
 
     // Get team's last N match results from tournament matches
     const getTeamForm = (teamId: number, count: number = 5): FormResult[] => {
@@ -145,6 +217,7 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                         <th className="pt-stat">M</th>
                         <th className="pt-stat">W</th>
                         <th className="pt-stat">L</th>
+                        <th className="pt-stat">NRR</th>
                         <th className="pt-points">Pts</th>
                         <th className="pt-form">Form</th>
                     </tr>
@@ -169,6 +242,7 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                                 <td className="pt-stat">{team.matches}</td>
                                 <td className="pt-stat pt-win">{team.wins}</td>
                                 <td className="pt-stat pt-loss">{team.loss}</td>
+                                <td className="pt-stat pt-nrr">{getNRRDisplay(team.id)}</td>
                                 <td className="pt-points">{getPoints(team)}</td>
                                 <td className="pt-form-cell">{renderFormDots(form)}</td>
                             </tr>
