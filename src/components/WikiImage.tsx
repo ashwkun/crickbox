@@ -1,6 +1,7 @@
 import React, { useEffect, useState, CSSProperties } from 'react';
 import { safeSetItem } from '../utils/storage';
 import { isTBCName } from '../utils/tbcMatch';
+import { getLeagueLogo } from '../utils/leagueLogos';
 
 // Types
 interface WikiImageProps {
@@ -97,9 +98,6 @@ const WikiImage: React.FC<WikiImageProps> = React.memo(({
 
         // Strategy 0: League Logo (High Priority for Series/Tournaments)
         if ((type === 'series' || type === 'tournament') && name) {
-            // Dynamically import to avoid circular dependencies if any (though utils are safe)
-            // But we already imported it at top level (need to add import)
-            const { getLeagueLogo } = require('../utils/leagueLogos');
             const logoData = getLeagueLogo(name);
             if (logoData?.badge) {
                 setSrc(logoData.badge);
