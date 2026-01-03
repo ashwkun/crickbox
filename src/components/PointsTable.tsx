@@ -3,17 +3,14 @@ import WikiImage from './WikiImage';
 import '../styles/PointsTable.css';
 
 interface TeamStanding {
-    team_id: string;
-    team_name: string;
-    team_short_name: string;
-    played: string;
-    won: string;
-    lost: string;
-    tied: string;
-    no_result: string;
-    net_run_rate: string;
-    points: string;
-    position: string;
+    id: number;
+    name: string;
+    short_name: string;
+    matches: number;
+    wins: number;
+    loss: number;
+    draw: number;
+    tied: number;
 }
 
 interface PointsTableProps {
@@ -27,10 +24,14 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, style }) => {
         return <div className="points-table-empty">No standings available</div>;
     }
 
-    // Sort by position (just in case API returns unsorted)
-    const sorted = [...standings].sort((a, b) =>
-        parseInt(a.position || '0') - parseInt(b.position || '0')
-    );
+    // Sort by wins (descending), then by matches played (ascending for tie-breaker)
+    const sorted = [...standings].sort((a, b) => {
+        if (b.wins !== a.wins) return b.wins - a.wins;
+        return a.matches - b.matches; // Fewer matches = better if same wins
+    });
+
+    // Calculate points (2 per win, 1 per tie/NR)
+    const getPoints = (team: TeamStanding) => (team.wins * 2) + (team.tied || 0);
 
     return (
         <div className="points-table-container" style={style}>
@@ -42,27 +43,25 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, style }) => {
                         <th className="pt-stat">M</th>
                         <th className="pt-stat">W</th>
                         <th className="pt-stat">L</th>
-                        <th className="pt-nrr">NRR</th>
                         <th className="pt-points">Pts</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {sorted.map((team) => (
-                        <tr key={team.team_id} className="pt-row">
-                            <td className="pt-rank">{team.position}</td>
+                    {sorted.map((team, idx) => (
+                        <tr key={team.id} className="pt-row">
+                            <td className="pt-rank">{idx + 1}</td>
                             <td className="pt-team-cell">
                                 <WikiImage
-                                    name={team.team_name}
+                                    name={team.name}
                                     type="team"
                                     className="pt-team-logo"
                                 />
-                                <span className="pt-team-name">{team.team_short_name || team.team_name}</span>
+                                <span className="pt-team-name">{team.short_name || team.name}</span>
                             </td>
-                            <td className="pt-stat">{team.played}</td>
-                            <td className="pt-stat pt-win">{team.won}</td>
-                            <td className="pt-stat pt-loss">{team.lost}</td>
-                            <td className="pt-nrr">{team.net_run_rate}</td>
-                            <td className="pt-points">{team.points}</td>
+                            <td className="pt-stat">{team.matches}</td>
+                            <td className="pt-stat pt-win">{team.wins}</td>
+                            <td className="pt-stat pt-loss">{team.loss}</td>
+                            <td className="pt-points">{getPoints(team)}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -72,3 +71,4 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, style }) => {
 };
 
 export default PointsTable;
+

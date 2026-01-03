@@ -51,11 +51,16 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
         if (activeTab === 'table' && pointsData.length === 0 && seriesId) {
             const loadPoints = async () => {
                 setLoadingTable(true);
-                const data = await fetchSeriesInfo(seriesId);
-                // Extract standings from response
-                // Structure: data.series.standings.groups[0].team
-                const teams = data?.series?.standings?.groups?.[0]?.team || [];
-                setPointsData(teams);
+                try {
+                    const data = await fetchSeriesInfo(seriesId);
+                    // API returns: data[0].teams (array of team objects)
+                    // Each team has: id, name, short_name, matches, wins, loss, etc.
+                    const seriesData = Array.isArray(data) ? data[0] : data;
+                    const teams = seriesData?.teams || [];
+                    setPointsData(teams);
+                } catch (err) {
+                    console.error('Failed to load points table:', err);
+                }
                 setLoadingTable(false);
             };
             loadPoints();
