@@ -100,8 +100,8 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
             }
         }
 
-        // Reverse so oldest is first, newest is last (reading L→R)
-        return form.reverse();
+        // Return recent-first (Recent -> Left)
+        return form;
     };
 
     // Render form dots
@@ -112,9 +112,23 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                     <div
                         key={idx}
                         className={`pt-form-dot ${result ? `pt-form-${result.toLowerCase()}` : 'pt-form-blank'}`}
-                        title={result || '-'}
+                        title={idx === 0 ? 'Latest Match' : (result || '-')}
+                        style={{ position: 'relative' }}
                     >
                         {result || ''}
+                        {/* Dot indicator for latest match (index 0) */}
+                        {idx === 0 && (
+                            <div style={{
+                                position: 'absolute',
+                                bottom: -4,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: 4,
+                                height: 4,
+                                borderRadius: '50%',
+                                background: 'rgba(255,255,255,0.4)' // White dot for dark theme
+                            }} />
+                        )}
                     </div>
                 ))}
             </div>
