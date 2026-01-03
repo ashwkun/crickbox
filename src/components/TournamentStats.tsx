@@ -161,6 +161,7 @@ const TournamentStats: React.FC<TournamentStatsProps> = ({ seriesId, seriesName 
                             <div className="stats-rank">{idx + 1}</div>
                             <WikiImage
                                 name={player.player_name}
+                                id={player.player_id}
                                 type="player"
                                 className="stats-player-img"
                             />
@@ -187,6 +188,7 @@ const TournamentStats: React.FC<TournamentStatsProps> = ({ seriesId, seriesName 
                             <div className="stats-rank">{idx + 1}</div>
                             <WikiImage
                                 name={player.player_name}
+                                id={player.player_id}
                                 type="player"
                                 className="stats-player-img"
                             />

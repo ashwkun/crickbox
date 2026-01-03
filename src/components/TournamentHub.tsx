@@ -117,7 +117,7 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
                     <WikiImage
                         name={tournamentName}
-                        id={tournamentName?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}
+                        id={seriesId}
                         type="tournament"
                         style={{ width: 48, height: 48, borderRadius: 12, objectFit: 'contain' }}
                     />
