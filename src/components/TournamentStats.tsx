@@ -6,15 +6,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../utils/supabaseClient';
 import WikiImage from './WikiImage';
 import '../styles/TournamentStats.css';
-
-// Supabase Client (using public anon key for read-only access)
-// These are safe to expose - anon key only allows public reads via RLS
-const SUPABASE_URL = 'https://ycumznofytwntinxlxkc.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Cwxlp3Az6TKQBXsIXnUemg_A4Avw-71';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 interface TournamentStatsProps {
     seriesId: string;
