@@ -342,9 +342,13 @@ export default function useCricketData(): UseCricketDataReturn {
         // For extended results, we just update the completed bucket
         updateBucket('completed', allMatches);
 
-        // Return full list
+        // Return full list (Live + Upcoming + Completed)
         const { live, upcoming, completed } = bucketsRef.current;
-        return Array.from(completed.values());
+        const merged = new Map<string, Match>(completed);
+        upcoming.forEach(m => merged.set(m.game_id, m));
+        live.forEach(m => merged.set(m.game_id, m));
+
+        return Array.from(merged.values());
     };
 
     // ============ CENTRALIZED FETCH FUNCTIONS ============
