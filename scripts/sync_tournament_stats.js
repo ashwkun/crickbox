@@ -332,8 +332,9 @@ async function main() {
         const allMatchData = [];
         const allBattingInnings = [];
         const allBowlingInnings = [];
+        const allTeamStats = []; // NEW: For NRR
 
-        // Process all new matches (User requested one-off full sync)
+        // Process all new matches
         const matchesToProcess = newMatches;
         console.log(`Processing all ${matchesToProcess.length} matches...`);
 
@@ -356,6 +357,30 @@ async function main() {
             allBattingInnings.push(...transformed.battingInnings);
             allBowlingInnings.push(...transformed.bowlingInnings);
 
+            // EXTRACT TEAM STATS FOR NRR
+            if (scorecard.Innings) {
+                scorecard.Innings.forEach(inn => {
+                    const runs = parseInt(inn.Total || '0', 10);
+                    const wickets = parseInt(inn.Wickets || '0', 10);
+                    const ballsFaced = parseInt(inn.Total_Balls_Bowled || '0', 10);
+                    const allotedBalls = parseInt(inn.AllotedBalls || '0', 10);
+                    const isAllOut = wickets === 10 || (inn.dismissal === 'all out');
+
+                    allTeamStats.push({
+                        match_id: match.game_id,
+                        team_id: inn.Battingteam,
+                        innings_number: inn.Number === 'First' ? 1 : (inn.Number === 'Second' ? 2 : 1),
+                        series_id: match.series_id,
+                        runs: runs,
+                        wickets: wickets,
+                        overs_display: inn.Overs,
+                        balls_faced: ballsFaced,
+                        alloted_balls: allotedBalls,
+                        is_all_out: isAllOut
+                    });
+                });
+            }
+
             if ((i + 1) % 10 === 0) {
                 console.log(`[${i + 1}/${matchesToProcess.length}] Processed: ${match.series_name}`);
             }
@@ -373,10 +398,14 @@ async function main() {
         const bowlingUpserted = await upsertToSupabase(supabase, 'bowling_innings', allBowlingInnings);
         console.log(`  bowling_innings: ${bowlingUpserted} rows`);
 
+        const teamStatsUpserted = await upsertToSupabase(supabase, 'team_innings_stats', allTeamStats);
+        console.log(`  team_innings_stats: ${teamStatsUpserted} rows (NRR Data)`);
+
         console.log('\n✅ Sync complete!');
         console.log(`   Matches: ${matchesUpserted}`);
         console.log(`   Batting: ${battingUpserted} innings`);
         console.log(`   Bowling: ${bowlingUpserted} innings`);
+        console.log(`   TeamStats: ${teamStatsUpserted} rows`);
 
     } catch (error) {
         console.error('Sync failed:', error);
