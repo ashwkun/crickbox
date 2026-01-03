@@ -1,16 +1,21 @@
-/* TournamentHub.css - Premium tournament landing page styles */
+/* TournamentHub.css - Glassmorphic tournament landing page */
 
 .tournament-hub {
     min-height: 100vh;
     background: var(--bg-primary, #0a0a0a);
-    padding-bottom: 80px;
+    padding: 16px;
+    padding-bottom: 100px;
 }
 
-/* ===== HERO SECTION ===== */
+/* ===== HERO CARD (Glassmorphic) ===== */
 .th-hero {
-    padding: 24px 16px 20px;
-    background: linear-gradient(180deg, rgba(138, 43, 226, 0.15) 0%, transparent 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 12px;
 }
 
 .th-hero-content {
@@ -21,37 +26,34 @@
 
 .th-hero-logo-container {
     flex-shrink: 0;
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .th-hero-logo {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     object-fit: contain;
-    border-radius: 12px;
+    border-radius: 14px;
 }
 
 /* Typography fallback when no logo */
 .th-hero-abbreviation {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #6b21a8 0%, #9333ea 50%, #a855f7 100%);
-    border-radius: 16px;
-    font-size: 18px;
+    background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+    border-radius: 14px;
+    font-size: 16px;
     font-weight: 800;
     letter-spacing: -0.5px;
     color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    box-shadow:
-        0 4px 12px rgba(139, 92, 246, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .th-hero-text {
@@ -60,8 +62,8 @@
 }
 
 .th-hero-title {
-    font-size: 22px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: #fff;
     margin: 0 0 6px 0;
     line-height: 1.2;
@@ -75,14 +77,14 @@
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .th-format-badge {
     background: rgba(139, 92, 246, 0.2);
     color: #a78bfa;
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -92,48 +94,54 @@
     color: rgba(255, 255, 255, 0.3);
 }
 
-/* ===== QUICK STATS ROW ===== */
+/* ===== QUICK STATS (Glassmorphic Cards) ===== */
 .th-stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
-    padding: 16px;
-    background: rgba(255, 255, 255, 0.02);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 12px;
 }
 
 .th-stat-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 12px 8px;
+    justify-content: center;
+    padding: 14px 8px;
     background: rgba(255, 255, 255, 0.04);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
 }
 
 .th-stat-value {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
     color: #fff;
     line-height: 1;
 }
 
 .th-stat-label {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.45);
     margin-top: 4px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-weight: 500;
 }
 
-/* ===== TABS ===== */
+/* ===== TABS (Pill Style) ===== */
 .th-tabs {
     display: flex;
-    gap: 0;
-    padding: 12px 16px;
-    background: rgba(0, 0, 0, 0.3);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    gap: 8px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    margin-bottom: 16px;
 }
 
 .th-tab {
@@ -141,81 +149,64 @@
     padding: 10px 16px;
     background: transparent;
     border: none;
+    border-radius: 10px;
     font-size: 14px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
     transition: all 0.2s ease;
-    position: relative;
-}
-
-.th-tab:first-child {
-    border-radius: 8px 0 0 8px;
-}
-
-.th-tab:last-child {
-    border-radius: 0 8px 8px 0;
 }
 
 .th-tab.active {
-    background: rgba(139, 92, 246, 0.2);
-    color: #a78bfa;
-}
-
-.th-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 24px;
-    height: 2px;
-    background: #a78bfa;
-    border-radius: 2px;
+    background: rgba(139, 92, 246, 0.25);
+    color: #c4b5fd;
 }
 
 /* ===== CONTENT AREA ===== */
 .th-content {
-    padding: 16px;
+    /* Content inherits parent padding */
 }
 
-/* ===== FIXTURES ===== */
+/* ===== FIXTURES (Glassmorphic Cards) ===== */
 .th-fixtures {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .th-match-row {
     display: flex;
     align-items: center;
-    padding: 12px 14px;
+    padding: 14px 16px;
     background: rgba(255, 255, 255, 0.04);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .th-match-row:hover {
     background: rgba(255, 255, 255, 0.08);
-    transform: translateX(2px);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
 }
 
 .th-match-row.live {
-    border-color: rgba(239, 68, 68, 0.4);
-    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.06);
 }
 
 .th-match-row.next {
-    border-color: rgba(139, 92, 246, 0.4);
-    background: rgba(139, 92, 246, 0.08);
+    border-color: rgba(139, 92, 246, 0.3);
+    background: rgba(139, 92, 246, 0.06);
 }
 
 .th-match-date {
-    flex: 0 0 90px;
+    flex: 0 0 80px;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.45);
 }
 
 .th-match-teams {
@@ -229,7 +220,7 @@
 }
 
 .th-vs {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.25);
     font-size: 11px;
     font-weight: 400;
 }
@@ -237,23 +228,20 @@
 .th-match-result {
     flex: 0 0 auto;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.45);
     text-align: right;
     display: flex;
     align-items: center;
     gap: 6px;
-}
-
-.th-match-result.live {
-    color: #ef4444;
-    font-weight: 600;
-}
-
-.th-match-result.completed {
-    max-width: 120px;
+    max-width: 110px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.th-match-result.live {
+    color: #f87171;
+    font-weight: 600;
 }
 
 .th-live-dot {
@@ -276,15 +264,20 @@
     }
 }
 
-/* ===== TABLE & STATS ===== */
+/* ===== TABLE & STATS WRAPPERS ===== */
 .th-table,
 .th-stats {
-    /* Inherit styles from child components */
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 16px;
 }
 
 .th-loading {
     text-align: center;
-    padding: 32px;
-    color: rgba(255, 255, 255, 0.5);
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.4);
     font-size: 14px;
 }
