@@ -650,7 +650,7 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
     position: relative;
     z-index: 1;
 }
@@ -664,11 +664,15 @@
 }
 
 .new-team:first-child {
-    justify-self: end;
+    justify-self: center;
+    margin-left: auto;
+    /* Push to right edge of column */
 }
 
 .new-team:last-child {
-    justify-self: start;
+    justify-self: center;
+    margin-right: auto;
+    /* Push to left edge of column */
 }
 
 .new-team-logo {
