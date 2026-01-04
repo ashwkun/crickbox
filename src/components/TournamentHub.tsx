@@ -335,88 +335,63 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
     const team1 = teams[0];
     const team2 = teams[1];
 
-    // Formatting
-    const formatTime = (d: string) => new Date(d).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
+    // Time
+    const matchTime = new Date(match.start_date).toLocaleTimeString(undefined, {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
 
-    // Status Logic
-    let status = 'completed';
-    let statusText = match.short_event_status || 'Completed';
+    // Status
+    const isLive = match.event_state === 'L';
+    const isCompleted = match.event_state === 'R' || match.event_state === 'C';
 
-    if (match.event_state === 'U') {
-        status = 'upcoming';
-        statusText = 'Starts ' + formatTime(match.start_date);
-    } else if (match.event_state === 'L') {
-        status = 'live';
-        statusText = match.short_event_status || 'LIVE';
-    }
-
-    // Dynamic Colors
+    // Colors
     const color1 = getTeamColor(team1?.name);
     const color2 = getTeamColor(team2?.name);
 
-    const bgStyle: React.CSSProperties = (color1 && color2)
-        ? { backgroundImage: `radial-gradient(circle at -20% -20%, ${color1}50, transparent 60%), radial-gradient(circle at 120% 120%, ${color2}50, transparent 60%)` }
-        : color1
-            ? { backgroundImage: `radial-gradient(circle at -20% -20%, ${color1}40, transparent 70%)` }
-            : {};
-
-    // Venue Logic (Robust)
-    const venue = match.venue_city || match.venue_name || match.venue || '';
-    const displayVenue = venue.split(',')[0];
+    const bgGradient = (color1 && color2)
+        ? `radial-gradient(circle at 0% 50%, ${color1}35, transparent 55%), radial-gradient(circle at 100% 50%, ${color2}35, transparent 55%), #1a1a1a`
+        : '#1a1a1a';
 
     return (
-        <div className={`th-match-row ${status}`} onClick={onClick} style={bgStyle}>
-            {/* Background Watermarks */}
-            <div className="th-bg-logo home">
-                <WikiImage name={team1?.name} id={String(team1?.id || '0')} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        <div className="new-match-card" onClick={onClick} style={{ background: bgGradient }}>
+            {/* BG Watermarks */}
+            <div className="new-match-bg new-match-bg-left">
+                <WikiImage name={team1?.name} id={String(team1?.id || '0')} type="team" />
             </div>
-            <div className="th-bg-logo away">
-                <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <div className="new-match-bg new-match-bg-right">
+                <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" />
             </div>
 
-            <div className="th-card-content">
-                {/* Header: Venue • Date/Time */}
-                <div className="th-row-header">
-                    <span>{displayVenue || 'Scheduled'} • {formatTime(match.start_date)}</span>
-                </div>
+            <div className="new-match-inner">
+                {/* Time */}
+                <div className="new-match-time">{matchTime}</div>
 
-                {/* Team 1 (Left) */}
-                <div className="th-team-item home">
-                    <div className="th-logo-wrapper">
-                        <WikiImage
-                            name={team1?.name}
-                            id={String(team1?.id || '0')}
-                            type="team"
-                            className="th-team-logo"
-                        />
+                {/* Teams Row */}
+                <div className="new-match-teams">
+                    {/* Team 1 */}
+                    <div className="new-team">
+                        <div className="new-team-logo">
+                            <WikiImage name={team1?.name} id={String(team1?.id || '0')} type="team" />
+                        </div>
+                        <div className="new-team-name">{team1?.name || 'TBC'}</div>
                     </div>
-                    <div className="th-team-name">{team1?.name || 'TBC'}</div>
-                </div>
 
-                {/* Center Status / Result */}
-                <div className="th-match-center">
-                    {status === 'live' && <div className="th-status-pill th-live-pill">LIVE</div>}
-
-                    {status === 'completed' && match.result && (
-                        <div className="th-result-text">{match.result}</div>
-                    )}
-
-                    {status === 'upcoming' && <span className="th-vs-badge">VS</span>}
-
-                    {status === 'live' && <span className="th-status-pill">{statusText}</span>}
-                </div>
-
-                {/* Team 2 (Right) */}
-                <div className="th-team-item away">
-                    <div className="th-logo-wrapper">
-                        <WikiImage
-                            name={team2?.name}
-                            id={String(team2?.id || '0')}
-                            type="team"
-                            className="th-team-logo"
-                        />
+                    {/* VS / Result */}
+                    <div className="new-match-vs">
+                        {isLive && <span className="new-live">LIVE</span>}
+                        {!isLive && !isCompleted && <span>VS</span>}
+                        {isCompleted && match.result && <span className="new-result">{match.result}</span>}
                     </div>
-                    <div className="th-team-name">{team2?.name || 'TBC'}</div>
+
+                    {/* Team 2 */}
+                    <div className="new-team">
+                        <div className="new-team-logo">
+                            <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" />
+                        </div>
+                        <div className="new-team-name">{team2?.name || 'TBC'}</div>
+                    </div>
                 </div>
             </div>
         </div>
