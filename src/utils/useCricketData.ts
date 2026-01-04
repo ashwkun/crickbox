@@ -549,4 +549,12 @@ export default function useCricketData(): UseCricketDataReturn {
 }
 
 // Re-export Supabase match database functions for convenience
-export { getTeamForm, getTeamMatches, getH2HMatches, getMatchesByLeague } from './matchDatabase';
+export {
+    getTeamForm,
+    getTeamMatches,
+    getH2HMatches,
+    getMatchesByLeague,
+    getTeamTournamentStats,
+    getTopRunScorers,
+    getTopWicketTakers
+} from './matchDatabase';

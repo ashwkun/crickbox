@@ -1,7 +1,7 @@
 import React from 'react';
 import WikiImage from './WikiImage';
 import { Match } from '../types';
-import { supabase } from '../utils/supabaseClient';
+import { getTeamTournamentStats } from '../utils/matchDatabase';
 import '../styles/PointsTable.css';
 
 interface TeamStanding {
@@ -51,15 +51,8 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
             if (!seriesId) return;
 
             try {
-                const { data, error } = await supabase
-                    .from('team_tournament_stats')
-                    .select('*')
-                    .eq('series_id', seriesId);
-
-                if (error) {
-                    console.error('Failed to fetch NRR:', error);
-                    return;
-                }
+                const data = await getTeamTournamentStats(seriesId);
+                if (!data.length) return;
 
                 const nrrMap: Record<string, number> = {};
                 data.forEach((stat: any) => {
