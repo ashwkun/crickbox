@@ -7,6 +7,7 @@ import useCricketData from '../utils/useCricketData';
 import { getTournamentAbbreviation, getMatchFormat } from '../utils/tournamentAbbreviations';
 import { getLeagueLogo } from '../utils/leagueLogos';
 import { getTournamentColor } from '../utils/tournamentColors';
+import { isKnockoutStage, hasUndeterminedTeams } from '../utils/tbcMatch';
 import '../styles/TournamentHub.css';
 
 interface TournamentHubProps {
@@ -20,6 +21,7 @@ interface TournamentHubProps {
 }
 
 type Tab = 'fixtures' | 'table' | 'stats';
+type FixturesSubTab = 'upcoming' | 'results' | 'knockouts';
 
 // Shorten series name for display (remove year)
 const shortenSeriesName = (name: string | undefined): string => {
@@ -100,32 +102,6 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
             remaining: upcoming + live
         };
     }, [matches]);
-
-    // Format helpers
-    const formatDate = (dateStr: string): string => {
-        const d = new Date(dateStr);
-        return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-    };
-
-    const formatTime = (dateStr: string): string => {
-        const d = new Date(dateStr);
-        return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
-    };
-
-    const getMatchStatus = (match: Match): string => {
-        if (match.event_state === 'U') {
-            const isNext = sortedMatches.find(m => m.event_state === 'U')?.game_id === match.game_id;
-            return isNext ? 'next' : 'upcoming';
-        }
-        if (match.event_state === 'L') return 'live';
-        return 'completed';
-    };
-
-    const getResultText = (match: Match): string => {
-        if (match.event_state === 'U') return formatTime(match.start_date);
-        if (match.event_state === 'L') return 'LIVE';
-        return match.short_event_status || 'Completed';
-    };
 
     // Get tournament accent color for dynamic theming
     const accentColor = getTournamentColor(tournamentName);
@@ -226,32 +202,7 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
             <div className="th-content">
                 {/* FIXTURES TAB */}
                 {activeTab === 'fixtures' && (
-                    <div className="th-fixtures">
-                        {sortedMatches.map((match, idx) => {
-                            const status = getMatchStatus(match);
-                            const teams = match.participants || [];
-                            return (
-                                <div
-                                    key={match.game_id || idx}
-                                    className={`th-match-row ${status}`}
-                                    onClick={() => onMatchClick(match)}
-                                >
-                                    <div className="th-match-date">
-                                        {formatDate(match.start_date)}
-                                    </div>
-                                    <div className="th-match-teams">
-                                        <span>{teams[0]?.short_name || '?'}</span>
-                                        <span className="th-vs">vs</span>
-                                        <span>{teams[1]?.short_name || '?'}</span>
-                                    </div>
-                                    <div className={`th-match-result ${status}`}>
-                                        {status === 'live' && <span className="th-live-dot"></span>}
-                                        {getResultText(match)}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                    <FixturesTab matches={sortedMatches} onMatchClick={onMatchClick} />
                 )}
 
                 {/* TABLE TAB */}
@@ -278,5 +229,168 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
         </div>
     );
 };
+
+// === SUB COMPONENTS ===
+
+const FixturesTab: React.FC<{ matches: Match[], onMatchClick: (m: Match) => void }> = ({ matches, onMatchClick }) => {
+    const [subTab, setSubTab] = useState<FixturesSubTab>('upcoming');
+
+    // Filter Logic
+    const filteredMatches = useMemo(() => {
+        if (subTab === 'knockouts') {
+            return matches.filter(m => isKnockoutStage(m) || hasUndeterminedTeams(m));
+        }
+        if (subTab === 'results') {
+            return matches
+                .filter(m => m.event_state === 'R' || m.event_state === 'C')
+                .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()); // Newest first
+        }
+        // Upcoming defaults (including Live)
+        return matches.filter(m => m.event_state === 'U' || m.event_state === 'L');
+    }, [matches, subTab]);
+
+    // Grouping Logic
+    const groupedMatches = useMemo(() => {
+        if (subTab === 'knockouts') return null; // No date grouping for knockouts
+
+        const groups: { [date: string]: Match[] } = {};
+        filteredMatches.forEach(match => {
+            const dateParams = { weekday: 'short', month: 'short', day: 'numeric' } as const;
+            const d = new Date(match.start_date);
+            const dateKey = d.toLocaleDateString(undefined, dateParams);
+
+            // Allow relative keys like Today/Tomorrow for nicer UI
+            const today = new Date();
+            const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+            const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+
+            let displayKey = dateKey;
+            if (d.toDateString() === today.toDateString()) displayKey = 'Today';
+            else if (d.toDateString() === tomorrow.toDateString()) displayKey = 'Tomorrow';
+            else if (d.toDateString() === yesterday.toDateString()) displayKey = 'Yesterday';
+
+            if (!groups[displayKey]) groups[displayKey] = [];
+            groups[displayKey].push(match);
+        });
+        return groups;
+    }, [filteredMatches, subTab]);
+
+    // Auto-scroll to first item
+    useEffect(() => {
+        const el = document.querySelector('.th-fixtures-list');
+        if (el) el.scrollTop = 0;
+    }, [subTab]);
+
+    return (
+        <div className="th-fixtures">
+            {/* Sub Tabs */}
+            <div className="th-fixtures-tabs">
+                {(['upcoming', 'results', 'knockouts'] as const).map(t => (
+                    <button
+                        key={t}
+                        className={`th-sub-tab ${subTab === t ? 'active' : ''}`}
+                        onClick={() => setSubTab(t)}
+                    >
+                        {t}
+                    </button>
+                ))}
+            </div>
+
+            {/* Content List */}
+            <div className="th-fixtures-list">
+                {subTab === 'knockouts' ? (
+                    filteredMatches.length > 0 ? (
+                        filteredMatches.map(m => (
+                            <KnockoutCard key={m.game_id} match={m} onClick={() => onMatchClick(m)} />
+                        ))
+                    ) : (
+                        <div className="th-empty-state">No knockout matches detected yet.</div>
+                    )
+                ) : (
+                    Object.keys(groupedMatches || {}).length > 0 ? (
+                        Object.entries(groupedMatches!).map(([date, groupMatches]) => (
+                            <div key={date} className="th-date-group">
+                                <div className="th-date-header">
+                                    <span>{date}</span>
+                                </div>
+                                {groupMatches.map((match, idx) => (
+                                    <MatchRow key={match.game_id || idx} match={match} onClick={() => onMatchClick(match)} />
+                                ))}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="th-empty-state">
+                            {subTab === 'upcoming' ? 'No upcoming matches scheduled.' : 'No completed matches yet.'}
+                        </div>
+                    )
+                )}
+            </div>
+        </div>
+    );
+};
+
+const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onClick }) => {
+    const teams = match.participants || [];
+
+    // Formatting
+    const formatTime = (d: string) => new Date(d).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    // Status Logic
+    let status = 'completed';
+    let statusText = match.short_event_status || 'Completed';
+
+    if (match.event_state === 'U') {
+        status = 'upcoming';
+        statusText = formatTime(match.start_date);
+    } else if (match.event_state === 'L') {
+        status = 'live';
+        statusText = 'LIVE';
+    }
+
+    return (
+        <div className={`th-match-row ${status}`} onClick={onClick}>
+            <div className="th-match-date" style={{ width: 50, fontSize: 10, opacity: 0.6 }}>
+                {formatTime(match.start_date)}
+            </div>
+            <div className="th-match-teams">
+                <span>{teams[0]?.short_name || '?'}</span>
+                <span className="th-vs">vs</span>
+                <span>{teams[1]?.short_name || '?'}</span>
+            </div>
+            <div className={`th-match-result ${status}`}>
+                {status === 'live' && <span className="th-live-dot"></span>}
+                {statusText}
+            </div>
+        </div>
+    );
+};
+
+const KnockoutCard: React.FC<{ match: Match, onClick: () => void }> = ({ match, onClick }) => {
+    const teams = match.participants || [];
+    // Identify stage
+    let stage = match.event_stage || match.event_name || 'Knockout';
+    if (stage === 'final') stage = 'GRAND FINAL';
+    const isFinal = /final/i.test(stage) && !/semi/i.test(stage) && !/quarter/i.test(stage);
+
+    return (
+        <div className={`th-knockout-card ${isFinal ? 'final' : ''}`} onClick={onClick}>
+            <div className="th-ko-stage">{stage}</div>
+            <div className="th-ko-teams">
+                <div className="th-ko-team">
+                    <WikiImage name={teams[0]?.name} type="team" className="th-ko-logo" style={{ width: 40, height: 40 }} />
+                    <div className="th-ko-name">{teams[0]?.short_name || teams[0]?.name || 'TBC'}</div>
+                </div>
+                <div className="th-ko-vs">VS</div>
+                <div className="th-ko-team">
+                    <WikiImage name={teams[1]?.name} type="team" className="th-ko-logo" style={{ width: 40, height: 40 }} />
+                    <div className="th-ko-name">{teams[1]?.short_name || teams[1]?.name || 'TBC'}</div>
+                </div>
+            </div>
+            <div className="th-ko-result">
+                {match.event_state === 'U' ? new Date(match.start_date).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' }) : match.status_note || match.result || 'Match Completed'}
+            </div>
+        </div>
+    )
+}
 
 export default TournamentHub;
