@@ -412,33 +412,51 @@
 
 /* Team 1: Left aligned */
 .th-team-item.home {
-    justify-self: start;
+    justify-self: stretch;
+    /* Fill space */
     flex-direction: row;
+    justify-content: flex-start;
+    /* Align to Left */
+    text-align: left;
+}
+
+.th-team-item.home .th-team-name {
     text-align: left;
 }
 
 /* Team 2: Right aligned (Logo on right) */
 .th-team-item.away {
-    justify-self: end;
+    justify-self: stretch;
+    /* Fill space */
     flex-direction: row-reverse;
+    justify-content: flex-start;
+    /* Align to Right (start of row-reverse) */
+    text-align: right;
+}
+
+.th-team-item.away .th-team-name {
     text-align: right;
 }
 
 .th-team-logo {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    /* Slightly larger again for "Pro" feel */
+    height: 38px;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    flex-shrink: 0;
+    /* Prevent squishing */
 }
 
 .th-team-name {
-    font-size: 13px;
-    /* Slightly smaller to fit 2 columns */
+    font-size: 14px;
+    /* Balanced size */
     font-weight: 800;
     color: #fff;
     white-space: pre-wrap;
-    /* Allow wrapping if really needed */
-    line-height: 1.2;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Center Status Block */
