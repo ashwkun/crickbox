@@ -937,10 +937,7 @@
 }
 
 /* -------------------- Tournament Hub -------------------- */
-.tournament-hub {
-    padding: 20px;
-    min-height: 100vh;
-}
+/* Main styles moved to TournamentHub.css */
 
 .tournament-hub-header {
     margin-bottom: 20px;
