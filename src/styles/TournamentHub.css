@@ -122,29 +122,33 @@
     letter-spacing: 0.3px;
 }
 
-/* ===== TABS ===== */
+/* ===== TABS (Pill Container) ===== */
 .th-tabs {
     display: flex;
-    margin: 0 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
 }
 
 .th-tab {
     flex: 1;
-    padding: 12px 8px;
+    padding: 10px 12px;
     background: transparent;
     border: none;
-    border-bottom: 2px solid transparent;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
 }
 
 .th-tab.active {
+    background: var(--th-accent);
     color: #fff;
-    border-bottom-color: var(--th-accent);
+    font-weight: 600;
 }
 
 /* ===== CONTENT ===== */
