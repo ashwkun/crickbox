@@ -51,13 +51,32 @@ const TournamentStats: React.FC<TournamentStatsProps> = ({ seriesId, seriesName 
         fetchStats();
     }, [seriesId]);
 
-    if (loading) {
-        return (
-            <div className="stats-loading">
-                <div className="stats-spinner"></div>
-                <span>Loading stats...</span>
+    const LoadingSkeleton = () => (
+        <div className="tournament-stats">
+            {/* Sub-tabs (Static during loading) */}
+            <div className="stats-sub-tabs">
+                <button className={`stats-sub-tab active`}>Most Runs</button>
+                <button className={`stats-sub-tab`}>Most Wickets</button>
             </div>
-        );
+
+            <div className="stats-skeleton-list">
+                {[...Array(5)].map((_, i) => (
+                    <div key={i} className="stats-skeleton-card">
+                        <div className="stats-skeleton-rank"></div>
+                        <div className="stats-skeleton-img"></div>
+                        <div className="stats-skeleton-info">
+                            <div className="stats-skeleton-name"></div>
+                            <div className="stats-skeleton-meta"></div>
+                        </div>
+                        <div className="stats-skeleton-value"></div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
+    if (loading) {
+        return <LoadingSkeleton />;
     }
 
     if (error) {

@@ -205,3 +205,86 @@
     font-size: 13px;
     color: rgba(255, 255, 255, 0.4);
 }
+
+/* Skeleton Loading State */
+.stats-skeleton-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stats-skeleton-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shimmer Effect */
+.stats-skeleton-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.05),
+            transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+.stats-skeleton-rank {
+    width: 26px;
+    height: 26px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.stats-skeleton-img {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.stats-skeleton-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stats-skeleton-name {
+    width: 60%;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.stats-skeleton-meta {
+    width: 40%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+}
+
+.stats-skeleton-value {
+    width: 40px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
