@@ -547,14 +547,3 @@ export default function useCricketData(): UseCricketDataReturn {
         fetchSeriesInfo
     };
 }
-
-// Re-export Supabase match database functions for convenience
-export {
-    getTeamForm,
-    getTeamMatches,
-    getH2HMatches,
-    getMatchesByLeague,
-    getTeamTournamentStats,
-    getTopRunScorers,
-    getTopWicketTakers
-} from './matchDatabase';
