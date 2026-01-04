@@ -414,9 +414,9 @@
     /* Vertical: logo on top, name below */
 }
 
-/* Team 1: Center aligned */
+/* Team 1: Left positioned */
 .th-team-item.home {
-    justify-self: center;
+    justify-self: start;
     text-align: center;
 }
 
@@ -424,9 +424,9 @@
     text-align: center;
 }
 
-/* Team 2: Center aligned */
+/* Team 2: Right positioned */
 .th-team-item.away {
-    justify-self: center;
+    justify-self: end;
     text-align: center;
 }
 
