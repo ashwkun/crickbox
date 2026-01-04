@@ -310,13 +310,14 @@
 
 /* ===== MASTER CARD CONTAINER ===== */
 .th-master-card {
-    background: rgba(30, 30, 35, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
     margin: 0 16px;
     padding: 16px 4px;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* ===== DATE GROUP HEADERS ===== */
