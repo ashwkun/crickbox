@@ -275,37 +275,52 @@
     font-size: 13px;
 }
 
-/* ===== FIXTURES SUB-TABS ===== */
-.th-fixtures-tabs {
+/* ===== UNIFIED FILTER BAR ===== */
+.th-team-filters {
     display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 20px;
+    align-items: center;
+    overflow-x: auto;
     padding: 0 16px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-.th-sub-tab {
-    padding: 8px 16px;
-    border-radius: 12px;
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 12px;
-    font-weight: 600;
+.th-team-filters::-webkit-scrollbar {
+    display: none;
+}
+
+/* Mode Chips (Upcoming/Results) */
+.th-mode-chip {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    /* Slightly distinct from team chips */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
     text-transform: capitalize;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.th-sub-tab:hover {
-    color: rgba(255, 255, 255, 0.8);
-    background: rgba(255, 255, 255, 0.05);
+.th-mode-chip.active {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
 }
 
-.th-sub-tab.active {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    font-weight: 700;
+/* Divider */
+.th-filter-divider {
+    width: 1px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 4px;
+    flex-shrink: 0;
 }
 
 /* ===== TEAM FILTER CHIPS ===== */

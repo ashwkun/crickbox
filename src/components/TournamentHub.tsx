@@ -310,39 +310,47 @@ const FixturesTab: React.FC<{ matches: Match[], onMatchClick: (m: Match) => void
 
     return (
         <div className="th-fixtures">
-            {/* Sub Tabs */}
-            <div className="th-fixtures-tabs">
+            {/* Unified Filter Bar: Modes + Teams */}
+            <div className="th-team-filters">
+                {/* Modes */}
                 {(['upcoming', 'results'] as const).map(t => (
                     <button
                         key={t}
-                        className={`th-sub-tab ${subTab === t ? 'active' : ''}`}
-                        onClick={() => setSubTab(t)}
+                        className={`th-mode-chip ${subTab === t ? 'active' : ''}`}
+                        onClick={() => {
+                            setSubTab(t);
+                            // Optional: Reset team filter when switching modes?
+                            // setSelectedTeam(null); 
+                        }}
                     >
                         {t}
                     </button>
                 ))}
-            </div>
 
-            {/* Team Filters (Horizontal Scroll) */}
-            {uniqueTeams.length > 0 && (
-                <div className="th-team-filters">
-                    <button
-                        className={`th-team-chip ${!selectedTeam ? 'active' : ''}`}
-                        onClick={() => setSelectedTeam(null)}
-                    >
-                        All
-                    </button>
-                    {uniqueTeams.map(team => (
+                {/* Vertical Divider */}
+                <div className="th-filter-divider"></div>
+
+                {/* Team Chips */}
+                {uniqueTeams.length > 0 && (
+                    <>
                         <button
-                            key={team}
-                            className={`th-team-chip ${selectedTeam === team ? 'active' : ''}`}
-                            onClick={() => setSelectedTeam(selectedTeam === team ? null : team)}
+                            className={`th-team-chip ${!selectedTeam ? 'active' : ''}`}
+                            onClick={() => setSelectedTeam(null)}
                         >
-                            {team}
+                            All Teams
                         </button>
-                    ))}
-                </div>
-            )}
+                        {uniqueTeams.map(team => (
+                            <button
+                                key={team}
+                                className={`th-team-chip ${selectedTeam === team ? 'active' : ''}`}
+                                onClick={() => setSelectedTeam(selectedTeam === team ? null : team)}
+                            >
+                                {team}
+                            </button>
+                        ))}
+                    </>
+                )}
+            </div>
 
             {/* Master Card Container */}
             <div className="th-master-card">
