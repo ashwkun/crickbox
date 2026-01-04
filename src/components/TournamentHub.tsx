@@ -364,34 +364,30 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
                 <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" />
             </div>
 
-            <div className="new-match-inner">
-                {/* Time */}
-                <div className="new-match-time">{matchTime}</div>
-
-                {/* Teams Row */}
-                <div className="new-match-teams">
-                    {/* Team 1 */}
-                    <div className="new-team">
-                        <div className="new-team-logo">
-                            <WikiImage name={team1?.name} id={String(team1?.id || '0')} type="team" />
-                        </div>
-                        <div className="new-team-name">{team1?.name || 'TBC'}</div>
+            {/* Teams Row */}
+            <div className="new-match-teams">
+                {/* Team 1 */}
+                <div className="new-team">
+                    <div className="new-team-logo">
+                        <WikiImage name={team1?.name} id={String(team1?.id || '0')} type="team" />
                     </div>
+                    <div className="new-team-name">{team1?.name || 'TBC'}</div>
+                </div>
 
-                    {/* VS / Result */}
-                    <div className="new-match-vs">
-                        {isLive && <span className="new-live">LIVE</span>}
-                        {!isLive && !isCompleted && <span>VS</span>}
-                        {isCompleted && match.result && <span className="new-result">{match.result}</span>}
-                    </div>
+                {/* Center: VS + Time stacked */}
+                <div className="new-match-center">
+                    {isLive && <span className="new-live">LIVE</span>}
+                    {!isLive && !isCompleted && <span className="new-vs">VS</span>}
+                    {isCompleted && match.result && <span className="new-result">{match.result}</span>}
+                    <span className="new-time-chip">{matchTime.toUpperCase()}</span>
+                </div>
 
-                    {/* Team 2 */}
-                    <div className="new-team">
-                        <div className="new-team-logo">
-                            <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" />
-                        </div>
-                        <div className="new-team-name">{team2?.name || 'TBC'}</div>
+                {/* Team 2 */}
+                <div className="new-team">
+                    <div className="new-team-logo">
+                        <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" />
                     </div>
+                    <div className="new-team-name">{team2?.name || 'TBC'}</div>
                 </div>
             </div>
         </div>
