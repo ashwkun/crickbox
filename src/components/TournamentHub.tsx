@@ -360,16 +360,17 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
             ? { backgroundImage: `radial-gradient(circle at -20% -20%, ${color1}40, transparent 70%)` }
             : {};
 
-    // Venue Logic (Basic)
-    const venue = match.venue || '';
+    // Venue Logic (Robust)
+    const venue = match.venue_city || match.venue_name || match.venue || '';
+    const displayVenue = venue.split(',')[0];
 
     return (
         <div className={`th-match-row ${status}`} onClick={onClick} style={bgStyle}>
             <div className="th-card-content">
                 {/* Header: Venue/Date */}
                 <div className="th-row-header">
-                    <span>{venue ? venue.split(',')[0] : 'Scheduled'}</span>
-                    {!venue && <span>{formatTime(match.start_date)}</span>}
+                    <span>{displayVenue || 'Scheduled'}</span>
+                    {!displayVenue && <span>{formatTime(match.start_date)}</span>}
                 </div>
 
                 {/* Team Rows */}
