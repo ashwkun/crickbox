@@ -63,7 +63,7 @@ const TournamentStats: React.FC<TournamentStatsProps> = ({ seriesId, seriesName 
     if (error) {
         return (
             <div className="stats-error">
-                <span>⚠️ {error}</span>
+                <span>{error}</span>
             </div>
         );
     }
@@ -73,7 +73,8 @@ const TournamentStats: React.FC<TournamentStatsProps> = ({ seriesId, seriesName 
     if (!hasData) {
         return (
             <div className="stats-empty">
-                <div className="stats-empty-icon">📊</div>
+                {/* Icon removed or replaced with CSS styled element if needed, kept empty for now per request */}
+                <div className="stats-empty-icon"></div>
                 <div className="stats-empty-text">No stats available yet</div>
                 <div className="stats-empty-subtext">Stats will appear once matches are completed</div>
             </div>
@@ -88,13 +89,13 @@ const TournamentStats: React.FC<TournamentStatsProps> = ({ seriesId, seriesName 
                     className={`stats-sub-tab ${activeTab === 'batting' ? 'active' : ''}`}
                     onClick={() => setActiveTab('batting')}
                 >
-                    🏏 Most Runs
+                    Most Runs
                 </button>
                 <button
                     className={`stats-sub-tab ${activeTab === 'bowling' ? 'active' : ''}`}
                     onClick={() => setActiveTab('bowling')}
                 >
-                    🎯 Most Wickets
+                    Most Wickets
                 </button>
             </div>
 
