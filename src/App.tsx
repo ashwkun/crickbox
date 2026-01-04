@@ -216,57 +216,6 @@ export default function App(): React.ReactElement {
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
-    // Fetch scorecard and wallstream when a match is selected
-    useEffect(() => {
-        if (!selectedMatch?.game_id) {
-            setScorecard(null);
-            setWallstream(null);
-            return;
-        }
-
-        let isCancelled = false;
-
-        const loadMatchData = async () => {
-            // Fetch scorecard
-            const sc = await fetchScorecard(selectedMatch.game_id);
-            if (!isCancelled && sc) {
-                setScorecard(sc);
-            }
-
-            // Fetch wallstream for live matches
-            if (selectedMatch.event_state === 'L') {
-                const ws = await fetchWallstream(selectedMatch.game_id);
-                if (!isCancelled && ws) {
-                    setWallstream(ws);
-                }
-            }
-        };
-
-        loadMatchData();
-
-        // Poll wallstream for live matches
-        let pollInterval: NodeJS.Timeout | null = null;
-        if (selectedMatch.event_state === 'L') {
-            pollInterval = setInterval(async () => {
-                if (isCancelled) return;
-                const ws = await fetchWallstream(selectedMatch.game_id);
-                if (!isCancelled && ws) {
-                    setWallstream(ws);
-                }
-                // Also refresh scorecard periodically for live
-                const sc = await fetchScorecard(selectedMatch.game_id);
-                if (!isCancelled && sc) {
-                    setScorecard(sc);
-                }
-            }, 10000); // Poll every 10s for live matches (matches useCricketData)
-        }
-
-        return () => {
-            isCancelled = true;
-            if (pollInterval) clearInterval(pollInterval);
-        };
-    }, [selectedMatch?.game_id, selectedMatch?.event_state, fetchScorecard, fetchWallstream]);
-
     // --- Legacy Handler Replacements ---
 
     // Handle match selection
@@ -501,11 +450,12 @@ export default function App(): React.ReactElement {
                     if (found) activeData = found;
                 }
 
-                // For SERIES/TOURNAMENT: If data missing (deep link), derive from matches
-                if (view.type === 'SERIES' && (!activeData || !activeData.matches)) {
+                // For SERIES: Always refresh from live matches to keep UI consistent
+                if (view.type === 'SERIES') {
                     const seriesMatches = matches.filter(m => m.series_id === view.id);
                     if (seriesMatches.length > 0) {
                         activeData = {
+                            ...activeData,
                             seriesId: view.id,
                             seriesName: seriesMatches[0].series_name,
                             matches: seriesMatches
@@ -513,10 +463,12 @@ export default function App(): React.ReactElement {
                     }
                 }
 
-                if (view.type === 'TOURNAMENT' && (!activeData || !activeData.matches)) {
+                // For TOURNAMENT: Always refresh from live matches
+                if (view.type === 'TOURNAMENT') {
                     const tournamentMatches = matches.filter(m => m.series_id === view.id); // Tournament ID is series_id in Wisden
                     if (tournamentMatches.length > 0) {
                         activeData = {
+                            ...activeData,
                             seriesId: view.id,
                             tournamentName: tournamentMatches[0].series_name,
                             matches: tournamentMatches
