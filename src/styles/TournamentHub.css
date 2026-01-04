@@ -357,81 +357,125 @@
     border-color: rgba(255, 255, 255, 0.2);
 }
 
+/* Background Team Logo (Watermark) */
+.th-bg-logo {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    opacity: 0.06;
+    filter: grayscale(100%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.th-bg-logo.home {
+    top: -20px;
+    left: -20px;
+    transform: rotate(-15deg);
+}
+
+.th-bg-logo.away {
+    bottom: -20px;
+    right: -20px;
+    transform: rotate(15deg);
+}
+
+/* New Symmetric Grid Layout */
 .th-card-content {
     position: relative;
     z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
 }
 
 .th-row-header {
+    grid-column: 1 / -1;
+    /* Full width header */
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    font-size: 11px;
-    opacity: 0.7;
-    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 10px;
+    opacity: 0.8;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .th-team-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 8px;
-    padding: 0 4px;
-    /* Slight indent */
+    gap: 10px;
+    padding: 0;
 }
 
-.th-team-item:last-child {
-    margin-bottom: 0;
+/* Team 1: Left aligned */
+.th-team-item.home {
+    justify-self: start;
+    flex-direction: row;
+    text-align: left;
+}
+
+/* Team 2: Right aligned (Logo on right) */
+.th-team-item.away {
+    justify-self: end;
+    flex-direction: row-reverse;
+    text-align: right;
 }
 
 .th-team-logo {
-    width: 32px;
-    /* Slightly larger */
-    height: 32px;
+    width: 36px;
+    height: 36px;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .th-team-name {
-    font-size: 15px;
-    /* Larger font */
-    font-weight: 700;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-    letter-spacing: -0.02em;
-}
-
-.th-match-footer {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
-}
-
-.th-footer-status {
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.9);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.th-live-badge {
-    background: #ef4444;
-    color: #fff;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 10px;
-    text-transform: uppercase;
+    font-size: 13px;
+    /* Slightly smaller to fit 2 columns */
     font-weight: 800;
+    color: #fff;
+    white-space: pre-wrap;
+    /* Allow wrapping if really needed */
+    line-height: 1.2;
+}
+
+/* Center Status Block */
+.th-match-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.th-vs-badge {
+    font-size: 12px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.3);
+    font-style: italic;
+}
+
+.th-status-pill {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+.th-live-pill {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    animation: pulse-live 2s infinite;
+}
+
+/* Hide old footer */
+.th-match-footer {
+    display: none;
 }
 
 /* Override Grid/Flex from previous basic design */

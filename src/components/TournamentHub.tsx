@@ -366,6 +366,14 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
 
     return (
         <div className={`th-match-row ${status}`} onClick={onClick} style={bgStyle}>
+            {/* Background Watermarks */}
+            <div className="th-bg-logo home">
+                <WikiImage name={team1?.name} id={String(team1?.id || '0')} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+            <div className="th-bg-logo away">
+                <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            </div>
+
             <div className="th-card-content">
                 {/* Header: Venue/Date */}
                 <div className="th-row-header">
@@ -373,8 +381,8 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
                     {!displayVenue && <span>{formatTime(match.start_date)}</span>}
                 </div>
 
-                {/* Team Rows */}
-                <div className="th-team-item">
+                {/* Team 1 (Left) */}
+                <div className="th-team-item home">
                     <WikiImage
                         name={team1?.name}
                         id={String(team1?.id || '0')}
@@ -385,7 +393,18 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
                     <div className="th-team-name">{team1?.name || 'TBC'}</div>
                 </div>
 
-                <div className="th-team-item">
+                {/* Center Status */}
+                <div className="th-match-center">
+                    {status === 'live' ? (
+                        <div className="th-status-pill th-live-pill">LIVE</div>
+                    ) : (
+                        <span className="th-vs-badge">VS</span>
+                    )}
+                    {status === 'live' && <span className="th-status-pill">{statusText}</span>}
+                </div>
+
+                {/* Team 2 (Right) */}
+                <div className="th-team-item away">
                     <WikiImage
                         name={team2?.name}
                         id={String(team2?.id || '0')}
@@ -394,14 +413,6 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
                         style={{ width: 32, height: 32 }}
                     />
                     <div className="th-team-name">{team2?.name || 'TBC'}</div>
-                </div>
-
-                {/* Footer: Result/Status */}
-                <div className="th-match-footer">
-                    <div className="th-footer-status">
-                        {status === 'live' && <span className="th-live-badge">LIVE</span>}
-                        <span>{statusText}</span>
-                    </div>
                 </div>
             </div>
         </div>
