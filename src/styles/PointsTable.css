@@ -1,18 +1,20 @@
 /* Glassmorphism Points Table - Minimal Redesign */
-.points-table-container {
+.points-scroll-view {
     width: 100%;
     overflow-x: auto;
-    border-radius: 20px;
-    background: transparent;
-    /* Container is transparent, rows float */
-    padding-bottom: 8px;
-    /* Removed margin-top as parent handles padding */
+    padding: 12px 0 16px 0;
+    /* Vertical padding */
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
 
-.points-table-container::-webkit-scrollbar {
+.points-scroll-view::-webkit-scrollbar {
     display: none;
+}
+
+.points-table-container {
+    /* This class is now typically the master card wrapper, controlled by styles prop in TSX mostly */
+    /* Reseting to act as wrapper if used */
 }
 
 .points-table {

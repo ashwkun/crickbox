@@ -29,40 +29,42 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
 
     // Skeleton Loader Component
     const TableSkeleton = () => (
-        <div className="points-table-container th-master-card">
-            <table className="points-table">
-                <thead>
-                    <tr>
-                        <th className="pt-rank">#</th>
-                        <th className="pt-team">Team</th>
-                        <th className="pt-stat">M</th>
-                        <th className="pt-stat">W</th>
-                        <th className="pt-stat">L</th>
-                        <th className="pt-points">Pts</th>
-                        <th className="pt-stat">NRR</th>
-                        <th className="pt-form">Form</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Array.from({ length: 8 }).map((_, i) => (
-                        <tr key={i} className="pt-row pt-loading-row">
-                            <td><div className="pt-skeleton short" /></td>
-                            <td>
-                                <div className="pt-team-cell">
-                                    <div className="pt-skeleton logo" />
-                                    <div className="pt-skeleton text" />
-                                </div>
-                            </td>
-                            <td><div className="pt-skeleton short" /></td>
-                            <td><div className="pt-skeleton short" /></td>
-                            <td><div className="pt-skeleton short" /></td>
-                            <td><div className="pt-skeleton short" /></td>
-                            <td><div className="pt-skeleton text" style={{ width: 60 }} /></td>
-                            <td><div className="pt-skeleton text" style={{ width: 50 }} /></td>
+        <div className="th-master-card" style={{ padding: 0 }}>
+            <div className="points-scroll-view">
+                <table className="points-table">
+                    <thead>
+                        <tr>
+                            <th className="pt-rank">#</th>
+                            <th className="pt-team">Team</th>
+                            <th className="pt-stat">M</th>
+                            <th className="pt-stat">W</th>
+                            <th className="pt-stat">L</th>
+                            <th className="pt-points">Pts</th>
+                            <th className="pt-stat">NRR</th>
+                            <th className="pt-form">Form</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <tr key={i} className="pt-row pt-loading-row">
+                                <td><div className="pt-skeleton short" /></td>
+                                <td>
+                                    <div className="pt-team-cell">
+                                        <div className="pt-skeleton logo" />
+                                        <div className="pt-skeleton text" />
+                                    </div>
+                                </td>
+                                <td><div className="pt-skeleton short" /></td>
+                                <td><div className="pt-skeleton short" /></td>
+                                <td><div className="pt-skeleton short" /></td>
+                                <td><div className="pt-skeleton short" /></td>
+                                <td><div className="pt-skeleton text" style={{ width: 60 }} /></td>
+                                <td><div className="pt-skeleton text" style={{ width: 50 }} /></td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 
@@ -70,7 +72,11 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
 
     // Defensive check
     if (!standings || !Array.isArray(standings) || standings.length === 0) {
-        return <div className="points-table-empty">No standings available</div>;
+        return (
+            <div className="th-master-card">
+                <div className="points-table-empty">No standings available</div>
+            </div>
+        );
     }
 
     // Sort by wins (descending), then by matches played (ascending for tie-breaker)
@@ -192,43 +198,45 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
     );
 
     return (
-        <div className="points-table-container th-master-card" style={style}>
-            <table className="points-table">
-                <thead>
-                    <tr>
-                        <th className="pt-rank">#</th>
-                        <th className="pt-team">Team</th>
-                        <th className="pt-stat">M</th>
-                        <th className="pt-stat">W</th>
-                        <th className="pt-stat">L</th>
-                        <th className="pt-points">Pts</th>
-                        <th className="pt-stat">NRR</th>
-                        <th className="pt-form">Form</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {sorted.map((team, idx) => {
-                        const form = matches.length > 0 ? getTeamForm(team.id) : Array(5).fill(null) as FormResult[];
-                        const isQualified = idx < 4; // Top 4 highlight
+        <div className="th-master-card" style={{ ...style, padding: 0 }}>
+            <div className="points-scroll-view">
+                <table className="points-table">
+                    <thead>
+                        <tr>
+                            <th className="pt-rank">#</th>
+                            <th className="pt-team">Team</th>
+                            <th className="pt-stat">M</th>
+                            <th className="pt-stat">W</th>
+                            <th className="pt-stat">L</th>
+                            <th className="pt-points">Pts</th>
+                            <th className="pt-stat">NRR</th>
+                            <th className="pt-form">Form</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {sorted.map((team, idx) => {
+                            const form = matches.length > 0 ? getTeamForm(team.id) : Array(5).fill(null) as FormResult[];
+                            const isQualified = idx < 4; // Top 4 highlight
 
-                        return (
-                            <tr key={team.id} className={`pt-row ${isQualified ? 'pt-qualify' : ''}`}>
-                                <td className="pt-rank">{idx + 1}</td>
-                                <td className="pt-team-cell">
-                                    <WikiImage name={team.name} id={String(team.id)} type="team" className="pt-team-logo" />
-                                    <span className="pt-team-name">{team.short_name || team.name}</span>
-                                </td>
-                                <td className="pt-stat pt-matches">{team.matches}</td>
-                                <td className="pt-stat pt-win">{team.wins}</td>
-                                <td className="pt-stat pt-loss">{team.loss}</td>
-                                <td className="pt-points">{getPoints(team)}</td>
-                                <td className="pt-stat pt-nrr">{getNRRDisplay(team.id)}</td>
-                                <td className="pt-form-cell">{renderFormDots(form)}</td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                            return (
+                                <tr key={team.id} className={`pt-row ${isQualified ? 'pt-qualify' : ''}`}>
+                                    <td className="pt-rank">{idx + 1}</td>
+                                    <td className="pt-team-cell">
+                                        <WikiImage name={team.name} id={String(team.id)} type="team" className="pt-team-logo" />
+                                        <span className="pt-team-name">{team.short_name || team.name}</span>
+                                    </td>
+                                    <td className="pt-stat pt-matches">{team.matches}</td>
+                                    <td className="pt-stat pt-win">{team.wins}</td>
+                                    <td className="pt-stat pt-loss">{team.loss}</td>
+                                    <td className="pt-points">{getPoints(team)}</td>
+                                    <td className="pt-stat pt-nrr">{getNRRDisplay(team.id)}</td>
+                                    <td className="pt-form-cell">{renderFormDots(form)}</td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
