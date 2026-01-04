@@ -191,9 +191,16 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                 </div>
             </div>
 
-            {/* TABS */}
+            {/* TABS with sliding indicator */}
             {seriesId && (
                 <div className="th-tabs">
+                    {/* Sliding pill indicator */}
+                    <div
+                        className="th-tab-indicator"
+                        style={{
+                            transform: `translateX(${activeTab === 'fixtures' ? 0 : activeTab === 'table' ? 100 : 200}%)`
+                        }}
+                    />
                     <button
                         className={`th-tab ${activeTab === 'fixtures' ? 'active' : ''}`}
                         onClick={() => setActiveTab('fixtures')}
