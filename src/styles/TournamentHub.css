@@ -609,7 +609,7 @@
 
 /* Points Table Container Padding */
 .th-table {
-    padding: 0 16px 24px 16px;
+    padding: 0 0 24px 0;
 }
 
 .th-knockout-card.final {
