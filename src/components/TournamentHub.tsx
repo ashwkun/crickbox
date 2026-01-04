@@ -140,7 +140,7 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                 '--th-accent-glow': `${accentColor}22`,
             } as React.CSSProperties}
         >
-            {/* HERO SECTION */}
+            {/* HERO SECTION (with integrated stats) */}
             <div className="th-hero">
                 <div className="th-hero-content">
                     {/* Logo or Typography Fallback */}
@@ -151,7 +151,7 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                                 id={seriesId}
                                 type="tournament"
                                 className="th-hero-logo"
-                                style={{ width: 64, height: 64, objectFit: 'contain' }}
+                                style={{ width: 56, height: 56, objectFit: 'contain' }}
                             />
                         ) : (
                             <div className="th-hero-abbreviation">
@@ -169,25 +169,25 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* QUICK STATS */}
-            <div className="th-stats-row">
-                <div className="th-stat-card">
-                    <span className="th-stat-value">{stats.teams}</span>
-                    <span className="th-stat-label">Teams</span>
-                </div>
-                <div className="th-stat-card">
-                    <span className="th-stat-value">{stats.total}</span>
-                    <span className="th-stat-label">Matches</span>
-                </div>
-                <div className="th-stat-card">
-                    <span className="th-stat-value">{stats.completed}</span>
-                    <span className="th-stat-label">Done</span>
-                </div>
-                <div className="th-stat-card">
-                    <span className="th-stat-value">{stats.remaining}</span>
-                    <span className="th-stat-label">Left</span>
+                {/* Stats bar inside hero */}
+                <div className="th-stats-bar">
+                    <div className="th-stat">
+                        <span className="th-stat-num">{stats.teams}</span>
+                        <span className="th-stat-lbl">Teams</span>
+                    </div>
+                    <div className="th-stat">
+                        <span className="th-stat-num">{stats.total}</span>
+                        <span className="th-stat-lbl">Games</span>
+                    </div>
+                    <div className="th-stat">
+                        <span className="th-stat-num">{stats.completed}</span>
+                        <span className="th-stat-lbl">Done</span>
+                    </div>
+                    <div className="th-stat">
+                        <span className="th-stat-num">{stats.remaining}</span>
+                        <span className="th-stat-lbl">Left</span>
+                    </div>
                 </div>
             </div>
 
