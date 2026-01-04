@@ -375,10 +375,9 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
             </div>
 
             <div className="th-card-content">
-                {/* Header: Venue/Date */}
+                {/* Header: Venue • Date/Time */}
                 <div className="th-row-header">
-                    <span>{displayVenue || 'Scheduled'}</span>
-                    {!displayVenue && <span>{formatTime(match.start_date)}</span>}
+                    <span>{displayVenue || 'Scheduled'} • {formatTime(match.start_date)}</span>
                 </div>
 
                 {/* Team 1 (Left) */}
@@ -393,13 +392,16 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
                     <div className="th-team-name">{team1?.name || 'TBC'}</div>
                 </div>
 
-                {/* Center Status */}
+                {/* Center Status / Result */}
                 <div className="th-match-center">
-                    {status === 'live' ? (
-                        <div className="th-status-pill th-live-pill">LIVE</div>
-                    ) : (
-                        <span className="th-vs-badge">VS</span>
+                    {status === 'live' && <div className="th-status-pill th-live-pill">LIVE</div>}
+
+                    {status === 'completed' && match.result && (
+                        <div className="th-result-text">{match.result}</div>
                     )}
+
+                    {status === 'upcoming' && <span className="th-vs-badge">VS</span>}
+
                     {status === 'live' && <span className="th-status-pill">{statusText}</span>}
                 </div>
 
