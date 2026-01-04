@@ -1,6 +1,7 @@
 import React from 'react';
 import WikiImage from './WikiImage';
 import { Match } from '../types';
+import { supabase } from '../utils/supabaseClient';
 import '../styles/PointsTable.css';
 
 interface TeamStanding {
@@ -50,11 +51,6 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
             if (!seriesId) return;
 
             try {
-                const { createClient } = await import('@supabase/supabase-js');
-                const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://ycumznofytwntinxlxkc.supabase.co';
-                const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '***REMOVED***';
-                const supabase = createClient(supabaseUrl, supabaseKey);
-
                 const { data, error } = await supabase
                     .from('team_tournament_stats')
                     .select('*')
