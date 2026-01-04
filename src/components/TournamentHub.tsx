@@ -90,7 +90,11 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
         let live = 0;
 
         matches.forEach(m => {
-            m.participants?.forEach(p => uniqueTeams.add(p.id));
+            m.participants?.forEach(p => {
+                if (p.name !== 'TBC' && p.id !== '0') {
+                    uniqueTeams.add(p.id);
+                }
+            });
             if (m.event_state === 'R' || m.event_state === 'C') completed++;
             else if (m.event_state === 'U') upcoming++;
             else if (m.event_state === 'L') live++;
