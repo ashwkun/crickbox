@@ -12,7 +12,7 @@
 
 /* ===== HERO (Stadium Banner) ===== */
 .th-hero {
-    margin: 8px;
+    margin: 4px;
     padding: 16px;
     background: linear-gradient(135deg, var(--th-accent-light) 0%, var(--th-accent-glow) 40%, rgba(0, 0, 0, 0) 100%);
     border-radius: 16px;
