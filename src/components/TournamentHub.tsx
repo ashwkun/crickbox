@@ -366,10 +366,10 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
     return (
         <div className={`th-match-row ${status}`} onClick={onClick} style={bgStyle}>
             <div className="th-card-content">
-                {/* Header: Date/Time */}
+                {/* Header: Venue/Date */}
                 <div className="th-row-header">
-                    <span>{match.event_format || 'Match'}</span>
-                    <span>{venue ? venue.split(',')[0] : 'TBC'}</span>
+                    <span>{venue ? venue.split(',')[0] : 'Scheduled'}</span>
+                    {!venue && <span>{formatTime(match.start_date)}</span>}
                 </div>
 
                 {/* Team Rows */}
