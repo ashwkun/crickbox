@@ -316,7 +316,9 @@ const FixturesTab: React.FC<{ matches: Match[], onMatchClick: (m: Match) => void
                                         <span>{date}</span>
                                     </div>
                                     {groupMatches.map((match, idx) => (
-                                        <MatchRow key={match.game_id || idx} match={match} onClick={() => onMatchClick(match)} />
+                                        subTab === 'results'
+                                            ? <ResultCard key={match.game_id || idx} match={match} onClick={() => onMatchClick(match)} />
+                                            : <MatchRow key={match.game_id || idx} match={match} onClick={() => onMatchClick(match)} />
                                     ))}
                                 </div>
                             ))
@@ -392,6 +394,70 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
                     <div className="new-team-name">{team2?.name || 'TBC'}</div>
                 </div>
             </div>
+        </div>
+    );
+};
+
+// Result Card - styled like JustFinished section
+const ResultCard: React.FC<{ match: Match, onClick: () => void }> = ({ match, onClick }) => {
+    const team1 = match.participants?.[0];
+    const team2 = match.participants?.[1];
+
+    // Winner Logic
+    const winnerId = match.participants?.find(p => p.highlight === 'true')?.id ||
+        (match.short_event_status?.includes(team1?.short_name || 'ZZZ') ? team1?.id :
+            match.short_event_status?.includes(team2?.short_name || 'ZZZ') ? team2?.id : null);
+
+    const isDraw = match.result_code === 'D';
+    const isT1Winner = !isDraw && team1?.id === winnerId;
+    const isT2Winner = !isDraw && team2?.id === winnerId;
+
+    // Team Colors
+    const color1 = getTeamColor(team1?.name);
+    const color2 = getTeamColor(team2?.name);
+
+    let bgGradient = '#1a1a1a';
+    if (color1 && color2) {
+        bgGradient = `radial-gradient(circle at top left, ${color1}30, transparent 50%), radial-gradient(circle at bottom right, ${color2}30, transparent 50%), #1a1a1a`;
+    }
+
+    // Score Renderer
+    const renderScore = (score: string | undefined, isWinner: boolean) => {
+        if (!score) return <span style={{ color: 'rgba(255,255,255,0.3)' }}>-</span>;
+        const cleanScore = score.replace(/\s*\([^)]*\)/g, '');
+        return (
+            <span style={{
+                fontSize: '13px',
+                fontWeight: isWinner ? 700 : 500,
+                color: isWinner ? '#fff' : 'rgba(255,255,255,0.6)'
+            }}>
+                {cleanScore}
+            </span>
+        );
+    };
+
+    return (
+        <div className="result-card" onClick={onClick} style={{ background: bgGradient }}>
+            {/* Teams */}
+            <div className="result-teams">
+                <div className="result-team-row">
+                    <div className="result-team-info">
+                        <WikiImage name={team1?.name} id={String(team1?.id || '0')} type="team" className="result-logo" />
+                        <span className={`result-team-name ${isT1Winner ? 'winner' : ''}`}>{team1?.name || 'TBC'}</span>
+                    </div>
+                    {renderScore(team1?.value, isT1Winner)}
+                </div>
+                <div className="result-team-row">
+                    <div className="result-team-info">
+                        <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" className="result-logo" />
+                        <span className={`result-team-name ${isT2Winner ? 'winner' : ''}`}>{team2?.name || 'TBC'}</span>
+                    </div>
+                    {renderScore(team2?.value, isT2Winner)}
+                </div>
+            </div>
+
+            {/* Result */}
+            <div className="result-summary">{match.short_event_status || match.result || 'Match Completed'}</div>
         </div>
     );
 };
