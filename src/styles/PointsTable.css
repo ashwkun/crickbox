@@ -5,8 +5,8 @@
     border-radius: 20px;
     background: transparent;
     /* Container is transparent, rows float */
-    margin-top: 16px;
     padding-bottom: 8px;
+    /* Removed margin-top as parent handles padding */
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
