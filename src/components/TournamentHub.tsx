@@ -297,34 +297,36 @@ const FixturesTab: React.FC<{ matches: Match[], onMatchClick: (m: Match) => void
                 ))}
             </div>
 
-            {/* Content List */}
-            <div className="th-fixtures-list">
-                {subTab === 'knockouts' ? (
-                    filteredMatches.length > 0 ? (
-                        filteredMatches.map(m => (
-                            <KnockoutCard key={m.game_id} match={m} onClick={() => onMatchClick(m)} />
-                        ))
+            {/* Master Card Container */}
+            <div className="th-master-card">
+                <div className="th-fixtures-list">
+                    {subTab === 'knockouts' ? (
+                        filteredMatches.length > 0 ? (
+                            filteredMatches.map(m => (
+                                <KnockoutCard key={m.game_id} match={m} onClick={() => onMatchClick(m)} />
+                            ))
+                        ) : (
+                            <div className="th-empty-state">No knockout matches detected yet.</div>
+                        )
                     ) : (
-                        <div className="th-empty-state">No knockout matches detected yet.</div>
-                    )
-                ) : (
-                    Object.keys(groupedMatches || {}).length > 0 ? (
-                        Object.entries(groupedMatches!).map(([date, groupMatches]) => (
-                            <div key={date} className="th-date-group">
-                                <div className="th-date-header">
-                                    <span>{date}</span>
+                        Object.keys(groupedMatches || {}).length > 0 ? (
+                            Object.entries(groupedMatches!).map(([date, groupMatches]) => (
+                                <div key={date} className="th-date-group">
+                                    <div className="th-date-header">
+                                        <span>{date}</span>
+                                    </div>
+                                    {groupMatches.map((match, idx) => (
+                                        <MatchRow key={match.game_id || idx} match={match} onClick={() => onMatchClick(match)} />
+                                    ))}
                                 </div>
-                                {groupMatches.map((match, idx) => (
-                                    <MatchRow key={match.game_id || idx} match={match} onClick={() => onMatchClick(match)} />
-                                ))}
+                            ))
+                        ) : (
+                            <div className="th-empty-state">
+                                {subTab === 'upcoming' ? 'No upcoming matches scheduled.' : 'No completed matches yet.'}
                             </div>
-                        ))
-                    ) : (
-                        <div className="th-empty-state">
-                            {subTab === 'upcoming' ? 'No upcoming matches scheduled.' : 'No completed matches yet.'}
-                        </div>
-                    )
-                )}
+                        )
+                    )}
+                </div>
             </div>
         </div>
     );

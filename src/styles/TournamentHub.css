@@ -304,6 +304,16 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* ===== MASTER CARD CONTAINER ===== */
+.th-master-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    margin: 0 12px;
+    padding: 12px 0;
+    overflow: hidden;
+}
+
 /* ===== DATE GROUP HEADERS ===== */
 .th-date-group {
     margin-bottom: 16px;
