@@ -269,7 +269,7 @@ function transformScorecard(scorecard, match) {
 /**
  * Upsert data to Supabase
  */
-async function upsertToSupabase(supabase, tableName, data, batchSize = 500) {
+async function upsertToSupabase(supabase, tableName, data, conflictKey = 'id', batchSize = 500) {
     if (!data.length) return 0;
 
     let upserted = 0;
@@ -279,7 +279,7 @@ async function upsertToSupabase(supabase, tableName, data, batchSize = 500) {
 
         const { error } = await supabase
             .from(tableName)
-            .upsert(chunk, { onConflict: 'id' });
+            .upsert(chunk, { onConflict: conflictKey });
 
         if (error) {
             console.error(`Error upserting to ${tableName}:`, error.message);
@@ -289,6 +289,61 @@ async function upsertToSupabase(supabase, tableName, data, batchSize = 500) {
     }
 
     return upserted;
+}
+
+
+/**
+ * Run Cleanup of Duplicates
+ * USAGE: node scripts/sync_tournament_stats.js clean
+ */
+async function runCleanup(supabase) {
+    console.log("🧹 Starting Deep Cleanup of stats...");
+
+    // 1. Get all matches
+    const { data: matches } = await supabase.from('tournament_matches').select('id');
+    console.log(`Scanning stats for ${matches.length} matches...`);
+
+    let totalDeleted = 0;
+
+    // Process in chunks to avoid timeouts
+    const CHUNK_SIZE = 50;
+    for (let i = 0; i < matches.length; i += CHUNK_SIZE) {
+        const batch = matches.slice(i, i + CHUNK_SIZE);
+        const matchIds = batch.map(m => m.id);
+
+        // Fetch all batting innings for these matches
+        const { data: batting } = await supabase
+            .from('batting_innings')
+            .select('id, match_id, player_id, created_at')
+            .in('match_id', matchIds);
+
+        // Group by Match+Player
+        const groups = {};
+        batting.forEach(row => {
+            const key = `${row.match_id}_${row.player_id}`;
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(row);
+        });
+
+        const toDeleteIds = [];
+        Object.values(groups).forEach(rows => {
+            if (rows.length > 1) {
+                // Sort by created_at desc (keep newest)
+                rows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                // Delete all except first
+                const dups = rows.slice(1);
+                dups.forEach(d => toDeleteIds.push(d.id));
+            }
+        });
+
+        if (toDeleteIds.length > 0) {
+            console.log(`Deleting ${toDeleteIds.length} duplicates in batch ${i}...`);
+            await supabase.from('batting_innings').delete().in('id', toDeleteIds);
+            totalDeleted += toDeleteIds.length;
+        }
+    }
+
+    console.log(`✅ Cleanup Complete. Removed ${totalDeleted} duplicate rows.`);
 }
 
 /**
@@ -306,6 +361,12 @@ async function main() {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Check for cleanup flag
+    if (process.argv.includes('clean')) {
+        await runCleanup(supabase);
+        return;
+    }
+
     try {
         // 1. Fetch recent completed matches (last 2 days)
         const allMatches = await fetchRecentMatches(2);
@@ -313,15 +374,19 @@ async function main() {
         // 2. Filter to premium tournaments
         const premiumMatches = filterPremiumTournaments(allMatches);
 
-        // 3. Check which matches are already synced
+        // 3. Check which matches are already synced (Optimized & Limit-Safe)
+        const matchIdsToCheck = premiumMatches.map(m => String(m.game_id));
+
         const { data: existingMatches } = await supabase
             .from('tournament_matches')
-            .select('id');
+            .select('id')
+            .in('id', matchIdsToCheck);
 
-        const existingIds = new Set((existingMatches || []).map(m => m.id));
-        const newMatches = premiumMatches.filter(m => !existingIds.has(m.game_id));
+        const existingIds = new Set((existingMatches || []).map(m => String(m.id)));
+        const newMatches = premiumMatches.filter(m => !existingIds.has(String(m.game_id)));
 
-        console.log(`${existingIds.size} matches already synced, ${newMatches.length} new matches to process`);
+        console.log(`Found ${existingIds.size} existing matches out of ${premiumMatches.length} candidates.`);
+        console.log(`${newMatches.length} new matches to process.`);
 
         if (newMatches.length === 0) {
             console.log('No new matches to sync.');
@@ -332,10 +397,13 @@ async function main() {
         const allMatchData = [];
         const allBattingInnings = [];
         const allBowlingInnings = [];
-        const allTeamStats = []; // NEW: For NRR
+        const allTeamStats = [];
 
         // Process all new matches
         const matchesToProcess = newMatches;
+        // Collect IDs for cleanup (idempotency)
+        const matchIdsToSync = matchesToProcess.map(m => String(m.game_id));
+
         console.log(`Processing all ${matchesToProcess.length} matches...`);
 
         for (let i = 0; i < matchesToProcess.length; i++) {
@@ -389,6 +457,17 @@ async function main() {
         // 5. Upsert to Supabase
         console.log('\nUpserting to Supabase...');
 
+        // CRITICAL: Delete existing stats for these matches first to allow re-sync (Idempotency)
+        if (matchIdsToSync.length > 0) {
+            console.log(`Cleaning up old stats for ${matchIdsToSync.length} matches...`);
+            const { error: delBatError } = await supabase.from('batting_innings').delete().in('match_id', matchIdsToSync);
+            const { error: delBowlError } = await supabase.from('bowling_innings').delete().in('match_id', matchIdsToSync);
+            const { error: delTeamError } = await supabase.from('team_innings_stats').delete().in('match_id', matchIdsToSync);
+
+            if (delBatError) console.error("Error cleaning batting_innings:", delBatError);
+            if (delBowlError) console.error("Error cleaning bowling_innings:", delBowlError);
+        }
+
         const matchesUpserted = await upsertToSupabase(supabase, 'tournament_matches', allMatchData);
         console.log(`  tournament_matches: ${matchesUpserted} rows`);
 
@@ -398,7 +477,7 @@ async function main() {
         const bowlingUpserted = await upsertToSupabase(supabase, 'bowling_innings', allBowlingInnings);
         console.log(`  bowling_innings: ${bowlingUpserted} rows`);
 
-        const teamStatsUpserted = await upsertToSupabase(supabase, 'team_innings_stats', allTeamStats);
+        const teamStatsUpserted = await upsertToSupabase(supabase, 'team_innings_stats', allTeamStats, 'match_id,team_id');
         console.log(`  team_innings_stats: ${teamStatsUpserted} rows (NRR Data)`);
 
         console.log('\n✅ Sync complete!');
