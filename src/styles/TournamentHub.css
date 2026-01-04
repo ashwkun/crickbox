@@ -438,14 +438,21 @@
     text-align: right;
 }
 
+/* Logo Wrapper for consistency */
+.th-logo-wrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 .th-team-logo {
-    width: 38px;
-    /* Slightly larger again for "Pro" feel */
-    height: 38px;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    flex-shrink: 0;
-    /* Prevent squishing */
 }
 
 .th-team-name {
