@@ -491,6 +491,16 @@
     animation: pulse-live 2s infinite;
 }
 
+.th-result-text {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--th-accent-light, #ffd700);
+    text-align: center;
+    line-height: 1.2;
+    max-width: 100px;
+    opacity: 0.9;
+}
+
 /* Hide old footer */
 .th-match-footer {
     display: none;
