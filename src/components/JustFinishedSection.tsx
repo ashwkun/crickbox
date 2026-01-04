@@ -194,8 +194,8 @@ const JustFinishedSection: React.FC<JustFinishedSectionProps> = ({ matches, onMa
     // --- STYLES ---
 
     const containerStyle: React.CSSProperties = {
-        marginTop: '24px',
-        marginBottom: '16px',
+        marginTop: '0',
+        marginBottom: '0',
         display: 'flex',
         flexDirection: 'column',
     };
