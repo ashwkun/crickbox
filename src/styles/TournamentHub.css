@@ -596,6 +596,7 @@
 }
 
 /* Knockout Special Card */
+/* Knockout Special Card */
 .th-knockout-card {
     margin: 16px;
     padding: 20px;
@@ -604,6 +605,11 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
     overflow: hidden;
+}
+
+/* Points Table Container Padding */
+.th-table {
+    padding: 0 16px 24px 16px;
 }
 
 .th-knockout-card.final {

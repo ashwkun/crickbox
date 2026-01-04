@@ -213,11 +213,11 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
                 {/* TABLE TAB */}
                 {activeTab === 'table' && (
                     <div className="th-table">
-                        {loadingTable ? (
-                            <div className="th-loading">Loading table...</div>
-                        ) : (
-                            <PointsTable standings={pointsData} matches={matches} />
-                        )}
+                        <PointsTable
+                            standings={pointsData}
+                            matches={matches}
+                            isLoading={loadingTable}
+                        />
                     </div>
                 )}
 
