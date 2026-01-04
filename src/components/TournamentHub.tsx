@@ -235,20 +235,42 @@ const TournamentHub: React.FC<TournamentHubProps> = ({
 
 const FixturesTab: React.FC<{ matches: Match[], onMatchClick: (m: Match) => void }> = ({ matches, onMatchClick }) => {
     const [subTab, setSubTab] = useState<FixturesSubTab>('upcoming');
+    const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+
+    // Extract unique teams from all matches
+    const uniqueTeams = useMemo(() => {
+        const teams = new Set<string>();
+        matches.forEach(m => {
+            m.participants?.forEach(p => {
+                if (p?.name && p.name !== 'TBC') teams.add(p.name);
+            });
+        });
+        return Array.from(teams).sort();
+    }, [matches]);
 
     // Filter Logic
     const filteredMatches = useMemo(() => {
+        let result = matches;
+
         if (subTab === 'knockouts') {
-            return matches.filter(m => isKnockoutStage(m) || hasUndeterminedTeams(m));
-        }
-        if (subTab === 'results') {
-            return matches
+            result = matches.filter(m => isKnockoutStage(m) || hasUndeterminedTeams(m));
+        } else if (subTab === 'results') {
+            result = matches
                 .filter(m => m.event_state === 'R' || m.event_state === 'C')
-                .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()); // Newest first
+                .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
+        } else {
+            result = matches.filter(m => m.event_state === 'U' || m.event_state === 'L');
         }
-        // Upcoming defaults (including Live)
-        return matches.filter(m => m.event_state === 'U' || m.event_state === 'L');
-    }, [matches, subTab]);
+
+        // Apply team filter
+        if (selectedTeam) {
+            result = result.filter(m =>
+                m.participants?.some(p => p?.name === selectedTeam)
+            );
+        }
+
+        return result;
+    }, [matches, subTab, selectedTeam]);
 
     // Grouping Logic
     const groupedMatches = useMemo(() => {
@@ -280,7 +302,7 @@ const FixturesTab: React.FC<{ matches: Match[], onMatchClick: (m: Match) => void
     useEffect(() => {
         const el = document.querySelector('.th-fixtures-list');
         if (el) el.scrollTop = 0;
-    }, [subTab]);
+    }, [subTab, selectedTeam]);
 
     return (
         <div className="th-fixtures">
@@ -296,6 +318,27 @@ const FixturesTab: React.FC<{ matches: Match[], onMatchClick: (m: Match) => void
                     </button>
                 ))}
             </div>
+
+            {/* Team Filters (Horizontal Scroll) */}
+            {uniqueTeams.length > 0 && (
+                <div className="th-team-filters">
+                    <button
+                        className={`th-team-chip ${!selectedTeam ? 'active' : ''}`}
+                        onClick={() => setSelectedTeam(null)}
+                    >
+                        All
+                    </button>
+                    {uniqueTeams.map(team => (
+                        <button
+                            key={team}
+                            className={`th-team-chip ${selectedTeam === team ? 'active' : ''}`}
+                            onClick={() => setSelectedTeam(selectedTeam === team ? null : team)}
+                        >
+                            {team}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {/* Master Card Container */}
             <div className="th-master-card">
