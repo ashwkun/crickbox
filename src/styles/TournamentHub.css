@@ -122,12 +122,15 @@
     letter-spacing: 0.3px;
 }
 
-/* ===== TABS (Pill Container) ===== */
+/* ===== TABS (Glassmorphic Pill) ===== */
 .th-tabs {
     display: flex;
     margin: 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
     padding: 4px;
     gap: 4px;
 }
@@ -137,7 +140,7 @@
     padding: 10px 12px;
     background: transparent;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 13px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.5);
@@ -146,7 +149,10 @@
 }
 
 .th-tab.active {
-    background: var(--th-accent);
+    background: linear-gradient(135deg, var(--th-accent-light), rgba(255, 255, 255, 0.08));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--th-accent-light);
     color: #fff;
     font-weight: 600;
 }
