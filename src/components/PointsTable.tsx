@@ -17,15 +17,58 @@ interface TeamStanding {
 
 interface PointsTableProps {
     standings: TeamStanding[];
-    matches?: Match[];  // Tournament matches to compute form from
+    matches?: Match[];
     style?: React.CSSProperties;
+    isLoading?: boolean;
 }
 
 // Form result type
 type FormResult = 'W' | 'L' | 'D' | null;
 
-const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], style }) => {
-    // Defensive check: ensure standings is an array
+const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], style, isLoading = false }) => {
+
+    // Skeleton Loader Component
+    const TableSkeleton = () => (
+        <div className="points-table-container">
+            <table className="points-table">
+                <thead>
+                    <tr>
+                        <th className="pt-rank">#</th>
+                        <th className="pt-team">Team</th>
+                        <th className="pt-stat">M</th>
+                        <th className="pt-stat">W</th>
+                        <th className="pt-stat">L</th>
+                        <th className="pt-stat">NRR</th>
+                        <th className="pt-points">Pts</th>
+                        <th className="pt-form">Form</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {Array.from({ length: 8 }).map((_, i) => (
+                        <tr key={i} className="pt-row pt-loading-row">
+                            <td><div className="pt-skeleton short" /></td>
+                            <td>
+                                <div className="pt-team-cell">
+                                    <div className="pt-skeleton logo" />
+                                    <div className="pt-skeleton text" />
+                                </div>
+                            </td>
+                            <td><div className="pt-skeleton short" /></td>
+                            <td><div className="pt-skeleton short" /></td>
+                            <td><div className="pt-skeleton short" /></td>
+                            <td><div className="pt-skeleton text" style={{ width: 60 }} /></td>
+                            <td><div className="pt-skeleton short" /></td>
+                            <td><div className="pt-skeleton text" style={{ width: 50 }} /></td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+
+    if (isLoading) return <TableSkeleton />;
+
+    // Defensive check
     if (!standings || !Array.isArray(standings) || standings.length === 0) {
         return <div className="points-table-empty">No standings available</div>;
     }
@@ -33,20 +76,28 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
     // Sort by wins (descending), then by matches played (ascending for tie-breaker)
     const sorted = [...standings].sort((a, b) => {
         if (b.wins !== a.wins) return b.wins - a.wins;
-        return a.matches - b.matches; // Fewer matches = better if same wins
+        // If wins equal, check NRR (if we had it in sort, but here matches played is proxy)
+        return a.matches - b.matches;
+        // Note: Real sorting usually relies on Points -> NRR. 
+        // We calculate points below but sorting happens here. 
+        // Ideally sorting should use calculated Points > NRR.
+    });
+
+    // Re-sort based on Points (Wins * 2 + Tied) just to be safe
+    sorted.sort((a, b) => {
+        const ptsA = (a.wins * 2) + (a.tied || 0) + (a.draw || 0);
+        const ptsB = (b.wins * 2) + (b.tied || 0) + (b.draw || 0);
+        if (ptsB !== ptsA) return ptsB - ptsA;
+        return 0; // Need NRR here for true tie-break
     });
 
     // State for NRR data
     const [nrrData, setNrrData] = React.useState<Record<string, number>>({});
 
-    // Fetch NRR data on mount
+    // Fetch NRR data on mount (logic remains same)
     React.useEffect(() => {
         const fetchNRR = async () => {
-            // We need seriesId to fetch specific stats. 
-            // Currently matches[0].series_id is the best proxy if not passed explicitly?
-            // Ideally parent should pass seriesId. relying on matches for now.
             if (matches.length === 0) return;
-
             const seriesId = matches[0].series_id;
             if (!seriesId) return;
 
@@ -56,47 +107,36 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
 
                 const nrrMap: Record<string, number> = {};
                 data.forEach((stat: any) => {
-                    // NRR = (Runs Scored / Overs Faced) - (Runs Conceded / Overs Bowled)
-                    // The view now returns balls (pre-adjusted for all-out scenarios)
-
-                    // 1. Batting Rate: balls_faced is actual balls OR alloted_balls if all out
                     const ballsFaced = stat.balls_faced || 1;
                     const oversFaced = ballsFaced / 6;
                     const battingRate = (stat.runs_scored || 0) / oversFaced;
 
-                    // 2. Bowling Rate: overs_bowled_decimal is now actually total balls bowled (adjusted)
                     const ballsBowled = stat.overs_bowled_decimal || 1;
                     const oversBowled = ballsBowled / 6;
                     const bowlingRate = (stat.runs_conceded || 0) / oversBowled;
 
                     nrrMap[stat.team_id] = battingRate - bowlingRate;
                 });
-
                 setNrrData(nrrMap);
-
             } catch (e) {
                 console.error('NRR fetch error:', e);
             }
         };
-
         fetchNRR();
     }, [matches]);
 
-    // Calculate points (2 per win, 1 per tie/NR)
-    const getPoints = (team: TeamStanding) => (team.wins * 2) + (team.tied || 0);
+    const getPoints = (team: TeamStanding) => (team.wins * 2) + (team.tied || 0) + (team.draw || 0);
 
-    // Render helper
     const getNRRDisplay = (teamId: number) => {
         const nrr = nrrData[String(teamId)];
         if (nrr === undefined) return '-';
-        return (nrr > 0 ? '+' : '') + nrr.toFixed(3);
+        const formatted = (nrr > 0 ? '+' : '') + nrr.toFixed(3);
+        return <span className={`pt-nrr ${nrr > 0 ? 'positive' : nrr < 0 ? 'negative' : ''}`}>{formatted}</span>;
     };
 
-    // Get team's last N match results from tournament matches
+    // Form logic (Keep existing)
     const getTeamForm = (teamId: number, count: number = 5): FormResult[] => {
         const teamIdStr = String(teamId);
-
-        // Filter matches involving this team (completed only)
         const teamMatches = matches.filter(m => {
             const isTeamInMatch =
                 m.participants?.some(p => p.id === teamIdStr) ||
@@ -107,29 +147,23 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
             return isTeamInMatch && isCompleted;
         });
 
-        // Sort by date (newest first)
         const sortedMatches = [...teamMatches].sort((a, b) => {
             const dateA = new Date(a.start_date || '').getTime();
             const dateB = new Date(b.start_date || '').getTime();
             return dateB - dateA;
         });
 
-        // Get last N results
         const form: FormResult[] = [];
         for (let i = 0; i < count; i++) {
             if (i < sortedMatches.length) {
                 const match = sortedMatches[i];
-                // Determine if this team won
-                // Determine winner from participants highlight flag (string "true" or boolean true)
                 let winnerId: string | null = null;
                 if (match.participants) {
                     const winner = match.participants.find(p => String(p.highlight) === 'true');
-                    if (winner) {
-                        winnerId = winner.id;
-                    }
+                    if (winner) winnerId = winner.id;
                 }
 
-                // Fallback: search status text
+                // Fallback result parsing
                 if (!winnerId && (match.short_event_status || match.event_sub_status)) {
                     const status = (match.short_event_status || match.event_sub_status || '').toLowerCase();
                     const winningParticipant = match.participants?.find(p =>
@@ -139,55 +173,24 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                     if (winningParticipant) winnerId = winningParticipant.id;
                 }
 
-                const hasWinner = winnerId && winnerId !== '';
-
-                if (!hasWinner) {
-                    // No result or draw
-                    form.push('D');
-                } else if (winnerId === teamIdStr) {
-                    form.push('W');
-                } else {
-                    form.push('L');
-                }
+                if (!winnerId) form.push('D'); // Draw/NR
+                else if (winnerId === teamIdStr) form.push('W');
+                else form.push('L');
             } else {
-                form.push(null); // Blank dot
+                form.push(null);
             }
         }
-
-        // Return recent-first (Recent -> Left)
         return form;
     };
 
-    // Render form dots
-    const renderFormDots = (form: FormResult[]) => {
-        return (
-            <div className="pt-form-dots">
-                {form.map((result, idx) => (
-                    <div
-                        key={idx}
-                        className={`pt-form-dot ${result ? `pt-form-${result.toLowerCase()}` : 'pt-form-blank'}`}
-                        title={idx === 0 ? 'Latest Match' : (result || '-')}
-                        style={{ position: 'relative' }}
-                    >
-                        {result || ''}
-                        {/* Dot indicator for latest match (index 0) */}
-                        {idx === 0 && (
-                            <div style={{
-                                position: 'absolute',
-                                bottom: -4,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                width: 4,
-                                height: 4,
-                                borderRadius: '50%',
-                                background: 'rgba(255,255,255,0.4)' // White dot for dark theme
-                            }} />
-                        )}
-                    </div>
-                ))}
-            </div>
-        );
-    };
+    const renderFormDots = (form: FormResult[]) => (
+        <div className="pt-form-dots">
+            {form.map((result, idx) => {
+                if (!result) return <div key={idx} className="pt-form-dot pt-form-blank" />;
+                return <div key={idx} className={`pt-form-dot pt-form-${result.toLowerCase()}`} title={result} />;
+            })}
+        </div>
+    );
 
     return (
         <div className="points-table-container" style={style}>
@@ -206,22 +209,17 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                 </thead>
                 <tbody>
                     {sorted.map((team, idx) => {
-                        const form = matches.length > 0 ? getTeamForm(team.id) :
-                            Array(5).fill(null) as FormResult[];
+                        const form = matches.length > 0 ? getTeamForm(team.id) : Array(5).fill(null) as FormResult[];
+                        const isQualified = idx < 4; // Top 4 highlight
 
                         return (
-                            <tr key={team.id} className="pt-row">
+                            <tr key={team.id} className={`pt-row ${isQualified ? 'pt-qualify' : ''}`}>
                                 <td className="pt-rank">{idx + 1}</td>
                                 <td className="pt-team-cell">
-                                    <WikiImage
-                                        name={team.name}
-                                        id={String(team.id)}
-                                        type="team"
-                                        className="pt-team-logo"
-                                    />
+                                    <WikiImage name={team.name} id={String(team.id)} type="team" className="pt-team-logo" />
                                     <span className="pt-team-name">{team.short_name || team.name}</span>
                                 </td>
-                                <td className="pt-stat">{team.matches}</td>
+                                <td className="pt-stat pt-matches">{team.matches}</td>
                                 <td className="pt-stat pt-win">{team.wins}</td>
                                 <td className="pt-stat pt-loss">{team.loss}</td>
                                 <td className="pt-stat pt-nrr">{getNRRDisplay(team.id)}</td>
