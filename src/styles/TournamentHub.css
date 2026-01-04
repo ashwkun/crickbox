@@ -719,7 +719,8 @@
     align-items: center;
     justify-content: center;
     gap: 3px;
-    min-width: 50px;
+    min-width: 60px;
+    flex-shrink: 0;
 }
 
 .new-vs {
