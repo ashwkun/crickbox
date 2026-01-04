@@ -414,7 +414,7 @@
 
 /* Team 1: Center aligned */
 .th-team-item.home {
-    justify-self: start;
+    justify-self: center;
     text-align: center;
 }
 
@@ -424,7 +424,7 @@
 
 /* Team 2: Center aligned */
 .th-team-item.away {
-    justify-self: end;
+    justify-self: center;
     text-align: center;
 }
 
