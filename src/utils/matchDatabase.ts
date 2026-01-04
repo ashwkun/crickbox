@@ -114,3 +114,96 @@ export async function getMatchesByLeague(league: string, limit = 50): Promise<Ma
 
     return data as Match[];
 }
+
+// ============ TOURNAMENT STATS ============
+
+export interface TeamTournamentStats {
+    team_id: string;
+    series_id: string;
+    runs_scored: number;
+    overs_faced: number;
+    runs_conceded: number;
+    overs_bowled: number;
+    nrr?: number;
+}
+
+export interface RunScorer {
+    player_id: string;
+    player_name: string;
+    team_name: string;
+    total_runs: number;
+    innings: number;
+    average: number;
+    strike_rate: number;
+    highest_score: number;
+    fifties: number;
+    hundreds: number;
+}
+
+export interface WicketTaker {
+    player_id: string;
+    player_name: string;
+    team_name: string;
+    total_wickets: number;
+    innings: number;
+    average: number;
+    economy: number;
+    best_bowling: string;
+    four_wickets: number;
+    five_wickets: number;
+}
+
+/**
+ * Get team tournament stats (for NRR calculation)
+ */
+export async function getTeamTournamentStats(seriesId: string): Promise<TeamTournamentStats[]> {
+    const { data, error } = await supabase
+        .from('team_tournament_stats')
+        .select('*')
+        .eq('series_id', seriesId);
+
+    if (error) {
+        console.error('Error fetching team tournament stats:', error);
+        return [];
+    }
+
+    return data as TeamTournamentStats[];
+}
+
+/**
+ * Get top run scorers for a series
+ */
+export async function getTopRunScorers(seriesId: string, limit = 10): Promise<RunScorer[]> {
+    const { data, error } = await supabase
+        .from('top_run_scorers')
+        .select('*')
+        .eq('series_id', seriesId)
+        .order('total_runs', { ascending: false })
+        .limit(limit);
+
+    if (error) {
+        console.warn('top_run_scorers query failed:', error.message);
+        return [];
+    }
+
+    return data as RunScorer[];
+}
+
+/**
+ * Get top wicket takers for a series
+ */
+export async function getTopWicketTakers(seriesId: string, limit = 10): Promise<WicketTaker[]> {
+    const { data, error } = await supabase
+        .from('top_wicket_takers')
+        .select('*')
+        .eq('series_id', seriesId)
+        .order('total_wickets', { ascending: false })
+        .limit(limit);
+
+    if (error) {
+        console.warn('top_wicket_takers query failed:', error.message);
+        return [];
+    }
+
+    return data as WicketTaker[];
+}

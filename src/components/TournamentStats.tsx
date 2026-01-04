@@ -2,11 +2,11 @@
  * TournamentStats.tsx
  *
  * Displays aggregated player stats for a tournament series.
- * Fetches data from Supabase views: top_run_scorers, top_wicket_takers
+ * Fetches data from Supabase views via matchDatabase: top_run_scorers, top_wicket_takers
  */
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../utils/supabaseClient';
+import { getTopRunScorers, getTopWicketTakers, RunScorer, WicketTaker } from '../utils/matchDatabase';
 import WikiImage from './WikiImage';
 import '../styles/TournamentStats.css';
 
@@ -15,33 +15,7 @@ interface TournamentStatsProps {
     seriesName?: string;
 }
 
-interface RunScorer {
-    player_id: string;
-    player_name: string;
-    team_id: string;
-    total_runs: number;
-    matches_played: number;
-    innings: number;
-    average: number;
-    strike_rate: number;
-    highest_score: number;
-    fifties: number;
-    hundreds: number;
-}
 
-interface WicketTaker {
-    player_id: string;
-    player_name: string;
-    team_id: string;
-    total_wickets: number;
-    matches_played: number;
-    innings: number;
-    economy: number;
-    average: number;
-    best_figures: string;
-    four_wickets: number;
-    five_wickets: number;
-}
 
 type StatTab = 'batting' | 'bowling';
 
@@ -58,42 +32,13 @@ const TournamentStats: React.FC<TournamentStatsProps> = ({ seriesId, seriesName 
             setError(null);
 
             try {
-                // Check if supabase is available
-                if (!supabase) {
-                    setError('Database connection unavailable');
-                    setLoading(false);
-                    return;
-                }
-
                 // Fetch top run scorers for this series
-                const runResult = await supabase
-                    .from('top_run_scorers')
-                    .select('*')
-                    .eq('series_id', seriesId)
-                    .order('total_runs', { ascending: false })
-                    .limit(10);
-
-                if (runResult.error) {
-                    console.warn('top_run_scorers query failed:', runResult.error.message);
-                    // Don't throw - view might not exist yet
-                } else {
-                    setBatters(runResult.data || []);
-                }
+                const runData = await getTopRunScorers(seriesId, 10);
+                setBatters(runData as any);
 
                 // Fetch top wicket takers for this series
-                const wicketResult = await supabase
-                    .from('top_wicket_takers')
-                    .select('*')
-                    .eq('series_id', seriesId)
-                    .order('total_wickets', { ascending: false })
-                    .limit(10);
-
-                if (wicketResult.error) {
-                    console.warn('top_wicket_takers query failed:', wicketResult.error.message);
-                    // Don't throw - view might not exist yet
-                } else {
-                    setBowlers(wicketResult.data || []);
-                }
+                const wicketData = await getTopWicketTakers(seriesId, 10);
+                setBowlers(wicketData as any);
 
             } catch (err: any) {
                 console.error('Failed to fetch tournament stats:', err);
