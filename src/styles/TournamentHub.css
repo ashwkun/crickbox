@@ -125,12 +125,26 @@
 /* ===== TABS (Sleek Centered Pill) ===== */
 .th-tabs {
     display: flex;
+    position: relative;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 100px;
     padding: 3px;
     margin: 16px auto 16px auto;
     max-width: 280px;
     border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Sliding indicator */
+.th-tab-indicator {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(33.333% - 2px);
+    height: calc(100% - 6px);
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 100px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
 }
 
 .th-tab {
@@ -143,13 +157,14 @@
     font-weight: 600;
     color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 0.25s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
 }
 
 .th-tab.active {
-    background: rgba(255, 255, 255, 0.12);
     color: #fff;
     font-weight: 700;
 }
