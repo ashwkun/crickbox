@@ -286,7 +286,7 @@ const FixturesTab: React.FC<{ matches: Match[], onMatchClick: (m: Match) => void
         <div className="th-fixtures">
             {/* Sub Tabs */}
             <div className="th-fixtures-tabs">
-                {(['upcoming', 'results', 'knockouts'] as const).map(t => (
+                {(['upcoming', 'results'] as const).map(t => (
                     <button
                         key={t}
                         className={`th-sub-tab ${subTab === t ? 'active' : ''}`}
