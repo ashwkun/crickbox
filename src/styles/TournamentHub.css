@@ -10,10 +10,13 @@
     --th-accent-glow: rgba(124, 58, 237, 0.08);
 }
 
-/* ===== HERO (Stadium Banner) ===== */
+/* ===== HERO (Stadium Banner - extends under header) ===== */
 .th-hero {
     margin: 0;
-    padding: 16px 12px;
+    margin-top: -84px;
+    /* Extend under floating header */
+    padding: 100px 12px 16px 12px;
+    /* Top padding pushes content below header */
     background: linear-gradient(135deg, var(--th-accent-light) 0%, var(--th-accent-glow) 40%, rgba(0, 0, 0, 0) 100%);
     border-radius: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
