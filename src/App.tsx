@@ -216,6 +216,57 @@ export default function App(): React.ReactElement {
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
+    // Fetch scorecard and wallstream when a match is selected
+    useEffect(() => {
+        if (!selectedMatch?.game_id) {
+            setScorecard(null);
+            setWallstream(null);
+            return;
+        }
+
+        let isCancelled = false;
+
+        const loadMatchData = async () => {
+            // Fetch scorecard
+            const sc = await fetchScorecard(selectedMatch.game_id);
+            if (!isCancelled && sc) {
+                setScorecard(sc);
+            }
+
+            // Fetch wallstream for live matches
+            if (selectedMatch.event_state === 'L') {
+                const ws = await fetchWallstream(selectedMatch.game_id);
+                if (!isCancelled && ws) {
+                    setWallstream(ws);
+                }
+            }
+        };
+
+        loadMatchData();
+
+        // Poll wallstream for live matches
+        let pollInterval: NodeJS.Timeout | null = null;
+        if (selectedMatch.event_state === 'L') {
+            pollInterval = setInterval(async () => {
+                if (isCancelled) return;
+                const ws = await fetchWallstream(selectedMatch.game_id);
+                if (!isCancelled && ws) {
+                    setWallstream(ws);
+                }
+                // Also refresh scorecard periodically for live
+                const sc = await fetchScorecard(selectedMatch.game_id);
+                if (!isCancelled && sc) {
+                    setScorecard(sc);
+                }
+            }, 15000); // Poll every 15s for live matches
+        }
+
+        return () => {
+            isCancelled = true;
+            if (pollInterval) clearInterval(pollInterval);
+        };
+    }, [selectedMatch?.game_id, selectedMatch?.event_state, fetchScorecard, fetchWallstream]);
+
     // --- Legacy Handler Replacements ---
 
     // Handle match selection
