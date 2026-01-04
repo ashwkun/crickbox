@@ -377,9 +377,10 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
                 <div className="th-team-item">
                     <WikiImage
                         name={team1?.name}
+                        id={String(team1?.id || '0')}
                         type="team"
                         className="th-team-logo"
-                        style={{ width: 28, height: 28 }}
+                        style={{ width: 32, height: 32 }}
                     />
                     <div className="th-team-name">{team1?.name || 'TBC'}</div>
                 </div>
@@ -387,9 +388,10 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
                 <div className="th-team-item">
                     <WikiImage
                         name={team2?.name}
+                        id={String(team2?.id || '0')}
                         type="team"
                         className="th-team-logo"
-                        style={{ width: 28, height: 28 }}
+                        style={{ width: 32, height: 32 }}
                     />
                     <div className="th-team-name">{team2?.name || 'TBC'}</div>
                 </div>
