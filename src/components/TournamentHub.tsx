@@ -7,6 +7,7 @@ import useCricketData from '../utils/useCricketData';
 import { getTournamentAbbreviation, getMatchFormat } from '../utils/tournamentAbbreviations';
 import { getLeagueLogo } from '../utils/leagueLogos';
 import { getTournamentColor } from '../utils/tournamentColors';
+import { getTeamColor } from '../utils/teamColors';
 import { isKnockoutStage, hasUndeterminedTeams } from '../utils/tbcMatch';
 import '../styles/TournamentHub.css';
 
@@ -331,6 +332,8 @@ const FixturesTab: React.FC<{ matches: Match[], onMatchClick: (m: Match) => void
 
 const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onClick }) => {
     const teams = match.participants || [];
+    const team1 = teams[0];
+    const team2 = teams[1];
 
     // Formatting
     const formatTime = (d: string) => new Date(d).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
@@ -341,25 +344,62 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
 
     if (match.event_state === 'U') {
         status = 'upcoming';
-        statusText = formatTime(match.start_date);
+        statusText = 'Starts ' + formatTime(match.start_date);
     } else if (match.event_state === 'L') {
         status = 'live';
-        statusText = 'LIVE';
+        statusText = match.short_event_status || 'LIVE';
     }
 
+    // Dynamic Colors
+    const color1 = getTeamColor(team1?.name);
+    const color2 = getTeamColor(team2?.name);
+
+    const bgStyle: React.CSSProperties = (color1 && color2)
+        ? { backgroundImage: `radial-gradient(circle at -20% -20%, ${color1}50, transparent 60%), radial-gradient(circle at 120% 120%, ${color2}50, transparent 60%)` }
+        : color1
+            ? { backgroundImage: `radial-gradient(circle at -20% -20%, ${color1}40, transparent 70%)` }
+            : {};
+
+    // Venue Logic (Basic)
+    const venue = match.venue || '';
+
     return (
-        <div className={`th-match-row ${status}`} onClick={onClick}>
-            <div className="th-match-date" style={{ width: 50, fontSize: 10, opacity: 0.6 }}>
-                {formatTime(match.start_date)}
-            </div>
-            <div className="th-match-teams">
-                <span>{teams[0]?.short_name || '?'}</span>
-                <span className="th-vs">vs</span>
-                <span>{teams[1]?.short_name || '?'}</span>
-            </div>
-            <div className={`th-match-result ${status}`}>
-                {status === 'live' && <span className="th-live-dot"></span>}
-                {statusText}
+        <div className={`th-match-row ${status}`} onClick={onClick} style={bgStyle}>
+            <div className="th-card-content">
+                {/* Header: Date/Time */}
+                <div className="th-row-header">
+                    <span>{match.event_format || 'Match'}</span>
+                    <span>{venue ? venue.split(',')[0] : 'TBC'}</span>
+                </div>
+
+                {/* Team Rows */}
+                <div className="th-team-item">
+                    <WikiImage
+                        name={team1?.name}
+                        type="team"
+                        className="th-team-logo"
+                        style={{ width: 28, height: 28 }}
+                    />
+                    <div className="th-team-name">{team1?.name || 'TBC'}</div>
+                </div>
+
+                <div className="th-team-item">
+                    <WikiImage
+                        name={team2?.name}
+                        type="team"
+                        className="th-team-logo"
+                        style={{ width: 28, height: 28 }}
+                    />
+                    <div className="th-team-name">{team2?.name || 'TBC'}</div>
+                </div>
+
+                {/* Footer: Result/Status */}
+                <div className="th-match-footer">
+                    <div className="th-footer-status">
+                        {status === 'live' && <span className="th-live-badge">LIVE</span>}
+                        <span>{statusText}</span>
+                    </div>
+                </div>
             </div>
         </div>
     );

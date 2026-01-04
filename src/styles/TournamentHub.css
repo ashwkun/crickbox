@@ -338,8 +338,102 @@
 
 /* Match Row adjustments for groups */
 .th-match-row {
-    margin: 0 12px 8px 12px;
-    /* Side margins returned */
+    margin: 0 12px 12px 12px;
+    padding: 16px;
+    background: #1a1a1a;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+}
+
+.th-match-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.th-card-content {
+    position: relative;
+    z-index: 2;
+}
+
+.th-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 11px;
+    opacity: 0.7;
+    font-weight: 600;
+}
+
+.th-team-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.th-team-item:last-child {
+    margin-bottom: 0;
+}
+
+.th-team-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.th-team-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.th-match-footer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+}
+
+.th-footer-status {
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.th-live-badge {
+    background: #ef4444;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+/* Override Grid/Flex from previous basic design */
+.th-match-date,
+.th-match-teams,
+.th-match-result {
+    display: none;
+    /* Hide old elements if they exist in DOM for smooth transition */
 }
 
 /* Empty State */
