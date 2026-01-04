@@ -122,39 +122,36 @@
     letter-spacing: 0.3px;
 }
 
-/* ===== TABS (Glassmorphic Pill) ===== */
+/* ===== TABS (Sleek Centered Pill) ===== */
 .th-tabs {
     display: flex;
-    margin: 12px;
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
-    padding: 4px;
-    gap: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 100px;
+    padding: 3px;
+    margin: 0 auto 16px auto;
+    max-width: 280px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .th-tab {
     flex: 1;
-    padding: 10px 12px;
-    background: transparent;
+    padding: 8px 0;
+    border-radius: 100px;
     border: none;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 500;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 600;
     color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
     transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .th-tab.active {
-    background: linear-gradient(135deg, var(--th-accent-light), rgba(255, 255, 255, 0.08));
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--th-accent-light);
+    background: linear-gradient(135deg, var(--th-accent-light), rgba(255, 255, 255, 0.1));
     color: #fff;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 /* ===== CONTENT ===== */
