@@ -258,7 +258,7 @@ export default function App(): React.ReactElement {
                 if (!isCancelled && sc) {
                     setScorecard(sc);
                 }
-            }, 15000); // Poll every 15s for live matches
+            }, 10000); // Poll every 10s for live matches (matches useCricketData)
         }
 
         return () => {
