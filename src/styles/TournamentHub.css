@@ -664,15 +664,13 @@
 }
 
 .new-team:first-child {
-    justify-self: center;
-    margin-left: auto;
-    /* Push to right edge of column */
+    justify-self: start;
+    /* Push to LEFT outer edge */
 }
 
 .new-team:last-child {
-    justify-self: center;
-    margin-right: auto;
-    /* Push to left edge of column */
+    justify-self: end;
+    /* Push to RIGHT outer edge */
 }
 
 .new-team-logo {
