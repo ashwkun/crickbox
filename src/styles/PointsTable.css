@@ -125,18 +125,9 @@
 
 .pt-nrr {
     font-family: 'Geist Mono', monospace;
-    /* or fallback monospace */
     font-size: 11px;
     color: rgba(255, 255, 255, 0.4);
     letter-spacing: -0.5px;
-}
-
-.pt-nrr.positive {
-    color: #4ade80;
-}
-
-.pt-nrr.negative {
-    color: #f87171;
 }
 
 /* Form */

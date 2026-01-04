@@ -29,7 +29,7 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
 
     // Skeleton Loader Component
     const TableSkeleton = () => (
-        <div className="points-table-container">
+        <div className="points-table-container th-master-card">
             <table className="points-table">
                 <thead>
                     <tr>
@@ -38,8 +38,8 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                         <th className="pt-stat">M</th>
                         <th className="pt-stat">W</th>
                         <th className="pt-stat">L</th>
-                        <th className="pt-stat">NRR</th>
                         <th className="pt-points">Pts</th>
+                        <th className="pt-stat">NRR</th>
                         <th className="pt-form">Form</th>
                     </tr>
                 </thead>
@@ -56,8 +56,8 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                             <td><div className="pt-skeleton short" /></td>
                             <td><div className="pt-skeleton short" /></td>
                             <td><div className="pt-skeleton short" /></td>
-                            <td><div className="pt-skeleton text" style={{ width: 60 }} /></td>
                             <td><div className="pt-skeleton short" /></td>
+                            <td><div className="pt-skeleton text" style={{ width: 60 }} /></td>
                             <td><div className="pt-skeleton text" style={{ width: 50 }} /></td>
                         </tr>
                     ))}
@@ -78,8 +78,8 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
         if (b.wins !== a.wins) return b.wins - a.wins;
         // If wins equal, check NRR (if we had it in sort, but here matches played is proxy)
         return a.matches - b.matches;
-        // Note: Real sorting usually relies on Points -> NRR. 
-        // We calculate points below but sorting happens here. 
+        // Note: Real sorting usually relies on Points -> NRR.
+        // We calculate points below but sorting happens here.
         // Ideally sorting should use calculated Points > NRR.
     });
 
@@ -130,8 +130,7 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
     const getNRRDisplay = (teamId: number) => {
         const nrr = nrrData[String(teamId)];
         if (nrr === undefined) return '-';
-        const formatted = (nrr > 0 ? '+' : '') + nrr.toFixed(3);
-        return <span className={`pt-nrr ${nrr > 0 ? 'positive' : nrr < 0 ? 'negative' : ''}`}>{formatted}</span>;
+        return (nrr > 0 ? '+' : '') + nrr.toFixed(3);
     };
 
     // Form logic (Keep existing)
@@ -193,7 +192,7 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
     );
 
     return (
-        <div className="points-table-container" style={style}>
+        <div className="points-table-container th-master-card" style={style}>
             <table className="points-table">
                 <thead>
                     <tr>
@@ -202,8 +201,8 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                         <th className="pt-stat">M</th>
                         <th className="pt-stat">W</th>
                         <th className="pt-stat">L</th>
-                        <th className="pt-stat">NRR</th>
                         <th className="pt-points">Pts</th>
+                        <th className="pt-stat">NRR</th>
                         <th className="pt-form">Form</th>
                     </tr>
                 </thead>
@@ -222,8 +221,8 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                                 <td className="pt-stat pt-matches">{team.matches}</td>
                                 <td className="pt-stat pt-win">{team.wins}</td>
                                 <td className="pt-stat pt-loss">{team.loss}</td>
-                                <td className="pt-stat pt-nrr">{getNRRDisplay(team.id)}</td>
                                 <td className="pt-points">{getPoints(team)}</td>
+                                <td className="pt-stat pt-nrr">{getNRRDisplay(team.id)}</td>
                                 <td className="pt-form-cell">{renderFormDots(form)}</td>
                             </tr>
                         );
