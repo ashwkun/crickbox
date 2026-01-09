@@ -2,10 +2,12 @@
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
+const { TextToSpeechClient } = require('@google-cloud/text-to-speech');
 
 // --- CONFIG ---
 const BOT_TOKEN = process.env.AI_TOKEN; // Passed from GitHub Secrets (AI_TOKEN)
 const MATCH_SUMMARY_FILE = path.join(__dirname, '../src/data/ai_match_summaries.json');
+const AUDIO_DIR = path.join(__dirname, '../src/data/audio');
 const WISDEN_CLIENT_ID = 'e656463796'; // From wisdenConfig.ts
 const SCORECARD_CLIENT_ID = '430fdd0d';
 const MAX_MATCHES_TO_PROCESS = 5; // Safety limit per run
@@ -363,17 +365,28 @@ Guidelines:
             const duration = ((Date.now() - startTime) / 1000).toFixed(1);
 
             if (aiRes && aiRes.text) {
+                // Generate Audio
+                let audioFile = null;
+                try {
+                    audioFile = await generateAudio(aiRes.text, match.match_id);
+                } catch (audioErr) {
+                    log(`   ⚠️  Audio generation failed: ${audioErr.message}`);
+                }
+
                 summaryDB[match.match_id] = {
                     text: aiRes.text,
                     model: aiRes.model,
+                    audio: audioFile,
                     generated_at: new Date().toISOString()
                 };
                 log(`   ✅ Summary generated in ${duration}s (via ${aiRes.model})`);
+                if (audioFile) log(`   🔊 Audio saved: ${audioFile}`);
                 log(`   📝 "${aiRes.text.substring(0, 60)}..."`);
                 processedCount++;
             } else {
                 log('   ⚠️  AI returned empty response');
             }
+
 
             // Rate limit protection delay
             log('   ⏳ Waiting 5s before next request...');
@@ -401,4 +414,43 @@ Guidelines:
     log('='.repeat(60));
 }
 
-main();
+main().catch(err => {
+    log(`FATAL ERROR: ${err.message}`);
+    process.exit(1);
+});
+
+async function generateAudio(text, matchId) {
+    if (!process.env.GOOGLE_TTS_KEY) {
+        log('   ⚠️  No Google TTS Key found. Skipping audio.');
+        return null;
+    }
+
+    // Ensure audio directory exists
+    if (!fs.existsSync(AUDIO_DIR)) {
+        fs.mkdirSync(AUDIO_DIR, { recursive: true });
+    }
+
+    // Clean text for speech
+    const speechText = text
+        .replace(/\*\*/g, '')          // Remove markdown bold
+        .replace(/(\d+)\/(\d+)/g, '$1 for $2')  // 2/40 -> 2 for 40
+        .replace(/(\d+)\*/g, '$1 not out')      // 163* -> 163 not out
+        .replace(/SR\s?(\d+)/gi, 'strike rate $1')
+        .replace(/RR\s?(\d+)/gi, 'run rate $1');
+
+    const client = new TextToSpeechClient();
+    const request = {
+        input: { text: speechText },
+        // Select the language and SSML voice gender (optional)
+        voice: { languageCode: 'en-AU', name: 'en-AU-Neural2-B' },
+        // select the type of audio encoding
+        audioConfig: { audioEncoding: 'MP3' },
+    };
+
+    const [response] = await client.synthesizeSpeech(request);
+    const audioFileName = `${matchId}.mp3`;
+    const audioPath = path.join(AUDIO_DIR, audioFileName);
+
+    fs.writeFileSync(audioPath, response.audioContent, 'binary');
+    return audioFileName;
+}
