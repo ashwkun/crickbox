@@ -31,4 +31,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "🤖 Update AI Match Summaries [skip ci]"
-          file_pattern: "src/data/ai_match_summaries.json"
+          file_pattern: "src/data/*"
+          add_options: "-A"
+          push_options: "--force"
