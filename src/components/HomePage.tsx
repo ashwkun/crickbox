@@ -748,63 +748,74 @@ export default function HomePage({
                     style={{
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'space-between',
                         gap: 16,
-                        background: 'rgba(254, 240, 138, 0.05)', // Very subtle yellow tint
-                        backdropFilter: 'blur(12px)',
-                        borderRadius: 20,
-                        padding: '12px 16px',
-                        border: '1px solid rgba(254, 240, 138, 0.15)',
+                        background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)', // Formal dark slate
+                        borderRadius: 16,
+                        padding: '16px 20px',
+                        border: '1px solid rgba(251, 191, 36, 0.3)', // Gold border
                         textDecoration: 'none',
-                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                        position: 'relative',
-                        overflow: 'hidden',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        transition: 'transform 0.2s',
                         cursor: 'pointer'
                     }}
                 >
-                    {/* Solid Yellow Logo Container */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        {/* Logo in Gold Container */}
+                        <div style={{
+                            background: '#f59e0b', // Classic Gold
+                            borderRadius: '50%',
+                            width: 40,
+                            height: 40,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 0 15px rgba(245, 158, 11, 0.2)'
+                        }}>
+                            <img
+                                src={wisdenLogo}
+                                alt="Wisden"
+                                style={{ height: 18, width: 'auto', mixBlendMode: 'multiply', opacity: 0.9 }}
+                            />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{
+                                color: '#94a3b8', // Muted slate text
+                                fontSize: 11,
+                                textTransform: 'uppercase',
+                                letterSpacing: 1,
+                                fontWeight: 600,
+                                marginBottom: 2
+                            }}>
+                                Data Powered By
+                            </span>
+                            <span style={{
+                                color: '#fcd34d', // Light Gold
+                                fontSize: 20,
+                                fontWeight: 700,
+                                fontFamily: '"Times New Roman", Times, serif', // Classic Formal Serif
+                                letterSpacing: 0.5,
+                                lineHeight: 1
+                            }}>
+                                WISDEN
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Arrow Icon */}
                     <div style={{
-                        background: '#fbbf24', // Amber-400 solid
-                        borderRadius: 14,
-                        padding: '8px 12px',
+                        background: 'rgba(255,255,255,0.05)',
+                        borderRadius: '50%',
+                        width: 32,
+                        height: 32,
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 15px rgba(251, 191, 36, 0.3)'
+                        justifyContent: 'center'
                     }}>
-                        <img
-                            src={wisdenLogo}
-                            alt="Wisden"
-                            style={{ height: 24, width: 'auto', mixBlendMode: 'multiply' }}
-                        />
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <span style={{
-                            color: 'rgba(255,255,255,0.5)',
-                            fontSize: 10,
-                            textTransform: 'uppercase',
-                            letterSpacing: 1.5,
-                            fontWeight: 700
-                        }}>
-                            Data Source
-                        </span>
-                        <span style={{
-                            color: '#fbbf24', // Amber-400
-                            fontSize: 17,
-                            fontWeight: 800,
-                            fontFamily: '"BBH Bartle", serif',
-                            letterSpacing: -0.5,
-                            lineHeight: 1
-                        }}>
-                            WISDEN.com
-                        </span>
-                    </div>
-
-                    {/* External Link Icon */}
-                    <div style={{ marginLeft: 'auto', opacity: 0.6, transform: 'rotate(-45deg)' }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
                         </svg>
                     </div>
 
