@@ -1,7 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import WikiImage from './WikiImage';
 
+// AI Summary JSON URL (fetched from GitHub)
+const AI_SUMMARY_URL = 'https://raw.githubusercontent.com/ashwkun/crickbox/main/src/data/ai_match_summaries.json';
+
 const CompletedDetail = ({ match, scorecard, onClose }) => {
+    const [aiSummary, setAiSummary] = useState<string | null>(null);
+    const [loadingAI, setLoadingAI] = useState(true);
+
+    // Fetch AI summary on mount
+    useEffect(() => {
+        const fetchAISummary = async () => {
+            try {
+                // Cache bust with timestamp
+                const res = await fetch(`${AI_SUMMARY_URL}?t=${Date.now()}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const summary = data[match.match_id]?.text || null;
+                    setAiSummary(summary);
+                }
+            } catch (e) {
+                console.log('AI Summary fetch failed:', e);
+            } finally {
+                setLoadingAI(false);
+            }
+        };
+        fetchAISummary();
+    }, [match.match_id]);
+
     const team1 = match.participants?.[0];
     const team2 = match.participants?.[1];
 
@@ -61,6 +87,76 @@ const CompletedDetail = ({ match, scorecard, onClose }) => {
                     </div>
                 )}
             </div>
+
+            {/* AI Summary Card */}
+            {aiSummary && (
+                <div style={{
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: 16,
+                    padding: 20,
+                    marginBottom: 24,
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    boxShadow: '0 8px 32px rgba(139, 92, 246, 0.1)',
+                    position: 'relative' as const,
+                    overflow: 'hidden'
+                }}>
+                    {/* Decorative gradient orb */}
+                    <div style={{
+                        position: 'absolute' as const,
+                        top: -20,
+                        right: -20,
+                        width: 100,
+                        height: 100,
+                        background: 'radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%)',
+                        borderRadius: '50%',
+                        pointerEvents: 'none'
+                    }} />
+
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        marginBottom: 12
+                    }}>
+                        <span style={{ fontSize: 18 }}>✨</span>
+                        <span style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            textTransform: 'uppercase' as const,
+                            letterSpacing: 1,
+                            background: 'linear-gradient(90deg, #8b5cf6, #3b82f6)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                        }}>AI Match Insight</span>
+                    </div>
+
+                    <div style={{
+                        fontSize: 14,
+                        lineHeight: 1.6,
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        position: 'relative' as const,
+                        zIndex: 1
+                    }}>
+                        {aiSummary.split('\n').map((line, i) => (
+                            <p key={i} style={{ margin: i === 0 ? 0 : '8px 0 0 0' }}>
+                                {line.startsWith('**') && line.endsWith('**') ? (
+                                    <strong style={{
+                                        display: 'block',
+                                        fontSize: 16,
+                                        fontWeight: 700,
+                                        color: '#fff',
+                                        marginBottom: 8
+                                    }}>
+                                        {line.replace(/\*\*/g, '')}
+                                    </strong>
+                                ) : line}
+                            </p>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Scorecard Content */}
             {scorecard ? (
