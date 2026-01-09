@@ -135,12 +135,23 @@ function callModel(prompt, modelId) {
     });
 }
 
+// --- LOGGING HELPER ---
+function log(msg) {
+    const ts = new Date().toISOString();
+    console.log(`[${ts}] ${msg}`);
+}
+
 // --- MAIN LOGIC ---
 async function main() {
+    log('='.repeat(60));
+    log('AI MATCH SUMMARY GENERATOR - Starting');
+    log('='.repeat(60));
+
     if (!BOT_TOKEN) {
-        console.log("No AI_TOKEN, skipping AI generation.");
+        log('❌ ERROR: No AI_TOKEN found. Exiting.');
         return;
     }
+    log('✅ AI_TOKEN found');
 
     // 1. Get Date Range (Yesterday & Today)
     const today = new Date();
@@ -148,15 +159,17 @@ async function main() {
     const formatDate = (d) => d.toISOString().split('T')[0].split('-').reverse().join(''); // DDMMYYYY
     const range = `${formatDate(yes)}-${formatDate(today)}`;
 
-    console.log(`Fetching results for ${range}...`);
+    log(`📅 Date range: ${range}`);
+    log('📡 Fetching match list from Wisden API...');
     const listUrl = `https://www.wisden.com/default.aspx?methodtype=3&client=${WISDEN_CLIENT_ID}&sport=1&league=0&timezone=0530&language=en&daterange=${range}`;
 
     let matches = [];
     try {
         const Data = await fetchJson(listUrl);
         matches = Data.matches || [];
+        log(`✅ Fetched ${matches.length} total matches`);
     } catch (e) {
-        console.error("Failed to fetch match list:", e.message);
+        log(`❌ Failed to fetch match list: ${e.message}`);
         return;
     }
 
@@ -166,8 +179,11 @@ async function main() {
         isHighPriority(m)
     );
 
+    log(`🎯 High-priority completed matches: ${relevantMatches.length}`);
+    relevantMatches.forEach((m, i) => log(`   ${i + 1}. ${m.short_event_status || m.game_id}`));
+
     if (relevantMatches.length === 0) {
-        console.log("No relevant high-priority completed matches found.");
+        log('ℹ️  No relevant matches to process. Exiting.');
         return;
     }
 
@@ -175,6 +191,9 @@ async function main() {
     let summaryDB = {};
     if (fs.existsSync(MATCH_SUMMARY_FILE)) {
         summaryDB = JSON.parse(fs.readFileSync(MATCH_SUMMARY_FILE, 'utf8'));
+        log(`📂 Loaded ${Object.keys(summaryDB).length} existing summaries`);
+    } else {
+        log('📂 No existing summary file found. Starting fresh.');
     }
 
     // 4. Process Matches
@@ -184,11 +203,13 @@ async function main() {
 
         // IDEMPOTENCY CHECK
         if (summaryDB[match.match_id]) {
-            console.log(`Skipping ${match.match_id} (Summary exists)`);
+            log(`⏭️  Skipping ${match.match_id} (Summary already exists)`);
             continue;
         }
 
-        console.log(`Generating summary for ${match.short_event_status} (${match.match_id})...`);
+        log('-'.repeat(50));
+        log(`🏏 Processing: ${match.short_event_status}`);
+        log(`   Match ID: ${match.match_id} | Game ID: ${match.game_id}`);
 
         // Fetch Scorecard
         try {
@@ -327,40 +348,47 @@ Guidelines:
 `;
 
             // Call AI
+            log('   🤖 Calling AI...');
+            const startTime = Date.now();
             const aiRes = await postAI(prompt);
-            const summaryText = aiRes.choices?.[0]?.message?.content;
+            const duration = ((Date.now() - startTime) / 1000).toFixed(1);
 
-            if (summaryText) {
+            if (aiRes) {
                 summaryDB[match.match_id] = {
-                    text: summaryText,
+                    text: aiRes,
                     generated_at: new Date().toISOString()
                 };
-                console.log(`> Success: "${summaryText.substring(0, 50)}..."`);
+                log(`   ✅ Summary generated in ${duration}s`);
+                log(`   📝 "${aiRes.substring(0, 60)}..."`);
                 processedCount++;
             } else {
-                console.error("AI returned empty response");
+                log('   ⚠️  AI returned empty response');
             }
 
-            // Small delay to be nice to APIs
-            await new Promise(r => setTimeout(r, 1000));
+            // Rate limit protection delay
+            log('   ⏳ Waiting 5s before next request...');
+            await new Promise(r => setTimeout(r, 5000));
 
         } catch (e) {
-            console.error(`Failed to process ${match.match_id}: `, e.message);
+            log(`   ❌ Error: ${e.message}`);
         }
     }
 
     // 5. Save DB
+    log('='.repeat(60));
     if (processedCount > 0) {
         // Ensure directory exists
         const dir = path.dirname(MATCH_SUMMARY_FILE);
         if (!fs.existsSync(dir)) {
+            log(`📁 Creating directory: ${dir}`);
             fs.mkdirSync(dir, { recursive: true });
         }
         fs.writeFileSync(MATCH_SUMMARY_FILE, JSON.stringify(summaryDB, null, 2));
-        console.log(`Updated ${processedCount} summaries.`);
+        log(`✅ DONE: Saved ${processedCount} new summaries to ${MATCH_SUMMARY_FILE}`);
     } else {
-        console.log("No new summaries generated.");
+        log('ℹ️  DONE: No new summaries generated.');
     }
+    log('='.repeat(60));
 }
 
 main();
