@@ -254,28 +254,51 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
                         {expanded ? body : body.slice(0, 250)}
                         {!expanded && body.length > 250 && '...'}
 
-                        {/* Inline "continue reading" link - right aligned */}
-                        {body.length > 250 && (
-                            <div
-                                onClick={() => setExpanded(!expanded)}
-                                style={{
-                                    textAlign: 'right',
-                                    marginTop: 8,
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <span style={{
-                                    fontStyle: 'italic',
-                                    fontSize: 12,
-                                    background: 'linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 100%)',
-                                    backgroundSize: '200% 100%',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    backgroundClip: 'text',
-                                    animation: 'continueShimmer 2s ease-in-out infinite'
-                                }}>
-                                    {expanded ? 'show less ↑' : 'continue reading ↓'}
-                                </span>
+                        {/* Footer: Model Info + Continue Reading */}
+                        {(modelInfo || body.length > 250) && (
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'flex-end',
+                                gap: 16,
+                                marginTop: 12,
+                                opacity: 0.9,
+                                borderTop: '1px solid rgba(255,255,255,0.05)',
+                                paddingTop: 12
+                            }}>
+                                {/* Model Attribution */}
+                                {modelInfo && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, opacity: 0.6 }}>
+                                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>by</span>
+                                        <modelInfo.Logo />
+                                        <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>{modelInfo.name}</span>
+                                    </div>
+                                )}
+
+                                {/* Continue Reading Logic */}
+                                {body.length > 250 && (
+                                    <div
+                                        onClick={() => setExpanded(!expanded)}
+                                        style={{
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <span style={{
+                                            fontStyle: 'italic',
+                                            fontSize: 12,
+                                            background: 'linear-gradient(90deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.6) 100%)',
+                                            backgroundSize: '200% 100%',
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent',
+                                            backgroundClip: 'text',
+                                            animation: 'continueShimmer 2s ease-in-out infinite'
+                                        }}>
+                                            {expanded ? 'show less ↑' : 'continue reading ↓'}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
