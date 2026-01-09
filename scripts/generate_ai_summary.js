@@ -190,8 +190,17 @@ async function main() {
     // 3. Load Existing Summaries
     let summaryDB = {};
     if (fs.existsSync(MATCH_SUMMARY_FILE)) {
-        summaryDB = JSON.parse(fs.readFileSync(MATCH_SUMMARY_FILE, 'utf8'));
-        log(`📂 Loaded ${Object.keys(summaryDB).length} existing summaries`);
+        try {
+            const content = fs.readFileSync(MATCH_SUMMARY_FILE, 'utf8').trim();
+            if (content) {
+                summaryDB = JSON.parse(content);
+                log(`📂 Loaded ${Object.keys(summaryDB).length} existing summaries`);
+            } else {
+                log('📂 Existing file is empty. Starting fresh.');
+            }
+        } catch (e) {
+            log(`⚠️ Could not parse existing summaries file: ${e.message}. Starting fresh.`);
+        }
     } else {
         log('📂 No existing summary file found. Starting fresh.');
     }
