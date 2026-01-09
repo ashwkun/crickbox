@@ -10,3 +10,4 @@ GETTING_STARTED.md
 !package.json
 !package-lock.json
 !tsconfig.json
+!src/data/ai_match_summaries.json
