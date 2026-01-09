@@ -6,8 +6,8 @@ const AI_SUMMARY_URL = 'https://raw.githubusercontent.com/ashwkun/crickbox/main/
 
 // Model Logo Components
 const GrokLogo = () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93s3.06-7.44 7-7.93v15.86zm2-15.86c3.94.49 7 3.85 7 7.93s-3.06 7.44-7 7.93V4.07z" fill="#fff" />
+    <svg width="14" height="14" viewBox="0 0 48 48" fill="none">
+        <path d="M18.542 30.532l15.956-11.776c.783-.576 1.902-.354 2.274.545 1.962 4.728 1.084 10.411-2.819 14.315-3.903 3.901-9.333 4.756-14.299 2.808l-5.423 2.511c7.778 5.315 17.224 4 23.125-1.903 4.682-4.679 6.131-11.058 4.775-16.812l.011.011c-1.966-8.452.482-11.829 5.501-18.735C47.759 1.332 47.88 1.166 48 1l-6.602 6.599V7.577l-22.86 22.958M15.248 33.392c-5.582-5.329-4.619-13.579.142-18.339 3.521-3.522 9.294-4.958 14.331-2.847l5.412-2.497c-.974-.704-2.224-1.46-3.659-1.994-6.478-2.666-14.238-1.34-19.505 3.922C6.904 16.701 5.31 24.488 8.045 31.133c2.044 4.965-1.307 8.48-4.682 12.023C2.164 44.411.967 45.67 0 47l15.241-13.608" fill="#fff" />
     </svg>
 );
 
@@ -17,10 +17,9 @@ const GPTLogo = () => (
     </svg>
 );
 
-const LlamaLogo = () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="2" fill="none" />
-        <text x="12" y="16" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="bold">L</text>
+const MetaLogo = () => (
+    <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
+        <path d="M5,19.5c0-4.6,2.3-9.4,5-9.4c1.5,0,2.7,0.9,4.6,3.6c-1.8,2.8-2.9,4.5-2.9,4.5c-2.4,3.8-3.2,4.6-4.5,4.6 C5.9,22.9,5,21.7,5,19.5 M20.7,17.8L19,15c-0.4-0.7-0.9-1.4-1.3-2c1.5-2.3,2.7-3.5,4.2-3.5c3,0,5.4,4.5,5.4,10.1 c0,2.1-0.7,3.3-2.1,3.3S23.3,22,20.7,17.8 M16.4,11c-2.2-2.9-4.1-4-6.3-4C5.5,7,2,13.1,2,19.5c0,4,1.9,6.5,5.1,6.5 c2.3,0,3.9-1.1,6.9-6.3c0,0,1.2-2.2,2.1-3.7c0.3,0.5,0.6,1,0.9,1.6l1.4,2.4c2.7,4.6,4.2,6.1,6.9,6.1c3.1,0,4.8-2.6,4.8-6.7 C30,12.6,26.4,7,22.1,7C19.8,7,18,8.8,16.4,11" fill="#fff" />
     </svg>
 );
 
@@ -45,40 +44,78 @@ const AIInsightCard = ({ summary, model }: { summary: string; model?: string }) 
         if (!model) return null;
         if (model.includes('grok')) return { name: 'Grok', Logo: GrokLogo };
         if (model.includes('gpt')) return { name: 'GPT-4o', Logo: GPTLogo };
-        if (model.includes('Llama')) return { name: 'Llama', Logo: LlamaLogo };
+        if (model.includes('Llama') || model.includes('meta')) return { name: 'Llama', Logo: MetaLogo };
         return null;
     };
     const modelInfo = getModelInfo();
 
     return (
         <div style={{
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%)',
-            backdropFilter: 'blur(12px)',
+            background: 'rgba(255, 255, 255, 0.03)',
+            backdropFilter: 'blur(16px)',
             borderRadius: 16,
             padding: '16px 18px',
             marginBottom: 20,
-            border: '1px solid rgba(139, 92, 246, 0.25)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-            position: 'relative' as const
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.05)',
+            position: 'relative' as const,
+            overflow: 'hidden'
         }}>
+            {/* Animated gradient orb - subtle AI animation */}
+            <div style={{
+                position: 'absolute' as const,
+                top: -40,
+                right: -40,
+                width: 120,
+                height: 120,
+                background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
+                borderRadius: '50%',
+                animation: 'orbFloat 4s ease-in-out infinite',
+                pointerEvents: 'none'
+            }} />
+            <div style={{
+                position: 'absolute' as const,
+                bottom: -30,
+                left: -30,
+                width: 80,
+                height: 80,
+                background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
+                borderRadius: '50%',
+                animation: 'orbFloat 5s ease-in-out infinite reverse',
+                pointerEvents: 'none'
+            }} />
+
+            <style>{`
+                @keyframes wrapShimmer {
+                    0% { background-position: 0% 50%; }
+                    100% { background-position: 100% 50%; }
+                }
+                @keyframes orbFloat {
+                    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+                    50% { transform: translate(-10px, 10px) scale(1.1); opacity: 0.8; }
+                }
+            `}</style>
+
             {/* .WRAP Header */}
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: 12
+                marginBottom: 12,
+                position: 'relative' as const,
+                zIndex: 1
             }}>
                 <span style={{
                     fontFamily: '"BBH Bartle", sans-serif',
                     fontSize: 14,
                     fontWeight: 600,
                     letterSpacing: 1,
-                    background: 'linear-gradient(90deg, #8b5cf6 0%, #8b5cf6 35%, #a78bfa 50%, #8b5cf6 65%, #8b5cf6 100%)',
+                    background: 'linear-gradient(90deg, #8b5cf6 0%, #a78bfa 50%, #8b5cf6 100%)',
                     backgroundSize: '200% 100%',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
-                    animation: 'wrapShimmer 2s ease-in-out infinite alternate'
+                    animation: 'wrapShimmer 3s ease-in-out infinite'
                 }}>.WRAP</span>
 
                 {/* Powered by Model */}
@@ -87,67 +124,88 @@ const AIInsightCard = ({ summary, model }: { summary: string; model?: string }) 
                         display: 'flex',
                         alignItems: 'center',
                         gap: 5,
-                        opacity: 0.5,
+                        opacity: 0.4,
                         fontSize: 10
                     }}>
-                        <span style={{ color: 'rgba(255,255,255,0.6)' }}>by</span>
+                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>by</span>
                         <modelInfo.Logo />
-                        <span style={{ color: '#fff', fontWeight: 500 }}>{modelInfo.name}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>{modelInfo.name}</span>
                     </div>
                 )}
             </div>
-
-            <style>{`
-                @keyframes wrapShimmer {
-                    0% { background-position: 0% 50%; }
-                    100% { background-position: 100% 50%; }
-                }
-            `}</style>
 
             {/* Headline */}
             {headline && (
                 <div style={{
                     fontSize: 15,
-                    fontWeight: 700,
+                    fontWeight: 600,
                     color: '#fff',
                     lineHeight: 1.4,
-                    marginBottom: body ? 10 : 0
+                    marginBottom: body ? 10 : 0,
+                    position: 'relative' as const,
+                    zIndex: 1
                 }}>
                     {headline}
                 </div>
             )}
 
-            {/* Body */}
+            {/* Body with fade effect when collapsed */}
             {body && (
                 <div style={{
                     fontSize: 13,
-                    lineHeight: 1.65,
-                    color: 'rgba(255, 255, 255, 0.75)'
+                    lineHeight: 1.7,
+                    color: 'rgba(255, 255, 255, 0.65)',
+                    position: 'relative' as const,
+                    zIndex: 1,
+                    overflow: 'hidden',
+                    maxHeight: expanded ? '500px' : '60px',
+                    transition: 'max-height 0.4s ease-in-out',
+                    maskImage: !expanded && showMoreButton ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none',
+                    WebkitMaskImage: !expanded && showMoreButton ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none'
                 }}>
-                    {displayBody}{!expanded && body.length > 150 && '...'}
+                    {body}
                 </div>
             )}
 
-            {/* Show More Button */}
+            {/* Show More - tap area that feels like expansion */}
             {showMoreButton && (
-                <button
+                <div
                     onClick={() => setExpanded(!expanded)}
                     style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#8b5cf6',
-                        fontSize: 12,
-                        fontWeight: 600,
+                        marginTop: expanded ? 12 : 0,
+                        paddingTop: 8,
                         cursor: 'pointer',
-                        padding: '8px 0 0 0',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 4
+                        justifyContent: 'center',
+                        gap: 6,
+                        position: 'relative' as const,
+                        zIndex: 1
                     }}
                 >
-                    {expanded ? 'Show less' : 'Show more'}
-                    <span style={{ fontSize: 10 }}>{expanded ? '↑' : '↓'}</span>
-                </button>
+                    <div style={{
+                        width: 40,
+                        height: 4,
+                        borderRadius: 2,
+                        background: 'rgba(255, 255, 255, 0.15)',
+                        transition: 'all 0.3s ease'
+                    }} />
+                    <span style={{
+                        fontSize: 11,
+                        color: 'rgba(255, 255, 255, 0.4)',
+                        fontWeight: 500,
+                        letterSpacing: 0.5
+                    }}>
+                        {expanded ? 'less' : 'more'}
+                    </span>
+                    <div style={{
+                        width: 40,
+                        height: 4,
+                        borderRadius: 2,
+                        background: 'rgba(255, 255, 255, 0.15)',
+                        transition: 'all 0.3s ease'
+                    }} />
+                </div>
             )}
         </div>
     );
