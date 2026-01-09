@@ -431,12 +431,22 @@ async function generateAudio(text, matchId) {
     }
 
     // Clean text for speech
-    const speechText = text
+    let speechText = text
         .replace(/\*\*/g, '')          // Remove markdown bold
         .replace(/(\d+)\/(\d+)/g, '$1 for $2')  // 2/40 -> 2 for 40
         .replace(/(\d+)\*/g, '$1 not out')      // 163* -> 163 not out
         .replace(/SR\s?(\d+)/gi, 'strike rate $1')
         .replace(/RR\s?(\d+)/gi, 'run rate $1');
+
+    // COST SAFETY: Hard limit to 700 characters (~46s audio)
+    // 1M free chars / 700 chars = ~1400 matches/month capacity (Safe)
+    if (speechText.length > 700) {
+        log(`   ✂️ Truncating audio text from ${speechText.length} to 700 chars for cost safety`);
+        speechText = speechText.substring(0, 700);
+        // Try to cut at the last period to keep it natural
+        const lastPeriod = speechText.lastIndexOf('.');
+        if (lastPeriod > 100) speechText = speechText.substring(0, lastPeriod + 1);
+    }
 
     const client = new TextToSpeechClient();
     const request = {
