@@ -101,8 +101,11 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
             borderRadius: 16,
             padding: '16px 18px',
             marginBottom: 20,
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.05)',
+            border: isPlaying ? '1px solid rgba(139, 92, 246, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: isPlaying
+                ? '0 0 30px rgba(139, 92, 246, 0.2), inset 0 0 10px rgba(139, 92, 246, 0.1)'
+                : '0 4px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.05)',
+            transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
             position: 'relative' as const,
             overflow: 'hidden'
         }}>
@@ -163,45 +166,62 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
                         backgroundClip: 'text',
                         animation: 'wrapShimmer 3s ease-in-out infinite'
                     }}>.WRAP</span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    {/* Powered by Model */}
+                    {modelInfo && (
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 5,
+                            opacity: 0.5,
+                            fontSize: 10,
+                            marginRight: 4
+                        }}>
+                            <modelInfo.Logo />
+                        </div>
+                    )}
 
                     {audioFile && (
                         <button
                             onClick={togglePlay}
                             style={{
-                                background: 'rgba(255,255,255,0.1)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '50%',
-                                width: 24,
-                                height: 24,
+                                background: isPlaying ? 'rgba(139, 92, 246, 0.3)' : 'rgba(255,255,255,0.1)',
+                                border: `1px solid ${isPlaying ? 'rgba(139, 92, 246, 0.5)' : 'rgba(255,255,255,0.1)'}`,
+                                borderRadius: 12, // Squircle
+                                padding: '6px 12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 6,
+                                cursor: 'pointer',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: isPlaying ? '0 0 15px rgba(139, 92, 246, 0.4)' : 'none',
+                                transform: isPlaying ? 'scale(1.02)' : 'scale(1)'
+                            }}
+                        >
+                            <div style={{
+                                width: 16,
+                                height: 16,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                cursor: 'pointer',
-                                padding: 0,
-                                marginLeft: 10,
-                                transition: 'all 0.2s ease',
-                                transform: isPlaying ? 'scale(1.1)' : 'scale(1)'
-                            }}
-                        >
-                            {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                                animation: isPlaying ? 'pulse 2s infinite' : 'none'
+                            }}>
+                                {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                            </div>
+                            <span style={{
+                                fontSize: 11,
+                                fontWeight: 600,
+                                color: '#fff',
+                                opacity: 0.9,
+                                letterSpacing: 0.5
+                            }}>
+                                {isPlaying ? 'PLAYING' : 'LISTEN'}
+                            </span>
                         </button>
                     )}
                 </div>
-
-                {/* Powered by Model */}
-                {modelInfo && (
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 5,
-                        opacity: 0.4,
-                        fontSize: 10
-                    }}>
-                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>by</span>
-                        <modelInfo.Logo />
-                        <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>{modelInfo.name}</span>
-                    </div>
-                )}
             </div>
 
             {/* Headline */}
