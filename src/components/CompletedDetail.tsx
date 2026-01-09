@@ -23,9 +23,54 @@ const MetaLogo = () => (
     </svg>
 );
 
+const PlayIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M8 5V19L19 12L8 5Z" fill="white" />
+    </svg>
+);
+
+const PauseIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z" fill="white" />
+    </svg>
+);
+
+// Define Audio Base URL
+const AUDIO_BASE_URL = 'https://raw.githubusercontent.com/ashwkun/crickbox/main/src/data/audio';
+
 // AI Insight Card Component with .WRAP branding
-const AIInsightCard = ({ summary, model }: { summary: string; model?: string }) => {
+const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?: string; audioFile?: string }) => {
     const [expanded, setExpanded] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+    // Initialise audio if available
+    useEffect(() => {
+        if (audioFile) {
+            const audioUrl = `${AUDIO_BASE_URL}/${audioFile}`;
+            const newAudio = new Audio(audioUrl);
+            newAudio.onended = () => setIsPlaying(false);
+            setAudio(newAudio);
+        }
+        return () => {
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        };
+    }, [audioFile]);
+
+    const togglePlay = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!audio) return;
+
+        if (isPlaying) {
+            audio.pause();
+        } else {
+            audio.play().catch(e => console.error("Audio playback error:", e));
+        }
+        setIsPlaying(!isPlaying);
+    };
 
     // Clean the summary: remove ** markdown
     const cleanText = summary.replace(/\*\*/g, '').trim();
@@ -105,18 +150,43 @@ const AIInsightCard = ({ summary, model }: { summary: string; model?: string }) 
                 position: 'relative' as const,
                 zIndex: 1
             }}>
-                <span style={{
-                    fontFamily: '"BBH Bartle", sans-serif',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    letterSpacing: 1,
-                    background: 'linear-gradient(90deg, #8b5cf6 0%, #a78bfa 50%, #8b5cf6 100%)',
-                    backgroundSize: '200% 100%',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    animation: 'wrapShimmer 3s ease-in-out infinite'
-                }}>.WRAP</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{
+                        fontFamily: '"BBH Bartle", sans-serif',
+                        fontSize: 14,
+                        fontWeight: 600,
+                        letterSpacing: 1,
+                        background: 'linear-gradient(90deg, #8b5cf6 0%, #a78bfa 50%, #8b5cf6 100%)',
+                        backgroundSize: '200% 100%',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        animation: 'wrapShimmer 3s ease-in-out infinite'
+                    }}>.WRAP</span>
+
+                    {audioFile && (
+                        <button
+                            onClick={togglePlay}
+                            style={{
+                                background: 'rgba(255,255,255,0.1)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '50%',
+                                width: 24,
+                                height: 24,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                padding: 0,
+                                marginLeft: 10,
+                                transition: 'all 0.2s ease',
+                                transform: isPlaying ? 'scale(1.1)' : 'scale(1)'
+                            }}
+                        >
+                            {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                        </button>
+                    )}
+                </div>
 
                 {/* Powered by Model */}
                 {modelInfo && (
@@ -135,58 +205,62 @@ const AIInsightCard = ({ summary, model }: { summary: string; model?: string }) 
             </div>
 
             {/* Headline */}
-            {headline && (
-                <div style={{
-                    fontSize: 15,
-                    fontWeight: 600,
-                    color: '#fff',
-                    lineHeight: 1.4,
-                    marginBottom: body ? 10 : 0,
-                    position: 'relative' as const,
-                    zIndex: 1
-                }}>
-                    {headline}
-                </div>
-            )}
+            {
+                headline && (
+                    <div style={{
+                        fontSize: 15,
+                        fontWeight: 600,
+                        color: '#fff',
+                        lineHeight: 1.4,
+                        marginBottom: body ? 10 : 0,
+                        position: 'relative' as const,
+                        zIndex: 1
+                    }}>
+                        {headline}
+                    </div>
+                )
+            }
 
             {/* Body with fade effect when collapsed */}
-            {body && (
-                <div style={{
-                    fontSize: 13,
-                    lineHeight: 1.7,
-                    color: 'rgba(255, 255, 255, 0.65)',
-                    position: 'relative' as const,
-                    zIndex: 1
-                }}>
-                    {expanded ? body : body.slice(0, 250)}
-                    {!expanded && body.length > 250 && '...'}
+            {
+                body && (
+                    <div style={{
+                        fontSize: 13,
+                        lineHeight: 1.7,
+                        color: 'rgba(255, 255, 255, 0.65)',
+                        position: 'relative' as const,
+                        zIndex: 1
+                    }}>
+                        {expanded ? body : body.slice(0, 250)}
+                        {!expanded && body.length > 250 && '...'}
 
-                    {/* Inline "continue reading" link - right aligned */}
-                    {body.length > 250 && (
-                        <div
-                            onClick={() => setExpanded(!expanded)}
-                            style={{
-                                textAlign: 'right',
-                                marginTop: 8,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <span style={{
-                                fontStyle: 'italic',
-                                fontSize: 12,
-                                background: 'linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 100%)',
-                                backgroundSize: '200% 100%',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                backgroundClip: 'text',
-                                animation: 'continueShimmer 2s ease-in-out infinite'
-                            }}>
-                                {expanded ? 'show less ↑' : 'continue reading ↓'}
-                            </span>
-                        </div>
-                    )}
-                </div>
-            )}
+                        {/* Inline "continue reading" link - right aligned */}
+                        {body.length > 250 && (
+                            <div
+                                onClick={() => setExpanded(!expanded)}
+                                style={{
+                                    textAlign: 'right',
+                                    marginTop: 8,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                <span style={{
+                                    fontStyle: 'italic',
+                                    fontSize: 12,
+                                    background: 'linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 100%)',
+                                    backgroundSize: '200% 100%',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    backgroundClip: 'text',
+                                    animation: 'continueShimmer 2s ease-in-out infinite'
+                                }}>
+                                    {expanded ? 'show less ↑' : 'continue reading ↓'}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                )
+            }
 
             <style>{`
                 @keyframes continueShimmer {
@@ -194,13 +268,14 @@ const AIInsightCard = ({ summary, model }: { summary: string; model?: string }) 
                     100% { background-position: 0% 50%; }
                 }
             `}</style>
-        </div>
+        </div >
     );
 };
 
 const CompletedDetail = ({ match, scorecard, onClose }) => {
     const [aiSummary, setAiSummary] = useState<string | null>(null);
     const [aiModel, setAiModel] = useState<string | null>(null);
+    const [aiAudio, setAiAudio] = useState<string | null>(null);
     const [loadingAI, setLoadingAI] = useState(true);
 
     // Fetch AI summary on mount
@@ -214,6 +289,7 @@ const CompletedDetail = ({ match, scorecard, onClose }) => {
                     const matchData = data[match.match_id];
                     setAiSummary(matchData?.text || null);
                     setAiModel(matchData?.model || null);
+                    setAiAudio(matchData?.audio || null);
                 }
             } catch (e) {
                 console.log('AI Summary fetch failed:', e);
@@ -286,7 +362,7 @@ const CompletedDetail = ({ match, scorecard, onClose }) => {
 
             {/* AI Summary Card */}
             {aiSummary && (
-                <AIInsightCard summary={aiSummary} model={aiModel || undefined} />
+                <AIInsightCard summary={aiSummary} model={aiModel || undefined} audioFile={aiAudio || undefined} />
             )}
 
             {/* Scorecard Content */}

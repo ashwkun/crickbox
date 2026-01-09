@@ -22,9 +22,19 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install Dependencies
+        run: npm install @google-cloud/text-to-speech
+
+      - name: Create Google Credentials File
+        env:
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}
+        run: echo "$GOOGLE_TTS_KEY" | base64 -d > google_credentials.json
+
       - name: Run AI Generator Script
         env:
           AI_TOKEN: ${{ secrets.AI_TOKEN }}
+          GOOGLE_APPLICATION_CREDENTIALS: google_credentials.json
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }} # Used for check in script
         run: node scripts/generate_ai_summary.js
 
       - name: Commit and Push Changes

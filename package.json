@@ -13,6 +13,7 @@
   "description": "",
   "dependencies": {
     "@bybas/weather-icons": "^2.0.0",
+    "@google-cloud/text-to-speech": "^6.4.0",
     "@tailwindcss/postcss": "^4.1.18",
     "autoprefixer": "^10.4.23",
     "cors": "^2.8.5",
