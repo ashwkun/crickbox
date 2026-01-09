@@ -75,7 +75,7 @@ async function postAI(prompt) {
                 { role: "system", content: "You are a witty, insightful cricket expert. You write for a hardcore cricket audience." },
                 { role: "user", content: prompt }
             ],
-            model: "gpt-4o",
+            model: "grok-3",
             temperature: 0.7,
             max_tokens: 600
         });
