@@ -737,6 +737,84 @@ export default function HomePage({
                     <div className="empty-state">No recent results</div>
                 )}
             </section>
+
+            {/* Wisden Attribution Footer */}
+            <div style={{ padding: '0 20px 40px' }}>
+                <a
+                    href="https://wisden.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="wisden-card"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 16,
+                        background: 'rgba(254, 240, 138, 0.05)', // Very subtle yellow tint
+                        backdropFilter: 'blur(12px)',
+                        borderRadius: 20,
+                        padding: '12px 16px',
+                        border: '1px solid rgba(254, 240, 138, 0.15)',
+                        textDecoration: 'none',
+                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        cursor: 'pointer'
+                    }}
+                >
+                    {/* Solid Yellow Logo Container */}
+                    <div style={{
+                        background: '#fbbf24', // Amber-400 solid
+                        borderRadius: 14,
+                        padding: '8px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 15px rgba(251, 191, 36, 0.3)'
+                    }}>
+                        <img
+                            src={require('../assets/wisden_logo.png')}
+                            alt="Wisden"
+                            style={{ height: 20, width: 'auto', mixBlendMode: 'multiply', filter: 'brightness(0.9)' }}
+                        />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <span style={{
+                            color: 'rgba(255,255,255,0.5)',
+                            fontSize: 10,
+                            textTransform: 'uppercase',
+                            letterSpacing: 1.5,
+                            fontWeight: 700
+                        }}>
+                            Data Source
+                        </span>
+                        <span style={{
+                            color: '#fbbf24', // Amber-400
+                            fontSize: 17,
+                            fontWeight: 800,
+                            fontFamily: '"BBH Bartle", serif',
+                            letterSpacing: -0.5,
+                            lineHeight: 1
+                        }}>
+                            WISDEN.com
+                        </span>
+                    </div>
+
+                    {/* External Link Icon */}
+                    <div style={{ marginLeft: 'auto', opacity: 0.6, transform: 'rotate(-45deg)' }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </div>
+
+                    <style>{`
+                        .wisden-card:active {
+                            transform: scale(0.98);
+                        }
+                     `}</style>
+                </a>
+            </div>
         </>
     );
 }
