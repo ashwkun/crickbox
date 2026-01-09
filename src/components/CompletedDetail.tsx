@@ -156,55 +156,26 @@ const AIInsightCard = ({ summary, model }: { summary: string; model?: string }) 
                     lineHeight: 1.7,
                     color: 'rgba(255, 255, 255, 0.65)',
                     position: 'relative' as const,
-                    zIndex: 1,
-                    overflow: 'hidden',
-                    maxHeight: expanded ? '500px' : '60px',
-                    transition: 'max-height 0.4s ease-in-out',
-                    maskImage: !expanded && showMoreButton ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none',
-                    WebkitMaskImage: !expanded && showMoreButton ? 'linear-gradient(to bottom, black 50%, transparent 100%)' : 'none'
+                    zIndex: 1
                 }}>
-                    {body}
-                </div>
-            )}
+                    {expanded ? body : body.slice(0, 250)}
+                    {!expanded && body.length > 250 && '... '}
 
-            {/* Show More - tap area that feels like expansion */}
-            {showMoreButton && (
-                <div
-                    onClick={() => setExpanded(!expanded)}
-                    style={{
-                        marginTop: expanded ? 12 : 0,
-                        paddingTop: 8,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 6,
-                        position: 'relative' as const,
-                        zIndex: 1
-                    }}
-                >
-                    <div style={{
-                        width: 40,
-                        height: 4,
-                        borderRadius: 2,
-                        background: 'rgba(255, 255, 255, 0.15)',
-                        transition: 'all 0.3s ease'
-                    }} />
-                    <span style={{
-                        fontSize: 11,
-                        color: 'rgba(255, 255, 255, 0.4)',
-                        fontWeight: 500,
-                        letterSpacing: 0.5
-                    }}>
-                        {expanded ? 'less' : 'more'}
-                    </span>
-                    <div style={{
-                        width: 40,
-                        height: 4,
-                        borderRadius: 2,
-                        background: 'rgba(255, 255, 255, 0.15)',
-                        transition: 'all 0.3s ease'
-                    }} />
+                    {/* Inline "continue reading" link */}
+                    {body.length > 250 && (
+                        <span
+                            onClick={() => setExpanded(!expanded)}
+                            style={{
+                                fontStyle: 'italic',
+                                color: 'rgba(255, 255, 255, 0.45)',
+                                cursor: 'pointer',
+                                fontSize: 12,
+                                marginLeft: expanded ? 0 : 4
+                            }}
+                        >
+                            {expanded ? ' show less' : 'continue reading →'}
+                        </span>
+                    )}
                 </div>
             )}
         </div>
