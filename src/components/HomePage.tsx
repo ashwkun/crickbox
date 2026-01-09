@@ -738,8 +738,8 @@ export default function HomePage({
                 )}
             </section>
 
-            {/* Wisden Attribution Footer */}
-            <div style={{ padding: '0 20px 40px' }}>
+            {/* Wisden Attribution Footer - Modern & Bold */}
+            <div style={{ padding: '0 20px 48px' }}>
                 <a
                     href="https://wisden.com"
                     target="_blank"
@@ -749,77 +749,78 @@ export default function HomePage({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        gap: 16,
-                        background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)', // Formal dark slate
-                        borderRadius: 16,
-                        padding: '16px 20px',
-                        border: '1px solid rgba(251, 191, 36, 0.3)', // Gold border
+                        gap: 20,
+                        background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%)',
+                        backdropFilter: 'blur(16px)',
+                        borderRadius: 24,
+                        padding: '20px 24px',
+                        border: '1px solid rgba(251, 191, 36, 0.15)',
+                        boxShadow: '0 8px 32px -8px rgba(0, 0, 0, 0.4)',
                         textDecoration: 'none',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                        transition: 'transform 0.2s',
-                        cursor: 'pointer'
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer',
+                        transform: 'translateZ(0)' // Hardware accel
                     }}
                 >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        {/* Logo in Gold Container */}
+                        {/* Logo - Larger & Popping */}
                         <div style={{
-                            background: '#f59e0b', // Classic Gold
-                            borderRadius: '50%',
-                            width: 40,
-                            height: 40,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 0 15px rgba(245, 158, 11, 0.2)'
+                            position: 'relative',
+                            filter: 'drop-shadow(0 0 15px rgba(245, 158, 11, 0.3))'
                         }}>
-                            <img
-                                src={wisdenLogo}
-                                alt="Wisden"
-                                style={{ height: 18, width: 'auto', mixBlendMode: 'multiply', opacity: 0.9 }}
-                            />
+                            <div style={{
+                                background: '#f59e0b',
+                                borderRadius: 16,
+                                padding: '10px 14px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                <img
+                                    src={wisdenLogo}
+                                    alt="Wisden"
+                                    style={{ height: 26, width: 'auto', mixBlendMode: 'multiply' }}
+                                />
+                            </div>
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <span style={{
-                                color: '#94a3b8', // Muted slate text
+                                color: 'rgba(255,255,255,0.4)',
                                 fontSize: 11,
-                                textTransform: 'uppercase',
-                                letterSpacing: 1,
                                 fontWeight: 600,
-                                marginBottom: 2
+                                marginBottom: 4,
+                                letterSpacing: 0.5
                             }}>
-                                Data Powered By
+                                Stats from
                             </span>
                             <span style={{
-                                color: '#fcd34d', // Light Gold
-                                fontSize: 20,
+                                color: '#fbbf24', // Amber-400
+                                fontSize: 22,
                                 fontWeight: 700,
-                                fontFamily: '"Times New Roman", Times, serif', // Classic Formal Serif
+                                fontFamily: '"BBH Bartle", sans-serif',
                                 letterSpacing: 0.5,
-                                lineHeight: 1
+                                lineHeight: 1,
+                                textShadow: '0 2px 10px rgba(251, 191, 36, 0.2)'
                             }}>
-                                WISDEN
+                                WISDEN.com
                             </span>
                         </div>
                     </div>
 
-                    {/* Arrow Icon */}
-                    <div style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        borderRadius: '50%',
-                        width: 32,
-                        height: 32,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="7" y1="17" x2="17" y2="7"></line>
-                            <polyline points="7 7 17 7 17 17"></polyline>
-                        </svg>
-                    </div>
+                    {/* Arrow - Minimal */}
+                    <span style={{
+                        fontSize: '24px',
+                        color: 'rgba(255,255,255,0.2)',
+                        fontWeight: 300
+                    }}>→</span>
 
                     <style>{`
+                        .wisden-card:hover {
+                            background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
+                            border-color: rgba(251, 191, 36, 0.3) !important;
+                            transform: translateY(-2px);
+                        }
                         .wisden-card:active {
                             transform: scale(0.98);
                         }
