@@ -4,6 +4,113 @@ import WikiImage from './WikiImage';
 // AI Summary JSON URL (fetched from GitHub)
 const AI_SUMMARY_URL = 'https://raw.githubusercontent.com/ashwkun/crickbox/main/src/data/ai_match_summaries.json';
 
+// AI Icon SVG Component
+const AIIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#3b82f6" />
+            </linearGradient>
+        </defs>
+        <path d="M12 2L13.09 8.26L18 6L14.74 10.91L21 12L14.74 13.09L18 18L13.09 15.74L12 22L10.91 15.74L6 18L9.26 13.09L3 12L9.26 10.91L6 6L10.91 8.26L12 2Z"
+            fill="url(#aiGradient)" />
+    </svg>
+);
+
+// AI Insight Card Component
+const AIInsightCard = ({ summary }: { summary: string }) => {
+    const [expanded, setExpanded] = useState(false);
+
+    // Clean the summary: remove ** markdown
+    const cleanText = summary.replace(/\*\*/g, '').trim();
+
+    // Split into headline and body
+    const lines = cleanText.split('\n').filter(l => l.trim());
+    const headline = lines[0] || '';
+    const body = lines.slice(1).join(' ');
+
+    // Truncate body if collapsed
+    const displayBody = expanded ? body : body.slice(0, 150);
+    const showMoreButton = body.length > 150;
+
+    return (
+        <div style={{
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: 16,
+            padding: '16px 18px',
+            marginBottom: 20,
+            border: '1px solid rgba(139, 92, 246, 0.25)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+            position: 'relative' as const
+        }}>
+            {/* Header */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginBottom: 12
+            }}>
+                <AIIcon />
+                <span style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    textTransform: 'uppercase' as const,
+                    letterSpacing: 1.5,
+                    color: 'rgba(139, 92, 246, 0.9)'
+                }}>AI Insight</span>
+            </div>
+
+            {/* Headline */}
+            {headline && (
+                <div style={{
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: '#fff',
+                    lineHeight: 1.4,
+                    marginBottom: body ? 10 : 0
+                }}>
+                    {headline}
+                </div>
+            )}
+
+            {/* Body */}
+            {body && (
+                <div style={{
+                    fontSize: 13,
+                    lineHeight: 1.65,
+                    color: 'rgba(255, 255, 255, 0.75)'
+                }}>
+                    {displayBody}{!expanded && body.length > 150 && '...'}
+                </div>
+            )}
+
+            {/* Show More Button */}
+            {showMoreButton && (
+                <button
+                    onClick={() => setExpanded(!expanded)}
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#8b5cf6',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        padding: '8px 0 0 0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4
+                    }}
+                >
+                    {expanded ? 'Show less' : 'Show more'}
+                    <span style={{ fontSize: 10 }}>{expanded ? '↑' : '↓'}</span>
+                </button>
+            )}
+        </div>
+    );
+};
+
 const CompletedDetail = ({ match, scorecard, onClose }) => {
     const [aiSummary, setAiSummary] = useState<string | null>(null);
     const [loadingAI, setLoadingAI] = useState(true);
@@ -90,72 +197,7 @@ const CompletedDetail = ({ match, scorecard, onClose }) => {
 
             {/* AI Summary Card */}
             {aiSummary && (
-                <div style={{
-                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: 16,
-                    padding: 20,
-                    marginBottom: 24,
-                    border: '1px solid rgba(139, 92, 246, 0.3)',
-                    boxShadow: '0 8px 32px rgba(139, 92, 246, 0.1)',
-                    position: 'relative' as const,
-                    overflow: 'hidden'
-                }}>
-                    {/* Decorative gradient orb */}
-                    <div style={{
-                        position: 'absolute' as const,
-                        top: -20,
-                        right: -20,
-                        width: 100,
-                        height: 100,
-                        background: 'radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%)',
-                        borderRadius: '50%',
-                        pointerEvents: 'none'
-                    }} />
-
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        marginBottom: 12
-                    }}>
-                        <span style={{ fontSize: 18 }}>✨</span>
-                        <span style={{
-                            fontSize: 11,
-                            fontWeight: 700,
-                            textTransform: 'uppercase' as const,
-                            letterSpacing: 1,
-                            background: 'linear-gradient(90deg, #8b5cf6, #3b82f6)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text'
-                        }}>AI Match Insight</span>
-                    </div>
-
-                    <div style={{
-                        fontSize: 14,
-                        lineHeight: 1.6,
-                        color: 'rgba(255, 255, 255, 0.9)',
-                        position: 'relative' as const,
-                        zIndex: 1
-                    }}>
-                        {aiSummary.split('\n').map((line, i) => (
-                            <p key={i} style={{ margin: i === 0 ? 0 : '8px 0 0 0' }}>
-                                {line.startsWith('**') && line.endsWith('**') ? (
-                                    <strong style={{
-                                        display: 'block',
-                                        fontSize: 16,
-                                        fontWeight: 700,
-                                        color: '#fff',
-                                        marginBottom: 8
-                                    }}>
-                                        {line.replace(/\*\*/g, '')}
-                                    </strong>
-                                ) : line}
-                            </p>
-                        ))}
-                    </div>
-                </div>
+                <AIInsightCard summary={aiSummary} />
             )}
 
             {/* Scorecard Content */}
