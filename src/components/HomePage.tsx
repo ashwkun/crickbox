@@ -5,9 +5,9 @@ import { LuMoonStar, LuCalendarClock, LuCalendarDays } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
 import JustFinishedSection from './JustFinishedSection';
 import UpcomingCard from './UpcomingCard';
-import UpcomingCard from './UpcomingCard';
 import FilterChips from './FilterChips';
 import TimeFilter, { TimeFilterValue } from './upcoming/TimeFilter';
+import wisdenLogo from '../assets/wisden_logo.png';
 import { filterByTime, isToday, isTomorrow, isThisWeek } from '../utils/upcomingUtils';
 
 import SkeletonMatchCard from './SkeletonMatchCard';
@@ -772,9 +772,9 @@ export default function HomePage({
                         boxShadow: '0 4px 15px rgba(251, 191, 36, 0.3)'
                     }}>
                         <img
-                            src={require('../assets/wisden_logo.png')}
+                            src={wisdenLogo}
                             alt="Wisden"
-                            style={{ height: 20, width: 'auto', mixBlendMode: 'multiply', filter: 'brightness(0.9)' }}
+                            style={{ height: 24, width: 'auto', mixBlendMode: 'multiply' }}
                         />
                     </div>
 
