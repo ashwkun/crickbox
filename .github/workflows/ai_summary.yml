@@ -33,4 +33,5 @@ jobs:
           commit_message: "🤖 Update AI Match Summaries [skip ci]"
           file_pattern: "src/data/*"
           add_options: "-A"
-          push_options: "--force"
+          repository: .
+          branch: main
