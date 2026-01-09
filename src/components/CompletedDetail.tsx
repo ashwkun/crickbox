@@ -127,13 +127,16 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
             .replace(/\n+/g, '. ');                  // Paragraph breaks -> Pause
 
         const utterance = new SpeechSynthesisUtterance(speechText);
-        utterance.rate = 1.0;
+        utterance.rate = 0.9;  // Slightly slower for clarity
+        utterance.pitch = 0.85; // Lower pitch for male-like tone
 
-        // Try to find a good English voice
+        // Voice Heuristics for "Male" preference
         const voices = window.speechSynthesis.getVoices();
-        const preferred = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) ||
-            voices.find(v => v.lang === 'en-AU') ||
-            voices.find(v => v.lang.startsWith('en'));
+        let preferred = voices.find(v => v.name === 'Daniel'); // Best Mac Male Voice
+        if (!preferred) preferred = voices.find(v => v.name.includes('Google UK English Male'));
+        if (!preferred) preferred = voices.find(v => v.name.includes('Male') && v.lang.startsWith('en'));
+        if (!preferred) preferred = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')); // Generic Google fallback
+
         if (preferred) utterance.voice = preferred;
 
         window.speechSynthesis.speak(utterance);
