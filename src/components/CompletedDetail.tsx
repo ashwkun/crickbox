@@ -23,6 +23,13 @@ const MetaLogo = () => (
     </svg>
 );
 
+const SpeakIcon = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+    </svg>
+);
+
 const PlayIcon = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path d="M8 5V19L19 12L8 5Z" fill="white" />
@@ -93,6 +100,44 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
         return null;
     };
     const modelInfo = getModelInfo();
+
+    // Native Browser TTS for testing/fallback
+    const speakNative = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        // Stop Google Audio if running
+        if (audio && isPlaying) {
+            audio.pause();
+            setIsPlaying(false);
+        }
+
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+            return;
+        }
+
+        // Optimized Cleaning for Native Speech
+        const speechText = summary
+            .replace(/\*\*(.*?)\*\*/g, '$1. ')      // **Headline** -> Headline. (Pause)
+            .replace(/(\d+)\/(\d+)/g, '$1 for $2')   // 2/40 -> 2 for 40
+            .replace(/(\d+)\*/g, '$1 not out')       // 163* -> 163 not out
+            .replace(/SR\s?(\d+)/gi, 'strike rate $1')
+            .replace(/RR\s?(\d+)/gi, 'run rate $1')
+            .replace(/vs/gi, 'versus')
+            .replace(/\n+/g, '. ');                  // Paragraph breaks -> Pause
+
+        const utterance = new SpeechSynthesisUtterance(speechText);
+        utterance.rate = 1.0;
+
+        // Try to find a good English voice
+        const voices = window.speechSynthesis.getVoices();
+        const preferred = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) ||
+            voices.find(v => v.lang === 'en-AU') ||
+            voices.find(v => v.lang.startsWith('en'));
+        if (preferred) utterance.voice = preferred;
+
+        window.speechSynthesis.speak(utterance);
+    };
 
     return (
         <div style={{
@@ -186,6 +231,30 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
                             {isPlaying ? <PauseIcon /> : <PlayIcon />}
                         </button>
                     )}
+
+                    {/* Native TTS Test Button */}
+                    <button
+                        onClick={speakNative}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            width: 24,
+                            height: 24,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            padding: 0,
+                            marginLeft: audioFile ? 5 : 10,
+                            opacity: 0.7,
+                            transition: 'opacity 0.2s ease'
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                        onMouseLeave={e => (e.currentTarget.style.opacity = '0.7')}
+                        title="Test Native TTS"
+                    >
+                        <SpeakIcon />
+                    </button>
                 </div>
 
                 {/* Powered by Model */}
