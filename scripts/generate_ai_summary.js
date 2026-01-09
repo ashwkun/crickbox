@@ -178,6 +178,13 @@ async function main() {
                 continue;
             }
 
+            // HELPER: Get Team Name
+            const getTeamName = (id) => {
+                try {
+                    return scorecard.Teams[id]?.Name_Full || scorecard.Teams[id]?.Name_Short || id;
+                } catch (e) { return id; }
+            };
+
             const homeTeamName = getTeamName(scorecard.Matchdetail.Team_Home);
             const awayTeamName = getTeamName(scorecard.Matchdetail.Team_Away);
 
@@ -203,16 +210,6 @@ async function main() {
                     topBowls
                 };
             });
-
-            // HELPER: Get Team Name
-            const getTeamName = (id) => {
-                try {
-                    return scorecard.Teams[id]?.Name_Full || scorecard.Teams[id]?.Name_Short || id;
-                } catch (e) { return id; }
-            };
-
-            const homeTeamName = getTeamName(scorecard.Matchdetail.Team_Home);
-            const awayTeamName = getTeamName(scorecard.Matchdetail.Team_Away);
 
             // FETCH OBO DATA (For Narrative Flow)
             let oboNarrative = "Not available";
