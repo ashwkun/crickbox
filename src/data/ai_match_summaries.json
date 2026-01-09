@@ -1,1 +1,26 @@
-{}
+{
+  "253246": {
+    "text": "**Head's Heroics Power Australia to 5-Wicket Triumph**\n\nTravis Head’s blistering 163 in the first innings set the tone as Australia outmuscled England to clinch a 5-wicket victory. England’s Joe Root (160) and Jacob Bethell (154) fought valiantly across their two innings, totaling 384 and 342, but Australia’s mammoth 567, bolstered by Steve Smith’s 138, built an unassailable lead. Chasing 161 in the fourth innings, Head (29) and Marnus Labuschagne (37) steered the ship, despite Josh Tongue’s fiery 3/42. The finish was clinical—16 runs in the last four overs sealed the deal with minimal fuss.",
+    "model": "grok-3",
+    "audio": "253246.mp3",
+    "generated_at": "2026-01-09T23:15:02.575Z"
+  },
+  "263546": {
+    "text": "**Dwarshuis, Davies dismantle Stars as Sixers cruise to six-wicket win**  \n\nSydney Sixers chased down 129 with clinical precision, courtesy of a disciplined bowling display led by Ben Dwarshuis (4/13) and Joel Davies (2/15). Melbourne Stars stumbled to 128 despite promising starts from Stoinis and Macdonald, undone by regular strikes. Josh Philippe’s brisk 35 ensured the chase rarely felt in doubt, with Marcus Stoinis’ late burst (2/20) and Peter Siddle’s miserly final over (2 runs) proving futile. A 14-run 17th over off Stoinis sealed the deal for the Sixers, who remain a model of efficiency.",
+    "model": "gpt-4o",
+    "audio": "263546.mp3",
+    "generated_at": "2026-01-09T23:15:13.556Z"
+  },
+  "263551": {
+    "text": "**Nathan Ellis and Hurricanes snuff out Strikers with clinical win**  \n\nHobart Hurricanes defended 178 with aplomb, toppling the Adelaide Strikers by 37 runs in a game dominated by Nathan Ellis' nerveless spell of 2/7 from two overs. The Strikers' chase never gained traction after a disastrous PowerPlay (3/4 in 3 overs), despite Liam Scott's valiant 91 off 58. Rishad Hossain (3/26) and Riley Meredith (2/16) dismantled the middle order, leaving Scott stranded. Earlier, Mitchell Owen's whirlwind 33 off 9 was pivotal in taking the Hurricanes to 178/6. A tame finish from the Strikers sealed a comprehensive win for Hobart.",
+    "model": "gpt-4o",
+    "audio": "263551.mp3",
+    "generated_at": "2026-01-09T23:15:25.164Z"
+  },
+  "267686": {
+    "text": "**De Klerk’s all-round brilliance sinks Mumbai in last-over thriller**  \n\nRoyal Challengers Bengaluru clinched a nerve-jangling 3-wicket win over Mumbai Indians, powered by Nadine De Klerk’s all-round heroics. Chasing 155, RCB stumbled to 137/7 after Nicola Carey’s double strike in the 17th over, but De Klerk (63* off 44) held her nerve. With 20 needed off the final over, Nat Sciver-Brunt crumbled under pressure, conceding two boundaries and a six as De Klerk sealed it with a flourish. Earlier, De Klerk’s 4/26 had stifled MI, despite Sajana Sajeevan’s brisk 45 and Nicola Carey’s 40. RCB's lower order wobbled but their MVP stood tall.",
+    "model": "gpt-4o",
+    "audio": "267686.mp3",
+    "generated_at": "2026-01-09T23:15:37.901Z"
+  }
+}
