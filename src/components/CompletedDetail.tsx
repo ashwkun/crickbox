@@ -159,25 +159,41 @@ const AIInsightCard = ({ summary, model }: { summary: string; model?: string }) 
                     zIndex: 1
                 }}>
                     {expanded ? body : body.slice(0, 250)}
-                    {!expanded && body.length > 250 && '... '}
+                    {!expanded && body.length > 250 && '...'}
 
-                    {/* Inline "continue reading" link */}
+                    {/* Inline "continue reading" link - right aligned */}
                     {body.length > 250 && (
-                        <span
+                        <div
                             onClick={() => setExpanded(!expanded)}
                             style={{
-                                fontStyle: 'italic',
-                                color: 'rgba(255, 255, 255, 0.45)',
-                                cursor: 'pointer',
-                                fontSize: 12,
-                                marginLeft: expanded ? 0 : 4
+                                textAlign: 'right',
+                                marginTop: 8,
+                                cursor: 'pointer'
                             }}
                         >
-                            {expanded ? ' show less' : 'continue reading →'}
-                        </span>
+                            <span style={{
+                                fontStyle: 'italic',
+                                fontSize: 12,
+                                background: 'linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 100%)',
+                                backgroundSize: '200% 100%',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text',
+                                animation: 'continueShimmer 2s ease-in-out infinite'
+                            }}>
+                                {expanded ? 'show less ↑' : 'continue reading ↓'}
+                            </span>
+                        </div>
                     )}
                 </div>
             )}
+
+            <style>{`
+                @keyframes continueShimmer {
+                    0% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
+                }
+            `}</style>
         </div>
     );
 };
