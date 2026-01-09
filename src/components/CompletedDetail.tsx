@@ -286,10 +286,18 @@ const CompletedDetail = ({ match, scorecard, onClose }) => {
                 const res = await fetch(`${AI_SUMMARY_URL}?t=${Date.now()}`);
                 if (res.ok) {
                     const data = await res.json();
-                    const matchData = data[match.match_id];
-                    setAiSummary(matchData?.text || null);
-                    setAiModel(matchData?.model || null);
-                    setAiAudio(matchData?.audio || null);
+
+                    // Robust lookup (handle string vs number match_id)
+                    const key = match.match_id;
+                    const matchData = data[key] || data[String(key)];
+
+                    if (matchData) {
+                        setAiSummary(matchData?.text || null);
+                        setAiModel(matchData?.model || null);
+                        setAiAudio(matchData?.audio || null);
+                    } else {
+                        console.log(`[AI] No summary found for match ${key}`);
+                    }
                 }
             } catch (e) {
                 console.log('AI Summary fetch failed:', e);
