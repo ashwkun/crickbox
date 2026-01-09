@@ -75,7 +75,7 @@ async function postAI(prompt) {
                 { role: "system", content: "You are an expert cricket commentator." },
                 { role: "user", content: prompt }
             ],
-            model: "openai/gpt-5", // OpenAI gpt-5 from GitHub Models
+            model: "gpt-4o", // Switch to Stable GPT-4o
             temperature: 0.7,
             max_tokens: 600
         });
