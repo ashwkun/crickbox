@@ -68,14 +68,37 @@ function fetchJson(url) {
     });
 }
 
+// Model fallback chain: Try Grok first, then GPT-4o, then Llama
+const MODEL_FALLBACK_CHAIN = [
+    "grok-3",
+    "gpt-4o",
+    "meta/Llama-3.3-70B-Instruct"
+];
+
 async function postAI(prompt) {
+    for (const model of MODEL_FALLBACK_CHAIN) {
+        try {
+            console.log(`  Trying model: ${model}...`);
+            const result = await callModel(prompt, model);
+            if (result) {
+                console.log(`  ✅ Success with ${model}`);
+                return result;
+            }
+        } catch (err) {
+            console.log(`  ❌ ${model} failed: ${err.message}. Trying next...`);
+        }
+    }
+    return null; // All models failed
+}
+
+function callModel(prompt, modelId) {
     return new Promise((resolve, reject) => {
         const data = JSON.stringify({
             messages: [
                 { role: "system", content: "You are a witty, insightful cricket expert. You write for a hardcore cricket audience." },
                 { role: "user", content: prompt }
             ],
-            model: "grok-3",
+            model: modelId,
             temperature: 0.7,
             max_tokens: 600
         });
@@ -85,13 +108,24 @@ async function postAI(prompt) {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${BOT_TOKEN}`,
-                'Content-Length': data.length
+                'Content-Length': Buffer.byteLength(data)
             }
         }, (res) => {
             let body = '';
             res.on('data', c => body += c);
             res.on('end', () => {
-                try { resolve(JSON.parse(body)); } catch (e) { reject(e); }
+                try {
+                    const json = JSON.parse(body);
+                    if (json.error) {
+                        reject(new Error(json.error.message || 'API Error'));
+                    } else if (json.choices && json.choices[0]) {
+                        resolve(json.choices[0].message.content);
+                    } else {
+                        reject(new Error('Empty response'));
+                    }
+                } catch (e) {
+                    reject(new Error('Parse error: ' + body.substring(0, 50)));
+                }
             });
         });
 
