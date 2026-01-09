@@ -317,6 +317,11 @@ Guidelines:
 
     // 5. Save DB
     if (processedCount > 0) {
+        // Ensure directory exists
+        const dir = path.dirname(MATCH_SUMMARY_FILE);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
         fs.writeFileSync(MATCH_SUMMARY_FILE, JSON.stringify(summaryDB, null, 2));
         console.log(`Updated ${processedCount} summaries.`);
     } else {
