@@ -1,0 +1,34 @@
+name: AI Match Summary Generator
+
+on:
+  schedule:
+    # Run every 2 hours
+    - cron: '*/20 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write # Needed to commit the JSON file
+
+jobs:
+  generate-summary:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run AI Generator Script
+        env:
+          AI_TOKEN: ${{ secrets.AI_TOKEN }}
+        run: node scripts/generate_ai_summary.js
+
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Update AI Match Summaries [skip ci]"
+          file_pattern: "src/data/ai_match_summaries.json"
