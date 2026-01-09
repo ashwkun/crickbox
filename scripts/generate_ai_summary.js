@@ -451,9 +451,8 @@ async function generateAudio(text, matchId) {
     const client = new TextToSpeechClient();
     const request = {
         input: { text: speechText },
-        // Select the language and SSML voice gender (optional)
-        voice: { languageCode: 'en-AU', name: 'en-AU-Neural2-B' },
-        // select the type of audio encoding
+        // Select Voice: British Neural2 Male (Option 2) - Cost Safe (1M chars free)
+        voice: { languageCode: 'en-GB', name: 'en-GB-Neural2-D' },
         audioConfig: { audioEncoding: 'MP3' },
     };
 
