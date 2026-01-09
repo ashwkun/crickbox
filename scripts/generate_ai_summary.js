@@ -72,10 +72,10 @@ async function postAI(prompt) {
     return new Promise((resolve, reject) => {
         const data = JSON.stringify({
             messages: [
-                { role: "system", content: "You are an expert cricket commentator." },
+                { role: "system", content: "You are a witty, insightful cricket expert. You write for a hardcore cricket audience." },
                 { role: "user", content: prompt }
             ],
-            model: "gpt-4o", // Switch to Stable GPT-4o
+            model: "gpt-4o",
             temperature: 0.7,
             max_tokens: 600
         });
@@ -165,29 +165,39 @@ async function main() {
             // HELPER: Get Player Name
             const getPlayerName = (teamId, playerId) => {
                 try {
-                    return scorecard.Teams[teamId].Players[playerId].Name_Short || scorecard.Teams[teamId].Players[playerId].Name_Full;
-                } catch (e) { return "Unknown Player"; }
+                    const team = scorecard.Teams[teamId];
+                    const player = team.Players[playerId];
+                    return player.Name_Full || player.Name_Short || playerId;
+                } catch (e) { return playerId; }
             };
 
             // DATA PREP: Extract Top Performers
-            const inningsData = scorecard.Innings.map(inn => {
-                const battingTeam = inn.Battingteam;
-                const bowlingTeam = inn.Bowlingteam;
+            // CHECK: Match might be abandoned (No innings)
+            if (!scorecard.Innings || scorecard.Innings.length === 0) {
+                console.log(`Skipping ${match.match_id}: No innings data (Abandoned?)`);
+                continue;
+            }
 
-                // Top 3 Batsmen
+            const homeTeamName = getTeamName(scorecard.Matchdetail.Team_Home);
+            const awayTeamName = getTeamName(scorecard.Matchdetail.Team_Away);
+
+            const inningsData = scorecard.Innings.map(inn => {
+                const teamName = inn.Battingteam === scorecard.Matchdetail.Team_Home ? homeTeamName : awayTeamName;
+
+                // Top 3 Batsmen by Runs
                 const topBats = (inn.Batsmen || [])
                     .sort((a, b) => parseInt(b.Runs || 0) - parseInt(a.Runs || 0))
                     .slice(0, 3)
-                    .map(b => `${getPlayerName(battingTeam, b.Batsman)}: ${b.Runs}(${b.Balls})`);
+                    .map(b => `${getPlayerName(inn.Battingteam, b.Batsman)}: ${b.Runs} (${b.Balls})`);
 
-                // Top 3 Bowlers
+                // Top 3 Bowlers by Wickets
                 const topBowls = (inn.Bowlers || [])
                     .sort((a, b) => parseInt(b.Wickets || 0) - parseInt(a.Wickets || 0))
                     .slice(0, 3)
-                    .map(b => `${getPlayerName(bowlingTeam, b.Bowler)}: ${b.Wickets}/${b.Runs} (${b.Overs}ov)`);
+                    .map(b => `${getPlayerName(scorecard.Matchdetail.Team_Home === inn.Battingteam ? scorecard.Matchdetail.Team_Away : scorecard.Matchdetail.Team_Home, b.Bowler)}: ${b.Wickets}/${b.Runs} (${b.Overs}ov)`);
 
                 return {
-                    team: battingTeam === scorecard.Matchdetail.Team_Home ? 'Home' : 'Away', // Simplified for prompt
+                    team: teamName,
                     score: `${inn.Total}/${inn.Wickets} (${inn.Overs})`,
                     topBats,
                     topBowls
