@@ -169,19 +169,6 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    {/* Powered by Model */}
-                    {modelInfo && (
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 5,
-                            opacity: 0.5,
-                            fontSize: 10,
-                            marginRight: 4
-                        }}>
-                            <modelInfo.Logo />
-                        </div>
-                    )}
 
                     {audioFile && (
                         <button
