@@ -7,7 +7,7 @@ import JustFinishedSection from './JustFinishedSection';
 import UpcomingCard from './UpcomingCard';
 import FilterChips from './FilterChips';
 import TimeFilter, { TimeFilterValue } from './upcoming/TimeFilter';
-import wisdenLogo from '../assets/wisden_logo.png';
+import { wisdenLogo } from '../assets/wisden_logo_base64';
 import { filterByTime, isToday, isTomorrow, isThisWeek } from '../utils/upcomingUtils';
 
 import SkeletonMatchCard from './SkeletonMatchCard';
