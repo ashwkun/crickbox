@@ -82,7 +82,7 @@ async function postAI(prompt) {
             const result = await callModel(prompt, model);
             if (result) {
                 console.log(`  ✅ Success with ${model}`);
-                return result;
+                return { text: result, model: model };
             }
         } catch (err) {
             console.log(`  ❌ ${model} failed: ${err.message}. Trying next...`);
@@ -353,13 +353,14 @@ Guidelines:
             const aiRes = await postAI(prompt);
             const duration = ((Date.now() - startTime) / 1000).toFixed(1);
 
-            if (aiRes) {
+            if (aiRes && aiRes.text) {
                 summaryDB[match.match_id] = {
-                    text: aiRes,
+                    text: aiRes.text,
+                    model: aiRes.model,
                     generated_at: new Date().toISOString()
                 };
-                log(`   ✅ Summary generated in ${duration}s`);
-                log(`   📝 "${aiRes.substring(0, 60)}..."`);
+                log(`   ✅ Summary generated in ${duration}s (via ${aiRes.model})`);
+                log(`   📝 "${aiRes.text.substring(0, 60)}..."`);
                 processedCount++;
             } else {
                 log('   ⚠️  AI returned empty response');
