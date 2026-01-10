@@ -243,10 +243,14 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                 const res = await fetch(`${AI_SUMMARY_URL}?t=${Date.now()}`);
                 if (res.ok) {
                     const data = await res.json();
-                    const key = match.game_id;
-                    // Try full game_id first, then extract numeric suffix (e.g., "mindcw01102026267688" -> "267688")
-                    const numericSuffix = key?.match(/(\d{6})$/)?.[1];
-                    const matchData = data[key] || data[String(key)] ||
+                    // Try match_id first (exact numeric ID), then fall back to game_id variations
+                    const matchId = match.match_id;
+                    const gameId = match.game_id;
+                    const numericSuffix = gameId?.match(/(\d{6})$/)?.[1];
+
+                    const matchData = (matchId ? data[matchId] : null) ||
+                        data[gameId] ||
+                        data[String(gameId)] ||
                         (numericSuffix ? data[numericSuffix] : null);
                     if (matchData) {
                         setAiSummary(matchData?.text || null);
