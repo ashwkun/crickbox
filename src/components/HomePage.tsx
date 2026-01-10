@@ -7,8 +7,10 @@ import JustFinishedSection from './JustFinishedSection';
 import UpcomingCard from './UpcomingCard';
 import FilterChips from './FilterChips';
 import TimeFilter, { TimeFilterValue } from './upcoming/TimeFilter';
+import PastFilter from './upcoming/PastFilter';
 import { wisdenLogo } from '../assets/wisden_logo_base64';
 import { filterByTime, isToday, isTomorrow, isThisWeek } from '../utils/upcomingUtils';
+import { filterByPastTime, isYesterday, wasLastWeek, PastTimeFilterValue } from '../utils/pastUtils';
 
 import SkeletonMatchCard from './SkeletonMatchCard';
 import { Match, Scorecard } from '../types';
@@ -113,6 +115,13 @@ export default function HomePage({
     const [activeUpcomingChip, setActiveUpcomingChip] = useState('all');
     const [lastChangedFilter, setLastChangedFilter] = useState<'time' | 'type' | null>(null);
     const [hasInitializedTimeFilter, setHasInitializedTimeFilter] = useState(false);
+
+    // Results (.PAST) section filter states
+    const [resultsTimeFilter, setResultsTimeFilter] = useState<PastTimeFilterValue>('all');
+    const [activeResultsChip, setActiveResultsChip] = useState('all');
+    const [lastChangedResultsFilter, setLastChangedResultsFilter] = useState<'time' | 'type' | null>(null);
+    const [hasInitializedResultsTimeFilter, setHasInitializedResultsTimeFilter] = useState(false);
+
     const resultsScrollRef = useRef<HTMLDivElement>(null);
     const upcomingScrollRef = useRef<HTMLDivElement>(null);
     const liveScrollRef = useRef<HTMLDivElement>(null);
@@ -287,6 +296,60 @@ export default function HomePage({
 
         return result.sort((a, b) => b.latestDate.getTime() - a.latestDate.getTime());
     }, [completedMatches, completedSeriesGroups]);
+
+    // Generate chips for results section (based on ALL completed matches)
+    const resultsChips = useMemo(() => generateUpcomingChips(completedMatches), [completedMatches]);
+
+    // Smart default for results time filter: Yesterday > Week > All
+    useEffect(() => {
+        if (hasInitializedResultsTimeFilter || completedMatches.length === 0) return;
+
+        const hasYesterday = completedMatches.some(m => isYesterday(new Date(m.start_date)));
+        const hasLastWeek = completedMatches.some(m => wasLastWeek(new Date(m.start_date)));
+
+        if (hasYesterday) {
+            setResultsTimeFilter('yesterday');
+        } else if (hasLastWeek) {
+            setResultsTimeFilter('week');
+        }
+        // else keep 'all'
+
+        setHasInitializedResultsTimeFilter(true);
+    }, [completedMatches, hasInitializedResultsTimeFilter]);
+
+    // Apply time AND category filters to processed completed
+    const filteredCompleted = useMemo(() => {
+        let result = processedCompleted;
+
+        // Apply time filter
+        if (resultsTimeFilter !== 'all') {
+            result = result.filter(item => {
+                const timeFiltered = filterByPastTime([item.match], resultsTimeFilter);
+                return timeFiltered.length > 0;
+            });
+        }
+
+        // Apply category filter
+        if (activeResultsChip !== 'all') {
+            result = result.filter(item => {
+                return filterByChip([item.match], activeResultsChip).length > 0;
+            });
+        }
+
+        return result;
+    }, [processedCompleted, resultsTimeFilter, activeResultsChip]);
+
+    // Smart bidirectional fallback for results
+    useEffect(() => {
+        if (filteredCompleted.length === 0 && lastChangedResultsFilter) {
+            if (lastChangedResultsFilter === 'time' && activeResultsChip !== 'all') {
+                setActiveResultsChip('all');
+            } else if (lastChangedResultsFilter === 'type' && resultsTimeFilter !== 'all') {
+                setResultsTimeFilter('all');
+            }
+            setLastChangedResultsFilter(null);
+        }
+    }, [filteredCompleted.length, lastChangedResultsFilter, activeResultsChip, resultsTimeFilter]);
 
     // Process upcoming matches
     const processedUpcoming = useMemo(() => {
@@ -698,20 +761,69 @@ export default function HomePage({
                 </div>
             </div>
 
-            {/* Results Section */}
+            {/* Results Section - .PAST Design */}
             <section className="section">
-                <div className="section-header">
-                    <h3 className="section-title">Results</h3>
-                    <div className="section-line"></div>
+                {/* Header Row: .PAST + Time Chips */}
+                <div style={{
+                    padding: '0 20px 8px 16px',
+                    position: 'relative',
+                    zIndex: 10,
+                }}>
+                    <PastFilter
+                        value={resultsTimeFilter}
+                        onChange={(v) => {
+                            setLastChangedResultsFilter('time');
+                            setResultsTimeFilter(v);
+                        }}
+                    />
                 </div>
+
+                {/* Chips Row: horizontally scrollable */}
+                <div style={{
+                    display: 'flex',
+                    gap: 8,
+                    padding: '0 20px 12px 16px',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                }}>
+                    {resultsChips.map(chip => (
+                        <div
+                            key={chip.id}
+                            onClick={() => {
+                                setLastChangedResultsFilter('type');
+                                setActiveResultsChip(chip.id);
+                            }}
+                            style={{
+                                padding: '5px 10px',
+                                borderRadius: 12,
+                                fontSize: 11,
+                                fontWeight: chip.id === activeResultsChip ? 600 : 500,
+                                whiteSpace: 'nowrap',
+                                cursor: 'pointer',
+                                flexShrink: 0,
+                                transition: 'all 0.2s ease',
+                                background: chip.id === activeResultsChip
+                                    ? 'rgba(245, 158, 11, 0.25)'
+                                    : 'rgba(20, 20, 20, 0.5)',
+                                border: chip.id === activeResultsChip
+                                    ? '1px solid rgba(245, 158, 11, 0.5)'
+                                    : '1px solid rgba(255, 255, 255, 0.08)',
+                                color: chip.id === activeResultsChip ? '#fcd34d' : 'rgba(255,255,255,0.6)',
+                            }}
+                        >
+                            {typeof chip.label === 'string' ? chip.label : String(chip.label || '')}
+                        </div>
+                    ))}
+                </div>
+
                 {loading && matches.length === 0 ? (
                     <div className="horizontal-scroll">
                         <SkeletonMatchCard />
                         <SkeletonMatchCard />
                     </div>
-                ) : processedCompleted.length > 0 ? (
+                ) : filteredCompleted.length > 0 ? (
                     <div className="horizontal-scroll" ref={resultsScrollRef}>
-                        {processedCompleted.slice(0, resultsLimit).map((item, idx) => (
+                        {filteredCompleted.slice(0, resultsLimit).map((item, idx) => (
                             <CompletedCard
                                 key={item.match.game_id + '-' + idx}
                                 match={item.match}
@@ -722,21 +834,52 @@ export default function HomePage({
                                 onViewTournament={openTournament}
                             />
                         ))}
-                        {resultsLimit < processedCompleted.length && (
+                        {resultsLimit < filteredCompleted.length && (
                             <button
                                 className="view-more-card"
                                 onClick={loadMoreResults}
                             >
                                 <span className="view-more-icon">+</span>
                                 <span className="view-more-text">View More</span>
-                                <span className="view-more-count">{processedCompleted.length - resultsLimit} more</span>
+                                <span className="view-more-count">{filteredCompleted.length - resultsLimit} more</span>
                             </button>
                         )}
                     </div>
                 ) : (
-                    <div className="empty-state">No recent results</div>
+                    <div className="empty-state">No results found</div>
                 )}
             </section>
+
+            {/* Gradient Accent Banner for Results */}
+            <div style={{ margin: '-12px 20px 8px' }}>
+                <div style={{
+                    height: '1px',
+                    background: 'linear-gradient(90deg, #f59e0b 0%, rgba(245, 158, 11, 0) 100%)',
+                    marginBottom: '6px',
+                    opacity: 0.8
+                }} />
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer'
+                }}>
+                    <span style={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        letterSpacing: '0.3px'
+                    }}>
+                        {completedMatches.length} completed matches
+                    </span>
+                    <span style={{
+                        fontSize: '16px',
+                        color: '#f59e0b',
+                        fontWeight: 300,
+                        transform: 'translateY(-1px)'
+                    }}>→</span>
+                </div>
+            </div>
 
             {/* Wisden Attribution Footer */}
             <div style={{ padding: '16px 20px 48px' }}>
