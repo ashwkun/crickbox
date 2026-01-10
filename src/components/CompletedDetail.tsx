@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import WikiImage from './WikiImage';
+import WikiImage, { getFlagUrl } from './WikiImage';
+import LiveInsights from './LiveInsights';
+import useCricketData from '../utils/useCricketData';
+import { getTeamColor } from '../utils/teamColors';
+import { getMatchStatusConfig } from '../utils/matchStatus';
+import { Match, Scorecard } from '../types';
+import { BatsmanSplitsResponse, OverByOverResponse } from '../utils/h2hApi';
 
 // AI Summary JSON URL (fetched from GitHub)
 const AI_SUMMARY_URL = 'https://raw.githubusercontent.com/ashwkun/crickbox/main/src/data/ai_match_summaries.json';
+const AUDIO_BASE_URL = 'https://raw.githubusercontent.com/ashwkun/crickbox/main/src/data/audio';
 
 // Model Logo Components
 const GrokLogo = () => (
@@ -35,16 +42,12 @@ const PauseIcon = () => (
     </svg>
 );
 
-// Define Audio Base URL
-const AUDIO_BASE_URL = 'https://raw.githubusercontent.com/ashwkun/crickbox/main/src/data/audio';
-
 // AI Insight Card Component with .WRAP branding
 const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?: string; audioFile?: string }) => {
     const [expanded, setExpanded] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
     const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
-    // Initialise audio if available
     useEffect(() => {
         if (audioFile) {
             const audioUrl = `${AUDIO_BASE_URL}/${audioFile}`;
@@ -63,7 +66,6 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
     const togglePlay = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!audio) return;
-
         if (isPlaying) {
             audio.pause();
         } else {
@@ -72,19 +74,11 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
         setIsPlaying(!isPlaying);
     };
 
-    // Clean the summary: remove ** markdown
     const cleanText = summary.replace(/\*\*/g, '').trim();
-
-    // Split into headline and body
     const lines = cleanText.split('\n').filter(l => l.trim());
     const headline = lines[0] || '';
     const body = lines.slice(1).join(' ');
 
-    // Truncate body if collapsed  
-    const displayBody = expanded ? body : body.slice(0, 150);
-    const showMoreButton = body.length > 150;
-
-    // Get model display info
     const getModelInfo = () => {
         if (!model) return null;
         if (model.includes('grok')) return { name: 'Grok', Logo: GrokLogo };
@@ -109,13 +103,10 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
             position: 'relative' as const,
             overflow: 'hidden'
         }}>
-            {/* Animated gradient orb - subtle AI animation */}
             <div style={{
                 position: 'absolute' as const,
-                top: -40,
-                right: -40,
-                width: 120,
-                height: 120,
+                top: -40, right: -40,
+                width: 120, height: 120,
                 background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
                 borderRadius: '50%',
                 animation: 'orbFloat 4s ease-in-out infinite',
@@ -123,10 +114,8 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
             }} />
             <div style={{
                 position: 'absolute' as const,
-                bottom: -30,
-                left: -30,
-                width: 80,
-                height: 80,
+                bottom: -30, left: -30,
+                width: 80, height: 80,
                 background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
                 borderRadius: '50%',
                 animation: 'orbFloat 5s ease-in-out infinite reverse',
@@ -134,384 +123,606 @@ const AIInsightCard = ({ summary, model, audioFile }: { summary: string; model?:
             }} />
 
             <style>{`
-                @keyframes wrapShimmer {
-                    0% { background-position: 0% 50%; }
-                    100% { background-position: 100% 50%; }
-                }
-                @keyframes orbFloat {
-                    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-                    50% { transform: translate(-10px, 10px) scale(1.1); opacity: 0.8; }
-                }
+                @keyframes wrapShimmer { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+                @keyframes orbFloat { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; } 50% { transform: translate(-10px, 10px) scale(1.1); opacity: 0.8; } }
+                @keyframes continueShimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
             `}</style>
 
-            {/* .WRAP Header */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 12,
-                position: 'relative' as const,
-                zIndex: 1
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{
-                        fontFamily: '"BBH Bartle", sans-serif',
-                        fontSize: 14,
-                        fontWeight: 600,
-                        letterSpacing: 1,
-                        background: 'linear-gradient(90deg, #8b5cf6 0%, #a78bfa 50%, #8b5cf6 100%)',
-                        backgroundSize: '200% 100%',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                        animation: 'wrapShimmer 3s ease-in-out infinite'
-                    }}>.WRAP</span>
-                </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, position: 'relative' as const, zIndex: 1 }}>
+                <span style={{
+                    fontFamily: '"BBH Bartle", sans-serif',
+                    fontSize: 14, fontWeight: 600, letterSpacing: 1,
+                    background: 'linear-gradient(90deg, #8b5cf6 0%, #a78bfa 50%, #8b5cf6 100%)',
+                    backgroundSize: '200% 100%',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    animation: 'wrapShimmer 3s ease-in-out infinite'
+                }}>.WRAP</span>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-
-                    {audioFile && (
-                        <button
-                            onClick={togglePlay}
-                            style={{
-                                background: isPlaying ? 'rgba(139, 92, 246, 0.3)' : 'rgba(255,255,255,0.1)',
-                                border: `1px solid ${isPlaying ? 'rgba(139, 92, 246, 0.5)' : 'rgba(255,255,255,0.1)'}`,
-                                borderRadius: 12, // Squircle
-                                padding: '6px 12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 6,
-                                cursor: 'pointer',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: isPlaying ? '0 0 15px rgba(139, 92, 246, 0.4)' : 'none',
-                                transform: isPlaying ? 'scale(1.02)' : 'scale(1)'
-                            }}
-                        >
-                            <div style={{
-                                width: 16,
-                                height: 16,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                animation: isPlaying ? 'pulse 2s infinite' : 'none'
-                            }}>
-                                {isPlaying ? <PauseIcon /> : <PlayIcon />}
-                            </div>
-                            <span style={{
-                                fontSize: 11,
-                                fontWeight: 600,
-                                color: '#fff',
-                                opacity: 0.9,
-                                letterSpacing: 0.5
-                            }}>
-                                {isPlaying ? 'PLAYING' : 'LISTEN'}
-                            </span>
-                        </button>
-                    )}
-                </div>
+                {audioFile && (
+                    <button onClick={togglePlay} style={{
+                        background: isPlaying ? 'rgba(139, 92, 246, 0.3)' : 'rgba(255,255,255,0.1)',
+                        border: `1px solid ${isPlaying ? 'rgba(139, 92, 246, 0.5)' : 'rgba(255,255,255,0.1)'}`,
+                        borderRadius: 12, padding: '6px 12px',
+                        display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        boxShadow: isPlaying ? '0 0 15px rgba(139, 92, 246, 0.4)' : 'none',
+                        transform: isPlaying ? 'scale(1.02)' : 'scale(1)'
+                    }}>
+                        {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                        <span style={{ fontSize: 11, fontWeight: 600, color: '#fff', opacity: 0.9, letterSpacing: 0.5 }}>
+                            {isPlaying ? 'PLAYING' : 'LISTEN'}
+                        </span>
+                    </button>
+                )}
             </div>
 
-            {/* Headline */}
-            {
-                headline && (
-                    <div style={{
-                        fontSize: 15,
-                        fontWeight: 600,
-                        color: '#fff',
-                        lineHeight: 1.4,
-                        marginBottom: body ? 10 : 0,
-                        position: 'relative' as const,
-                        zIndex: 1
-                    }}>
-                        {headline}
-                    </div>
-                )
-            }
+            {headline && (
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#fff', lineHeight: 1.4, marginBottom: body ? 10 : 0, position: 'relative' as const, zIndex: 1 }}>
+                    {headline}
+                </div>
+            )}
 
-            {/* Body with fade effect when collapsed */}
-            {
-                body && (
-                    <div style={{
-                        fontSize: 13,
-                        lineHeight: 1.7,
-                        color: 'rgba(255, 255, 255, 0.65)',
-                        position: 'relative' as const,
-                        zIndex: 1
-                    }}>
-                        {expanded ? body : body.slice(0, 250)}
-                        {!expanded && body.length > 250 && '...'}
+            {body && (
+                <div style={{ fontSize: 13, lineHeight: 1.7, color: 'rgba(255, 255, 255, 0.65)', position: 'relative' as const, zIndex: 1 }}>
+                    {expanded ? body : body.slice(0, 250)}
+                    {!expanded && body.length > 250 && '...'}
 
-                        {/* Footer: Model Info + Continue Reading */}
-                        {(modelInfo || body.length > 250) && (
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'flex-end',
-                                gap: 16,
-                                marginTop: 12,
-                                opacity: 0.9,
-                                borderTop: '1px solid rgba(255,255,255,0.05)',
-                                paddingTop: 12
-                            }}>
-                                {/* Model Attribution */}
-                                {modelInfo && (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, opacity: 0.6 }}>
-                                        <span style={{ color: 'rgba(255,255,255,0.5)' }}>by</span>
-                                        <modelInfo.Logo />
-                                        <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>{modelInfo.name}</span>
-                                    </div>
-                                )}
-
-                                {/* Continue Reading Logic */}
-                                {body.length > 250 && (
-                                    <div
-                                        onClick={() => setExpanded(!expanded)}
-                                        style={{
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center'
-                                        }}
-                                    >
-                                        <span style={{
-                                            fontStyle: 'italic',
-                                            fontSize: 12,
-                                            background: 'linear-gradient(90deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.6) 100%)',
-                                            backgroundSize: '200% 100%',
-                                            WebkitBackgroundClip: 'text',
-                                            WebkitTextFillColor: 'transparent',
-                                            backgroundClip: 'text',
-                                            animation: 'continueShimmer 2s ease-in-out infinite'
-                                        }}>
-                                            {expanded ? 'show less ↑' : 'continue reading ↓'}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                )
-            }
-
-            <style>{`
-                @keyframes continueShimmer {
-                    0% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
-                }
-            `}</style>
-        </div >
+                    {(modelInfo || body.length > 250) && (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 16, marginTop: 12, opacity: 0.9, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
+                            {modelInfo && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, opacity: 0.6 }}>
+                                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>by</span>
+                                    <modelInfo.Logo />
+                                    <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>{modelInfo.name}</span>
+                                </div>
+                            )}
+                            {body.length > 250 && (
+                                <div onClick={() => setExpanded(!expanded)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                                    <span style={{
+                                        fontStyle: 'italic', fontSize: 12,
+                                        background: 'linear-gradient(90deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.6) 100%)',
+                                        backgroundSize: '200% 100%',
+                                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                                        animation: 'continueShimmer 2s ease-in-out infinite'
+                                    }}>
+                                        {expanded ? 'show less ↑' : 'continue reading ↓'}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
     );
 };
 
-const CompletedDetail = ({ match, scorecard, onClose }) => {
+interface CompletedDetailProps {
+    match: Match;
+    scorecard: Scorecard | null;
+    onClose: () => void;
+    onSeriesClick?: (seriesId: string, seriesMatches?: any[]) => void;
+}
+
+const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onClose, onSeriesClick }) => {
+    const { fetchH2H, fetchBatsmanSplits, fetchOverByOver } = useCricketData();
+
+    // AI Summary State
     const [aiSummary, setAiSummary] = useState<string | null>(null);
     const [aiModel, setAiModel] = useState<string | null>(null);
     const [aiAudio, setAiAudio] = useState<string | null>(null);
-    const [loadingAI, setLoadingAI] = useState(true);
 
-    // Fetch AI summary on mount
+    // Scorecard Tab State
+    const [selectedInningsIdx, setSelectedInningsIdx] = useState(0);
+
+    // Insights Data State (fetched ONCE)
+    const [h2hData, setH2hData] = useState<any>(null);
+    const [batsmanSplits, setBatsmanSplits] = useState<BatsmanSplitsResponse | null>(null);
+    const [overByOver, setOverByOver] = useState<OverByOverResponse | null>(null);
+    const [wormPrimary, setWormPrimary] = useState<{ data: OverByOverResponse | null, label: string, color: string } | null>(null);
+    const [wormSecondary, setWormSecondary] = useState<{ data: OverByOverResponse | null, label: string, color: string } | null>(null);
+    const [manhattanData, setManhattanData] = useState<{ data: OverByOverResponse, label: string, color: string, id: number }[]>([]);
+    const [manhattanInnings, setManhattanInnings] = useState<number[]>([]);
+    const [isInsightsLoading, setIsInsightsLoading] = useState(true);
+
+    // Insights Innings Control
+    const [wagonWheelInnings, setWagonWheelInnings] = useState(1);
+    const [matchupsInnings, setMatchupsInnings] = useState(1);
+    const [partnershipsInnings, setPartnershipsInnings] = useState(1);
+
+    const team1 = match.participants?.[0];
+    const team2 = match.participants?.[1];
+    const color1 = getTeamColor(team1?.name) || getTeamColor(team1?.short_name) || '#3b82f6';
+    const color2 = getTeamColor(team2?.name) || getTeamColor(team2?.short_name) || '#8b5cf6';
+
+    // Fetch AI Summary
     useEffect(() => {
         const fetchAISummary = async () => {
             try {
-                // Cache bust with timestamp
                 const res = await fetch(`${AI_SUMMARY_URL}?t=${Date.now()}`);
                 if (res.ok) {
                     const data = await res.json();
-
-                    // Robust lookup (handle string vs number match_id)
-                    const key = match.match_id;
+                    const key = match.game_id;
                     const matchData = data[key] || data[String(key)];
-
                     if (matchData) {
                         setAiSummary(matchData?.text || null);
                         setAiModel(matchData?.model || null);
                         setAiAudio(matchData?.audio || null);
-                    } else {
-                        console.log(`[AI] No summary found for match ${key}`);
                     }
                 }
             } catch (e) {
                 console.log('AI Summary fetch failed:', e);
-            } finally {
-                setLoadingAI(false);
             }
         };
         fetchAISummary();
-    }, [match.match_id]);
+    }, [match.game_id]);
 
-    const team1 = match.participants?.[0];
-    const team2 = match.participants?.[1];
+    // Fetch Insights Data (ONE TIME)
+    useEffect(() => {
+        if (!match?.game_id || !scorecard?.Innings?.length) return;
+
+        const loadInsights = async () => {
+            setIsInsightsLoading(true);
+            const inningsCount = scorecard.Innings.length;
+
+            // Fetch H2H
+            const h2h = await fetchH2H(match.game_id);
+            if (h2h) setH2hData(h2h);
+
+            // Fetch BatsmanSplits for last innings (default)
+            const splits = await fetchBatsmanSplits(match.game_id, inningsCount);
+            if (splits) setBatsmanSplits(splits);
+
+            // Fetch OBO for last innings
+            const obo = await fetchOverByOver(match.game_id, inningsCount);
+            if (obo) setOverByOver(obo);
+
+            // Build Worm data (all innings)
+            const getInningsMeta = (idx: number) => {
+                const inn = scorecard.Innings[idx];
+                const teamId = inn?.Battingteam;
+                const team = scorecard.Teams?.[teamId];
+                const label = `${team?.Name_Short || 'TM'} ${Math.floor(idx / 2) + 1}`;
+                const teamColor = getTeamColor(team?.Name_Full || team?.Name_Short) || '#3b82f6';
+                return { label, color: teamColor };
+            };
+
+            // Worm: Primary = last innings, Secondary = opponent's last
+            const primaryIdx = inningsCount - 1;
+            const primaryMeta = getInningsMeta(primaryIdx);
+            const primaryObo = await fetchOverByOver(match.game_id, primaryIdx + 1);
+            if (primaryObo) setWormPrimary({ data: primaryObo, label: primaryMeta.label, color: primaryMeta.color });
+
+            // Find opponent's innings
+            const primaryTeamId = scorecard.Innings[primaryIdx]?.Battingteam;
+            let secondaryIdx = -1;
+            for (let i = primaryIdx - 1; i >= 0; i--) {
+                if (scorecard.Innings[i].Battingteam !== primaryTeamId) {
+                    secondaryIdx = i;
+                    break;
+                }
+            }
+            if (secondaryIdx >= 0) {
+                const secondaryMeta = getInningsMeta(secondaryIdx);
+                const secondaryObo = await fetchOverByOver(match.game_id, secondaryIdx + 1);
+                if (secondaryObo) setWormSecondary({ data: secondaryObo, label: secondaryMeta.label, color: secondaryMeta.color });
+            }
+
+            // Manhattan: Fetch all innings
+            const manhattanPromises = scorecard.Innings.map(async (inn: any, idx: number) => {
+                const data = await fetchOverByOver(match.game_id, idx + 1);
+                if (data) {
+                    const meta = getInningsMeta(idx);
+                    return { data, label: meta.label, color: meta.color, id: idx + 1 };
+                }
+                return null;
+            });
+            const manhattanResults = await Promise.all(manhattanPromises);
+            const validManhattan = manhattanResults.filter(r => r !== null) as any[];
+            setManhattanData(validManhattan);
+            setManhattanInnings(validManhattan.map(m => m.id));
+
+            // Set default innings for charts
+            setWagonWheelInnings(inningsCount);
+            setMatchupsInnings(inningsCount);
+            setPartnershipsInnings(inningsCount);
+
+            setIsInsightsLoading(false);
+        };
+
+        loadInsights();
+    }, [match?.game_id, scorecard?.Innings?.length]);
+
+    // Handler for Manhattan toggle
+    const handleManhattanInningsChange = (inningsIdx: number) => {
+        setManhattanInnings(prev => {
+            if (prev.includes(inningsIdx)) {
+                const newVal = prev.filter(i => i !== inningsIdx);
+                return newVal.length === 0 ? prev : newVal;
+            }
+            return [...prev, inningsIdx].sort((a, b) => a - b);
+        });
+    };
+
+    // Handler for Wagon Wheel change
+    const handleWagonWheelInningsChange = async (innings: number) => {
+        setWagonWheelInnings(innings);
+        const splits = await fetchBatsmanSplits(match.game_id, innings);
+        if (splits) setBatsmanSplits(splits);
+    };
+
+    // Handler for Matchups change
+    const handleMatchupsInningsChange = async (innings: number) => {
+        setMatchupsInnings(innings);
+        const [splits, obo] = await Promise.all([
+            fetchBatsmanSplits(match.game_id, innings),
+            fetchOverByOver(match.game_id, innings)
+        ]);
+        if (splits) setBatsmanSplits(splits);
+        if (obo) setOverByOver(obo);
+    };
+
+    // Get Player of the Match
+    const getPlayerOfMatch = () => {
+        if (!scorecard?.Matchdetail?.Player_Of_The_Match) return null;
+        const pom = scorecard.Matchdetail.Player_Of_The_Match;
+        return {
+            name: pom.Name_Full || pom.Name,
+            id: pom.Id
+        };
+    };
+    const playerOfMatch = getPlayerOfMatch();
+
+    // Get Score for Team
+    const getTeamScore = (teamId: string | undefined) => {
+        if (!teamId || !scorecard?.Innings?.length) return '';
+        const teamInnings = scorecard.Innings.filter((inn: any) => inn.Battingteam === teamId);
+        if (teamInnings.length === 0) return '';
+
+        const scores = teamInnings.map((inn: any) => {
+            const score = `${inn.Total}/${inn.Wickets}`;
+            const overs = inn.Overs ? ` (${inn.Overs})` : '';
+            return `${score}${overs}`;
+        });
+        return scores.join(' & ');
+    };
+
+    // Get innings label
+    const getInningsLabel = (inn: any, idx: number) => {
+        const teamName = scorecard?.Teams?.[inn.Battingteam]?.Name_Short || 'Team';
+        const inningsNum = Math.floor(idx / 2) + 1;
+        return `${teamName} ${inningsNum}`;
+    };
+
+    // Hero Card Style
+    const heroStyle: React.CSSProperties = {
+        position: 'relative',
+        overflow: 'hidden',
+        backgroundColor: '#0f0f14',
+        backgroundImage: `
+            radial-gradient(ellipse 50% 60% at 10% 50%, ${color1}25 0%, transparent 100%),
+            radial-gradient(ellipse 50% 60% at 90% 50%, ${color2}25 0%, transparent 100%)
+        `,
+        borderRadius: 20,
+        padding: 24,
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+        marginBottom: 20,
+    };
+
+    const selectedInn = scorecard?.Innings?.[selectedInningsIdx];
 
     return (
-        <div className="upcoming-detail">
-            {/* Back Button */}
-            <button
-                onClick={onClose}
-                style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'rgba(255,255,255,0.7)',
-                    cursor: 'pointer',
-                    fontSize: 14,
-                    marginBottom: 16,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    fontWeight: 600,
-                    padding: 0
-                }}
-            >
-                <span style={{ fontSize: 18 }}>←</span> Back
-            </button>
-
+        <div className="live-detail fade-in" style={{ padding: '0 16px 100px 16px' }}>
             {/* Hero Card */}
-            <div style={{
-                background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
-                borderRadius: 20,
-                padding: 24,
-                marginBottom: 24,
-                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)',
-                border: '1px solid rgba(255,255,255,0.05)'
-            }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20, opacity: 0.8, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
-                    <span>{match.event_sub_status || match.event_status}</span>
-                    <span>{match.series_name}</span>
+            <div style={heroStyle}>
+                {/* Series Name */}
+                <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>
+                    {match.series_name}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '40%' }}>
-                        <WikiImage name={team1?.name} id={team1?.id} style={{ width: 56, height: 56, background: 'rgba(255,255,255,0.95)', borderRadius: 12, padding: 4 }} />
-                        <span style={{ fontSize: 16, fontWeight: 700, textAlign: 'center', lineHeight: 1.2, color: '#fff' }}>{team1?.short_name}</span>
-                        <span style={{ fontSize: 20, fontWeight: 700, fontFamily: 'monospace', marginTop: 4, color: '#fff' }}>{team1?.value || ''}</span>
+                {/* Match Info Chips */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+                    {match.event_name && (
+                        <span style={{ fontSize: 10, fontWeight: 600, padding: '4px 10px', background: 'rgba(59, 130, 246, 0.15)', borderRadius: 20, color: '#3b82f6' }}>
+                            {match.event_name}
+                        </span>
+                    )}
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: '4px 10px', background: 'rgba(139, 92, 246, 0.15)', borderRadius: 20, color: '#a78bfa', display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <span style={{ width: 5, height: 5, background: '#a78bfa', borderRadius: '50%' }} />
+                        Completed
+                    </span>
+                </div>
+
+                {/* Teams */}
+                <div className="upcoming-teams">
+                    <div className="upcoming-team">
+                        <WikiImage
+                            name={team1?.name}
+                            id={team1?.id}
+                            type="team"
+                            className="team-logo-hero"
+                            style={getFlagUrl(team1?.name) ? { width: 60, height: 60, objectFit: 'contain' } : { maxHeight: 60, width: 'auto', height: 'auto' }}
+                        />
+                        <span className="upcoming-team-name left">{team1?.name}</span>
+                        <div style={{ marginTop: 4, minHeight: 42, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{getTeamScore(team1?.id)}</span>
+                        </div>
                     </div>
-                    <div style={{ fontSize: 14, opacity: 0.5, fontWeight: 900, color: '#fff' }}>VS</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: '40%' }}>
-                        <WikiImage name={team2?.name} id={team2?.id} style={{ width: 56, height: 56, background: 'rgba(255,255,255,0.95)', borderRadius: 12, padding: 4 }} />
-                        <span style={{ fontSize: 16, fontWeight: 700, textAlign: 'center', lineHeight: 1.2, color: '#fff' }}>{team2?.short_name}</span>
-                        <span style={{ fontSize: 20, fontWeight: 700, fontFamily: 'monospace', marginTop: 4, color: '#fff' }}>{team2?.value || ''}</span>
+
+                    <div className="upcoming-vs">
+                        <span className="vs-text">VS</span>
+                    </div>
+
+                    <div className="upcoming-team right-align">
+                        <WikiImage
+                            name={team2?.name}
+                            id={team2?.id}
+                            type="team"
+                            className="team-logo-hero"
+                            style={getFlagUrl(team2?.name) ? { width: 60, height: 60, objectFit: 'contain' } : { maxHeight: 60, width: 'auto', height: 'auto' }}
+                        />
+                        <span className="upcoming-team-name right">{team2?.name}</span>
+                        <div style={{ marginTop: 4, minHeight: 42, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{getTeamScore(team2?.id)}</span>
+                        </div>
                     </div>
                 </div>
 
+                {/* Result Banner */}
                 {match.result && (
-                    <div style={{ textAlign: 'center', fontSize: 13, borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 12, opacity: 0.9, color: 'rgba(255,255,255,0.8)' }}>
+                    <div style={{
+                        textAlign: 'center',
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: '#22c55e',
+                        marginTop: 16,
+                        padding: '12px 16px',
+                        background: 'rgba(34, 197, 94, 0.1)',
+                        borderRadius: 12,
+                        border: '1px solid rgba(34, 197, 94, 0.2)'
+                    }}>
                         {match.result}
                     </div>
                 )}
+
+                {/* Venue */}
+                <div style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 12 }}>
+                    📍 {match.venue || scorecard?.Matchdetail?.Venue?.Name}
+                </div>
             </div>
 
-            {/* AI Summary Card */}
+            {/* Player of the Match */}
+            {playerOfMatch && (
+                <div style={{
+                    background: 'var(--bg-card)',
+                    borderRadius: 16,
+                    padding: 16,
+                    marginBottom: 20,
+                    border: '1px solid var(--border-color)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 16
+                }}>
+                    <WikiImage name={playerOfMatch.name} id={playerOfMatch.id} type="player" style={{ width: 56, height: 56 }} circle={true} />
+                    <div>
+                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>Player of the Match</div>
+                        <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{playerOfMatch.name}</div>
+                    </div>
+                </div>
+            )}
+
+            {/* AI Summary */}
             {aiSummary && (
                 <AIInsightCard summary={aiSummary} model={aiModel || undefined} audioFile={aiAudio || undefined} />
             )}
 
-            {/* Scorecard Content */}
-            {scorecard ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {scorecard.Innings?.map((inn, idx) => (
-                        <div key={idx} style={{
-                            background: 'rgba(255,255,255,0.03)',
-                            borderRadius: 16,
-                            overflow: 'hidden',
-                            border: '1px solid rgba(255,255,255,0.08)'
-                        }}>
-                            <div style={{
-                                background: 'rgba(255,255,255,0.05)',
-                                padding: '12px 16px',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                borderBottom: '1px solid rgba(255,255,255,0.05)'
-                            }}>
-                                <span style={{ fontWeight: 700, color: '#fff' }}>
-                                    {scorecard.Teams?.[inn.Battingteam]?.Name_Full}
-                                </span>
-                                <span style={{ fontWeight: 700, color: '#fff', fontFamily: 'monospace' }}>
-                                    {inn.Total}/{inn.Wickets}
-                                    <span style={{ fontSize: 14, fontWeight: 400, opacity: 0.8 }}>
-                                        ({inn.Overs} ov)
-                                    </span>
-                                </span>
-                            </div>
+            {/* Full Scorecard with Innings Tabs */}
+            {scorecard?.Innings && scorecard.Innings.length > 0 && selectedInn && (
+                <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border-color)', marginBottom: 20 }}>
+                    {/* Innings Tabs */}
+                    <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        {scorecard.Innings.map((inn: any, idx: number) => (
+                            <button
+                                key={idx}
+                                onClick={() => setSelectedInningsIdx(idx)}
+                                style={{
+                                    flex: 1,
+                                    minWidth: 70,
+                                    padding: '12px 16px',
+                                    border: 'none',
+                                    background: selectedInningsIdx === idx ? 'rgba(139, 92, 246, 0.15)' : 'transparent',
+                                    borderBottom: selectedInningsIdx === idx ? '2px solid #a78bfa' : '2px solid transparent',
+                                    color: selectedInningsIdx === idx ? '#a78bfa' : 'rgba(255,255,255,0.6)',
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    whiteSpace: 'nowrap',
+                                }}
+                            >
+                                {getInningsLabel(inn, idx)}
+                            </button>
+                        ))}
+                    </div>
 
-                            {/* Batting Table */}
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                                    <thead>
-                                        <tr>
-                                            <th style={{ textAlign: 'left', padding: '12px 16px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', width: '50%' }}>Batter</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>R</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>B</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>4s</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>6s</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>SR</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {inn.Batsmen?.map((bat, i) => {
-                                            const pName = scorecard.Teams?.[inn.Battingteam]?.Players?.[bat.Batsman]?.Name_Full || '';
-                                            return (
-                                                <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                            <WikiImage name={pName} id={bat.Batsman} type="player" style={{ width: 32, height: 32 }} circle={true} />
-                                                            <div>
-                                                                <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>{pName}</div>
-                                                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{bat.Howout_short || 'not out'}</div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Runs}</td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Balls}</td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Fours}</td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Sixes}</td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Strikerate}</td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
+                    {/* Selected Innings Header */}
+                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <span style={{ fontWeight: 700, color: '#fff' }}>{scorecard.Teams?.[selectedInn.Battingteam]?.Name_Full}</span>
+                        <span style={{ fontWeight: 700, color: '#fff', fontFamily: 'monospace' }}>
+                            {selectedInn.Total}/{selectedInn.Wickets} <span style={{ fontSize: 14, fontWeight: 400, opacity: 0.8 }}>({selectedInn.Overs} ov)</span>
+                        </span>
+                    </div>
 
-                            {/* Bowling Table */}
-                            <h4 style={{ margin: '20px 16px 8px', fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Bowling</h4>
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                                    <thead>
-                                        <tr>
-                                            <th style={{ textAlign: 'left', padding: '12px 16px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', width: '50%' }}>Bowler</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>O</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>M</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>R</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>W</th>
-                                            <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>ER</th>
+                    {/* Batting Table */}
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                            <thead>
+                                <tr>
+                                    <th style={{ textAlign: 'left', padding: '12px 16px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', width: '50%' }}>Batter</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>R</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>B</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>4s</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>6s</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>SR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {selectedInn.Batsmen?.map((bat: any, i: number) => {
+                                    const pName = scorecard.Teams?.[selectedInn.Battingteam]?.Players?.[bat.Batsman]?.Name_Full || '';
+                                    return (
+                                        <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                            <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                    <WikiImage name={pName} id={bat.Batsman} type="player" style={{ width: 32, height: 32 }} circle={true} />
+                                                    <div>
+                                                        <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>{pName}</div>
+                                                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{bat.Howout_short || 'not out'}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Runs}</td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Balls}</td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Fours}</td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Sixes}</td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Strikerate}</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {inn.Bowlers?.map((bowl, i) => {
-                                            const pName = scorecard.Teams?.[inn.Bowlingteam]?.Players?.[bowl.Bowler]?.Name_Full;
-                                            return (
-                                                <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                            <WikiImage name={pName} id={bowl.Bowler} type="player" style={{ width: 32, height: 32 }} circle={true} />
-                                                            <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>{pName}</div>
-                                                        </div>
-                                                    </td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Overs}</td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Maidens}</td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Runs}</td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Wickets}</td>
-                                                    <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Economyrate}</td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Fall of Wickets */}
+                    {selectedInn.FallofWickets?.length > 0 && (
+                        <div style={{ padding: '8px 16px', fontSize: 11, color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+                            <span style={{ color: 'rgba(255,255,255,0.4)', marginRight: 6 }}>FOW:</span>
+                            {selectedInn.FallofWickets.map((fow: any, idx: number) => (
+                                <span key={idx}>
+                                    {fow.Score}-{fow.Wicket_No}
+                                    {idx < selectedInn.FallofWickets.length - 1 && <span style={{ margin: '0 4px', opacity: 0.3 }}>,</span>}
+                                </span>
+                            ))}
                         </div>
-                    ))}
+                    )}
+
+                    {/* Bowling Table */}
+                    <h4 style={{ margin: '20px 16px 8px', fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Bowling</h4>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                            <thead>
+                                <tr>
+                                    <th style={{ textAlign: 'left', padding: '12px 16px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', width: '50%' }}>Bowler</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>O</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>M</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>R</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>W</th>
+                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>ER</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {selectedInn.Bowlers?.map((bowl: any, i: number) => {
+                                    const pName = scorecard.Teams?.[selectedInn.Bowlingteam]?.Players?.[bowl.Bowler]?.Name_Full;
+                                    return (
+                                        <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                            <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                    <WikiImage name={pName} id={bowl.Bowler} type="player" style={{ width: 32, height: 32 }} circle={true} />
+                                                    <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>{pName}</div>
+                                                </div>
+                                            </td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Overs}</td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Maidens}</td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Runs}</td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Wickets}</td>
+                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Economyrate}</td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                            {/* Extras Row */}
+                            {(() => {
+                                const b = parseInt(selectedInn.Byes) || 0;
+                                const lb = parseInt(selectedInn.Legbyes) || 0;
+                                const w = parseInt(selectedInn.Wides) || 0;
+                                const nb = parseInt(selectedInn.Noballs) || 0;
+                                const p = parseInt(selectedInn.Penalty) || 0;
+                                const totalExtras = b + lb + w + nb + p;
+                                const details: string[] = [];
+                                if (b > 0) details.push(`b ${b}`);
+                                if (lb > 0) details.push(`lb ${lb}`);
+                                if (w > 0) details.push(`w ${w}`);
+                                if (nb > 0) details.push(`nb ${nb}`);
+                                if (p > 0) details.push(`p ${p}`);
+
+                                return (
+                                    <tfoot>
+                                        <tr style={{ borderTop: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}>
+                                            <td style={{ padding: '12px 16px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>Extras</td>
+                                            <td colSpan={5} style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 600, color: '#fff', fontFamily: 'monospace', fontSize: 13 }}>
+                                                {totalExtras}
+                                                {details.length > 0 && (
+                                                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginLeft: 8, fontWeight: 400 }}>
+                                                        ({details.join(', ')})
+                                                    </span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                );
+                            })()}
+                        </table>
+                    </div>
                 </div>
-            ) : (
-                <div style={{ padding: 40, textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>Loading detailed stats...</div>
+            )}
+
+            {/* Insights Section */}
+            <LiveInsights
+                match={match}
+                h2hData={h2hData}
+                scorecard={scorecard}
+                batsmanSplits={batsmanSplits}
+                batsmanSplitsMatchups={batsmanSplits}
+                overByOverMatchups={overByOver}
+                overByOver={overByOver}
+                wormPrimary={wormPrimary}
+                wormSecondary={wormSecondary}
+                wagonWheelInnings={wagonWheelInnings}
+                onWagonWheelInningsChange={handleWagonWheelInningsChange}
+                matchupsInnings={matchupsInnings}
+                onMatchupsInningsChange={handleMatchupsInningsChange}
+                partnershipsInnings={partnershipsInnings}
+                onPartnershipsInningsChange={setPartnershipsInnings}
+                manhattanData={manhattanData}
+                manhattanInnings={manhattanInnings}
+                onManhattanInningsChange={handleManhattanInningsChange}
+                isLoading={isInsightsLoading}
+            />
+
+            {/* Series Link */}
+            {match.series_id && onSeriesClick && (
+                <div
+                    onClick={() => onSeriesClick(match.series_id)}
+                    style={{
+                        background: 'var(--bg-card)',
+                        borderRadius: 16,
+                        padding: 16,
+                        marginTop: 20,
+                        border: '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    <div>
+                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>View Full Series</div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{match.series_name}</div>
+                    </div>
+                    <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)' }}>→</span>
+                </div>
             )}
         </div>
     );
