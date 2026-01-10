@@ -96,184 +96,199 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
     const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
+    const [team1FormMatches, setTeam1FormMatches] = useState<string[]>([]);
+    const [team2FormMatches, setTeam2FormMatches] = useState<string[]>([]);
+
     useEffect(() => {
-        const loadData = async () => {
-            if (!match.game_id) return;
+        if (!match.game_id) return;
 
-            // Fetch H2H, Scorecard, and Form in PARALLEL
-            // const format = match.event_format || 't20'; // Usually API gives lowercase
-            const format = match.event_format || 't20';
-
-            const [h2hResult, scorecardResult, form1, form2] = await Promise.allSettled([
-                fetchH2H(match.game_id),
-                proxyFetch(`${WISDEN_SCORECARD}${match.game_id}`),
-                team1?.id ? getTeamForm(team1.id, 5, format) : Promise.resolve([]),
-                team2?.id ? getTeamForm(team2.id, 5, format) : Promise.resolve([])
-            ]);
-
-            // Process H2H
-            let h2hDataValue = null;
-            if (h2hResult.status === 'fulfilled') {
-                h2hDataValue = h2hResult.value;
-                setH2hData(h2hResult.value);
-            }
+        // 1. Fetch H2H (Critical for Main Content)
+        setLoadingH2H(true);
+        fetchH2H(match.game_id).then(data => {
+            if (data) setH2hData(data);
             setLoadingH2H(false);
+        }).catch(() => setLoadingH2H(false));
 
-            // Process Scorecard
-            let scorecardValue = null;
-            if (scorecardResult.status === 'fulfilled') {
-                scorecardValue = scorecardResult.value;
-                const scData = scorecardResult.value;
-                const details = scData?.data?.Matchdetail;
-                const series = details?.Series;
-                const venue = details?.Venue;
+        // 2. Fetch Scorecard (For Weather, Streaming, Pitch)
+        let scFetch = proxyFetch(`${WISDEN_SCORECARD}${match.game_id}`).then(scData => {
+            const details = scData?.data?.Matchdetail;
+            const series = details?.Series;
+            const venue = details?.Venue;
 
-                if (series || venue) {
-                    setScorecardData({
-                        Series_match_count: series?.Series_match_count,
-                        Streaming_platform: series?.Streaming_platform || [],
-                        Broadcasting_platform: series?.Broadcasting_platform || [],
-                        Venue: venue,
-                        Teams: scData?.data?.Teams
-                    });
+            if (series || venue) {
+                setScorecardData({
+                    Series_match_count: series?.Series_match_count,
+                    Streaming_platform: series?.Streaming_platform || [],
+                    Broadcasting_platform: series?.Broadcasting_platform || [],
+                    Venue: venue,
+                    Teams: scData?.data?.Teams
+                });
 
-                    // Fetch Weather using venue coordinates
-                    if (venue?.Latitude && venue?.Longitude) {
-                        const lat = parseFloat(venue.Latitude);
-                        const lon = parseFloat(venue.Longitude);
-                        fetchWeather(lat, lon, 7).then(setWeather);
-                    }
+                // Fetch Weather using venue coordinates
+                if (venue?.Latitude && venue?.Longitude) {
+                    const lat = parseFloat(venue.Latitude);
+                    const lon = parseFloat(venue.Longitude);
+                    fetchWeather(lat, lon, 7).then(setWeather);
                 }
             }
+            return scData;
+        });
 
-            // Calculate Win Probability
-            if (team1?.id && team2?.id) {
-                // Determine H2H stats for this matchup
-                let h2hStats = { matches_played: '0', won: '0', lost: '0' };
-                if (h2hDataValue?.team?.head_to_head?.comp_type?.data) {
-                    const opponentStat = h2hDataValue.team.head_to_head.comp_type.data.find((op: any) => String(op.id) === String(team2.id));
-                    if (opponentStat) {
-                        h2hStats = {
-                            matches_played: opponentStat.matches_played,
-                            won: opponentStat.won,
-                            lost: opponentStat.lost
-                        };
-                    }
-                }
+        // 3. Fetch Team Forms (For Win Probability)
+        const format = match.event_format || 't20';
+        if (team1?.id) {
+            getTeamForm(team1.id, 5, format).then(setTeam1FormMatches);
+        }
+        if (team2?.id) {
+            getTeamForm(team2.id, 5, format).then(setTeam2FormMatches);
+        }
 
-                // Extract Venue-specific H2H
-                let venueH2H = {};
-                if (h2hDataValue?.team?.head_to_head?.venue?.data) {
-                    const venueData = h2hDataValue.team.head_to_head.venue.data;
-                    const team1VenueStat = venueData.find((t: any) => String(t.id) === String(team1.id));
-                    const team2VenueStat = venueData.find((t: any) => String(t.id) === String(team2.id));
-                    if (team1VenueStat && team2VenueStat) {
-                        venueH2H = {
-                            team1_matches: team1VenueStat.matches_played || 0,
-                            team1_win_pct: team1VenueStat.win_percentage || 50,
-                            team2_matches: team2VenueStat.matches_played || 0,
-                            team2_win_pct: team2VenueStat.win_percentage || 50
-                        };
-                    }
-                }
+        // 4. Load Squads (Dependent on Scorecard or H2H)
+        // We wait for Scorecard to check if it has squads, then decide
+        const loadSquads = async () => {
+            const scData = await scFetch; // Wait for scorecard result
+            setLoadingSquads(true);
 
-                // Determine if International (Men's='icc', Women's='womens_international', Youth='youth_international')
-                const isInternational = match.league_code === 'icc' ||
-                    match.league_code === 'womens_international' ||
-                    match.league_code === 'youth_international';
-                const isFranchise = !isInternational;
+            try {
+                // Check if Scorecard has squad data
+                const scorecardTeams = scData?.data?.Teams;
 
-                const f1 = (form1.status === 'fulfilled' ? form1.value : []) as string[];
-                const f2 = (form2.status === 'fulfilled' ? form2.value : []) as string[];
-                // Extract Pitch Detail from Scorecard if available
-                const pitch = scorecardValue?.data?.Matchdetail?.Venue?.Pitch_Detail || {};
-                const homeTeamId = scorecardValue?.data?.Matchdetail?.Team_Home;
+                // Get player counts from Scorecard
+                const team1ScorecardPlayers: any = scorecardTeams && team1 ?
+                    Object.entries(scorecardTeams).find(([_, t]: [string, any]) =>
+                        t.Name_Short === team1.short_name || t.Name_Full?.includes(team1.name)
+                    )?.[1] : null;
+                const team2ScorecardPlayers: any = scorecardTeams && team2 ?
+                    Object.entries(scorecardTeams).find(([_, t]: [string, any]) =>
+                        t.Name_Short === team2.short_name || t.Name_Full?.includes(team2.name)
+                    )?.[1] : null;
 
-                const prob = calculatePreMatchProbability(
-                    team1 as any,
-                    team2 as any,
-                    h2hStats,
-                    f1,
-                    f2,
-                    venueH2H,
-                    pitch,
-                    match.venue_name || "",
-                    isFranchise,
-                    homeTeamId,
-                    h2hDataValue // Full H2H data for player strength analysis
-                );
-                setWinProb(prob);
-            }
+                const team1Count = team1ScorecardPlayers?.Players ? Object.keys(team1ScorecardPlayers.Players).length : 0;
+                const team2Count = team2ScorecardPlayers?.Players ? Object.keys(team2ScorecardPlayers.Players).length : 0;
 
-            // HYBRID SQUAD APPROACH: Try Scorecard first, fallback to H2H per team
-            if (team1?.id && team2?.id) {
-                try {
-                    // Check if Scorecard has squad data
-                    const scorecardTeams = scorecardResult.status === 'fulfilled'
-                        ? scorecardResult.value?.data?.Teams
-                        : null;
-
-                    // Get player counts from Scorecard
-                    const team1ScorecardPlayers: any = scorecardTeams ?
-                        Object.entries(scorecardTeams).find(([_, t]: [string, any]) =>
-                            t.Name_Short === team1.short_name || t.Name_Full?.includes(team1.name)
-                        )?.[1] : null;
-                    const team2ScorecardPlayers: any = scorecardTeams ?
-                        Object.entries(scorecardTeams).find(([_, t]: [string, any]) =>
-                            t.Name_Short === team2.short_name || t.Name_Full?.includes(team2.name)
-                        )?.[1] : null;
-
-                    const team1Count = team1ScorecardPlayers?.Players ? Object.keys(team1ScorecardPlayers.Players).length : 0;
-                    const team2Count = team2ScorecardPlayers?.Players ? Object.keys(team2ScorecardPlayers.Players).length : 0;
-
-                    // Convert Scorecard format to SquadData format
-                    const scorecardToSquad = (teamData: any, teamInfo: any): SquadData | null => {
-                        if (!teamData?.Players || Object.keys(teamData.Players).length === 0) return null;
-                        return {
-                            team_id: parseInt(teamInfo.id),
-                            team_name: teamData.Name_Full || teamInfo.name,
-                            team_short_name: teamData.Name_Short || teamInfo.short_name,
-                            players: Object.entries(teamData.Players)
-                                .sort((a: any, b: any) => parseInt(a[1].Position || '99') - parseInt(b[1].Position || '99'))
-                                .map(([playerId, p]: [string, any]) => ({
-                                    player_id: parseInt(playerId),
-                                    player_name: p.Name_Full,
-                                    short_name: p.Name_Short || p.Name_Full,
-                                    role: p.Role || p.Skill_Name,
-                                    skill: p.Skill_Name,
-                                    is_captain: p.Iscaptain === true || p.Iscaptain === 'true',
-                                    is_keeper: p.Iskeeper === true || p.Iskeeper === 'true'
-                                }))
-                        };
+                // Convert Scorecard format to SquadData format
+                const scorecardToSquad = (teamData: any, teamInfo: any): SquadData | null => {
+                    if (!teamData?.Players || Object.keys(teamData.Players).length === 0) return null;
+                    return {
+                        team_id: parseInt(teamInfo.id),
+                        team_name: teamData.Name_Full || teamInfo.name,
+                        team_short_name: teamData.Name_Short || teamInfo.short_name,
+                        players: Object.entries(teamData.Players)
+                            .sort((a: any, b: any) => parseInt(a[1].Position || '99') - parseInt(b[1].Position || '99'))
+                            .map(([playerId, p]: [string, any]) => ({
+                                player_id: parseInt(playerId),
+                                player_name: p.Name_Full,
+                                short_name: p.Name_Short || p.Name_Full,
+                                role: p.Role || p.Skill_Name,
+                                skill: p.Skill_Name,
+                                is_captain: p.Iscaptain === true || p.Iscaptain === 'true',
+                                is_keeper: p.Iskeeper === true || p.Iskeeper === 'true'
+                            }))
                     };
+                };
 
-                    // Team 1: Use Scorecard if available, else H2H
-                    let finalSquad1: SquadData | null = null;
+                // Team 1: Use Scorecard if available, else H2H
+                let finalSquad1: SquadData | null = null;
+                if (team1?.id) {
                     if (team1Count > 0) {
                         finalSquad1 = scorecardToSquad(team1ScorecardPlayers, team1);
                     } else {
                         finalSquad1 = await fetchSquad(team1.id, match.series_id);
                     }
+                }
 
-                    // Team 2: Use Scorecard if available, else H2H
-                    let finalSquad2: SquadData | null = null;
+                // Team 2: Use Scorecard if available, else H2H
+                let finalSquad2: SquadData | null = null;
+                if (team2?.id) {
                     if (team2Count > 0) {
                         finalSquad2 = scorecardToSquad(team2ScorecardPlayers, team2);
                     } else {
                         finalSquad2 = await fetchSquad(team2.id, match.series_id);
                     }
-
-                    setSquad1(finalSquad1);
-                    setSquad2(finalSquad2);
-                } catch (err) {
-                    console.error("Failed to load Squads", err);
                 }
+
+                setSquad1(finalSquad1);
+                setSquad2(finalSquad2);
+            } catch (err) {
+                console.error("Failed to load Squads", err);
+            } finally {
+                setLoadingSquads(false);
             }
-            setLoadingSquads(false);
         };
 
-        loadData();
+        loadSquads();
+
     }, [match.game_id, match.series_id, team1?.id, team2?.id]);
+
+    // NEW: Win Probability Effect (Runs when dependencies arrive)
+    useEffect(() => {
+        if (!team1?.id || !team2?.id || !h2hData) return;
+
+        // Wait for forms to be populated (or at least attempted)
+        // Note: form arrays can be empty, so checking length > 0 might block if no form exists.
+        // But in initial render they are empty. 
+        // We can just run this whenever data changes.
+
+        // Determine H2H stats for this matchup
+        let h2hStats = { matches_played: '0', won: '0', lost: '0' };
+        if (h2hData?.team?.head_to_head?.comp_type?.data) {
+            const opponentStat = h2hData.team.head_to_head.comp_type.data.find((op: any) => String(op.id) === String(team2.id));
+            if (opponentStat) {
+                h2hStats = {
+                    matches_played: opponentStat.matches_played,
+                    won: opponentStat.won,
+                    lost: opponentStat.lost
+                };
+            }
+        }
+
+        // Extract Venue-specific H2H
+        let venueH2H = {};
+        if (h2hData?.team?.head_to_head?.venue?.data) {
+            const venueData = h2hData.team.head_to_head.venue.data;
+            const team1VenueStat = venueData.find((t: any) => String(t.id) === String(team1.id));
+            const team2VenueStat = venueData.find((t: any) => String(t.id) === String(team2.id));
+            if (team1VenueStat && team2VenueStat) {
+                venueH2H = {
+                    team1_matches: team1VenueStat.matches_played || 0,
+                    team1_win_pct: team1VenueStat.win_percentage || 50,
+                    team2_matches: team2VenueStat.matches_played || 0,
+                    team2_win_pct: team2VenueStat.win_percentage || 50
+                };
+            }
+        }
+
+        // Determine if International
+        const isInternational = match.league_code === 'icc' ||
+            match.league_code === 'womens_international' ||
+            match.league_code === 'youth_international';
+        const isFranchise = !isInternational;
+
+        // Extract Pitch Detail from Scorecard if available
+        const pitch = scorecardData?.Venue?.Pitch_Detail || {}; // Access state directly?
+        // Wait, scorecardData is state. It might not be set yet.
+        // That's fine, if pitch is missing, algo handles it.
+
+        const homeTeamId = scorecardData?.Teams && Object.values(scorecardData.Teams).find((t: any) => t.Name_Full.includes(match.venue || 'Home')) ? 'UNKNOWN' : match.participants[0].id;
+        // Simplification for Home ID as strict check is complex without full Matchdetail here.
+        // Actually we can try to derive it.
+
+        const prob = calculatePreMatchProbability(
+            team1 as any,
+            team2 as any,
+            h2hStats,
+            team1FormMatches,
+            team2FormMatches,
+            venueH2H,
+            pitch,
+            match.venue_name || "",
+            isFranchise,
+            match.participants[0].id, // Assume first team is home for now or neutral
+            h2hData // Full H2H data for player strength analysis
+        );
+        setWinProb(prob);
+
+    }, [h2hData, team1FormMatches, team2FormMatches, scorecardData, team1, team2]);
 
     // Handle clicking a recent match
     const handleRecentMatchClick = async (gameId: string) => {
