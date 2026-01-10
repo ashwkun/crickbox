@@ -116,7 +116,7 @@ const SeriesHub: React.FC<SeriesHubProps> = ({ seriesName, matches, onBack, onMa
                         <div className="sh-team-logo">
                             <WikiImage name={team1?.name} id={String(team1?.id || '0')} type="team" />
                         </div>
-                        <span className="sh-team-name">{team1?.short_name || 'TBC'}</span>
+                        <span className="sh-team-name">{team1?.name || 'TBC'}</span>
                     </div>
 
                     <div className="sh-vs">VS</div>
@@ -125,7 +125,7 @@ const SeriesHub: React.FC<SeriesHubProps> = ({ seriesName, matches, onBack, onMa
                         <div className="sh-team-logo">
                             <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" />
                         </div>
-                        <span className="sh-team-name">{team2?.short_name || 'TBC'}</span>
+                        <span className="sh-team-name">{team2?.name || 'TBC'}</span>
                     </div>
                 </div>
 
