@@ -1199,10 +1199,10 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                 </div>
 
                 {/* Venue Display - Compact & Clamped */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12, marginTop: -8, opacity: 0.7 }}>
-                    <FaMapMarkerAlt size={10} color="#fff" />
-                    <span style={{ fontSize: 11, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
-                        {match.venue_name}{match.venue_city ? `, ${match.venue_city}` : ''}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12, marginTop: -4, zIndex: 5 }}>
+                    <FaMapMarkerAlt size={11} color="rgba(255,255,255,0.8)" />
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220 }}>
+                        {match.venue_name || match.venue || 'Venue TBD'}{match.venue_city ? `, ${match.venue_city}` : ''}
                     </span>
                 </div>
 
