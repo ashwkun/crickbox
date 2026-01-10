@@ -109,8 +109,13 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         if (!isScrollActiveRef.current) return;
-        const currentScrollY = e.currentTarget.scrollTop;
-        const delta = currentScrollY - lastScrollY.current;
+
+        const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+        // Prevent loop: If content is not significantly scrollable, don't hide filters
+        if (scrollHeight - clientHeight < 150) return;
+
+        const delta = scrollTop - lastScrollY.current;
 
         if (Math.sign(delta) === Math.sign(scrollAccumulator.current)) {
             scrollAccumulator.current += delta;
