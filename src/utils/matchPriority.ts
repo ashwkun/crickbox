@@ -430,20 +430,25 @@ export function filterFeatured24hr(matches: Match[]): Match[] {
         return false;
     });
 
-    // Sort: Upcoming first (by start time), then completed (by end time, most recent first)
+    // Sort chronologically by proximity to now
+    // Upcoming: use time until start
+    // Completed: use time since end
+    // Smaller distance = closer to now = first
     return featured.sort((a, b) => {
-        // Upcoming matches first
-        if (a.event_state === 'U' && b.event_state !== 'U') return -1;
-        if (b.event_state === 'U' && a.event_state !== 'U') return 1;
+        const now = Date.now();
 
-        // Within upcoming, sort by start time (earliest first)
-        if (a.event_state === 'U' && b.event_state === 'U') {
-            return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
-        }
+        // Calculate distance from now for each match
+        const getDistanceFromNow = (match: Match): number => {
+            if (match.event_state === 'U') {
+                // Upcoming: time until start
+                return new Date(match.start_date).getTime() - now;
+            } else {
+                // Completed: time since end (make positive for comparison)
+                const endTime = match.end_date ? new Date(match.end_date).getTime() : 0;
+                return now - endTime;
+            }
+        };
 
-        // Completed: most recent first
-        const endA = a.end_date ? new Date(a.end_date).getTime() : 0;
-        const endB = b.end_date ? new Date(b.end_date).getTime() : 0;
-        return endB - endA;
+        return getDistanceFromNow(a) - getDistanceFromNow(b);
     });
 }
