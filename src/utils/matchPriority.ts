@@ -396,8 +396,9 @@ export function filterJustFinished(matches: Match[]): Match[] {
 
 /**
  * Filter for ".FEAT" section
- * Featured matches in a 24-hour window (both upcoming and completed)
- * Returns: Live + Upcoming 24hr + Completed 24hr (priority <= 15 only)
+ * Featured matches in a 24-hour window (upcoming and completed only)
+ * Live matches are shown in the Live section above, so excluded here
+ * Returns: Upcoming 24hr + Completed 24hr (priority <= 15 only)
  */
 export function filterFeatured24hr(matches: Match[]): Match[] {
     const now = Date.now();
@@ -407,10 +408,10 @@ export function filterFeatured24hr(matches: Match[]): Match[] {
         // Must be featured (priority <= 15)
         if (getMatchPriority(match) > 15) return false;
 
-        const startTime = new Date(match.start_date).getTime();
+        // Skip live matches - they're shown in Live section
+        if (match.event_state === 'L') return false;
 
-        // Live matches
-        if (match.event_state === 'L') return true;
+        const startTime = new Date(match.start_date).getTime();
 
         // Upcoming within next 24 hours
         if (match.event_state === 'U') {
@@ -429,17 +430,13 @@ export function filterFeatured24hr(matches: Match[]): Match[] {
         return false;
     });
 
-    // Sort: Live first, then upcoming by start time, then completed by end time
+    // Sort: Upcoming first (by start time), then completed (by end time, most recent first)
     return featured.sort((a, b) => {
-        // Live matches first
-        if (a.event_state === 'L' && b.event_state !== 'L') return -1;
-        if (b.event_state === 'L' && a.event_state !== 'L') return 1;
-
-        // Upcoming matches second
+        // Upcoming matches first
         if (a.event_state === 'U' && b.event_state !== 'U') return -1;
         if (b.event_state === 'U' && a.event_state !== 'U') return 1;
 
-        // Within same category, sort by time
+        // Within upcoming, sort by start time (earliest first)
         if (a.event_state === 'U' && b.event_state === 'U') {
             return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
         }
