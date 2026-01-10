@@ -553,10 +553,7 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                             {match.event_name}
                         </span>
                     )}
-                    <span style={{ fontSize: 10, fontWeight: 700, padding: '4px 10px', background: 'rgba(139, 92, 246, 0.15)', borderRadius: 20, color: '#a78bfa', display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <span style={{ width: 5, height: 5, background: '#a78bfa', borderRadius: '50%' }} />
-                        Completed
-                    </span>
+
                 </div>
 
                 {/* Teams */}
