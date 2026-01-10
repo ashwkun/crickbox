@@ -637,30 +637,31 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                         border: '1px solid var(--border-color)',
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'space-between',
                         gap: 16
                     }}>
-                        <WikiImage name={playerOfMatch.name} id={playerOfMatch.id} type="player" style={{ width: 56, height: 56 }} circle={true} />
-                        <div>
-                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>Player of the Match</div>
-                            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{playerOfMatch.name}</div>
-                            {/* Performance Stats */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
-                                {playerOfMatch.battingStats.length > 0 && (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                        <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>Bat:</span>
-                                        <span style={{ color: '#fff' }}>{playerOfMatch.battingStats.join(' & ')}</span>
-                                    </div>
-                                )}
-                                {playerOfMatch.battingStats.length > 0 && playerOfMatch.bowlingStats.length > 0 && (
-                                    <span style={{ opacity: 0.3 }}>•</span>
-                                )}
-                                {playerOfMatch.bowlingStats.length > 0 && (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                        <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>Bowl:</span>
-                                        <span style={{ color: '#fff' }}>{playerOfMatch.bowlingStats.join(' & ')}</span>
-                                    </div>
-                                )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <WikiImage name={playerOfMatch.name} id={playerOfMatch.id} type="player" style={{ width: 48, height: 48 }} circle={true} />
+                            <div>
+                                <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 2, fontWeight: 600, letterSpacing: 0.5 }}>Player of the Match</div>
+                                <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{playerOfMatch.name}</div>
                             </div>
+                        </div>
+
+                        {/* Performance Stats - Right Aligned */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                            {playerOfMatch.battingStats.length > 0 && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: 8 }}>
+                                    <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Bat</span>
+                                    <span style={{ fontSize: 12, color: '#fff', fontWeight: 600, fontFamily: 'monospace' }}>{playerOfMatch.battingStats.join(', ')}</span>
+                                </div>
+                            )}
+                            {playerOfMatch.bowlingStats.length > 0 && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: 8 }}>
+                                    <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Bowl</span>
+                                    <span style={{ fontSize: 12, color: '#fff', fontWeight: 600, fontFamily: 'monospace' }}>{playerOfMatch.bowlingStats.join(', ')}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
