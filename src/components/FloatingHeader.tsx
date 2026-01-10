@@ -89,9 +89,12 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
     // Since ball colors are usually solid (e.g. #ff0000), we wrap in 'rgba(..., 0.8)' or use specific logic?
     // User wants "header bg... change to colour of the ball".
     // I'll assume data.ball.color is a valid color string.
+    // Dynamic Background Logic: Corner Spotlight
     const activeBg = celebrating && data?.ball?.color
-        ? data.ball.color // Ball color (usually bold)
-        : (data?.teamColor || 'rgba(20, 20, 20, 0.4)');
+        ? data.ball.color
+        : data?.teamColor
+            ? `radial-gradient(circle at top left, ${data.teamColor}, rgba(20, 20, 20, 0.4) 70%)`
+            : 'rgba(20, 20, 20, 0.4)';
 
     // If celebrating, we might want higher opacity to make text readable against bright colors?
     // Glassmorphism usually likes lower opacity.
