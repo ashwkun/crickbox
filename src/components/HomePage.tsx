@@ -860,16 +860,19 @@ export default function HomePage({
                                 onViewTournament={openTournament}
                             />
                         ))}
-                        {resultsLimit < filteredCompleted.length && (
-                            <button
-                                className="view-more-card"
-                                onClick={loadMoreResults}
-                            >
-                                <span className="view-more-icon">+</span>
-                                <span className="view-more-text">View All</span>
-                                <span className="view-more-count">Results</span>
-                            </button>
-                        )}
+                        ))}
+
+                        {/* Always show View All button for consistent navigation */}
+                        <button
+                            className="view-more-card"
+                            onClick={loadMoreResults}
+                        >
+                            <div className="view-more-icon">
+                                <LuCalendarClock size={24} />
+                            </div>
+                            <span className="view-more-text">Full History</span>
+                            <span className="view-more-count">{filteredCompleted.length} matches</span>
+                        </button>
                     </div>
                 ) : (
                     <div className="empty-state">No results found</div>
