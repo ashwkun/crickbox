@@ -149,10 +149,10 @@ const CompletedCard: React.FC<CompletedCardProps> = React.memo(({
                 {badgeText && <div className="completed-format-badge">{badgeText}</div>}
             </div>
 
-            {/* Teams Content */}
+            {/* Content: Team Rows */}
             <div className="completed-content">
                 {/* Team 1 Row */}
-                <div className={`completed-team-row ${isT1Winner ? 'winner' : ''}`}>
+                <div className="completed-team-row">
                     <div className="completed-team-info">
                         <div className="completed-team-logo-wrapper">
                             <WikiImage name={team1Name} id={team1Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -163,7 +163,7 @@ const CompletedCard: React.FC<CompletedCardProps> = React.memo(({
                 </div>
 
                 {/* Team 2 Row */}
-                <div className={`completed-team-row ${isT2Winner ? 'winner' : ''}`}>
+                <div className="completed-team-row">
                     <div className="completed-team-info">
                         <div className="completed-team-logo-wrapper">
                             <WikiImage name={team2Name} id={team2Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -172,13 +172,18 @@ const CompletedCard: React.FC<CompletedCardProps> = React.memo(({
                     </div>
                     <div className="completed-score">{renderScore(team2?.value, isT2Winner)}</div>
                 </div>
+
+                {/* Result Text inside content */}
+                {resultText && (
+                    <div className={`completed-result-text ${isDraw ? 'draw' : ''}`}>
+                        {resultText}
+                    </div>
+                )}
             </div>
 
-            {/* Result Footer */}
+            {/* Footer: Series Name and Action */}
             <div className="completed-card-footer">
-                <span className={`completed-result ${isDraw ? 'draw' : ''}`}>
-                    {resultText || seriesName}
-                </span>
+                <span className="upcoming-series-name" style={{ flex: 1 }}>{seriesName}</span>
                 {hasAction && (
                     <button className="completed-action-btn" onClick={handleAction}>
                         {actionText} <span style={{ opacity: 0.6 }}>›</span>

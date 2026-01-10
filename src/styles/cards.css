@@ -628,15 +628,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 10px;
+    padding: 6px 10px;
     border-radius: 10px;
     transition: all 0.2s ease;
 }
 
-.completed-team-row.winner {
-    background: rgba(34, 197, 94, 0.08);
-    border: 1px solid rgba(34, 197, 94, 0.15);
-}
+/* Removed green winner highlight background per user request */
 
 .completed-team-info {
     display: flex;
@@ -665,12 +662,31 @@
 .completed-team-name.winner {
     font-weight: 700;
     color: #fff;
+    /* Optional: subtle text shadow to pop winner name */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .completed-score {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: inherit;
+    /* Use standard font */
+    font-size: 14px;
+    font-weight: 700;
     text-align: right;
     flex-shrink: 0;
+}
+
+.completed-result-text {
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #22c55e;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.completed-result-text.draw {
+    color: #f59e0b;
 }
 
 /* Footer: Result and Action */
@@ -698,9 +714,7 @@
     max-width: 180px;
 }
 
-.completed-result.draw {
-    color: #f59e0b;
-}
+/* Result moved to content area, footer uses upcoming-series-name style */
 
 .completed-action-btn {
     font-size: 9px;
