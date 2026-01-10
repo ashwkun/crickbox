@@ -336,25 +336,30 @@ export function generateUpcomingChips(matches: Match[]): Chip[] {
     }
 
     // Sort: Priority tier first, then earliestDate within tier
+    // Sort: Explicit CHIP_ORDER
     chips.sort((a, b) => {
-        // "All" always first
-        if (a.id === 'all') return -1;
-        if (b.id === 'all') return 1;
-        // "Featured" always second
-        if (a.id === 'featured') return -1;
-        if (b.id === 'featured') return 1;
+        const orderA = CHIP_ORDER.indexOf(a.id);
+        const orderB = CHIP_ORDER.indexOf(b.id);
 
-        // Compare tiers first
-        if (a.priorityTier !== b.priorityTier) {
-            return a.priorityTier - b.priorityTier;
+        // If both present in CHIP_ORDER, use that order
+        if (orderA !== -1 && orderB !== -1) {
+            return orderA - orderB;
         }
 
-        // Within same tier, sort by earliest upcoming match
+        // If one is missing, push it to end
+        if (orderA === -1 && orderB !== -1) return 1;
+        if (orderA !== -1 && orderB === -1) return -1;
+
+        // If both missing (unknown categories), fallback to date sorting (imminence)
         return a.earliestDate.getTime() - b.earliestDate.getTime();
     });
 
-    // Return only the Chip interface properties
-    return chips.map(({ id, label, count }) => ({ id, label, count }));
+    // Within same tier, sort by earliest upcoming match
+    return a.earliestDate.getTime() - b.earliestDate.getTime();
+});
+
+// Return only the Chip interface properties
+return chips.map(({ id, label, count }) => ({ id, label, count }));
 }
 
 /**
