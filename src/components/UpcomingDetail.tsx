@@ -458,13 +458,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                     {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)', flexShrink: 0 }}>›</span>}
                 </div>
 
-                {/* Venue Display - Compact & Clamped */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12, marginTop: -4, zIndex: 5 }}>
-                    <FaMapMarkerAlt size={11} color="rgba(255,255,255,0.8)" />
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220 }}>
-                        {match.venue_name || match.venue || 'Venue TBD'}{match.venue_city ? `, ${match.venue_city}` : ''}
-                    </span>
-                </div>
+
 
                 {/* Row 2: Chips - Match format only */}
                 <div style={{
@@ -607,6 +601,14 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                         ))}
                     </div>
                 ) : null}
+                {/* Venue - Bottom Style */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 12 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    {match.venue || match.venue_name || 'Venue TBD'}
+                </div>
             </div>
 
             {/* H2H Section */}
