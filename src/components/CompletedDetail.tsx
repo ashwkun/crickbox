@@ -270,7 +270,12 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
         if (!match?.game_id || !scorecard?.Innings?.length) return;
 
         const loadInsights = async () => {
+            if (!match.game_id || !scorecard?.Innings) return;
+
+            console.log("🚀 Starting Insights Load...");
+            const startTime = performance.now();
             setIsInsightsLoading(true);
+
             const inningsCount = scorecard.Innings.length;
             const inningsIds = scorecard.Innings.map((_: any, i: number) => i + 1);
 
@@ -286,11 +291,16 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
 
             try {
                 // Parallel Fetching: Get H2H, Splits for last innings AND OBO for ALL innings at once
+                console.time("Fetch_All_Insights");
                 const [h2h, splits, ...oboResults] = await Promise.all([
                     fetchH2H(match.game_id),
                     fetchBatsmanSplits(match.game_id, inningsCount),
                     ...inningsIds.map((id: number) => fetchOverByOver(match.game_id, id))
                 ]);
+                console.timeEnd("Fetch_All_Insights");
+
+                const fetchTime = performance.now();
+                console.log(`📡 Network Requests completed in ${(fetchTime - startTime).toFixed(2)}ms`);
 
                 // 0. Set H2H
                 if (h2h) setH2hData(h2h);
@@ -364,6 +374,10 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                 setWagonWheelInnings(inningsCount);
                 setMatchupsInnings(inningsCount);
                 setPartnershipsInnings(inningsCount);
+
+                const endTime = performance.now();
+                console.log(`✨ Insights Processing completed in ${(endTime - fetchTime).toFixed(2)}ms`);
+                console.log(`⏱️ Total Insights Time: ${(endTime - startTime).toFixed(2)}ms`);
 
             } catch (error) {
                 console.error("Error loading insights:", error);
