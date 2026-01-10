@@ -409,13 +409,11 @@ export default function App(): React.ReactElement {
             <FloatingHeader
                 showBack={currentView.type !== 'HOME'}
                 onBack={handleBack}
-                onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
-                data={headerData}
-                isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
+                onLogoClick={() => window.location.href = '/'}
                 data={headerData}
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
                 isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
-                isResults={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'R')}
+                isPast={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state !== 'L' && (currentView.data as Match)?.event_state !== 'U')}
             />
 
             {/* Base Layer: HomePage */}

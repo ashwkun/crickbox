@@ -17,10 +17,20 @@ interface FloatingHeaderProps {
     data?: HeaderDisplayData | null;
     isLive?: boolean;
     isUpcoming?: boolean;
+    isPast?: boolean;
 }
 
-const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming }) => {
+const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast }) => {
     const [celebrating, setCelebrating] = React.useState(false);
+    // ... (lines 24-219 unrelated) -> handled by 'StartLine' existing context matching. 
+    // Wait, I need to match exact context. 
+    // The simplified instruction is better if I use multi_replace or standard replace.
+    // I will replace separate chunks.
+
+    // Chunk 1: Interface Props
+    // Chunk 2: Component Signature
+    // Chunk 3: Render logic
+
     const prevBallId = React.useRef<string | undefined>(undefined);
 
     // Detect Ball Change
@@ -249,34 +259,47 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         WebkitTextFillColor: 'transparent',
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.NEXT</span>
-                                ) : (
+                                ) : isPast ? (
                                     <span style={{
                                         fontFamily: '"BBH Bartle", sans-serif',
                                         fontSize: '16px',
                                         fontWeight: 600,
                                         letterSpacing: '1px',
-                                        background: 'linear-gradient(90deg, #22c55e 0%, #22c55e 35%, #86efac 50%, #22c55e 65%, #22c55e 100%)',
+                                        background: 'linear-gradient(90deg, #d97706 0%, #d97706 35%, #fbbf24 50%, #d97706 65%, #d97706 100%)',
                                         backgroundSize: '200% 100%',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
-                                    }}>.CRIC</span>
+                                    }}>.PAST</span>
+                                ) : (                                    }}>.NEXT</span>
+                            ) : (
+                            <span style={{
+                                fontFamily: '"BBH Bartle", sans-serif',
+                                fontSize: '16px',
+                                fontWeight: 600,
+                                letterSpacing: '1px',
+                                background: 'linear-gradient(90deg, #22c55e 0%, #22c55e 35%, #86efac 50%, #22c55e 65%, #22c55e 100%)',
+                                backgroundSize: '200% 100%',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
+                            }}>.CRIC</span>
                                 )}
-                            </div>
-                            <style>{`
+                        </div>
+                    <style>{`
                                 @keyframes liveShimmer {
                                     0% { background-position: 100% 0; }
                                     100% { background-position: 0% 0; }
                                 }
                             `}</style>
-                        </>
+                </>
                     )}
-                </div>
             </div>
-
-            {/* Right: Empty spacer */}
-            <div style={{ width: 44 }}></div>
         </div>
+
+            {/* Right: Empty spacer */ }
+    <div style={{ width: 44 }}></div>
+        </div >
     );
 };
 export default FloatingHeader;
