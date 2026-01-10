@@ -43,7 +43,7 @@ const PREMIUM_LEAGUES: Record<string, { priority: number; chip: string }> = {
 
 // Chip display order
 const CHIP_ORDER = [
-    'all', 'T20 WC', 'ODI WC', 'CT', 'W-T20 WC', 'W-ODI WC', 'U19 WC',
+    'all', 'featured', 'T20 WC', 'ODI WC', 'CT', 'W-T20 WC', 'W-ODI WC', 'U19 WC',
     'Asia Cup', 'International', 'IPL', 'WPL', 'BBL', 'WBBL',
     'The Hundred', 'SA20', 'ILT20', 'PSL', 'CPL', 'BPL', 'LPL',
     "Women's", 'Youth', 'Domestic'
@@ -294,6 +294,9 @@ export function generateUpcomingChips(matches: Match[]): Chip[] {
             priorityTier: data.priorityTier
         }));
 
+    // Count featured matches
+    const featuredCount = matches.filter(m => getMatchPriority(m) <= 15).length;
+
     // Add "All" chip at the start
     chips.unshift({
         id: 'all',
@@ -303,11 +306,25 @@ export function generateUpcomingChips(matches: Match[]): Chip[] {
         priorityTier: 0
     });
 
+    // Add "Featured" chip after All (if there are any)
+    if (featuredCount > 0) {
+        chips.splice(1, 0, {
+            id: 'featured',
+            label: 'Featured',
+            count: featuredCount,
+            earliestDate: new Date(),
+            priorityTier: 0
+        });
+    }
+
     // Sort: Priority tier first, then earliestDate within tier
     chips.sort((a, b) => {
         // "All" always first
         if (a.id === 'all') return -1;
         if (b.id === 'all') return 1;
+        // "Featured" always second
+        if (a.id === 'featured') return -1;
+        if (b.id === 'featured') return 1;
 
         // Compare tiers first
         if (a.priorityTier !== b.priorityTier) {
@@ -327,7 +344,15 @@ export function generateUpcomingChips(matches: Match[]): Chip[] {
  */
 export function filterByChip(matches: Match[], chipId: string): Match[] {
     if (chipId === 'all') return matches;
+    if (chipId === 'featured') return matches.filter(m => getMatchPriority(m) <= 15);
     return matches.filter(m => getMatchChip(m) === chipId);
+}
+
+/**
+ * Check if match is featured (priority <= 15)
+ */
+export function isFeatured(match: Match): boolean {
+    return getMatchPriority(match) <= 15;
 }
 
 /**
@@ -363,6 +388,63 @@ export function filterJustFinished(matches: Match[]): Match[] {
         return timeSinceEnd >= 0 && timeSinceEnd <= TWELVE_HOURS;
     }).sort((a, b) => {
         // Sort most recently finished first
+        const endA = a.end_date ? new Date(a.end_date).getTime() : 0;
+        const endB = b.end_date ? new Date(b.end_date).getTime() : 0;
+        return endB - endA;
+    });
+}
+
+/**
+ * Filter for ".FEAT" section
+ * Featured matches in a 24-hour window (both upcoming and completed)
+ * Returns: Live + Upcoming 24hr + Completed 24hr (priority <= 15 only)
+ */
+export function filterFeatured24hr(matches: Match[]): Match[] {
+    const now = Date.now();
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+
+    const featured = matches.filter(match => {
+        // Must be featured (priority <= 15)
+        if (getMatchPriority(match) > 15) return false;
+
+        const startTime = new Date(match.start_date).getTime();
+
+        // Live matches
+        if (match.event_state === 'L') return true;
+
+        // Upcoming within next 24 hours
+        if (match.event_state === 'U') {
+            const timeUntilStart = startTime - now;
+            return timeUntilStart >= 0 && timeUntilStart <= TWENTY_FOUR_HOURS;
+        }
+
+        // Completed within last 24 hours
+        if (match.event_state === 'R' || match.event_state === 'C') {
+            if (!match.end_date) return false;
+            const endTime = new Date(match.end_date).getTime();
+            const timeSinceEnd = now - endTime;
+            return timeSinceEnd >= 0 && timeSinceEnd <= TWENTY_FOUR_HOURS;
+        }
+
+        return false;
+    });
+
+    // Sort: Live first, then upcoming by start time, then completed by end time
+    return featured.sort((a, b) => {
+        // Live matches first
+        if (a.event_state === 'L' && b.event_state !== 'L') return -1;
+        if (b.event_state === 'L' && a.event_state !== 'L') return 1;
+
+        // Upcoming matches second
+        if (a.event_state === 'U' && b.event_state !== 'U') return -1;
+        if (b.event_state === 'U' && a.event_state !== 'U') return 1;
+
+        // Within same category, sort by time
+        if (a.event_state === 'U' && b.event_state === 'U') {
+            return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+        }
+
+        // Completed: most recent first
         const endA = a.end_date ? new Date(a.end_date).getTime() : 0;
         const endB = b.end_date ? new Date(b.end_date).getTime() : 0;
         return endB - endA;
