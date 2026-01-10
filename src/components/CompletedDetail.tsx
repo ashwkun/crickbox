@@ -547,13 +547,7 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                     {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)', flexShrink: 0 }}>›</span>}
                 </div>
 
-                {/* Venue Display - Compact & Clamped */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12, marginTop: -4, zIndex: 5 }}>
-                    <FaMapMarkerAlt size={11} color="rgba(255,255,255,0.8)" />
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220 }}>
-                        {match.venue_name || match.venue || 'Venue TBD'}{match.venue_city ? `, ${match.venue_city}` : ''}
-                    </span>
-                </div>
+
 
                 {/* Match Info Chips */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
