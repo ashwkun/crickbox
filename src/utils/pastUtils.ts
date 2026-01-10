@@ -45,6 +45,10 @@ export function filterByPastTime(matches: Match[], timeFilter: PastTimeFilterVal
 
         if (isTest && match.end_date) {
             dateToUse = match.end_date;
+        } else if (isTest && !match.end_date && match.event_state === 'L') {
+            // Live test match, use today for filtering so it shows in 'today' tab?
+            // Actually results section is for completed matches mainly. 
+            // If completed but no end_date, fallback to start_date.
         }
 
         const matchDate = new Date(dateToUse);
