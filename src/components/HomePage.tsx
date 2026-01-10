@@ -3,7 +3,7 @@ import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
 import { LuMoonStar, LuCalendarClock, LuCalendarDays } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
-import JustFinishedSection from './JustFinishedSection';
+import FeatSection from './FeatSection';
 import UpcomingCard from './UpcomingCard';
 import FilterChips from './FilterChips';
 import TimeFilter, { TimeFilterValue } from './upcoming/TimeFilter';
@@ -14,7 +14,7 @@ import { filterByPastTime, isYesterday, wasLastWeek, PastTimeFilterValue } from 
 
 import SkeletonMatchCard from './SkeletonMatchCard';
 import { Match, Scorecard } from '../types';
-import { sortByPriority, generateChips, generateUpcomingChips, filterByChip, filterJustFinished } from '../utils/matchPriority';
+import { sortByPriority, generateChips, generateUpcomingChips, filterByChip, filterFeatured24hr } from '../utils/matchPriority';
 
 // Types for processed items
 interface ProcessedSeriesItem {
@@ -112,13 +112,13 @@ export default function HomePage({
     const [activeLiveIndex, setActiveLiveIndex] = useState(0);
     const [activeLiveChip, setActiveLiveChip] = useState('all');
     const [upcomingTimeFilter, setUpcomingTimeFilter] = useState<TimeFilterValue>('all');
-    const [activeUpcomingChip, setActiveUpcomingChip] = useState('all');
+    const [activeUpcomingChip, setActiveUpcomingChip] = useState('featured');
     const [lastChangedFilter, setLastChangedFilter] = useState<'time' | 'type' | null>(null);
     const [hasInitializedTimeFilter, setHasInitializedTimeFilter] = useState(false);
 
     // Results (.PAST) section filter states
     const [resultsTimeFilter, setResultsTimeFilter] = useState<PastTimeFilterValue>('all');
-    const [activeResultsChip, setActiveResultsChip] = useState('all');
+    const [activeResultsChip, setActiveResultsChip] = useState('featured');
     const [lastChangedResultsFilter, setLastChangedResultsFilter] = useState<'time' | 'type' | null>(null);
     const [hasInitializedResultsTimeFilter, setHasInitializedResultsTimeFilter] = useState(false);
 
@@ -248,9 +248,9 @@ export default function HomePage({
         [matches]
     );
 
-    // Look for Just Finished matches (high priority, recently completed)
-    const justFinishedMatches = useMemo(() =>
-        filterJustFinished(matches),
+    // Featured matches for .FEAT section (24hr window)
+    const featuredMatches = useMemo(() =>
+        filterFeatured24hr(matches),
         [matches]
     );
 
@@ -613,9 +613,9 @@ export default function HomePage({
                 )}
             </section>
 
-            {/* Just Finished Section (.JUST / .DONE) */}
-            <JustFinishedSection
-                matches={justFinishedMatches}
+            {/* Featured Section (.FEAT) - Live + Upcoming 24hr + Completed 24hr */}
+            <FeatSection
+                matches={featuredMatches}
                 onMatchClick={openMatch}
             />
 
