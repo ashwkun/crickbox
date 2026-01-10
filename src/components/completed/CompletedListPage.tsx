@@ -396,11 +396,7 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
                     marginRight: -16,
                 }}>
                     <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-                    {isFetchingHistory && (
-                        <div style={chipStyle(false)}>
-                            History...
-                        </div>
-                    )}
+
                     {timeChips.map(chip => (
                         <div
                             key={chip.id}
@@ -498,14 +494,29 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
                 )}
                 */}
 
-                {seriesGroups.length === 0 ? (
+                {isFetchingHistory ? (
+                    <div style={{ padding: '0 16px', opacity: 0.5 }}>
+                        {[1, 2, 3].map(i => (
+                            <div key={i} style={{ marginBottom: 24 }}>
+                                {/* Skeleton Header */}
+                                <div style={{ height: 16, width: '40%', background: 'rgba(255,255,255,0.1)', borderRadius: 4, marginBottom: 12 }} />
+                                {/* Skeleton Cards */}
+                                <div style={{ display: 'flex', gap: 16, overflow: 'hidden' }}>
+                                    {[1, 2].map(j => (
+                                        <div key={j} style={{ width: 280, height: 160, background: 'rgba(255,255,255,0.05)', borderRadius: 12, flexShrink: 0 }} />
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : seriesGroups.length === 0 ? (
                     <div style={{
                         textAlign: 'center',
                         padding: '80px 20px',
                         color: 'var(--text-muted)',
                     }}>
                         <LuCalendarDays size={48} style={{ opacity: 0.3, marginBottom: 16 }} />
-                        <p style={{ fontSize: 14 }}>No results found</p>
+                        <p style={{ fontSize: 14 }}>No matches found for this period</p>
                     </div>
                 ) : (
                     seriesGroups.map(group => (
