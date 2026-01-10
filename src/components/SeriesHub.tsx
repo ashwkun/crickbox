@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import WikiImage from './WikiImage';
+import { MatchRow, ResultCard } from './MatchCards';
 import { Match, Participant } from '../types';
+import { getTeamColor } from '../utils/teamColors';
+import '../styles/SeriesHub.css';
 
 interface SeriesHubProps {
     seriesName: string;
@@ -11,10 +14,7 @@ interface SeriesHubProps {
     style?: React.CSSProperties;
 }
 
-interface Standings {
-    wins: Record<string, number>;
-    draws: number;
-}
+type SubTab = 'upcoming' | 'results';
 
 // Parse winner from event_status text
 const parseWinner = (status: string | undefined, participants: Participant[] | undefined): string | null => {
@@ -37,162 +37,129 @@ const parseWinner = (status: string | undefined, participants: Participant[] | u
 };
 
 // Calculate series standings
-const calculateStandings = (matches: Match[]): Standings => {
-    const wins: Record<string, number> = {};
-    let draws = 0;
+const calculateStandings = (matches: Match[], teams: Participant[]): { t1Wins: number, t2Wins: number, draws: number } => {
+    let t1Wins = 0, t2Wins = 0, draws = 0;
+    const t1Short = teams[0]?.short_name;
+    const t2Short = teams[1]?.short_name;
 
     matches.forEach(m => {
-        if (m.event_state === 'U') return;
-
+        if (m.event_state === 'U' || m.event_state === 'L') return;
         const winner = parseWinner(m.event_status, m.participants);
-        if (winner === 'DRAW') {
-            draws++;
-        } else if (winner) {
-            wins[winner] = (wins[winner] || 0) + 1;
-        }
+        if (winner === 'DRAW') draws++;
+        else if (winner === t1Short) t1Wins++;
+        else if (winner === t2Short) t2Wins++;
     });
 
-    return { wins, draws };
+    return { t1Wins, t2Wins, draws };
 };
 
-// Normalize format
-const normalizeFormat = (format: string | undefined): string => {
-    if (!format) return '';
-    const f = format.toUpperCase();
-    if (f.includes('TEST')) return 'TEST';
-    if (f.includes('ODI') || f.includes('OD') || f.includes('LIST')) return 'ODI';
-    return 'T20';
-};
+const SeriesHub: React.FC<SeriesHubProps> = ({ seriesName, matches, onBack, onMatchClick, style }) => {
+    const [subTab, setSubTab] = useState<SubTab>('upcoming');
 
-const SeriesHub: React.FC<SeriesHubProps> = ({ seriesName, matches, onBack, onMatchClick }) => {
-    const teams = matches[0]?.participants || [];
+    const teams = matches[0]?.participants?.slice(0, 2) || [];
+    const team1 = teams[0];
+    const team2 = teams[1];
     const tourName = (matches[0] as any)?.tour_name || '';
 
     // Sort matches by date
-    const sortedMatches = [...matches].sort((a, b) =>
-        new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
-    );
+    const sortedMatches = useMemo(() =>
+        [...matches].sort((a, b) =>
+            new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+        ), [matches]);
 
     // Calculate standings
-    const { wins, draws } = calculateStandings(matches);
+    const { t1Wins, t2Wins, draws } = useMemo(() =>
+        calculateStandings(matches, teams), [matches, teams]);
 
-    // Format standings
-    const formatStandings = (): string => {
-        if (teams.length < 2) return '';
-        const [t1, t2] = teams.map(t => t.short_name);
-        const w1 = wins[t1] || 0;
-        const w2 = wins[t2] || 0;
-
-        if (w1 === 0 && w2 === 0 && draws === 0) return 'Series begins';
-
-        let text = `${w1} - ${w2}`;
-        if (draws > 0) text += ` (${draws} draw${draws > 1 ? 's' : ''})`;
-        return text;
-    };
-
-    const getMatchStatus = (match: Match): string => {
-        if (match.event_state === 'U') {
-            const isNext = sortedMatches.find(m => m.event_state === 'U')?.game_id === match.game_id;
-            if (isNext) return 'next';
-            return 'upcoming';
+    // Filter by tab
+    const filteredMatches = useMemo(() => {
+        if (subTab === 'results') {
+            return sortedMatches
+                .filter(m => m.event_state !== 'U')
+                .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
         }
-        if (match.event_state === 'L') return 'live';
-        return 'completed';
-    };
+        return sortedMatches.filter(m => m.event_state === 'U' || m.event_state === 'L');
+    }, [sortedMatches, subTab]);
 
-    const formatDate = (dateStr: string): string => {
-        const d = new Date(dateStr);
-        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-    };
+    // Team colors for theming
+    const color1 = getTeamColor(team1?.name);
+    const color2 = getTeamColor(team2?.name);
 
-    const getResultText = (match: Match): string => {
-        if (match.event_state === 'U') {
-            const d = new Date(match.start_date);
-            return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
-        }
-        if (match.event_state === 'L') return 'LIVE';
-
-        const winner = parseWinner(match.event_status, match.participants);
-        if (winner === 'DRAW') return 'Draw';
-        if (winner) return `${winner} won`;
-        return match.short_event_status || '';
-    };
+    const heroGradient = (color1 && color2)
+        ? `linear-gradient(135deg, ${color1}40 0%, transparent 50%, ${color2}40 100%)`
+        : 'linear-gradient(135deg, rgba(99,102,241,0.2) 0%, transparent 100%)';
 
     return (
-        <div className="series-hub" style={style}>
-            {/* Header */}
-            {/* Header */}
-            <div className="series-hub-header">
-                <button className="back-button" onClick={onBack}>
-                    ← Back
+        <div className="series-hub-v2" style={style}>
+            {/* HERO - H2H Style */}
+            <div className="sh-hero" style={{ background: heroGradient }}>
+                {/* Back Button */}
+                <button className="sh-back" onClick={onBack}>
+                    <span>←</span>
+                </button>
+
+                {/* Teams Face-off */}
+                <div className="sh-teams">
+                    <div className="sh-team">
+                        <div className="sh-team-logo">
+                            <WikiImage name={team1?.name} id={String(team1?.id || '0')} type="team" />
+                        </div>
+                        <span className="sh-team-name">{team1?.short_name || team1?.name || 'TBC'}</span>
+                    </div>
+
+                    <div className="sh-score-block">
+                        <div className="sh-score">
+                            <span className="sh-score-num">{t1Wins}</span>
+                            <span className="sh-score-sep">-</span>
+                            <span className="sh-score-num">{t2Wins}</span>
+                        </div>
+                        {draws > 0 && (
+                            <div className="sh-draws">{draws} draw{draws > 1 ? 's' : ''}</div>
+                        )}
+                    </div>
+
+                    <div className="sh-team">
+                        <div className="sh-team-logo">
+                            <WikiImage name={team2?.name} id={String(team2?.id || '0')} type="team" />
+                        </div>
+                        <span className="sh-team-name">{team2?.short_name || team2?.name || 'TBC'}</span>
+                    </div>
+                </div>
+
+                {/* Series Name */}
+                <h1 className="sh-title">{seriesName}</h1>
+                {tourName && <div className="sh-tour">{tourName}</div>}
+            </div>
+
+            {/* TABS */}
+            <div className="sh-tabs">
+                <button
+                    className={`sh-tab ${subTab === 'upcoming' ? 'active' : ''}`}
+                    onClick={() => setSubTab('upcoming')}
+                >
+                    Upcoming
+                </button>
+                <button
+                    className={`sh-tab ${subTab === 'results' ? 'active' : ''}`}
+                    onClick={() => setSubTab('results')}
+                >
+                    Results
                 </button>
             </div>
 
-            {/* Series Info */}
-            <div className="series-hub-info">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
-                    <WikiImage
-                        name={seriesName}
-                        id={seriesName?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}
-                        type="series"
-                        style={{ maxHeight: 64, width: 'auto', height: 'auto', borderRadius: 12 }}
-                    />
-                    <div>
-                        <h1 className="series-hub-title" style={{ marginBottom: 4 }}>{seriesName}</h1>
-                        {tourName && <div className="series-hub-tour">{tourName}</div>}
+            {/* MATCHES */}
+            <div className="sh-matches">
+                {filteredMatches.length > 0 ? (
+                    filteredMatches.map((match, idx) => (
+                        subTab === 'results'
+                            ? <ResultCard key={match.game_id || idx} match={match} onClick={() => onMatchClick(match)} />
+                            : <MatchRow key={match.game_id || idx} match={match} onClick={() => onMatchClick(match)} />
+                    ))
+                ) : (
+                    <div className="sh-empty">
+                        {subTab === 'upcoming' ? 'No upcoming matches' : 'No results yet'}
                     </div>
-                </div>
-            </div>
-
-            {/* Teams & Standings */}
-            <div className="series-hub-standings">
-                <div className="standings-teams">
-                    {teams.slice(0, 2).map((team, idx) => (
-                        <React.Fragment key={idx}>
-                            <div className="standings-team">
-                                <WikiImage
-                                    name={team.name}
-                                    type="team"
-                                    style={{ maxHeight: 48, width: 'auto', height: 'auto', borderRadius: 12, background: '#1a1a1a', padding: 4 }}
-                                />
-                                <span className="standings-team-name">{team.short_name}</span>
-                            </div>
-                            {idx === 0 && (
-                                <div className="standings-score">{formatStandings()}</div>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </div>
-            </div>
-
-            {/* Matches List */}
-            <div className="series-hub-matches">
-                <div className="section-header" style={{ padding: '0 0 16px 0' }}>
-                    <h3 className="section-title">Matches</h3>
-                    <div className="section-line"></div>
-                </div>
-
-                {sortedMatches.map((match, idx) => {
-                    const status = getMatchStatus(match);
-                    return (
-                        <div
-                            key={match.game_id || idx}
-                            className={`series-match-row ${status}`}
-                            onClick={() => onMatchClick(match)}
-                        >
-                            <div className="series-match-status-icon">
-                                {status === 'completed' && '✓'}
-                                {status === 'live' && '●'}
-                                {status === 'next' && '→'}
-                                {status === 'upcoming' && '○'}
-                            </div>
-                            <div className="series-match-date">{formatDate(match.start_date)}</div>
-                            <div className="series-match-name">{(match as any).event_name || 'Match'}</div>
-                            <div className="series-match-venue">{(match as any).venue_name?.split(',')[0] || ''}</div>
-                            <div className={`series-match-result ${status}`}>{getResultText(match)}</div>
-                        </div>
-                    );
-                })}
+                )}
             </div>
         </div>
     );
