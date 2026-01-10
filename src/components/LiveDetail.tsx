@@ -830,13 +830,11 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
         const teamInnings = scorecard.Innings.filter((inn: any) => inn.Battingteam === teamId);
         if (teamInnings.length === 0) return undefined;
 
-        // Build score string (e.g., "152/10 (20.0)" or "445/10 (120.0) & 89/7 (30.2)")
-        const scores = teamInnings.map((inn: any) => {
-            const score = `${inn.Total}/${inn.Wickets}`;
-            const overs = inn.Overs ? ` (${inn.Overs})` : '';
-            return `${score}${overs}`;
-        });
-        return scores.join(' & ');
+        // Only show the LATEST inning score for the header/ticker (cleaner for Tests)
+        const lastInn = teamInnings[teamInnings.length - 1];
+        const score = `${lastInn.Total}/${lastInn.Wickets}`;
+        const overs = lastInn.Overs ? ` (${lastInn.Overs})` : '';
+        return `${score}${overs}`;
     };
 
     // Use scorecard scores exclusively for live
