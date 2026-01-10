@@ -878,7 +878,10 @@ export default function HomePage({
             </section>
 
             {/* Gradient Accent Banner for Results */}
-            <div style={{ margin: '-12px 20px 8px' }}>
+            <div
+                onClick={onOpenCompletedList}
+                style={{ margin: '-12px 20px 8px', cursor: 'pointer' }}
+            >
                 <div style={{
                     height: '1px',
                     background: 'linear-gradient(90deg, #f59e0b 0%, rgba(245, 158, 11, 0) 100%)',
@@ -888,8 +891,7 @@ export default function HomePage({
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer'
+                    justifyContent: 'space-between'
                 }}>
                     <span style={{
                         fontSize: '13px',
@@ -897,7 +899,7 @@ export default function HomePage({
                         color: 'rgba(255, 255, 255, 0.6)',
                         letterSpacing: '0.3px'
                     }}>
-                        {completedMatches.length} completed matches
+                        View full history
                     </span>
                     <span style={{
                         fontSize: '16px',
