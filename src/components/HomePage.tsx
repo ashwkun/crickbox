@@ -246,11 +246,7 @@ export default function HomePage({
                 const dateA = a.end_date ? new Date(a.end_date).getTime() : new Date(a.start_date).getTime();
                 const dateB = b.end_date ? new Date(b.end_date).getTime() : new Date(b.start_date).getTime();
                 return dateB - dateA;
-            .sort((a, b) => {
-                    const dateA = a.end_date ? new Date(a.end_date).getTime() : new Date(a.start_date).getTime();
-                    const dateB = b.end_date ? new Date(b.end_date).getTime() : new Date(b.start_date).getTime();
-                    return dateB - dateA;
-                })
+            })
             // Only slice for the homepage widget view
             // The full list is handled by CompletedListPage
             .slice(0, 15),
