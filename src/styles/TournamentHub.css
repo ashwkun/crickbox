@@ -693,8 +693,8 @@
     position: absolute;
     width: 100px;
     height: 100px;
-    opacity: 0.04;
-    filter: grayscale(100%);
+    opacity: 0.06;
+    /* Removed grayscale for more vibrant team colors */
     pointer-events: none;
     z-index: 0;
 }
