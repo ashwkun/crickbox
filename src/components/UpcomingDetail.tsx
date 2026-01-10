@@ -8,6 +8,7 @@ import { useImageColor } from '../hooks/useImageColor';
 import { proxyFetch, WISDEN_SCORECARD } from '../utils/api';
 import { fetchWeather, WeatherData, getWeatherInfo } from '../utils/weather';
 import { getWeatherIcon, RaindropIcon } from './icons/WeatherIcons';
+import { FaMapMarkerAlt } from 'react-icons/fa';
 import H2HCard from './upcoming/H2HCard';
 import VenueCard from './upcoming/VenueCard';
 import DualTeamRecentForm from './upcoming/DualTeamRecentForm';
@@ -455,6 +456,14 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                         {match.series_name}
                     </span>
                     {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)', flexShrink: 0 }}>›</span>}
+                </div>
+
+                {/* Venue Display - Compact & Clamped */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12, marginTop: -8, opacity: 0.7 }}>
+                    <FaMapMarkerAlt size={10} color="#fff" />
+                    <span style={{ fontSize: 11, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
+                        {match.venue_name}{match.venue_city ? `, ${match.venue_city}` : ''}
+                    </span>
                 </div>
 
                 {/* Row 2: Chips - Match format only */}

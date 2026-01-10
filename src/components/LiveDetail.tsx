@@ -7,6 +7,7 @@ import { getTeamColor } from '../utils/teamColors';
 import { getMatchStatusConfig } from '../utils/matchStatus';
 import { GiCricketBat } from 'react-icons/gi';
 import { IoBaseball } from 'react-icons/io5';
+import { FaMapMarkerAlt } from 'react-icons/fa';
 import useCricketData from '../utils/useCricketData';
 import { H2HData, BatsmanSplitsResponse, OverByOverResponse } from '../utils/h2hApi';
 import { Match, Scorecard, WallstreamData, Participant } from '../types';
@@ -1195,6 +1196,14 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                         {match.series_name}
                     </span>
                     {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)', flexShrink: 0 }}>›</span>}
+                </div>
+
+                {/* Venue Display - Compact & Clamped */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12, marginTop: -8, opacity: 0.7 }}>
+                    <FaMapMarkerAlt size={10} color="#fff" />
+                    <span style={{ fontSize: 11, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
+                        {match.venue_name}{match.venue_city ? `, ${match.venue_city}` : ''}
+                    </span>
                 </div>
 
                 {/* Row 2: Chips - Day | Status | Match format */}
