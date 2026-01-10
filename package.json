@@ -4,7 +4,7 @@
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html && cp src/sw.js dist/sw.js",
-    "ship": "npm run build && firebase deploy --only hosting:prod && git add . && git commit -m \"Auto Update $(date)\" && git push origin main",
+    "ship": "npm run build && firebase deploy --only hosting:prod && git fetch origin main && git checkout origin/main -- src/data/ai_match_summaries.json src/data/audio/ 2>/dev/null || true && git add . && git commit -m \"Auto Update $(date)\" && git push origin main",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
