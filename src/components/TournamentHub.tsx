@@ -471,9 +471,9 @@ const ResultCard: React.FC<{ match: Match, onClick: () => void }> = ({ match, on
     const color1 = getTeamColor(team1?.name);
     const color2 = getTeamColor(team2?.name);
 
-    let bgGradient = '#1a1a1a';
+    let bgGradient = '#0f0f13';
     if (color1 && color2) {
-        bgGradient = `radial-gradient(circle at top left, ${color1}30, transparent 50%), radial-gradient(circle at bottom right, ${color2}30, transparent 50%), #1a1a1a`;
+        bgGradient = `radial-gradient(circle at top left, ${color1}35, transparent 50%), radial-gradient(circle at bottom right, ${color2}35, transparent 50%), #0f0f13`;
     }
 
     // Score Renderer
