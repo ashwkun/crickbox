@@ -243,8 +243,12 @@ export default function HomePage({
         matches
             .filter(m => m.event_state !== 'L' && m.event_state !== 'U')
             .filter(isInternationalMens)
-            .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())
-            .slice(0, 50),
+            .sort((a, b) => {
+                const dateA = a.end_date ? new Date(a.end_date).getTime() : new Date(a.start_date).getTime();
+                const dateB = b.end_date ? new Date(b.end_date).getTime() : new Date(b.start_date).getTime();
+                return dateB - dateA;
+            })
+            .slice(0, 500),
         [matches]
     );
 
