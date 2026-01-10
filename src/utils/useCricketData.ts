@@ -351,6 +351,20 @@ export default function useCricketData(): UseCricketDataReturn {
         return Array.from(merged.values());
     };
 
+    // Fetch specific date range (for on-demand history)
+    const fetchByDateRange = async (startDate: Date, endDate: Date): Promise<void> => {
+        const dateRange = `${formatDate(startDate)}-${formatDate(endDate)}`;
+        try {
+            const data = await fetchWithRetry(`${WISDEN_MATCHES}&daterange=${dateRange}`);
+            if (data?.matches) {
+                // Update specific matches
+                updateBucket('completed', data.matches);
+            }
+        } catch (e) {
+            console.error('Fetch by date range failed', e);
+        }
+    };
+
     // ============ CENTRALIZED FETCH FUNCTIONS ============
 
     // Wallstream - moved from wallstreamApi.ts
@@ -544,6 +558,7 @@ export default function useCricketData(): UseCricketDataReturn {
         fetchSquad,
         fetchBatsmanSplits,
         fetchOverByOver,
-        fetchSeriesInfo
+        fetchSeriesInfo,
+        fetchByDateRange
     };
 }

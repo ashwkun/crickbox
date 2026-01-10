@@ -25,7 +25,7 @@ interface ViewItem {
 }
 
 export default function App(): React.ReactElement {
-    const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream } = useCricketData();
+    const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream, fetchByDateRange } = useCricketData();
 
     const [headerData, setHeaderData] = useState<HeaderDisplayData | null>(null);
     const [scorecard, setScorecard] = useState<Scorecard | null>(null);
@@ -570,6 +570,7 @@ export default function App(): React.ReactElement {
                                     }}
                                     onSeriesClick={(sid, m) => handleOpenSeries(sid, m)}
                                     isVisible={isVisible}
+                                    fetchByDateRange={fetchByDateRange}
                                 />
                             </div>
                         );
