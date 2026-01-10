@@ -402,6 +402,24 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
         return `${teamName} ${inningsNum}`;
     };
 
+    // Determine winner
+    const getWinnerId = () => {
+        // Check participant highlight
+        const highlightedTeam = match.participants?.find(p => p.highlight === 'true');
+        if (highlightedTeam) return highlightedTeam.id;
+
+        // Check short_event_status for team name
+        const status = match.short_event_status || match.result || '';
+        if (team1?.short_name && status.includes(team1.short_name)) return team1.id;
+        if (team2?.short_name && status.includes(team2.short_name)) return team2.id;
+
+        return null;
+    };
+    const winnerId = getWinnerId();
+    const isDraw = match.result_code === 'D' || match.result?.toLowerCase().includes('draw');
+    const isT1Winner = !isDraw && team1?.id === winnerId;
+    const isT2Winner = !isDraw && team2?.id === winnerId;
+
     // Hero Card Style
     const heroStyle: React.CSSProperties = {
         position: 'relative',
@@ -423,9 +441,35 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
         <div className="upcoming-detail">
             {/* Hero Card */}
             <div className="upcoming-hero" style={heroStyle}>
-                {/* Series Name */}
-                <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>
-                    {match.series_name}
+                {/* Series Name - Clickable */}
+                <div
+                    onClick={() => {
+                        if (onSeriesClick) {
+                            onSeriesClick(match.series_id, undefined);
+                        }
+                    }}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        marginBottom: 12,
+                        cursor: onSeriesClick ? 'pointer' : 'default',
+                    }}
+                >
+                    <span style={{
+                        fontSize: 13,
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        fontWeight: 500,
+                        textAlign: 'center',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '100%',
+                    }}>
+                        {match.series_name}
+                    </span>
+                    {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)', flexShrink: 0 }}>›</span>}
                 </div>
 
                 {/* Match Info Chips */}
@@ -453,7 +497,10 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                         />
                         <span className="upcoming-team-name left">{team1?.name}</span>
                         <div style={{ marginTop: 4, minHeight: 42, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            <span style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{getTeamScore(team1?.id)}</span>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: isT1Winner ? '#22c55e' : '#fff' }}>
+                                {getTeamScore(team1?.id)}
+                                {isT1Winner && <span style={{ marginLeft: 6, fontSize: 12 }}>✓</span>}
+                            </span>
                         </div>
                     </div>
 
@@ -471,7 +518,10 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                         />
                         <span className="upcoming-team-name right">{team2?.name}</span>
                         <div style={{ marginTop: 4, minHeight: 42, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                            <span style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{getTeamScore(team2?.id)}</span>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: isT2Winner ? '#22c55e' : '#fff' }}>
+                                {getTeamScore(team2?.id)}
+                                {isT2Winner && <span style={{ marginLeft: 6, fontSize: 12 }}>✓</span>}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -494,8 +544,12 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                 )}
 
                 {/* Venue */}
-                <div style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 12 }}>
-                    📍 {match.venue || scorecard?.Matchdetail?.Venue?.Name}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 12 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    {match.venue || match.venue_name || scorecard?.Matchdetail?.Venue?.Name}
                 </div>
             </div>
 
