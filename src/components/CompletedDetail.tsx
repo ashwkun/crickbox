@@ -758,6 +758,7 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                     manhattanInnings={manhattanInnings}
                     onManhattanInningsChange={handleManhattanInningsChange}
                     isLoading={isInsightsLoading}
+                    hideContextSections={true}
                 />
 
                 {/* Series Link */}

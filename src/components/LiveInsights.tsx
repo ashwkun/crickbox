@@ -42,10 +42,11 @@ interface LiveInsightsProps {
     isWormLoading?: boolean; // Worm chart specific loading
     onH2HMatchClick?: (matchId: string) => void; // Click handler for H2H matches
     winProb?: WinProbabilityResult | null;
+    hideContextSections?: boolean; // Hide sections after Partnerships (for completed matches)
 }
 
 
-const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange, manhattanData = [], manhattanInnings = [], onManhattanInningsChange = () => { }, isManhattanLoading = false, isLoading = false, isWormLoading = false, onH2HMatchClick, winProb }) => {
+const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, batsmanSplits, batsmanSplitsMatchups, overByOverMatchups, overByOver, wormPrimary, wormSecondary, wagonWheelInnings, onWagonWheelInningsChange, isWagonWheelLoading, matchupsInnings, onMatchupsInningsChange, isMatchupsLoading, partnershipsInnings = 1, onPartnershipsInningsChange, manhattanData = [], manhattanInnings = [], onManhattanInningsChange = () => { }, isManhattanLoading = false, isLoading = false, isWormLoading = false, onH2HMatchClick, winProb, hideContextSections = false }) => {
     // if (!h2hData) return null; // Removed to allow Matchups to show even if H2H fails
 
     const team1 = match?.participants?.[0];
@@ -156,60 +157,63 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
             />
 
             {/* === SECTION 2: MATCH DEEP DIVE === */}
-
-            {/* 6. Conditions Card */}
-            <ConditionsCard
-                venueName={venueName}
-                weather={weather}
-                pitchDetail={pitchDetail}
-                officials={officials}
-            />
-
-            {/* === SECTION 3: TEAM CONTEXT === */}
-
-            {/* 7. Recent Form */}
-            {team1?.id && team2?.id && (
-                <div style={{ padding: '0 0px' }}>
-                    <DualTeamRecentForm
-                        team1={{ id: team1.id, name: team1.name, short_name: team1.short_name }}
-                        team2={{ id: team2.id, name: team2.name, short_name: team2.short_name }}
-                        currentFormat={match?.event_format || match?.match_type}
+            {!hideContextSections && (
+                <>
+                    {/* 6. Conditions Card */}
+                    <ConditionsCard
+                        venueName={venueName}
+                        weather={weather}
+                        pitchDetail={pitchDetail}
+                        officials={officials}
                     />
-                </div>
-            )}
 
-            {/* 8. Head to Head */}
-            {h2hData?.team?.head_to_head?.comp_type?.data && (
-                <div style={{ padding: '0 0px' }}>
-                    <H2HCard
-                        teams={h2hData.team.head_to_head.comp_type.data}
-                        teamIds={teamIds}
-                        title="Head to Head"
-                    />
-                </div>
-            )}
+                    {/* === SECTION 3: TEAM CONTEXT === */}
 
-            {/* 9. Recent H2H Matches */}
-            {h2hData?.team?.against_last_n_matches?.result && h2hData.team.against_last_n_matches.result.length > 0 && teamIds && (
-                <H2HRecentMatches
-                    matches={h2hData.team.against_last_n_matches.result}
-                    teamIds={teamIds}
-                    teamNames={[team1?.name || '', team2?.name || '']}
-                    format={match?.event_format}
-                    onMatchClick={onH2HMatchClick}
-                />
-            )}
+                    {/* 7. Recent Form */}
+                    {team1?.id && team2?.id && (
+                        <div style={{ padding: '0 0px' }}>
+                            <DualTeamRecentForm
+                                team1={{ id: team1.id, name: team1.name, short_name: team1.short_name }}
+                                team2={{ id: team2.id, name: team2.name, short_name: team2.short_name }}
+                                currentFormat={match?.event_format || match?.match_type}
+                            />
+                        </div>
+                    )}
 
-            {/* 10. Venue Stats */}
-            {h2hData?.team?.head_to_head?.venue && (
-                <VenueCard
-                    venue={h2hData.team.head_to_head.venue}
-                    teamIds={teamIds}
-                    pitchDetails={pitchDetail ? {
-                        Pitch_Suited_For: pitchDetail.Pitch_Suited_For,
-                        Pitch_Surface: pitchDetail.Pitch_Surface
-                    } : undefined}
-                />
+                    {/* 8. Head to Head */}
+                    {h2hData?.team?.head_to_head?.comp_type?.data && (
+                        <div style={{ padding: '0 0px' }}>
+                            <H2HCard
+                                teams={h2hData.team.head_to_head.comp_type.data}
+                                teamIds={teamIds}
+                                title="Head to Head"
+                            />
+                        </div>
+                    )}
+
+                    {/* 9. Recent H2H Matches */}
+                    {h2hData?.team?.against_last_n_matches?.result && h2hData.team.against_last_n_matches.result.length > 0 && teamIds && (
+                        <H2HRecentMatches
+                            matches={h2hData.team.against_last_n_matches.result}
+                            teamIds={teamIds}
+                            teamNames={[team1?.name || '', team2?.name || '']}
+                            format={match?.event_format}
+                            onMatchClick={onH2HMatchClick}
+                        />
+                    )}
+
+                    {/* 10. Venue Stats */}
+                    {h2hData?.team?.head_to_head?.venue && (
+                        <VenueCard
+                            venue={h2hData.team.head_to_head.venue}
+                            teamIds={teamIds}
+                            pitchDetails={pitchDetail ? {
+                                Pitch_Suited_For: pitchDetail.Pitch_Suited_For,
+                                Pitch_Surface: pitchDetail.Pitch_Surface
+                            } : undefined}
+                        />
+                    )}
+                </>
             )}
 
         </div>
