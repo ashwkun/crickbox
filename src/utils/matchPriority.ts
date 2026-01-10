@@ -5,9 +5,9 @@
 
 import { Match } from '../types';
 
-// Top 10 ICC Men's Teams (by ID)
-const TOP_ICC_TEAMS = ['4', '1', '3', '13', '5', '6', '9', '8', '7', '2'];
-// IND=4, AUS=1, ENG=3, SA=13, NZ=5, PAK=6, SL=9, BAN=8, WI=7, AFG=2
+// Top 5 ICC Men's Teams (by ID)
+const TOP_ICC_TEAMS = ['4', '1', '3', '13', '5'];
+// IND=4, AUS=1, ENG=3, SA=13, NZ=5
 
 // ICC World Cup Events (highest priority)
 const ICC_WORLD_CUPS: Record<string, { priority: number; chip: string }> = {
