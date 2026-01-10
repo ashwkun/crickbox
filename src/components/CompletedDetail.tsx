@@ -372,12 +372,35 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
 
     // Get Player of the Match
     const getPlayerOfMatch = () => {
-        if (!scorecard?.Matchdetail?.Player_Of_The_Match) return null;
-        const pom = scorecard.Matchdetail.Player_Of_The_Match;
-        return {
-            name: pom.Name_Full || pom.Name,
-            id: pom.Id
-        };
+        // 1. Direct Object
+        if (scorecard?.Matchdetail?.Player_Of_The_Match) {
+            const pom = scorecard.Matchdetail.Player_Of_The_Match;
+            // Check if it's a valid object with meaningful data
+            if (pom.Id && pom.Id !== '0') {
+                return {
+                    name: pom.Name_Full || pom.Name,
+                    id: pom.Id
+                };
+            }
+        }
+
+        // 2. Parse from Result/Status string
+        const resultString = scorecard?.Matchdetail?.Result || match.result || '';
+        const statusString = scorecard?.Matchdetail?.Status || match.short_event_status || '';
+        const combined = `${resultString} ${statusString}`;
+
+        // Regex for "Player of the Match: Name" or "MoM: Name"
+        const momRegex = /(?:Player of (?:the )?Match|MoM|Man of (?:the )?Match)[\s:-]+([A-Za-z\s.'-]+?)(?:$|\.|,|\(|\))/i;
+        const matchFound = combined.match(momRegex);
+
+        if (matchFound && matchFound[1]) {
+            return {
+                name: matchFound[1].trim(),
+                id: undefined // No ID available from string parse
+            };
+        }
+
+        return null;
     };
     const playerOfMatch = getPlayerOfMatch();
 
