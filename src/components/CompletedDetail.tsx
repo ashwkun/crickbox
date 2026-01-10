@@ -5,6 +5,7 @@ import useCricketData from '../utils/useCricketData';
 import { getTeamColor } from '../utils/teamColors';
 import { getMatchStatusConfig } from '../utils/matchStatus';
 import { Match, Scorecard } from '../types';
+import { FaMapMarkerAlt } from 'react-icons/fa';
 import { BatsmanSplitsResponse, OverByOverResponse } from '../utils/h2hApi';
 
 // AI Summary JSON URL (fetched from GitHub)
@@ -544,6 +545,14 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                         {match.series_name}
                     </span>
                     {onSeriesClick && <span style={{ fontSize: 14, color: 'rgba(255, 255, 255, 0.4)', flexShrink: 0 }}>›</span>}
+                </div>
+
+                {/* Venue Display - Compact & Clamped */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12, marginTop: -8, opacity: 0.7 }}>
+                    <FaMapMarkerAlt size={10} color="#fff" />
+                    <span style={{ fontSize: 11, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
+                        {match.venue_name}{match.venue_city ? `, ${match.venue_city}` : ''}
+                    </span>
                 </div>
 
                 {/* Match Info Chips */}
