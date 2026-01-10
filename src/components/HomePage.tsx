@@ -91,7 +91,10 @@ interface HomePageProps {
     onCloseSeries: () => void;
     onOpenTournament: (seriesId: string) => void;
     onCloseTournament: () => void;
+    onOpenTournament: (seriesId: string) => void;
+    onCloseTournament: () => void;
     onOpenUpcomingList: () => void;
+    onOpenCompletedList: () => void;
     isVisible?: boolean;
 }
 
@@ -104,7 +107,9 @@ export default function HomePage({
     onCloseSeries,
     onOpenTournament,
     onCloseTournament,
+    onCloseTournament,
     onOpenUpcomingList,
+    onOpenCompletedList,
     isVisible = true
 }: HomePageProps): React.ReactElement {
     const [upcomingLimit, setUpcomingLimit] = useState(10);
@@ -148,14 +153,8 @@ export default function HomePage({
     };
 
     const loadMoreResults = () => {
-        const currentScrollLeft = resultsScrollRef.current?.scrollLeft || 0;
-        setResultsLimit(prev => prev + 8);
-        fetchExtendedResults(1); // Load next chunk
-        setTimeout(() => {
-            if (resultsScrollRef.current) {
-                resultsScrollRef.current.scrollLeft = currentScrollLeft;
-            }
-        }, 50);
+        // Now opens full page instead of expanding inline
+        onOpenCompletedList();
     };
 
     // Navigation logic lifted to App.tsx
@@ -247,7 +246,14 @@ export default function HomePage({
                 const dateA = a.end_date ? new Date(a.end_date).getTime() : new Date(a.start_date).getTime();
                 const dateB = b.end_date ? new Date(b.end_date).getTime() : new Date(b.start_date).getTime();
                 return dateB - dateA;
-            }),
+            .sort((a, b) => {
+                    const dateA = a.end_date ? new Date(a.end_date).getTime() : new Date(a.start_date).getTime();
+                    const dateB = b.end_date ? new Date(b.end_date).getTime() : new Date(b.start_date).getTime();
+                    return dateB - dateA;
+                })
+            // Only slice for the homepage widget view
+            // The full list is handled by CompletedListPage
+            .slice(0, 15),
         [matches]
     );
 
@@ -871,8 +877,8 @@ export default function HomePage({
                                 onClick={loadMoreResults}
                             >
                                 <span className="view-more-icon">+</span>
-                                <span className="view-more-text">View More</span>
-                                <span className="view-more-count">{filteredCompleted.length - resultsLimit} more</span>
+                                <span className="view-more-text">View All</span>
+                                <span className="view-more-count">Results</span>
                             </button>
                         )}
                     </div>
