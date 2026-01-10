@@ -4,8 +4,9 @@
  */
 
 import { Match } from '../types';
+import { isToday } from './upcomingUtils';
 
-export type PastTimeFilterValue = 'all' | 'yesterday' | 'week';
+export type PastTimeFilterValue = 'all' | 'today' | 'yesterday' | 'week';
 
 /**
  * Check if a date is yesterday (local timezone)
@@ -40,6 +41,8 @@ export function filterByPastTime(matches: Match[], timeFilter: PastTimeFilterVal
         const matchDate = new Date(match.start_date);
 
         switch (timeFilter) {
+            case 'today':
+                return isToday(matchDate);
             case 'yesterday':
                 return isYesterday(matchDate);
             case 'week':

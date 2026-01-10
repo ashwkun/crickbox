@@ -300,14 +300,17 @@ export default function HomePage({
     // Generate chips for results section (based on ALL completed matches)
     const resultsChips = useMemo(() => generateUpcomingChips(completedMatches), [completedMatches]);
 
-    // Smart default for results time filter: Yesterday > Week > All
+    // Smart default for results time filter: Today > Yesterday > Week > All
     useEffect(() => {
         if (hasInitializedResultsTimeFilter || completedMatches.length === 0) return;
 
+        const hasToday = completedMatches.some(m => isToday(new Date(m.start_date)));
         const hasYesterday = completedMatches.some(m => isYesterday(new Date(m.start_date)));
         const hasLastWeek = completedMatches.some(m => wasLastWeek(new Date(m.start_date)));
 
-        if (hasYesterday) {
+        if (hasToday) {
+            setResultsTimeFilter('today');
+        } else if (hasYesterday) {
             setResultsTimeFilter('yesterday');
         } else if (hasLastWeek) {
             setResultsTimeFilter('week');

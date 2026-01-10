@@ -14,6 +14,7 @@ interface PastFilterProps {
 
 const OPTIONS: { value: PastTimeFilterValue; label: string }[] = [
     { value: 'all', label: 'All' },
+    { value: 'today', label: 'Today' },
     { value: 'yesterday', label: 'Yesterday' },
     { value: 'week', label: '7 Days' },
 ];
