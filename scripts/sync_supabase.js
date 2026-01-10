@@ -10,10 +10,27 @@
 const WISDEN_API = 'https://cricket-proxy.boxboxcric.workers.dev/?url=';
 const CLIENT_MATCHES = 'e656463796';
 
-async function fetchWisdenMatches() {
-    console.log('Fetching matches from Wisden...');
+// Helper to format date as DDMMYYYY
+function formatDateDDMMYYYY(date) {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}${month}${year}`;
+}
 
-    const url = `https://www.wisden.com/default.aspx?methodtype=3&client=${CLIENT_MATCHES}&sport=1&league=0&timezone=0530&language=en&gamestate=3`;
+async function fetchWisdenMatches() {
+    console.log('Fetching matches from Wisden (last 30 days)...');
+
+    // Calculate date range: last 30 days
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+
+    const dateRange = `${formatDateDDMMYYYY(startDate)}-${formatDateDDMMYYYY(endDate)}`;
+    console.log(`Date range: ${dateRange}`);
+
+    const url = `https://www.wisden.com/default.aspx?methodtype=3&client=${CLIENT_MATCHES}&sport=1&league=0&timezone=0530&language=en&daterange=${dateRange}`;
     const proxyUrl = `${WISDEN_API}${encodeURIComponent(url)}`;
 
     const response = await fetch(proxyUrl);
@@ -28,13 +45,12 @@ function transformMatch(m) {
     const teama = m.participants?.[0];
     const teamb = m.participants?.[1];
 
-    // Determine winner
+    // Determine winner using highlight field (reliable)
+    // Wisden API sets highlight="true" on the winning team's participant
     let winnerId = null;
-    if (m.result_code === 'W' && m.event_sub_status) {
-        // Parse winner from event_sub_status
-        const status = m.event_sub_status;
-        if (teama && status.includes(teama.name)) winnerId = teama.id;
-        else if (teamb && status.includes(teamb.name)) winnerId = teamb.id;
+    const winner = m.participants?.find(p => p.highlight === 'true');
+    if (winner) {
+        winnerId = winner.id;
     }
 
     // Extract date from game_id or start_date

@@ -43,8 +43,8 @@ https://www.wisden.com/default.aspx?methodtype=3&client={CLIENT_MATCHES}&sport=1
 ```
 - `gamestate=1`: Live Matches
 - `gamestate=2`: Upcoming Matches
-- `gamestate=4`: Recent Completed Matches (Last 2 days)
-- `gamestate=3`: Archived Matches (Older, e.g., 2023 - *Avoid*)
+- `gamestate=4`: Recent Completed Matches (Last 2 days)(very unreliable)
+- `gamestate=3`: Full list of Old to latest results (All time)(high response time due to huge data, for shorter fetches, use  the api below)
 
 ---
 
