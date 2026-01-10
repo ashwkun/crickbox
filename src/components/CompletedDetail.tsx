@@ -244,7 +244,10 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                 if (res.ok) {
                     const data = await res.json();
                     const key = match.game_id;
-                    const matchData = data[key] || data[String(key)];
+                    // Try full game_id first, then extract numeric suffix (e.g., "mindcw01102026267688" -> "267688")
+                    const numericSuffix = key?.match(/(\d{6})$/)?.[1];
+                    const matchData = data[key] || data[String(key)] ||
+                        (numericSuffix ? data[numericSuffix] : null);
                     if (matchData) {
                         setAiSummary(matchData?.text || null);
                         setAiModel(matchData?.model || null);
