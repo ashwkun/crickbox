@@ -83,7 +83,6 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
     onBack,
     onMatchClick,
     onSeriesClick,
-    onSeriesClick,
     isVisible = true,
     fetchByDateRange
 }) => {
