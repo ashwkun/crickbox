@@ -499,7 +499,6 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                         <div style={{ marginTop: 4, minHeight: 42, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                             <span style={{ fontSize: 18, fontWeight: 700, color: isT1Winner ? '#22c55e' : '#fff' }}>
                                 {getTeamScore(team1?.id)}
-                                {isT1Winner && <span style={{ marginLeft: 6, fontSize: 12 }}>✓</span>}
                             </span>
                         </div>
                     </div>
@@ -520,26 +519,25 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                         <div style={{ marginTop: 4, minHeight: 42, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                             <span style={{ fontSize: 18, fontWeight: 700, color: isT2Winner ? '#22c55e' : '#fff' }}>
                                 {getTeamScore(team2?.id)}
-                                {isT2Winner && <span style={{ marginLeft: 6, fontSize: 12 }}>✓</span>}
                             </span>
                         </div>
                     </div>
                 </div>
 
                 {/* Result Banner */}
-                {match.result && (
+                {(match.short_event_status || match.event_sub_status || match.result) && (
                     <div style={{
                         textAlign: 'center',
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: 600,
                         color: '#22c55e',
                         marginTop: 16,
-                        padding: '12px 16px',
+                        padding: '10px 16px',
                         background: 'rgba(34, 197, 94, 0.1)',
                         borderRadius: 12,
                         border: '1px solid rgba(34, 197, 94, 0.2)'
                     }}>
-                        {match.result}
+                        {match.short_event_status || match.event_sub_status || match.result}
                     </div>
                 )}
 
