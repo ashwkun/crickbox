@@ -89,20 +89,6 @@ export interface Scorecard {
     Matchid?: string;
     Innings?: Innings[];
     Teams?: Record<string, ScorecardTeam>;
-    Matchdetail?: {
-        Player_Of_The_Match?: {
-            Id: string;
-            Name: string;
-            Name_Full: string;
-        };
-        Result?: string;
-        Status?: string;
-        Venue?: {
-            Id: string;
-            Name: string;
-        };
-        Officials?: any;
-    };
 }
 
 // API response for matches list
