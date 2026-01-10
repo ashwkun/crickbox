@@ -262,19 +262,37 @@ export default function HomePage({
         const result: ProcessedCompletedItem[] = [];
         const processedSeriesIds = new Set<string>();
 
-        completedMatches.forEach(match => {
+        // Pre-sort completed matches by end_date (or start_date) descending
+        const sortedCompleted = [...completedMatches].sort((a, b) => {
+            const dateA = a.end_date ? new Date(a.end_date).getTime() : new Date(a.start_date).getTime();
+            const dateB = b.end_date ? new Date(b.end_date).getTime() : new Date(b.start_date).getTime();
+            return dateB - dateA;
+        });
+
+        sortedCompleted.forEach(match => {
             const sid = match.series_id || 'unknown';
             const seriesMatches = completedSeriesGroups[sid] || [match];
             const isBilateralMatch = isBilateral(seriesMatches);
             const isPartOfSeries = sid && sid !== 'unknown';
 
+            // Determination of "Date" for this item (use end_date for tests/completed)
+            const itemDate = match.end_date ? new Date(match.end_date) : new Date(match.start_date);
+
             if (isBilateralMatch && isPartOfSeries) {
                 if (!processedSeriesIds.has(sid)) {
+                    // Find the latest match in this series that is completed
+                    // (Should be 'match' because we sorted sortedCompleted, but let's be safe)
+                    const latestSeriesMatch = seriesMatches.reduce((prev, current) => {
+                        const prevDate = prev.end_date ? new Date(prev.end_date) : new Date(prev.start_date);
+                        const currDate = current.end_date ? new Date(current.end_date) : new Date(current.start_date);
+                        return (prevDate > currDate) ? prev : current;
+                    });
+
                     result.push({
                         type: 'series',
-                        match,
+                        match: latestSeriesMatch,
                         seriesId: sid,
-                        latestDate: new Date(match.start_date)
+                        latestDate: latestSeriesMatch.end_date ? new Date(latestSeriesMatch.end_date) : new Date(latestSeriesMatch.start_date)
                     });
                     processedSeriesIds.add(sid);
                 }
@@ -283,13 +301,13 @@ export default function HomePage({
                     type: 'tournament',
                     match,
                     seriesId: sid,
-                    latestDate: new Date(match.start_date)
+                    latestDate: itemDate
                 });
             } else {
                 result.push({
                     type: 'single',
                     match,
-                    latestDate: new Date(match.start_date)
+                    latestDate: itemDate
                 });
             }
         });
@@ -304,9 +322,16 @@ export default function HomePage({
     useEffect(() => {
         if (hasInitializedResultsTimeFilter || completedMatches.length === 0) return;
 
-        const hasToday = completedMatches.some(m => isToday(new Date(m.start_date)));
-        const hasYesterday = completedMatches.some(m => isYesterday(new Date(m.start_date)));
-        const hasLastWeek = completedMatches.some(m => wasLastWeek(new Date(m.start_date)));
+        const checkDate = (m: Match, checkFn: (d: Date) => boolean) => {
+            if (m.end_date && (m.event_format?.includes('TEST') || m.event_format?.includes('FC'))) {
+                return checkFn(new Date(m.end_date));
+            }
+            return checkFn(new Date(m.start_date));
+        };
+
+        const hasToday = completedMatches.some(m => checkDate(m, isToday));
+        const hasYesterday = completedMatches.some(m => checkDate(m, isYesterday));
+        const hasLastWeek = completedMatches.some(m => checkDate(m, wasLastWeek));
 
         if (hasToday) {
             setResultsTimeFilter('today');
