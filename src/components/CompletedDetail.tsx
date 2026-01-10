@@ -649,15 +649,15 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                         </div>
 
                         {/* Performance Stats - Right Aligned */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 4, minWidth: 80 }}>
                             {playerOfMatch.battingStats.length > 0 && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: 8 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, background: 'rgba(255,255,255,0.05)', padding: '6px 10px', borderRadius: 8 }}>
                                     <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Bat</span>
                                     <span style={{ fontSize: 12, color: '#fff', fontWeight: 600, fontFamily: 'monospace' }}>{playerOfMatch.battingStats.join(', ')}</span>
                                 </div>
                             )}
                             {playerOfMatch.bowlingStats.length > 0 && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.05)', padding: '4px 8px', borderRadius: 8 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, background: 'rgba(255,255,255,0.05)', padding: '6px 10px', borderRadius: 8 }}>
                                     <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Bowl</span>
                                     <span style={{ fontSize: 12, color: '#fff', fontWeight: 600, fontFamily: 'monospace' }}>{playerOfMatch.bowlingStats.join(', ')}</span>
                                 </div>
