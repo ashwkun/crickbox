@@ -457,8 +457,10 @@ export function filterFeatured24hr(matches: Match[]): Match[] {
 
         // Completed within last 24 hours
         if (match.event_state === 'R' || match.event_state === 'C') {
-            if (!match.end_date) return false;
-            const endTime = new Date(match.end_date).getTime();
+            // Use end_date if available, fallback to start_date for recently finished matches
+            const endTime = match.end_date
+                ? new Date(match.end_date).getTime()
+                : new Date(match.start_date).getTime();
             const timeSinceEnd = now - endTime;
             return timeSinceEnd >= 0 && timeSinceEnd <= TWENTY_FOUR_HOURS;
         }
