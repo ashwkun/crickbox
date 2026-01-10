@@ -339,6 +339,7 @@ const UpcomingDetail: React.FC<UpcomingDetailProps> = ({ match, onClose, onSerie
                         setSelectedRecentMatch(null);
                         setSelectedScorecard(null);
                     }}
+                    onSeriesClick={onSeriesClick}
                 />
             </div>
         );

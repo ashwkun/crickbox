@@ -2358,6 +2358,7 @@ const LiveDetail: React.FC<LiveDetailProps> = ({ match, scorecard, wallstream, o
                                 setSelectedRecentMatch(null);
                                 setSelectedRecentScorecard(null);
                             }}
+                            onSeriesClick={onSeriesClick}
                         />
                     </div>
                 )
