@@ -738,93 +738,63 @@ export default function HomePage({
                 )}
             </section>
 
-            {/* Wisden Attribution Footer - Modern & Bold */}
-            <div style={{ padding: '0 20px 48px' }}>
+            {/* Wisden Attribution Footer */}
+            <div style={{ padding: '16px 20px 48px' }}>
                 <a
                     href="https://wisden.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="wisden-card"
                     style={{
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: 20,
-                        background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%)',
-                        backdropFilter: 'blur(16px)',
-                        borderRadius: 24,
-                        padding: '20px 24px',
-                        border: '1px solid rgba(251, 191, 36, 0.15)',
-                        boxShadow: '0 8px 32px -8px rgba(0, 0, 0, 0.4)',
+                        gap: 12,
+                        background: 'linear-gradient(180deg, rgba(20, 20, 20, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                        backdropFilter: 'blur(20px)',
+                        borderRadius: 20,
+                        padding: '24px 32px',
+                        border: '1px solid rgba(251, 191, 36, 0.2)',
                         textDecoration: 'none',
-                        transition: 'all 0.3s ease',
-                        cursor: 'pointer',
-                        transform: 'translateZ(0)' // Hardware accel
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer'
                     }}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        {/* Logo - Larger & Popping */}
-                        <div style={{
-                            position: 'relative',
-                            filter: 'drop-shadow(0 0 15px rgba(245, 158, 11, 0.3))'
-                        }}>
-                            <div style={{
-                                background: '#f59e0b',
-                                borderRadius: 16,
-                                padding: '10px 14px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                                <img
-                                    src={wisdenLogo}
-                                    alt="Wisden"
-                                    style={{ height: 26, width: 'auto', mixBlendMode: 'multiply' }}
-                                />
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{
-                                color: 'rgba(255,255,255,0.4)',
-                                fontSize: 11,
-                                fontWeight: 600,
-                                marginBottom: 4,
-                                letterSpacing: 0.5
-                            }}>
-                                Stats from
-                            </span>
-                            <span style={{
-                                color: '#fbbf24', // Amber-400
-                                fontSize: 22,
-                                fontWeight: 700,
-                                fontFamily: '"BBH Bartle", sans-serif',
-                                letterSpacing: 0.5,
-                                lineHeight: 1,
-                                textShadow: '0 2px 10px rgba(251, 191, 36, 0.2)'
-                            }}>
-                                WISDEN.com
-                            </span>
-                        </div>
+                    {/* Large Logo */}
+                    <div style={{
+                        background: '#f59e0b',
+                        borderRadius: 16,
+                        padding: '12px 20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 20px rgba(245, 158, 11, 0.3)'
+                    }}>
+                        <img
+                            src={wisdenLogo}
+                            alt="Wisden"
+                            style={{ height: 50, width: 'auto', mixBlendMode: 'multiply' }}
+                        />
                     </div>
 
-                    {/* Arrow - Minimal */}
-                    <span style={{
-                        fontSize: '24px',
-                        color: 'rgba(255,255,255,0.2)',
-                        fontWeight: 300
-                    }}>→</span>
-
-                    <style>{`
-                        .wisden-card:hover {
-                            background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
-                            border-color: rgba(251, 191, 36, 0.3) !important;
-                            transform: translateY(-2px);
-                        }
-                        .wisden-card:active {
-                            transform: scale(0.98);
-                        }
-                     `}</style>
+                    {/* Text */}
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{
+                            color: 'rgba(255,255,255,0.5)',
+                            fontSize: 12,
+                            fontWeight: 500,
+                            marginBottom: 4
+                        }}>
+                            Data powered by
+                        </div>
+                        <div style={{
+                            color: '#fbbf24',
+                            fontSize: 18,
+                            fontWeight: 700,
+                            letterSpacing: 0.5
+                        }}>
+                            wisden.com
+                        </div>
+                    </div>
                 </a>
             </div>
         </>
