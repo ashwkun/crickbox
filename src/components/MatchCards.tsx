@@ -24,8 +24,8 @@ export const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ matc
     const color2 = getTeamColor(team2?.name);
 
     const bgGradient = (color1 && color2)
-        ? `radial-gradient(circle at 0% 50%, ${color1}35, transparent 55%), radial-gradient(circle at 100% 50%, ${color2}35, transparent 55%), #1a1a1a`
-        : '#1a1a1a';
+        ? `radial-gradient(circle at 0% 50%, ${color1}40, transparent 55%), radial-gradient(circle at 100% 50%, ${color2}40, transparent 55%), #0f0f13`
+        : '#0f0f13';
 
     return (
         <div className="new-match-card" onClick={onClick} style={{ background: bgGradient }}>
@@ -80,9 +80,9 @@ export const ResultCard: React.FC<{ match: Match, onClick: () => void }> = ({ ma
     const color1 = getTeamColor(team1?.name);
     const color2 = getTeamColor(team2?.name);
 
-    let bgGradient = '#1a1a1a';
+    let bgGradient = '#0f0f13';
     if (color1 && color2) {
-        bgGradient = `radial-gradient(circle at top left, ${color1}30, transparent 50%), radial-gradient(circle at bottom right, ${color2}30, transparent 50%), #1a1a1a`;
+        bgGradient = `radial-gradient(circle at top left, ${color1}35, transparent 50%), radial-gradient(circle at bottom right, ${color2}35, transparent 50%), #0f0f13`;
     }
 
     const renderScore = (score: string | undefined, isWinner: boolean) => {
