@@ -108,15 +108,6 @@ export default function useCricketData(): UseCricketDataReturn {
         live.forEach(m => merged.set(m.game_id, m));
 
         const finalArray = Array.from(merged.values());
-
-        // Debug logging for recompute
-        const ashes = finalArray.find(m => m.series_name?.includes('Ashes') || (m.participants?.some(p => p.name === 'England') && m.participants?.some(p => p.name === 'Australia')));
-        if (ashes) {
-            console.log(`[DEBUG_DATA] recomputeMatches final array has Ashes: ${ashes.game_id} (${ashes.event_state})`);
-        } else {
-            console.log(`[DEBUG_DATA] recomputeMatches final array MISSING Ashes.`);
-        }
-
         setMatches(finalArray);
         safeSetItem(CACHE_KEY, JSON.stringify(finalArray));
     };
@@ -173,14 +164,6 @@ export default function useCricketData(): UseCricketDataReturn {
             }
 
             if (results.status === 'fulfilled' && results.value?.matches) {
-                // Debug logging for missing match
-                const ashes = results.value.matches.find(m => m.series_name?.includes('Ashes') || (m.participants?.some(p => p.name === 'England') && m.participants?.some(p => p.name === 'Australia')));
-                if (ashes) {
-                    console.log(`[DEBUG_DATA] fetchHeavy found Ashes match in RESULTS: ${ashes.game_id} (${ashes.event_state}) - End: ${ashes.end_date}`);
-                } else {
-                    console.log(`[DEBUG_DATA] fetchHeavy results fetched ${results.value.matches.length} matches but NO Ashes match found.`);
-                }
-
                 // Merge into completed bucket
                 updateBucket('completed', results.value.matches);
             }
