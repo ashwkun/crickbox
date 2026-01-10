@@ -289,6 +289,11 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
 
             try {
                 // Parallel Fetching: Get H2H, Splits for last innings AND OBO for ALL innings at once
+                const [h2h, splits, ...oboResults] = await Promise.all([
+                    fetchH2H(match.game_id),
+                    fetchBatsmanSplits(match.game_id, inningsCount),
+                    ...inningsIds.map((id: number) => fetchOverByOver(match.game_id, id))
+                ]);
                 // 0. Set H2H
                 if (h2h) setH2hData(h2h);
 
