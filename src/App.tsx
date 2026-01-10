@@ -10,12 +10,13 @@ import { Match, Scorecard, Series, Tournament } from './types';
 // Stub wallstream data for forceLive testing
 import stubWallstream from '../api_samples/core/wallstream.json';
 import UpcomingListPage from './components/upcoming/UpcomingListPage';
+import CompletedListPage from './components/completed/CompletedListPage';
 import SeriesHub from './components/SeriesHub';
 import TournamentHub from './components/TournamentHub';
 import HowItWorks from './components/dev/HowItWorks';
 
 // --- Navigation Types ---
-export type ViewType = 'HOME' | 'MATCH' | 'SERIES' | 'TOURNAMENT' | 'UPCOMING_LIST' | 'HOW_IT_WORKS';
+export type ViewType = 'HOME' | 'MATCH' | 'SERIES' | 'TOURNAMENT' | 'UPCOMING_LIST' | 'COMPLETED_LIST' | 'HOW_IT_WORKS';
 
 interface ViewItem {
     type: ViewType;
@@ -72,6 +73,9 @@ export default function App(): React.ReactElement {
                 break;
             case 'UPCOMING_LIST':
                 query = '?upcoming=true';
+                break;
+            case 'COMPLETED_LIST':
+                query = '?results=true';
                 break;
             case 'HOW_IT_WORKS':
                 path = '/howitworks';
@@ -146,7 +150,9 @@ export default function App(): React.ReactElement {
         const matchId = params.get('match');
         const seriesId = params.get('series');
         const tournamentId = params.get('tournament');
+        const tournamentId = params.get('tournament');
         const upcoming = params.get('upcoming'); // check string 'true'
+        const results = params.get('results');
         const isGuide = window.location.pathname.replace(/\/$/, '') === '/howitworks';
 
         const initialStack: ViewItem[] = [{ type: 'HOME' }];
@@ -164,6 +170,8 @@ export default function App(): React.ReactElement {
             initialStack.push({ type: 'TOURNAMENT', id: tournamentId });
         } else if (upcoming === 'true') {
             initialStack.push({ type: 'UPCOMING_LIST' });
+        } else if (results === 'true') {
+            initialStack.push({ type: 'COMPLETED_LIST' });
         } else if (isGuide) {
             initialStack.push({ type: 'HOW_IT_WORKS' });
         }
@@ -186,11 +194,12 @@ export default function App(): React.ReactElement {
             const seriesId = params.get('series');
             const tournamentId = params.get('tournament');
             const upcoming = params.get('upcoming');
+            const results = params.get('results');
             const isGuide = window.location.pathname.replace(/\/$/, '') === '/howitworks';
 
             setViewStack(prev => {
                 // If we are at Home URL
-                if (!matchId && !seriesId && !tournamentId && !upcoming && !isGuide) {
+                if (!matchId && !seriesId && !tournamentId && !upcoming && !results && !isGuide) {
                     return [{ type: 'HOME' }];
                 }
 
@@ -206,6 +215,7 @@ export default function App(): React.ReactElement {
                 else if (seriesId) newStack.push({ type: 'SERIES', id: seriesId });
                 else if (tournamentId) newStack.push({ type: 'TOURNAMENT', id: tournamentId });
                 else if (upcoming === 'true') newStack.push({ type: 'UPCOMING_LIST' });
+                else if (results === 'true') newStack.push({ type: 'COMPLETED_LIST' });
                 else if (isGuide) newStack.push({ type: 'HOW_IT_WORKS' });
 
                 return newStack;
@@ -402,7 +412,10 @@ export default function App(): React.ReactElement {
                 onLogoClick={() => window.location.href = 'https://theboxcric.web.app/?match=inwslw12282025268163&forceLive=true'}
                 data={headerData}
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
+                data={headerData}
+                isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
                 isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
+                isResults={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'R')}
             />
 
             {/* Base Layer: HomePage */}
@@ -426,6 +439,9 @@ export default function App(): React.ReactElement {
 
                     onOpenUpcomingList={() => {
                         handleNavigate({ type: 'UPCOMING_LIST' });
+                    }}
+                    onOpenCompletedList={() => {
+                        handleNavigate({ type: 'COMPLETED_LIST' });
                     }}
 
                     isVisible={viewStack.length === 1}
@@ -531,6 +547,22 @@ export default function App(): React.ReactElement {
                                 {/* Spacer for FloatingHeader (UpcomingList needs it) */}
                                 <div style={{ height: 85 }}></div>
                                 <UpcomingListPage
+                                    matches={matches}
+                                    onBack={handleBack}
+                                    onMatchClick={(m) => {
+                                        handleSelectMatch(m);
+                                    }}
+                                    onSeriesClick={(sid, m) => handleOpenSeries(sid, m)}
+                                    isVisible={isVisible}
+                                />
+                            </div>
+                        );
+                    case 'COMPLETED_LIST':
+                        return (
+                            <div key="completed" style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-app)', overflowY: 'auto' }}>
+                                {/* Spacer for FloatingHeader */}
+                                <div style={{ height: 85 }}></div>
+                                <CompletedListPage
                                     matches={matches}
                                     onBack={handleBack}
                                     onMatchClick={(m) => {
