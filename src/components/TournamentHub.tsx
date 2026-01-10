@@ -410,8 +410,8 @@ const MatchRow: React.FC<{ match: Match, onClick: () => void }> = ({ match, onCl
     const color2 = getTeamColor(team2?.name);
 
     const bgGradient = (color1 && color2)
-        ? `radial-gradient(circle at 0% 50%, ${color1}35, transparent 55%), radial-gradient(circle at 100% 50%, ${color2}35, transparent 55%), #1a1a1a`
-        : '#1a1a1a';
+        ? `radial-gradient(circle at 0% 50%, ${color1}40, transparent 55%), radial-gradient(circle at 100% 50%, ${color2}40, transparent 55%), #0f0f13`
+        : '#0f0f13';
 
     return (
         <div className="new-match-card" onClick={onClick} style={{ background: bgGradient }}>
