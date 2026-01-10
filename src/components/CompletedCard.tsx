@@ -175,7 +175,15 @@ const CompletedCard: React.FC<CompletedCardProps> = React.memo(({
 
                 {/* Result Text inside content */}
                 {resultText && (
-                    <div className={`completed-result-text ${isDraw ? 'draw' : ''}`}>
+                    <div
+                        className={`completed-result-text ${isDraw ? 'draw' : ''}`}
+                        style={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                        }}
+                    >
                         {resultText}
                     </div>
                 )}
@@ -183,7 +191,17 @@ const CompletedCard: React.FC<CompletedCardProps> = React.memo(({
 
             {/* Footer: Series Name and Action */}
             <div className="completed-card-footer">
-                <span className="upcoming-series-name" style={{ flex: 1 }}>{seriesName}</span>
+                <span
+                    className="upcoming-series-name"
+                    style={{
+                        flex: 1,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                    }}
+                >
+                    {seriesName}
+                </span>
                 {hasAction && (
                     <button className="completed-action-btn" onClick={handleAction}>
                         {actionText} <span style={{ opacity: 0.6 }}>›</span>
