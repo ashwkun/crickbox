@@ -247,8 +247,7 @@ export default function HomePage({
                 const dateA = a.end_date ? new Date(a.end_date).getTime() : new Date(a.start_date).getTime();
                 const dateB = b.end_date ? new Date(b.end_date).getTime() : new Date(b.start_date).getTime();
                 return dateB - dateA;
-            })
-            .slice(0, 500),
+            }),
         [matches]
     );
 
@@ -263,11 +262,6 @@ export default function HomePage({
 
     // Process completed matches
     const processedCompleted = useMemo(() => {
-        // Debug input
-        const ashesInput = completedMatches.find(m => m.series_name?.includes('Ashes'));
-        if (ashesInput) console.log(`[DEBUG_HOME] processedCompleted Input has Ashes: ${ashesInput.game_id} (End: ${ashesInput.end_date})`);
-        else console.log(`[DEBUG_HOME] processedCompleted Input MISSING Ashes. Total: ${completedMatches.length}`);
-
         const result: ProcessedCompletedItem[] = [];
         const processedSeriesIds = new Set<string>();
 
@@ -372,11 +366,6 @@ export default function HomePage({
                 return filterByChip([item.match], activeResultsChip).length > 0;
             });
         }
-
-        // Debug filtered output
-        const ashesOutput = result.find(item => item.match.series_name?.includes('Ashes'));
-        if (ashesOutput) console.log(`[DEBUG_HOME] filteredCompleted Output HAS Ashes: ${ashesOutput.match.game_id}`);
-        else console.log(`[DEBUG_HOME] filteredCompleted Output MISSING Ashes. Time: ${resultsTimeFilter}, Chip: ${activeResultsChip}`);
 
         return result;
     }, [processedCompleted, resultsTimeFilter, activeResultsChip]);
