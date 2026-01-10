@@ -226,6 +226,26 @@ export default function App(): React.ReactElement {
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
+    // Hydrate pending match data from loaded matches
+    useEffect(() => {
+        if (loading || matches.length === 0) return;
+
+        setViewStack(prev => {
+            const needsUpdate = prev.some(v => v.type === 'MATCH' && !v.data && v.id);
+            if (!needsUpdate) return prev;
+
+            return prev.map(view => {
+                if (view.type === 'MATCH' && !view.data && view.id) {
+                    const foundMatch = matches.find(m => m.game_id === view.id);
+                    if (foundMatch) {
+                        return { ...view, data: foundMatch };
+                    }
+                }
+                return view;
+            });
+        });
+    }, [matches, loading]);
+
     // --- Legacy Handler Replacements ---
 
     // Handle match selection
@@ -413,7 +433,7 @@ export default function App(): React.ReactElement {
                 data={headerData}
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
                 isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
-                isPast={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state !== 'L' && (currentView.data as Match)?.event_state !== 'U')}
+                isPast={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && !!currentView.data && (currentView.data as Match)?.event_state !== 'L' && (currentView.data as Match)?.event_state !== 'U')}
             />
 
             {/* Base Layer: HomePage */}
