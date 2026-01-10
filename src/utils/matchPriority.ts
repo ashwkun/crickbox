@@ -21,6 +21,8 @@ const ICC_WORLD_CUPS: Record<string, { priority: number; chip: string }> = {
 
 // Secondary ICC Events
 const ICC_EVENTS: Record<string, { priority: number; chip: string }> = {
+    'Under-19 Asia Cup': { priority: 2, chip: 'U19 Asia Cup' },
+    'ACC Under-19 Asia Cup': { priority: 2, chip: 'U19 Asia Cup' },
     'Asia Cup': { priority: 3, chip: 'Asia Cup' },
     'Asia Cup T20I': { priority: 3, chip: 'Asia Cup' },
 };
@@ -43,7 +45,7 @@ const PREMIUM_LEAGUES: Record<string, { priority: number; chip: string }> = {
 
 // Chip display order
 const CHIP_ORDER = [
-    'all', 'featured', 'T20 WC', 'ODI WC', 'CT', 'W-T20 WC', 'W-ODI WC', 'U19 WC',
+    'all', 'featured', 'T20 WC', 'ODI WC', 'CT', 'W-T20 WC', 'W-ODI WC', 'U19 WC', 'U19 Asia Cup',
     'Asia Cup', 'International', 'IPL', 'WPL', 'BBL', 'WBBL',
     'The Hundred', 'SA20', 'ILT20', 'PSL', 'CPL', 'BPL', 'LPL',
     "Women's", 'Youth', 'Domestic'
