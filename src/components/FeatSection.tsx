@@ -81,6 +81,109 @@ const FeatCard: React.FC<{ match: Match; onMatchClick: (match: Match) => void }>
         );
     };
 
+    // Horizontal layout for UPCOMING matches (TournamentHub style)
+    if (isUpcoming) {
+        const bgGradient = (color1 && color2)
+            ? `radial-gradient(circle at 0% 50%, ${color1}35, transparent 55%), radial-gradient(circle at 100% 50%, ${color2}35, transparent 55%), #1a1a1a`
+            : '#1a1a1a';
+
+        const matchTime = new Date(match.start_date).toLocaleTimeString(undefined, {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+
+        return (
+            <div
+                onClick={() => onMatchClick(match)}
+                style={{
+                    minWidth: '260px',
+                    background: bgGradient,
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '14px',
+                    padding: '12px 14px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                }}
+            >
+                {/* Background Watermarks */}
+                <div style={{ position: 'absolute', top: '-15px', left: '-15px', width: '80px', height: '80px', opacity: 0.04, pointerEvents: 'none', filter: 'grayscale(100%)', transform: 'rotate(-15deg)' }}>
+                    <WikiImage name={team1Name} id={team1?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </div>
+                <div style={{ position: 'absolute', bottom: '-15px', right: '-15px', width: '80px', height: '80px', opacity: 0.04, pointerEvents: 'none', filter: 'grayscale(100%)', transform: 'rotate(15deg)' }}>
+                    <WikiImage name={team2Name} id={team2?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </div>
+
+                {/* Series Name Header */}
+                <div style={{
+                    fontSize: '9px',
+                    color: 'rgba(255,255,255,0.4)',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    marginBottom: '10px',
+                    textAlign: 'center',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                }}>
+                    {seriesName}
+                </div>
+
+                {/* Teams Row - Horizontal Grid */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto 1fr',
+                    alignItems: 'center',
+                    gap: '12px',
+                    position: 'relative',
+                    zIndex: 1,
+                }}>
+                    {/* Team 1 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                        <WikiImage name={team1?.name} id={team1?.id} type="team" style={{ width: '36px', height: '36px', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.25))' }} />
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff', textAlign: 'center', lineHeight: 1.15 }}>
+                            {team1?.short_name || team1?.name}
+                        </span>
+                    </div>
+
+                    {/* Center: VS + Time */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', minWidth: '50px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' }}>VS</span>
+                        <span style={{
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            color: '#06b6d4',
+                            background: 'rgba(6, 182, 212, 0.1)',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                        }}>
+                            {matchTime.toUpperCase()}
+                        </span>
+                    </div>
+
+                    {/* Team 2 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                        <WikiImage name={team2?.name} id={team2?.id} type="team" style={{ width: '36px', height: '36px', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.25))' }} />
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff', textAlign: 'center', lineHeight: 1.15 }}>
+                            {team2?.short_name || team2?.name}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Date Footer */}
+                <div style={{ marginTop: '8px', textAlign: 'center' }}>
+                    <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.35)' }}>
+                        {new Date(match.start_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                    </span>
+                </div>
+            </div>
+        );
+    }
+
+    // Original vertical layout for LIVE and COMPLETED matches
     return (
         <div
             onClick={() => onMatchClick(match)}
@@ -137,11 +240,6 @@ const FeatCard: React.FC<{ match: Match; onMatchClick: (match: Match) => void }>
                         animation: 'pulse 1.5s ease-in-out infinite'
                     }}>LIVE</span>
                 )}
-                {isUpcoming && (
-                    <span style={{ color: '#6366f1', fontWeight: 600 }}>
-                        {formatTime(match.start_date)}
-                    </span>
-                )}
                 {isCompleted && (
                     <span style={{ color: '#f59e0b' }}>{matchInfo}</span>
                 )}
@@ -185,13 +283,6 @@ const FeatCard: React.FC<{ match: Match; onMatchClick: (match: Match) => void }>
                 <div style={{ marginTop: '10px', zIndex: 1, textAlign: 'center' }}>
                     <span style={{ fontSize: '11px', color: isDraw ? '#eab308' : '#f59e0b', fontWeight: 600 }}>
                         {match.short_event_status}
-                    </span>
-                </div>
-            )}
-            {isUpcoming && (
-                <div style={{ marginTop: '10px', zIndex: 1, textAlign: 'center' }}>
-                    <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>
-                        {new Date(match.start_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                     </span>
                 </div>
             )}
