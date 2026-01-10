@@ -77,6 +77,7 @@ const MatchDetail: React.FC<MatchDetailProps> = ({
             match={match}
             scorecard={scorecard}
             onClose={onClose}
+            onSeriesClick={onSeriesClick}
             style={zIndex ? { zIndex } : undefined}
         />
     );
