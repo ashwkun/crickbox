@@ -863,7 +863,7 @@ export default function HomePage({
 
                         {/* Always show View All button for consistent navigation */}
                         <button
-                            className="view-more-card"
+                            className="view-more-card past"
                             onClick={loadMoreResults}
                         >
                             <div className="view-more-icon">
