@@ -84,6 +84,11 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
     onSeriesClick,
     isVisible = true,
 }) => {
+    // Ensure we only show COMPLETED matches (Not Live, Not Upcoming)
+    const completedMatches = useMemo(() =>
+        matches.filter(m => m.event_state !== 'L' && m.event_state !== 'U'),
+        [matches]);
+
     const timeChips = useMemo(() => generateTimeChips(), []);
     const [selectedTime, setSelectedTime] = useState(timeChips[0]?.id || '');
     const [selectedTypeChip, setSelectedTypeChip] = useState('all');
@@ -128,19 +133,19 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
     // Filter matches by time
     const timeFilteredMatches = useMemo(() => {
         const chip = timeChips.find(c => c.id === selectedTime);
-        if (!chip) return matches;
+        if (!chip) return completedMatches;
 
         // Special handling for "Last 30 Days"
         if (selectedTime === 'last30') {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            return matches.filter(m => {
+            return completedMatches.filter(m => {
                 const date = m.end_date ? new Date(m.end_date) : new Date(m.start_date);
                 return date >= thirtyDaysAgo;
             });
         }
 
-        return matches.filter(match => {
+        return completedMatches.filter(match => {
             const date = match.end_date ? new Date(match.end_date) : new Date(match.start_date);
             const matchMonth = date.getMonth();
             const matchYear = date.getFullYear();
@@ -151,7 +156,7 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
 
             return true;
         });
-    }, [matches, selectedTime, timeChips]);
+    }, [completedMatches, selectedTime, timeChips]);
 
     // Generate dynamic type chips
     const typeChips = useMemo(() => {
