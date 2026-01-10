@@ -38,7 +38,16 @@ export function filterByPastTime(matches: Match[], timeFilter: PastTimeFilterVal
     if (timeFilter === 'all') return matches;
 
     return matches.filter(match => {
-        const matchDate = new Date(match.start_date);
+        // For Test matches (and First Class), use end_date for filtering context
+        // This ensures a test match that finished today shows in "Today" even if it started 5 days ago
+        let dateToUse = match.start_date;
+        const isTest = match.event_format?.includes('TEST') || match.event_format?.includes('FC') || match.event_format?.includes('First Class');
+
+        if (isTest && match.end_date) {
+            dateToUse = match.end_date;
+        }
+
+        const matchDate = new Date(dateToUse);
 
         switch (timeFilter) {
             case 'today':
