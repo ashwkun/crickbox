@@ -45,9 +45,25 @@ const PREMIUM_LEAGUES: Record<string, { priority: number; chip: string }> = {
 
 // Chip display order
 const CHIP_ORDER = [
-    'all', 'featured', 'T20 WC', 'ODI WC', 'CT', 'W-T20 WC', 'W-ODI WC', 'U19 WC', 'U19 Asia Cup',
-    'Asia Cup', 'International', 'IPL', 'WPL', 'BBL', 'WBBL',
-    'The Hundred', 'SA20', 'ILT20', 'PSL', 'CPL', 'BPL', 'LPL',
+    // 1. Global Men's Events
+    'all', 'featured', 'T20 WC', 'ODI WC', 'CT',
+
+    // Explicit User Priority
+    'IPL', 'WPL', 'International',
+
+    // 2. Women's Global
+    'W-T20 WC', 'W-ODI WC',
+
+    // 4. Regional (International was moved up)
+    'Asia Cup',
+
+    // 5. Other Leagues (IPL/WPL moved up)
+    'BBL', 'WBBL', 'The Hundred', 'SA20', 'ILT20', 'PSL', 'CPL', 'BPL', 'LPL',
+
+    // 3. Youth (Moved down)
+    'U19 WC', 'U19 Asia Cup',
+
+    // 6. Catch-all
     "Women's", 'Youth', 'Domestic'
 ];
 
