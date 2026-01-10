@@ -221,7 +221,8 @@ const FeatSection: React.FC<FeatSectionProps> = ({ matches, onMatchClick }) => {
         fontSize: '14px',
         fontWeight: 600,
         letterSpacing: '0.5px',
-        background: 'linear-gradient(90deg, #fbbf24 0%, #fbbf24 35%, #fef3c7 50%, #fbbf24 65%, #fbbf24 100%)',
+        // Cyan/blue gradient for FEAT (different from amber PAST)
+        background: 'linear-gradient(90deg, #06b6d4 0%, #06b6d4 35%, #a5f3fc 50%, #06b6d4 65%, #06b6d4 100%)',
         backgroundSize: '200% 100%',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
@@ -261,6 +262,15 @@ const FeatSection: React.FC<FeatSectionProps> = ({ matches, onMatchClick }) => {
                 {matches.map((match) => (
                     <FeatCard key={match.game_id} match={match} onMatchClick={onMatchClick} />
                 ))}
+            </div>
+
+            {/* Gradient Accent Line below FEAT section */}
+            <div style={{ margin: '12px 20px 8px 16px' }}>
+                <div style={{
+                    height: '1px',
+                    background: 'linear-gradient(90deg, #06b6d4 0%, rgba(6, 182, 212, 0) 100%)',
+                    opacity: 0.6
+                }} />
             </div>
         </div>
     );
