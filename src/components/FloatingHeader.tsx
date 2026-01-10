@@ -21,16 +21,6 @@ interface FloatingHeaderProps {
 }
 
 const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast }) => {
-    const [celebrating, setCelebrating] = React.useState(false);
-    // ... (lines 24-219 unrelated) -> handled by 'StartLine' existing context matching. 
-    // Wait, I need to match exact context. 
-    // The simplified instruction is better if I use multi_replace or standard replace.
-    // I will replace separate chunks.
-
-    // Chunk 1: Interface Props
-    // Chunk 2: Component Signature
-    // Chunk 3: Render logic
-
     const prevBallId = React.useRef<string | undefined>(undefined);
 
     // Detect Ball Change
