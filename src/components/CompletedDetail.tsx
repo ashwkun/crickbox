@@ -274,6 +274,16 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
             const inningsCount = scorecard.Innings.length;
             const inningsIds = scorecard.Innings.map((_: any, i: number) => i + 1);
 
+            // Define helper to get metadata for an innings
+            const getInningsMeta = (idx: number) => {
+                const inn = scorecard.Innings[idx];
+                const teamId = inn?.Battingteam;
+                const team = scorecard.Teams?.[teamId];
+                const label = `${team?.Name_Short || 'TM'} ${Math.floor(idx / 2) + 1}`;
+                const teamColor = getTeamColor(team?.Name_Full || team?.Name_Short) || '#3b82f6';
+                return { label, color: teamColor };
+            };
+
             try {
                 // Parallel Fetching: Get H2H, Splits for last innings AND OBO for ALL innings at once
                 const [h2h, splits, ...oboResults] = await Promise.all([
