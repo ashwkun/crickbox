@@ -272,8 +272,6 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
         const loadInsights = async () => {
             if (!match.game_id || !scorecard?.Innings) return;
 
-            console.log("🚀 Starting Insights Load...");
-            const startTime = performance.now();
             setIsInsightsLoading(true);
 
             const inningsCount = scorecard.Innings.length;
@@ -291,17 +289,6 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
 
             try {
                 // Parallel Fetching: Get H2H, Splits for last innings AND OBO for ALL innings at once
-                console.time("Fetch_All_Insights");
-                const [h2h, splits, ...oboResults] = await Promise.all([
-                    fetchH2H(match.game_id),
-                    fetchBatsmanSplits(match.game_id, inningsCount),
-                    ...inningsIds.map((id: number) => fetchOverByOver(match.game_id, id))
-                ]);
-                console.timeEnd("Fetch_All_Insights");
-
-                const fetchTime = performance.now();
-                console.log(`📡 Network Requests completed in ${(fetchTime - startTime).toFixed(2)}ms`);
-
                 // 0. Set H2H
                 if (h2h) setH2hData(h2h);
 
@@ -375,10 +362,6 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                 setMatchupsInnings(inningsCount);
                 setPartnershipsInnings(inningsCount);
 
-                const endTime = performance.now();
-                console.log(`✨ Insights Processing completed in ${(endTime - fetchTime).toFixed(2)}ms`);
-                console.log(`⏱️ Total Insights Time: ${(endTime - startTime).toFixed(2)}ms`);
-
             } catch (error) {
                 console.error("Error loading insights:", error);
             } finally {
@@ -423,24 +406,47 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
         const detail = scorecard?.Matchdetail;
         if (!detail) return null;
 
+        let name = '';
+        let id = '';
+
         // Check primary object
         if (detail.Player_Of_The_Match) {
             const pom = detail.Player_Of_The_Match;
-            return {
-                name: pom.Name_Full || pom.Name,
-                id: pom.Id
-            };
+            name = pom.Name_Full || pom.Name;
+            id = pom.Id;
         }
-
         // Check flat fields (Fallback)
-        if (detail.Player_Match && detail.Player_Match_Id) {
-            return {
-                name: detail.Player_Match,
-                id: detail.Player_Match_Id
-            };
+        else if (detail.Player_Match && detail.Player_Match_Id) {
+            name = detail.Player_Match;
+            id = detail.Player_Match_Id;
         }
 
-        return null;
+        if (!name || !id) return null;
+
+        // Retrieve Performance Stats
+        let battingStats: string[] = [];
+        let bowlingStats: string[] = [];
+
+        if (scorecard?.Innings) {
+            scorecard.Innings.forEach((inn: any) => {
+                // Batting
+                if (inn.Batsmen) {
+                    const bat = inn.Batsmen.find((b: any) => String(b.Batsman) === String(id));
+                    if (bat) {
+                        battingStats.push(`${bat.Runs}(${bat.Balls})`);
+                    }
+                }
+                // Bowling
+                if (inn.Bowlers) {
+                    const bowl = inn.Bowlers.find((b: any) => String(b.Bowler) === String(id));
+                    if (bowl) {
+                        bowlingStats.push(`${bowl.Wickets}/${bowl.Runs}`);
+                    }
+                }
+            });
+        }
+
+        return { name, id, battingStats: battingStats.filter(Boolean), bowlingStats: bowlingStats.filter(Boolean) };
     };
     const playerOfMatch = getPlayerOfMatch();
 
@@ -632,6 +638,24 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                         <div>
                             <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>Player of the Match</div>
                             <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{playerOfMatch.name}</div>
+                            {/* Performance Stats */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
+                                {playerOfMatch.battingStats.length > 0 && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                        <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>Bat:</span>
+                                        <span style={{ color: '#fff' }}>{playerOfMatch.battingStats.join(' & ')}</span>
+                                    </div>
+                                )}
+                                {playerOfMatch.battingStats.length > 0 && playerOfMatch.bowlingStats.length > 0 && (
+                                    <span style={{ opacity: 0.3 }}>•</span>
+                                )}
+                                {playerOfMatch.bowlingStats.length > 0 && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                        <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>Bowl:</span>
+                                        <span style={{ color: '#fff' }}>{playerOfMatch.bowlingStats.join(' & ')}</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
