@@ -272,70 +272,94 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
         const loadInsights = async () => {
             setIsInsightsLoading(true);
             const inningsCount = scorecard.Innings.length;
+            const inningsIds = scorecard.Innings.map((_: any, i: number) => i + 1);
 
-            // Fetch H2H
-            const h2h = await fetchH2H(match.game_id);
-            if (h2h) setH2hData(h2h);
+            try {
+                // Parallel Fetching: Get H2H, Splits for last innings AND OBO for ALL innings at once
+                const [h2h, splits, ...oboResults] = await Promise.all([
+                    fetchH2H(match.game_id),
+                    fetchBatsmanSplits(match.game_id, inningsCount),
+                    ...inningsIds.map((id: number) => fetchOverByOver(match.game_id, id))
+                ]);
 
-            // Fetch BatsmanSplits for last innings (default)
-            const splits = await fetchBatsmanSplits(match.game_id, inningsCount);
-            if (splits) setBatsmanSplits(splits);
+                // 0. Set H2H
+                if (h2h) setH2hData(h2h);
 
-            // Fetch OBO for last innings
-            const obo = await fetchOverByOver(match.game_id, inningsCount);
-            if (obo) setOverByOver(obo);
+                // 1. Set Splits (Matches & Wagon Wheel)
+                if (splits) setBatsmanSplits(splits);
 
-            // Build Worm data (all innings)
-            const getInningsMeta = (idx: number) => {
-                const inn = scorecard.Innings[idx];
-                const teamId = inn?.Battingteam;
-                const team = scorecard.Teams?.[teamId];
-                const label = `${team?.Name_Short || 'TM'} ${Math.floor(idx / 2) + 1}`;
-                const teamColor = getTeamColor(team?.Name_Full || team?.Name_Short) || '#3b82f6';
-                return { label, color: teamColor };
-            };
+                // 2. Process OBO Data (Worm, Manhattan, Matchups)
+                const validManhattanData: any[] = [];
 
-            // Worm: Primary = last innings, Secondary = opponent's last
-            const primaryIdx = inningsCount - 1;
-            const primaryMeta = getInningsMeta(primaryIdx);
-            const primaryObo = await fetchOverByOver(match.game_id, primaryIdx + 1);
-            if (primaryObo) setWormPrimary({ data: primaryObo, label: primaryMeta.label, color: primaryMeta.color });
+                // Create a map for easy access
+                const oboMap = new Map();
+                oboResults.forEach((data, index) => {
+                    if (data) {
+                        const id = index + 1;
+                        oboMap.set(id, data);
 
-            // Find opponent's innings
-            const primaryTeamId = scorecard.Innings[primaryIdx]?.Battingteam;
-            let secondaryIdx = -1;
-            for (let i = primaryIdx - 1; i >= 0; i--) {
-                if (scorecard.Innings[i].Battingteam !== primaryTeamId) {
-                    secondaryIdx = i;
-                    break;
+                        // Prepare Manhattan Data
+                        const meta = getInningsMeta(index);
+                        validManhattanData.push({
+                            data,
+                            label: meta.label,
+                            color: meta.color,
+                            id
+                        });
+                    }
+                });
+
+                setManhattanData(validManhattanData);
+                setManhattanInnings(validManhattanData.map(m => m.id));
+
+                // 3. Worm Charts (Primary vs Secondary)
+                // Find Primary (Home/First Batting)
+                const primaryIdx = scorecard.Innings.findIndex((inn: any) => inn.Battingteam === match.participants[0].id) !== -1
+                    ? scorecard.Innings.findIndex((inn: any) => inn.Battingteam === match.participants[0].id)
+                    : 0;
+
+                const primaryId = primaryIdx + 1;
+                if (oboMap.has(primaryId)) {
+                    const meta = getInningsMeta(primaryIdx);
+                    setWormPrimary({ data: oboMap.get(primaryId), label: meta.label, color: meta.color });
                 }
-            }
-            if (secondaryIdx >= 0) {
-                const secondaryMeta = getInningsMeta(secondaryIdx);
-                const secondaryObo = await fetchOverByOver(match.game_id, secondaryIdx + 1);
-                if (secondaryObo) setWormSecondary({ data: secondaryObo, label: secondaryMeta.label, color: secondaryMeta.color });
-            }
 
-            // Manhattan: Fetch all innings
-            const manhattanPromises = scorecard.Innings.map(async (inn: any, idx: number) => {
-                const data = await fetchOverByOver(match.game_id, idx + 1);
-                if (data) {
-                    const meta = getInningsMeta(idx);
-                    return { data, label: meta.label, color: meta.color, id: idx + 1 };
+                // Find Secondary (Away/Second Batting)
+                const primaryTeamId = scorecard.Innings[primaryIdx]?.Battingteam;
+                let secondaryIdx = -1;
+
+                // Look for the last innings that ISN'T the primary team
+                for (let i = inningsCount - 1; i >= 0; i--) {
+                    if (scorecard.Innings[i].Battingteam !== primaryTeamId) {
+                        secondaryIdx = i;
+                        break;
+                    }
                 }
-                return null;
-            });
-            const manhattanResults = await Promise.all(manhattanPromises);
-            const validManhattan = manhattanResults.filter(r => r !== null) as any[];
-            setManhattanData(validManhattan);
-            setManhattanInnings(validManhattan.map(m => m.id));
 
-            // Set default innings for charts
-            setWagonWheelInnings(inningsCount);
-            setMatchupsInnings(inningsCount);
-            setPartnershipsInnings(inningsCount);
+                if (secondaryIdx >= 0) {
+                    const secondaryId = secondaryIdx + 1;
+                    if (oboMap.has(secondaryId)) {
+                        const meta = getInningsMeta(secondaryIdx);
+                        setWormSecondary({ data: oboMap.get(secondaryId), label: meta.label, color: meta.color });
+                    }
+                }
 
-            setIsInsightsLoading(false);
+                // 4. Initial Matchups OBO
+                // Use the OBO data for the current innings (last innings)
+                if (oboMap.has(inningsCount)) {
+                    setOverByOver(oboMap.get(inningsCount));
+                }
+
+                // Set default innings for charts
+                setWagonWheelInnings(inningsCount);
+                setMatchupsInnings(inningsCount);
+                setPartnershipsInnings(inningsCount);
+
+            } catch (error) {
+                console.error("Error loading insights:", error);
+            } finally {
+                setIsInsightsLoading(false);
+            }
         };
 
         loadInsights();
