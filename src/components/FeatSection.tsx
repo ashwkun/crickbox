@@ -84,8 +84,8 @@ const FeatCard: React.FC<{ match: Match; onMatchClick: (match: Match) => void }>
     // Horizontal layout for UPCOMING matches (TournamentHub style)
     if (isUpcoming) {
         const bgGradient = (color1 && color2)
-            ? `radial-gradient(circle at 0% 50%, ${color1}35, transparent 55%), radial-gradient(circle at 100% 50%, ${color2}35, transparent 55%), #1a1a1a`
-            : '#1a1a1a';
+            ? `radial-gradient(circle at 0% 50%, ${color1}40, transparent 55%), radial-gradient(circle at 100% 50%, ${color2}40, transparent 55%), #0f0f13`
+            : '#0f0f13';
 
         const matchTime = new Date(match.start_date).toLocaleTimeString(undefined, {
             hour: 'numeric',
@@ -108,11 +108,11 @@ const FeatCard: React.FC<{ match: Match; onMatchClick: (match: Match) => void }>
                     boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
                 }}
             >
-                {/* Background Watermarks */}
-                <div style={{ position: 'absolute', top: '-15px', left: '-15px', width: '80px', height: '80px', opacity: 0.04, pointerEvents: 'none', filter: 'grayscale(100%)', transform: 'rotate(-15deg)' }}>
+                {/* Background Watermarks - colored, no grayscale */}
+                <div style={{ position: 'absolute', top: '-15px', left: '-15px', width: '80px', height: '80px', opacity: 0.06, pointerEvents: 'none', transform: 'rotate(-15deg)' }}>
                     <WikiImage name={team1Name} id={team1?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
-                <div style={{ position: 'absolute', bottom: '-15px', right: '-15px', width: '80px', height: '80px', opacity: 0.04, pointerEvents: 'none', filter: 'grayscale(100%)', transform: 'rotate(15deg)' }}>
+                <div style={{ position: 'absolute', bottom: '-15px', right: '-15px', width: '80px', height: '80px', opacity: 0.06, pointerEvents: 'none', transform: 'rotate(15deg)' }}>
                     <WikiImage name={team2Name} id={team2?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
 
@@ -142,10 +142,10 @@ const FeatCard: React.FC<{ match: Match; onMatchClick: (match: Match) => void }>
                     zIndex: 1,
                 }}>
                     {/* Team 1 */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', maxWidth: '90px' }}>
                         <WikiImage name={team1?.name} id={team1?.id} type="team" style={{ width: '36px', height: '36px', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.25))' }} />
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff', textAlign: 'center', lineHeight: 1.15 }}>
-                            {team1?.short_name || team1?.name}
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#fff', textAlign: 'center', lineHeight: 1.2, maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                            {team1?.name}
                         </span>
                     </div>
 
@@ -165,10 +165,10 @@ const FeatCard: React.FC<{ match: Match; onMatchClick: (match: Match) => void }>
                     </div>
 
                     {/* Team 2 */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', maxWidth: '90px' }}>
                         <WikiImage name={team2?.name} id={team2?.id} type="team" style={{ width: '36px', height: '36px', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.25))' }} />
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff', textAlign: 'center', lineHeight: 1.15 }}>
-                            {team2?.short_name || team2?.name}
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#fff', textAlign: 'center', lineHeight: 1.2, maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                            {team2?.name}
                         </span>
                     </div>
                 </div>
