@@ -85,12 +85,9 @@ interface HomePageProps {
     loading: boolean;
     fetchExtendedResults: (chunks?: number) => Promise<Match[]>;
     onSelectMatch: (match: Match) => void;
-    onSelectMatch: (match: Match) => void;
     // New navigation callbacks
     onOpenSeries: (seriesId: string, seriesMatches?: Match[]) => void;
     onCloseSeries: () => void;
-    onOpenTournament: (seriesId: string) => void;
-    onCloseTournament: () => void;
     onOpenTournament: (seriesId: string) => void;
     onCloseTournament: () => void;
     onOpenUpcomingList: () => void;
@@ -106,7 +103,6 @@ export default function HomePage({
     onOpenSeries,
     onCloseSeries,
     onOpenTournament,
-    onCloseTournament,
     onCloseTournament,
     onOpenUpcomingList,
     onOpenCompletedList,
