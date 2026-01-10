@@ -32,6 +32,7 @@ export interface Match {
     league_code?: string;
     participants: Participant[];
     has_standings?: string;
+    match_id?: string; // Numeric ID used for scorecard/wallstream/AI summaries
     match_title?: string;
     genders?: string;
 }
