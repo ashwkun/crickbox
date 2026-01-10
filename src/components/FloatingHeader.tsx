@@ -21,6 +21,7 @@ interface FloatingHeaderProps {
 }
 
 const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast }) => {
+    const [celebrating, setCelebrating] = React.useState(false);
     const prevBallId = React.useRef<string | undefined>(undefined);
 
     // Detect Ball Change
