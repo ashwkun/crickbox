@@ -860,7 +860,6 @@ export default function HomePage({
                                 onViewTournament={openTournament}
                             />
                         ))}
-                        ))}
 
                         {/* Always show View All button for consistent navigation */}
                         <button
@@ -871,7 +870,6 @@ export default function HomePage({
                                 <LuCalendarClock size={24} />
                             </div>
                             <span className="view-more-text">Full History</span>
-                            <span className="view-more-count">{filteredCompleted.length} matches</span>
                         </button>
                     </div>
                 ) : (
