@@ -78,7 +78,8 @@ function transformMatch(m) {
         series_id: m.series_id || null,
         series_name: m.series_name || null,
         venue: m.venue || null,
-        match_type: m.event_format || null
+        match_type: m.event_format || null,
+        _event_state: m.event_state || null  // Temp field for filtering (not in DB)
     };
 }
 
@@ -126,7 +127,13 @@ async function main() {
         // Transform to our schema
         const matches = rawMatches
             .map(transformMatch)
-            .filter(m => m.id && m.match_date); // Only valid matches
+            .filter(m => m.id && m.match_date)  // Must have valid id and date
+            .filter(m => m._event_state === 'R' || m._event_state === 'C')  // Only completed matches
+            .map(m => {
+                // Remove temp field before upserting to DB
+                const { _event_state, ...dbMatch } = m;
+                return dbMatch;
+            });
 
         console.log(`Transformed ${matches.length} valid matches`);
 
