@@ -408,15 +408,14 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
         padding: 24,
         border: '1px solid rgba(255, 255, 255, 0.1)',
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-        marginBottom: 20,
     };
 
     const selectedInn = scorecard?.Innings?.[selectedInningsIdx];
 
     return (
-        <div className="live-detail fade-in" style={{ padding: '0 16px 100px 16px' }}>
+        <div className="upcoming-detail">
             {/* Hero Card */}
-            <div style={heroStyle}>
+            <div className="upcoming-hero" style={heroStyle}>
                 {/* Series Name */}
                 <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>
                     {match.series_name}
@@ -493,239 +492,243 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
                 </div>
             </div>
 
-            {/* Player of the Match */}
-            {playerOfMatch && (
-                <div style={{
-                    background: 'var(--bg-card)',
-                    borderRadius: 16,
-                    padding: 16,
-                    marginBottom: 20,
-                    border: '1px solid var(--border-color)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 16
-                }}>
-                    <WikiImage name={playerOfMatch.name} id={playerOfMatch.id} type="player" style={{ width: 56, height: 56 }} circle={true} />
-                    <div>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>Player of the Match</div>
-                        <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{playerOfMatch.name}</div>
-                    </div>
-                </div>
-            )}
-
-            {/* AI Summary */}
-            {aiSummary && (
-                <AIInsightCard summary={aiSummary} model={aiModel || undefined} audioFile={aiAudio || undefined} />
-            )}
-
-            {/* Full Scorecard with Innings Tabs */}
-            {scorecard?.Innings && scorecard.Innings.length > 0 && selectedInn && (
-                <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border-color)', marginBottom: 20 }}>
-                    {/* Innings Tabs */}
-                    <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        {scorecard.Innings.map((inn: any, idx: number) => (
-                            <button
-                                key={idx}
-                                onClick={() => setSelectedInningsIdx(idx)}
-                                style={{
-                                    flex: 1,
-                                    minWidth: 70,
-                                    padding: '12px 16px',
-                                    border: 'none',
-                                    background: selectedInningsIdx === idx ? 'rgba(139, 92, 246, 0.15)' : 'transparent',
-                                    borderBottom: selectedInningsIdx === idx ? '2px solid #a78bfa' : '2px solid transparent',
-                                    color: selectedInningsIdx === idx ? '#a78bfa' : 'rgba(255,255,255,0.6)',
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                {getInningsLabel(inn, idx)}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Selected Innings Header */}
-                    <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <span style={{ fontWeight: 700, color: '#fff' }}>{scorecard.Teams?.[selectedInn.Battingteam]?.Name_Full}</span>
-                        <span style={{ fontWeight: 700, color: '#fff', fontFamily: 'monospace' }}>
-                            {selectedInn.Total}/{selectedInn.Wickets} <span style={{ fontSize: 14, fontWeight: 400, opacity: 0.8 }}>({selectedInn.Overs} ov)</span>
-                        </span>
-                    </div>
-
-                    {/* Batting Table */}
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                            <thead>
-                                <tr>
-                                    <th style={{ textAlign: 'left', padding: '12px 16px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', width: '50%' }}>Batter</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>R</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>B</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>4s</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>6s</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>SR</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {selectedInn.Batsmen?.map((bat: any, i: number) => {
-                                    const pName = scorecard.Teams?.[selectedInn.Battingteam]?.Players?.[bat.Batsman]?.Name_Full || '';
-                                    return (
-                                        <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                            <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                    <WikiImage name={pName} id={bat.Batsman} type="player" style={{ width: 32, height: 32 }} circle={true} />
-                                                    <div>
-                                                        <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>{pName}</div>
-                                                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{bat.Howout_short || 'not out'}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Runs}</td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Balls}</td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Fours}</td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Sixes}</td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Strikerate}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Fall of Wickets */}
-                    {selectedInn.FallofWickets?.length > 0 && (
-                        <div style={{ padding: '8px 16px', fontSize: 11, color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', marginRight: 6 }}>FOW:</span>
-                            {selectedInn.FallofWickets.map((fow: any, idx: number) => (
-                                <span key={idx}>
-                                    {fow.Score}-{fow.Wicket_No}
-                                    {idx < selectedInn.FallofWickets.length - 1 && <span style={{ margin: '0 4px', opacity: 0.3 }}>,</span>}
-                                </span>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Bowling Table */}
-                    <h4 style={{ margin: '20px 16px 8px', fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Bowling</h4>
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                            <thead>
-                                <tr>
-                                    <th style={{ textAlign: 'left', padding: '12px 16px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', width: '50%' }}>Bowler</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>O</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>M</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>R</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>W</th>
-                                    <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>ER</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {selectedInn.Bowlers?.map((bowl: any, i: number) => {
-                                    const pName = scorecard.Teams?.[selectedInn.Bowlingteam]?.Players?.[bowl.Bowler]?.Name_Full;
-                                    return (
-                                        <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                            <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                    <WikiImage name={pName} id={bowl.Bowler} type="player" style={{ width: 32, height: 32 }} circle={true} />
-                                                    <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>{pName}</div>
-                                                </div>
-                                            </td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Overs}</td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Maidens}</td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Runs}</td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Wickets}</td>
-                                            <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Economyrate}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                            {/* Extras Row */}
-                            {(() => {
-                                const b = parseInt(selectedInn.Byes) || 0;
-                                const lb = parseInt(selectedInn.Legbyes) || 0;
-                                const w = parseInt(selectedInn.Wides) || 0;
-                                const nb = parseInt(selectedInn.Noballs) || 0;
-                                const p = parseInt(selectedInn.Penalty) || 0;
-                                const totalExtras = b + lb + w + nb + p;
-                                const details: string[] = [];
-                                if (b > 0) details.push(`b ${b}`);
-                                if (lb > 0) details.push(`lb ${lb}`);
-                                if (w > 0) details.push(`w ${w}`);
-                                if (nb > 0) details.push(`nb ${nb}`);
-                                if (p > 0) details.push(`p ${p}`);
-
-                                return (
-                                    <tfoot>
-                                        <tr style={{ borderTop: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}>
-                                            <td style={{ padding: '12px 16px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>Extras</td>
-                                            <td colSpan={5} style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 600, color: '#fff', fontFamily: 'monospace', fontSize: 13 }}>
-                                                {totalExtras}
-                                                {details.length > 0 && (
-                                                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginLeft: 8, fontWeight: 400 }}>
-                                                        ({details.join(', ')})
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                );
-                            })()}
-                        </table>
-                    </div>
-                </div>
-            )}
-
-            {/* Insights Section */}
-            <LiveInsights
-                match={match}
-                h2hData={h2hData}
-                scorecard={scorecard}
-                batsmanSplits={batsmanSplits}
-                batsmanSplitsMatchups={batsmanSplits}
-                overByOverMatchups={overByOver}
-                overByOver={overByOver}
-                wormPrimary={wormPrimary}
-                wormSecondary={wormSecondary}
-                wagonWheelInnings={wagonWheelInnings}
-                onWagonWheelInningsChange={handleWagonWheelInningsChange}
-                matchupsInnings={matchupsInnings}
-                onMatchupsInningsChange={handleMatchupsInningsChange}
-                partnershipsInnings={partnershipsInnings}
-                onPartnershipsInningsChange={setPartnershipsInnings}
-                manhattanData={manhattanData}
-                manhattanInnings={manhattanInnings}
-                onManhattanInningsChange={handleManhattanInningsChange}
-                isLoading={isInsightsLoading}
-            />
-
-            {/* Series Link */}
-            {match.series_id && onSeriesClick && (
-                <div
-                    onClick={() => onSeriesClick(match.series_id)}
-                    style={{
+            {/* Content Sections */}
+            <div className="section-container fade-in">
+                {/* Player of the Match */}
+                {playerOfMatch && (
+                    <div style={{
                         background: 'var(--bg-card)',
                         borderRadius: 16,
                         padding: 16,
-                        marginTop: 20,
+                        marginBottom: 20,
                         border: '1px solid var(--border-color)',
-                        cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'space-between',
-                        transition: 'all 0.2s'
-                    }}
-                >
-                    <div>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>View Full Series</div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{match.series_name}</div>
+                        gap: 16
+                    }}>
+                        <WikiImage name={playerOfMatch.name} id={playerOfMatch.id} type="player" style={{ width: 56, height: 56 }} circle={true} />
+                        <div>
+                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>Player of the Match</div>
+                            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{playerOfMatch.name}</div>
+                        </div>
                     </div>
-                    <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)' }}>→</span>
-                </div>
-            )}
+                )}
+
+                {/* AI Summary */}
+                {aiSummary && (
+                    <AIInsightCard summary={aiSummary} model={aiModel || undefined} audioFile={aiAudio || undefined} />
+                )}
+
+                {/* Full Scorecard with Innings Tabs */}
+                {scorecard?.Innings && scorecard.Innings.length > 0 && selectedInn && (
+                    <div style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border-color)', marginBottom: 20 }}>
+                        {/* Innings Tabs */}
+                        <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                            {scorecard.Innings.map((inn: any, idx: number) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setSelectedInningsIdx(idx)}
+                                    style={{
+                                        flex: 1,
+                                        minWidth: 70,
+                                        padding: '12px 16px',
+                                        border: 'none',
+                                        background: selectedInningsIdx === idx ? 'rgba(139, 92, 246, 0.15)' : 'transparent',
+                                        borderBottom: selectedInningsIdx === idx ? '2px solid #a78bfa' : '2px solid transparent',
+                                        color: selectedInningsIdx === idx ? '#a78bfa' : 'rgba(255,255,255,0.6)',
+                                        fontSize: 12,
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    {getInningsLabel(inn, idx)}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Selected Innings Header */}
+                        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                            <span style={{ fontWeight: 700, color: '#fff' }}>{scorecard.Teams?.[selectedInn.Battingteam]?.Name_Full}</span>
+                            <span style={{ fontWeight: 700, color: '#fff', fontFamily: 'monospace' }}>
+                                {selectedInn.Total}/{selectedInn.Wickets} <span style={{ fontSize: 14, fontWeight: 400, opacity: 0.8 }}>({selectedInn.Overs} ov)</span>
+                            </span>
+                        </div>
+
+                        {/* Batting Table */}
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                                <thead>
+                                    <tr>
+                                        <th style={{ textAlign: 'left', padding: '12px 16px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', width: '50%' }}>Batter</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>R</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>B</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>4s</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>6s</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>SR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {selectedInn.Batsmen?.map((bat: any, i: number) => {
+                                        const pName = scorecard.Teams?.[selectedInn.Battingteam]?.Players?.[bat.Batsman]?.Name_Full || '';
+                                        return (
+                                            <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                                <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                        <WikiImage name={pName} id={bat.Batsman} type="player" style={{ width: 32, height: 32 }} circle={true} />
+                                                        <div>
+                                                            <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>{pName}</div>
+                                                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 }}>{bat.Howout_short || 'not out'}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Runs}</td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Balls}</td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Fours}</td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Sixes}</td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bat.Strikerate}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Fall of Wickets */}
+                        {selectedInn.FallofWickets?.length > 0 && (
+                            <div style={{ padding: '8px 16px', fontSize: 11, color: 'rgba(255,255,255,0.5)', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
+                                <span style={{ color: 'rgba(255,255,255,0.4)', marginRight: 6 }}>FOW:</span>
+                                {selectedInn.FallofWickets.map((fow: any, idx: number) => (
+                                    <span key={idx}>
+                                        {fow.Score}-{fow.Wicket_No}
+                                        {idx < selectedInn.FallofWickets.length - 1 && <span style={{ margin: '0 4px', opacity: 0.3 }}>,</span>}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Bowling Table */}
+                        <h4 style={{ margin: '20px 16px 8px', fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Bowling</h4>
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                                <thead>
+                                    <tr>
+                                        <th style={{ textAlign: 'left', padding: '12px 16px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)', width: '50%' }}>Bowler</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>O</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>M</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>R</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>W</th>
+                                        <th style={{ textAlign: 'center', padding: '12px 8px', color: 'rgba(255,255,255,0.5)', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>ER</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {selectedInn.Bowlers?.map((bowl: any, i: number) => {
+                                        const pName = scorecard.Teams?.[selectedInn.Bowlingteam]?.Players?.[bowl.Bowler]?.Name_Full;
+                                        return (
+                                            <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                                                <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                        <WikiImage name={pName} id={bowl.Bowler} type="player" style={{ width: 32, height: 32 }} circle={true} />
+                                                        <div style={{ fontWeight: 600, color: '#fff', fontSize: 13 }}>{pName}</div>
+                                                    </div>
+                                                </td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Overs}</td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Maidens}</td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Runs}</td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Wickets}</td>
+                                                <td style={{ textAlign: 'center', padding: '12px 8px', fontFamily: 'monospace', fontWeight: 500, color: '#fff' }}>{bowl.Economyrate}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                                {/* Extras Row */}
+                                {(() => {
+                                    const b = parseInt(selectedInn.Byes) || 0;
+                                    const lb = parseInt(selectedInn.Legbyes) || 0;
+                                    const w = parseInt(selectedInn.Wides) || 0;
+                                    const nb = parseInt(selectedInn.Noballs) || 0;
+                                    const p = parseInt(selectedInn.Penalty) || 0;
+                                    const totalExtras = b + lb + w + nb + p;
+                                    const details: string[] = [];
+                                    if (b > 0) details.push(`b ${b}`);
+                                    if (lb > 0) details.push(`lb ${lb}`);
+                                    if (w > 0) details.push(`w ${w}`);
+                                    if (nb > 0) details.push(`nb ${nb}`);
+                                    if (p > 0) details.push(`p ${p}`);
+
+                                    return (
+                                        <tfoot>
+                                            <tr style={{ borderTop: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}>
+                                                <td style={{ padding: '12px 16px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>Extras</td>
+                                                <td colSpan={5} style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 600, color: '#fff', fontFamily: 'monospace', fontSize: 13 }}>
+                                                    {totalExtras}
+                                                    {details.length > 0 && (
+                                                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginLeft: 8, fontWeight: 400 }}>
+                                                            ({details.join(', ')})
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    );
+                                })()}
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* Insights Section */}
+                <LiveInsights
+                    match={match}
+                    h2hData={h2hData}
+                    scorecard={scorecard}
+                    batsmanSplits={batsmanSplits}
+                    batsmanSplitsMatchups={batsmanSplits}
+                    overByOverMatchups={overByOver}
+                    overByOver={overByOver}
+                    wormPrimary={wormPrimary}
+                    wormSecondary={wormSecondary}
+                    wagonWheelInnings={wagonWheelInnings}
+                    onWagonWheelInningsChange={handleWagonWheelInningsChange}
+                    matchupsInnings={matchupsInnings}
+                    onMatchupsInningsChange={handleMatchupsInningsChange}
+                    partnershipsInnings={partnershipsInnings}
+                    onPartnershipsInningsChange={setPartnershipsInnings}
+                    manhattanData={manhattanData}
+                    manhattanInnings={manhattanInnings}
+                    onManhattanInningsChange={handleManhattanInningsChange}
+                    isLoading={isInsightsLoading}
+                />
+
+                {/* Series Link */}
+                {match.series_id && onSeriesClick && (
+                    <div
+                        onClick={() => onSeriesClick(match.series_id)}
+                        style={{
+                            background: 'var(--bg-card)',
+                            borderRadius: 16,
+                            padding: 16,
+                            marginTop: 20,
+                            border: '1px solid var(--border-color)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        <div>
+                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', marginBottom: 4 }}>View Full Series</div>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>{match.series_name}</div>
+                        </div>
+                        <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.5)' }}>→</span>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
 
 export default CompletedDetail;
+
