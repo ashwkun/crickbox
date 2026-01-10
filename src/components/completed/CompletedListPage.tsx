@@ -18,6 +18,7 @@ interface CompletedListPageProps {
     onMatchClick: (match: Match) => void;
     onSeriesClick?: (seriesId: string, matches?: Match[]) => void;
     isVisible?: boolean;
+    fetchByDateRange?: (start: Date, end: Date) => Promise<void>;
 }
 
 // Generate time filter chips based on current date (GOING BACKWARDS)
@@ -82,8 +83,12 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
     onBack,
     onMatchClick,
     onSeriesClick,
+    onSeriesClick,
     isVisible = true,
+    fetchByDateRange
 }) => {
+    const [isFetchingHistory, setIsFetchingHistory] = useState(false);
+
     // Ensure we only show COMPLETED matches (Not Live, Not Upcoming)
     const completedMatches = useMemo(() =>
         matches.filter(m => m.event_state !== 'L' && m.event_state !== 'U'),
@@ -134,6 +139,33 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
         }
         lastScrollY.current = currentScrollY;
     };
+
+    // On-demand fetch for history
+    useEffect(() => {
+        if (!fetchByDateRange || selectedTime === 'last30') return;
+
+        const chip = timeChips.find(c => c.id === selectedTime);
+        if (!chip) return;
+
+        // Check if we have ANY matches for this month in the store
+        // We use a broader check than timeFilteredMatches loop to avoid circular deps
+        const hasMatchesForMonth = matches.some(m => {
+            const date = m.end_date ? new Date(m.end_date) : new Date(m.start_date);
+            return date.getMonth() === chip.startMonth && date.getFullYear() === chip.startYear;
+        });
+
+        // If bucket is empty for this month, fetch it
+        if (!hasMatchesForMonth && !isFetchingHistory) {
+            const startDate = new Date(chip.startYear, chip.startMonth, 1);
+            const endDate = new Date(chip.startYear, chip.startMonth + 1, 0); // Last day of month
+
+            console.log(`[History] Fetching missing data for: ${selectedTime}`);
+            setIsFetchingHistory(true);
+
+            fetchByDateRange(startDate, endDate)
+                .finally(() => setIsFetchingHistory(false));
+        }
+    }, [selectedTime, matches, fetchByDateRange, timeChips, isFetchingHistory]);
 
     // Filter matches by time
     const timeFilteredMatches = useMemo(() => {
@@ -365,6 +397,11 @@ const CompletedListPage: React.FC<CompletedListPageProps> = ({
                     marginRight: -16,
                 }}>
                     <style>{`div::-webkit-scrollbar { display: none; }`}</style>
+                    {isFetchingHistory && (
+                        <div style={chipStyle(false)}>
+                            History...
+                        </div>
+                    )}
                     {timeChips.map(chip => (
                         <div
                             key={chip.id}
