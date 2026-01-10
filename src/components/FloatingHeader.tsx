@@ -218,7 +218,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                     ) : (
                         <>
                             <div
-                                key={isLive ? 'live' : isUpcoming ? 'upcoming' : 'default'}
+                                key={isLive ? 'live' : isUpcoming ? 'upcoming' : isPast ? 'past' : 'default'}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -262,35 +262,34 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         WebkitTextFillColor: 'transparent',
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.PAST</span>
-                                ) : (                                    }}>.NEXT</span>
-                            ) : (
-                            <span style={{
-                                fontFamily: '"BBH Bartle", sans-serif',
-                                fontSize: '16px',
-                                fontWeight: 600,
-                                letterSpacing: '1px',
-                                background: 'linear-gradient(90deg, #22c55e 0%, #22c55e 35%, #86efac 50%, #22c55e 65%, #22c55e 100%)',
-                                backgroundSize: '200% 100%',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
-                            }}>.CRIC</span>
+                                ) : (
+                                    <span style={{
+                                        fontFamily: '"BBH Bartle", sans-serif',
+                                        fontSize: '16px',
+                                        fontWeight: 600,
+                                        letterSpacing: '1px',
+                                        background: 'linear-gradient(90deg, #22c55e 0%, #22c55e 35%, #86efac 50%, #22c55e 65%, #22c55e 100%)',
+                                        backgroundSize: '200% 100%',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
+                                    }}>.CRIC</span>
                                 )}
-                        </div>
-                    <style>{`
+                            </div>
+                            <style>{`
                                 @keyframes liveShimmer {
                                     0% { background-position: 100% 0; }
                                     100% { background-position: 0% 0; }
                                 }
                             `}</style>
-                </>
+                        </>
                     )}
+                </div>
             </div>
-        </div>
 
-            {/* Right: Empty spacer */ }
-    <div style={{ width: 44 }}></div>
-        </div >
+            {/* Right: Empty spacer */}
+            <div style={{ width: 44 }}></div>
+        </div>
     );
 };
 export default FloatingHeader;
