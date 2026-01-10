@@ -104,6 +104,21 @@ export function getMatchChip(match: Match): string {
     const championship = match.championship_name || '';
     const leagueCode = match.league_code || '';
     const searchFields = [parentSeries, seriesName, championship];
+    const combined = searchFields.join(' ').toLowerCase();
+
+    // 0. Demote Qualifiers and Warm-ups
+    // They should not get the premium tournament chip (e.g. T20 WC chip)
+    const isWarmupOrQualifier = combined.includes('warm-up') ||
+        combined.includes('warm up') ||
+        combined.includes('qualifier') ||
+        combined.includes('warm up matches');
+
+    if (isWarmupOrQualifier) {
+        if (leagueCode === 'icc') return 'International';
+        if (leagueCode === 'womens_international') return "Women's";
+        if (leagueCode === 'youth_international') return 'Youth';
+        return 'Domestic';
+    }
 
     // 1. Check ICC World Cups
     for (const [name, config] of Object.entries(ICC_WORLD_CUPS)) {
