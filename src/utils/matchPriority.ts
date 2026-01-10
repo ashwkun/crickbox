@@ -354,12 +354,10 @@ export function generateUpcomingChips(matches: Match[]): Chip[] {
         return a.earliestDate.getTime() - b.earliestDate.getTime();
     });
 
-    // Within same tier, sort by earliest upcoming match
-    return a.earliestDate.getTime() - b.earliestDate.getTime();
-});
 
-// Return only the Chip interface properties
-return chips.map(({ id, label, count }) => ({ id, label, count }));
+
+    // Return only the Chip interface properties
+    return chips.map(({ id, label, count }) => ({ id, label, count }));
 }
 
 /**
