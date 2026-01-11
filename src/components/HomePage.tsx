@@ -911,61 +911,84 @@ export default function HomePage({
             </div>
 
             {/* Wisden Attribution Footer */}
-            <div style={{ padding: '16px 20px 48px' }}>
+            {/* Wisden Attribution Footer - Premium Glass Card */}
+            <div style={{ padding: '24px 20px 64px' }}>
                 <a
                     href="https://wisden.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
                         display: 'flex',
-                        flexDirection: 'column',
                         alignItems: 'center',
-                        gap: 12,
-                        background: 'linear-gradient(180deg, rgba(20, 20, 20, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)',
+                        justifyContent: 'space-between',
+                        background: 'linear-gradient(145deg, rgba(30, 30, 30, 0.7) 0%, rgba(10, 10, 10, 0.9) 100%)',
                         backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
                         borderRadius: 20,
-                        padding: '24px 32px',
-                        border: '1px solid rgba(251, 191, 36, 0.2)',
+                        padding: '20px 24px',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
                         textDecoration: 'none',
-                        transition: 'all 0.2s ease',
-                        cursor: 'pointer'
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                        transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
                     }}
                 >
-                    {/* Large Logo */}
+                    {/* Text Section */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <span style={{
+                            color: 'rgba(255, 255, 255, 0.4)',
+                            fontSize: 10,
+                            textTransform: 'uppercase',
+                            letterSpacing: '1.2px',
+                            fontWeight: 600,
+                            fontFamily: "'Inter', sans-serif"
+                        }}>
+                            POWERED BY
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{
+                                background: 'linear-gradient(to right, #ffffff, #999999)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                fontSize: 20,
+                                fontWeight: 700,
+                                letterSpacing: '-0.5px'
+                            }}>
+                                wisden.com
+                            </span>
+                            <div style={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
+                                background: '#3b82f6',
+                                boxShadow: '0 0 8px #3b82f6'
+                            }} />
+                        </div>
+                    </div>
+
+                    {/* Logo Section - White Pill to handle white-bg logo */}
                     <div style={{
-                        background: '#f59e0b',
-                        borderRadius: 16,
-                        padding: '12px 20px',
+                        background: '#ffffff',
+                        padding: '8px 16px',
+                        borderRadius: 12,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: '0 4px 20px rgba(245, 158, 11, 0.3)'
+                        height: 38,
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
                     }}>
                         <img
                             src={wisdenLogo}
                             alt="Wisden"
-                            style={{ height: 50, width: 'auto', mixBlendMode: 'multiply' }}
+                            style={{ height: 20, width: 'auto', display: 'block' }}
                         />
-                    </div>
-
-                    {/* Text */}
-                    <div style={{ textAlign: 'center' }}>
-                        <div style={{
-                            color: 'rgba(255,255,255,0.5)',
-                            fontSize: 12,
-                            fontWeight: 500,
-                            marginBottom: 4
-                        }}>
-                            Data powered by
-                        </div>
-                        <div style={{
-                            color: '#fbbf24',
-                            fontSize: 18,
-                            fontWeight: 700,
-                            letterSpacing: 0.5
-                        }}>
-                            wisden.com
-                        </div>
                     </div>
                 </a>
             </div>
