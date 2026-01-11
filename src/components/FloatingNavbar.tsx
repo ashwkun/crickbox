@@ -86,7 +86,7 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                     pointerEvents: isVisible ? 'auto' : 'none',
                 }}
             >
-                {/* Arrow icon */}
+                {/* Arrow icon - diagonal */}
                 <svg
                     width="14"
                     height="14"
@@ -97,12 +97,13 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     style={{
-                        transform: isCric ? 'scaleY(1)' : 'scaleY(-1)',
+                        transform: isCric ? 'scaleX(1)' : 'scaleX(-1)',
                         transition: 'transform 0.3s ease',
                     }}
                 >
-                    <line x1="12" y1="19" x2="12" y2="5" />
-                    <polyline points="5 12 12 5 19 12" />
+                    {/* Diagonal arrow pointing top-right */}
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
                 </svg>
 
                 {/* Label with shimmer */}
