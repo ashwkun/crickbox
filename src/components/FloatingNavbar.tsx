@@ -12,7 +12,7 @@ interface FloatingNavbarProps {
  * 
  * Theme Colors:
  * - .CRIC: Electric Green (#22c55e)
- * - .PLAY: Electric Blue (#0ea5e9)
+ * - .PLAY: Hot Pink (#ec4899)
  */
 const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange }) => {
     const isCric = activeTab === 'CRIC';
@@ -55,24 +55,36 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                         background: isCric
                             ? 'rgba(34, 197, 94, 0.15)'
                             : 'transparent',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'background 0.3s ease',
                     }}
                 >
-                    <span style={{
-                        fontFamily: '"BBH Bartle", sans-serif',
-                        fontSize: 14,
-                        fontWeight: 700,
-                        letterSpacing: '0.5px',
-                        background: isCric
-                            ? 'linear-gradient(90deg, #22c55e 0%, #22c55e 35%, #86efac 50%, #22c55e 65%, #22c55e 100%)'
-                            : 'linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,0.4))',
-                        backgroundSize: '200% 100%',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        animation: isCric ? 'navShimmer 2s ease-in-out infinite alternate' : 'none',
-                    }}>
-                        .CRIC
-                    </span>
+                    {/* Active: Gradient text with shimmer */}
+                    {isCric ? (
+                        <span style={{
+                            fontFamily: '"BBH Bartle", sans-serif',
+                            fontSize: 14,
+                            fontWeight: 700,
+                            letterSpacing: '0.5px',
+                            background: 'linear-gradient(90deg, #22c55e 0%, #22c55e 35%, #86efac 50%, #22c55e 65%, #22c55e 100%)',
+                            backgroundSize: '200% 100%',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            animation: 'navShimmer 2s ease-in-out infinite alternate',
+                        }}>
+                            .CRIC
+                        </span>
+                    ) : (
+                        /* Inactive: Solid grey color (no gradient) */
+                        <span style={{
+                            fontFamily: '"BBH Bartle", sans-serif',
+                            fontSize: 14,
+                            fontWeight: 700,
+                            letterSpacing: '0.5px',
+                            color: 'rgba(255, 255, 255, 0.4)',
+                        }}>
+                            .CRIC
+                        </span>
+                    )}
 
                     {/* Glow Effect */}
                     {isCric && (
@@ -104,26 +116,38 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                         border: 'none',
                         cursor: 'pointer',
                         background: !isCric
-                            ? 'rgba(14, 165, 233, 0.15)'
+                            ? 'rgba(236, 72, 153, 0.15)'
                             : 'transparent',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'background 0.3s ease',
                     }}
                 >
-                    <span style={{
-                        fontFamily: '"BBH Bartle", sans-serif',
-                        fontSize: 14,
-                        fontWeight: 700,
-                        letterSpacing: '0.5px',
-                        background: !isCric
-                            ? 'linear-gradient(90deg, #0ea5e9 0%, #0ea5e9 35%, #7dd3fc 50%, #0ea5e9 65%, #0ea5e9 100%)'
-                            : 'linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,0.4))',
-                        backgroundSize: '200% 100%',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        animation: !isCric ? 'navShimmer 2s ease-in-out infinite alternate' : 'none',
-                    }}>
-                        .PLAY
-                    </span>
+                    {/* Active: Gradient text with shimmer */}
+                    {!isCric ? (
+                        <span style={{
+                            fontFamily: '"BBH Bartle", sans-serif',
+                            fontSize: 14,
+                            fontWeight: 700,
+                            letterSpacing: '0.5px',
+                            background: 'linear-gradient(90deg, #ec4899 0%, #ec4899 35%, #f9a8d4 50%, #ec4899 65%, #ec4899 100%)',
+                            backgroundSize: '200% 100%',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            animation: 'navShimmer 2s ease-in-out infinite alternate',
+                        }}>
+                            .PLAY
+                        </span>
+                    ) : (
+                        /* Inactive: Solid grey color (no gradient) */
+                        <span style={{
+                            fontFamily: '"BBH Bartle", sans-serif',
+                            fontSize: 14,
+                            fontWeight: 700,
+                            letterSpacing: '0.5px',
+                            color: 'rgba(255, 255, 255, 0.4)',
+                        }}>
+                            .PLAY
+                        </span>
+                    )}
 
                     {/* Glow Effect */}
                     {!isCric && (
@@ -131,7 +155,7 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                             position: 'absolute',
                             inset: 0,
                             borderRadius: 100,
-                            background: 'radial-gradient(circle at center, rgba(14, 165, 233, 0.2), transparent 70%)',
+                            background: 'radial-gradient(circle at center, rgba(236, 72, 153, 0.2), transparent 70%)',
                             pointerEvents: 'none',
                         }} />
                     )}
