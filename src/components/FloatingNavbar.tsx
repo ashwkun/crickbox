@@ -12,7 +12,7 @@ interface FloatingNavbarProps {
  * 
  * Theme Colors:
  * - .CRIC: Electric Green (#22c55e)
- * - .PLAY: Electric Purple (#8b5cf6)
+ * - .PLAY: Electric Blue (#0ea5e9)
  */
 const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange }) => {
     const isCric = activeTab === 'CRIC';
@@ -104,7 +104,7 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                         border: 'none',
                         cursor: 'pointer',
                         background: !isCric
-                            ? 'rgba(139, 92, 246, 0.15)'
+                            ? 'rgba(14, 165, 233, 0.15)'
                             : 'transparent',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     }}
@@ -115,7 +115,7 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                         fontWeight: 700,
                         letterSpacing: '0.5px',
                         background: !isCric
-                            ? 'linear-gradient(90deg, #8b5cf6 0%, #8b5cf6 35%, #c4b5fd 50%, #8b5cf6 65%, #8b5cf6 100%)'
+                            ? 'linear-gradient(90deg, #0ea5e9 0%, #0ea5e9 35%, #7dd3fc 50%, #0ea5e9 65%, #0ea5e9 100%)'
                             : 'linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,0.4))',
                         backgroundSize: '200% 100%',
                         WebkitBackgroundClip: 'text',
@@ -131,7 +131,7 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                             position: 'absolute',
                             inset: 0,
                             borderRadius: 100,
-                            background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.2), transparent 70%)',
+                            background: 'radial-gradient(circle at center, rgba(14, 165, 233, 0.2), transparent 70%)',
                             pointerEvents: 'none',
                         }} />
                     )}
