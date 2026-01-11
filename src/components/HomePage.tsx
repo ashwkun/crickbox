@@ -943,7 +943,7 @@ export default function HomePage({
                     {/* Text Section */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         <span style={{
-                            color: 'rgba(255, 255, 255, 0.4)',
+                            color: 'rgba(255, 255, 255, 0.5)',
                             fontSize: 10,
                             textTransform: 'uppercase',
                             letterSpacing: '1.2px',
@@ -954,9 +954,7 @@ export default function HomePage({
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <span style={{
-                                background: 'linear-gradient(to right, #ffffff, #999999)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
+                                color: '#ffffff',
                                 fontSize: 20,
                                 fontWeight: 700,
                                 letterSpacing: '-0.5px'
@@ -967,27 +965,32 @@ export default function HomePage({
                                 width: 6,
                                 height: 6,
                                 borderRadius: '50%',
-                                background: '#3b82f6',
-                                boxShadow: '0 0 8px #3b82f6'
+                                background: '#fbbf24',
+                                boxShadow: '0 0 8px #fbbf24'
                             }} />
                         </div>
                     </div>
 
-                    {/* Logo Section - White Pill to handle white-bg logo */}
+                    {/* Logo Section - Yellow Pill + Bigger Logo */}
                     <div style={{
-                        background: '#ffffff',
+                        background: '#fbbf24',
                         padding: '8px 16px',
                         borderRadius: 12,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        height: 38,
-                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                        height: 44,
+                        boxShadow: '0 4px 12px rgba(251, 191, 36, 0.3)'
                     }}>
                         <img
                             src={wisdenLogo}
                             alt="Wisden"
-                            style={{ height: 20, width: 'auto', display: 'block' }}
+                            style={{
+                                height: 26,
+                                width: 'auto',
+                                display: 'block',
+                                mixBlendMode: 'multiply'
+                            }}
                         />
                     </div>
                 </a>
