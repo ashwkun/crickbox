@@ -82,7 +82,15 @@ const LiveInsights: React.FC<LiveInsightsProps> = ({ match, h2hData, scorecard, 
     const officials = matchDetails?.Officials;
     const venueName = venue?.Name;
 
-    // Manhattan debug removed
+    // DEBUG: VenueCard visibility
+    console.log('[LiveInsights] VenueCard Debug:', {
+        hasH2HData: !!h2hData,
+        hasTeam: !!h2hData?.team,
+        hasHeadToHead: !!h2hData?.team?.head_to_head,
+        venueData: h2hData?.team?.head_to_head?.venue,
+        venueDataLength: h2hData?.team?.head_to_head?.venue?.data?.length,
+        hideContextSections
+    });
 
     // Skeleton Placeholder Component
     const SkeletonCard = ({ height = 200 }: { height?: number }) => (
