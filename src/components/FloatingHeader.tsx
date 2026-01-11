@@ -18,10 +18,9 @@ interface FloatingHeaderProps {
     isLive?: boolean;
     isUpcoming?: boolean;
     isPast?: boolean;
-    isPlay?: boolean;
 }
 
-const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast, isPlay }) => {
+const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast }) => {
     const [celebrating, setCelebrating] = React.useState(false);
     const prevBallId = React.useRef<string | undefined>(undefined);
 
@@ -266,18 +265,6 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         WebkitTextFillColor: 'transparent',
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.PAST</span>
-                                ) : isPlay ? (
-                                    <span style={{
-                                        fontFamily: '"BBH Bartle", sans-serif',
-                                        fontSize: '16px',
-                                        fontWeight: 600,
-                                        letterSpacing: '1px',
-                                        background: 'linear-gradient(90deg, #6366f1 0%, #6366f1 35%, #a5b4fc 50%, #6366f1 65%, #6366f1 100%)',
-                                        backgroundSize: '200% 100%',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                        animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
-                                    }}>.PLAY</span>
                                 ) : (
                                     <span style={{
                                         fontFamily: '"BBH Bartle", sans-serif',

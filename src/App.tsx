@@ -14,8 +14,6 @@ import CompletedListPage from './components/completed/CompletedListPage';
 import SeriesHub from './components/SeriesHub';
 import TournamentHub from './components/TournamentHub';
 import HowItWorks from './components/dev/HowItWorks';
-import PlayPage from './components/PlayPage';
-import FloatingNavbar, { NavTab } from './components/FloatingNavbar';
 
 // --- Navigation Types ---
 export type ViewType = 'HOME' | 'MATCH' | 'SERIES' | 'TOURNAMENT' | 'UPCOMING_LIST' | 'COMPLETED_LIST' | 'HOW_IT_WORKS';
@@ -34,7 +32,6 @@ export default function App(): React.ReactElement {
     const [wallstream, setWallstream] = useState<WallstreamData | null>(null);
     const [pendingMatchId, setPendingMatchId] = useState<string | null>(null);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-    const [activeTab, setActiveTab] = useState<NavTab>('CRIC'); // 'CRIC' (Home) or 'PLAY' (Fantasy)
 
     // Navigation State: Stack-based History
     // Stack always starts with HOME. Overlays are pushed on top.
@@ -437,7 +434,6 @@ export default function App(): React.ReactElement {
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
                 isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
                 isPast={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && !!currentView.data && (currentView.data as Match)?.event_state !== 'L' && (currentView.data as Match)?.event_state !== 'U')}
-                isPlay={activeTab === 'PLAY' && currentView.type === 'HOME'}
             />
 
             {/* Base Layer: HomePage */}
@@ -445,34 +441,29 @@ export default function App(): React.ReactElement {
                 We pass isVisible=false if stack > 1. 
             */}
             <main className="main-content" style={{ paddingTop: 85 }}>
-                <div style={{ display: activeTab === 'CRIC' ? 'block' : 'none' }}>
-                    <HomePage
-                        matches={matches}
-                        loading={loading}
-                        fetchExtendedResults={fetchExtendedResults}
-                        onSelectMatch={handleSelectMatch}
+                <HomePage
+                    matches={matches}
+                    loading={loading}
+                    fetchExtendedResults={fetchExtendedResults}
+                    onSelectMatch={handleSelectMatch}
 
-                        // Legacy props neutralized
-                        selectedSeries={null}
-                        selectedTournament={null}
-                        onOpenSeries={(sid, m) => handleOpenSeries(sid, m)}
-                        onCloseSeries={() => { }}
-                        onOpenTournament={handleOpenTournament}
-                        onCloseTournament={() => { }}
+                    // Legacy props neutralized
+                    selectedSeries={null}
+                    selectedTournament={null}
+                    onOpenSeries={(sid, m) => handleOpenSeries(sid, m)}
+                    onCloseSeries={() => { }}
+                    onOpenTournament={handleOpenTournament}
+                    onCloseTournament={() => { }}
 
-                        onOpenUpcomingList={() => {
-                            handleNavigate({ type: 'UPCOMING_LIST' });
-                        }}
-                        onOpenCompletedList={() => {
-                            handleNavigate({ type: 'COMPLETED_LIST' });
-                        }}
+                    onOpenUpcomingList={() => {
+                        handleNavigate({ type: 'UPCOMING_LIST' });
+                    }}
+                    onOpenCompletedList={() => {
+                        handleNavigate({ type: 'COMPLETED_LIST' });
+                    }}
 
-                        isVisible={viewStack.length === 1 && activeTab === 'CRIC'}
-                    />
-                </div>
-                <div style={{ display: activeTab === 'PLAY' ? 'block' : 'none' }}>
-                    <PlayPage isVisible={viewStack.length === 1 && activeTab === 'PLAY'} />
-                </div>
+                    isVisible={viewStack.length === 1}
+                />
             </main>
 
             {/* Overlay Stack */}
@@ -625,13 +616,6 @@ export default function App(): React.ReactElement {
                     ⚡
                 </div>
             )}
-
-            {/* Floating Navbar (Home vs Play) */}
-            <FloatingNavbar
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                visible={viewStack.length === 1}
-            />
 
             <InstallPrompt />
         </div>
