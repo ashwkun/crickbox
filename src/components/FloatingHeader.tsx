@@ -231,7 +231,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                             >
                                 <span style={{ fontFamily: '"BBH Bartle", sans-serif', fontSize: '16px', fontWeight: 600, letterSpacing: '1px', color: '#fff' }}>BOX</span>
                                 {isLive ? (
-                                    <span style={{
+                                    <span key="live" style={{
                                         fontFamily: '"BBH Bartle", sans-serif',
                                         fontSize: '16px',
                                         fontWeight: 600,
@@ -243,7 +243,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.LIVE</span>
                                 ) : isUpcoming ? (
-                                    <span style={{
+                                    <span key="next" style={{
                                         fontFamily: '"BBH Bartle", sans-serif',
                                         fontSize: '16px',
                                         fontWeight: 600,
@@ -255,7 +255,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.NEXT</span>
                                 ) : isPast ? (
-                                    <span style={{
+                                    <span key="past" style={{
                                         fontFamily: '"BBH Bartle", sans-serif',
                                         fontSize: '16px',
                                         fontWeight: 600,
@@ -267,7 +267,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.PAST</span>
                                 ) : isPlay ? (
-                                    <span style={{
+                                    <span key="play" style={{
                                         fontFamily: '"BBH Bartle", sans-serif',
                                         fontSize: '16px',
                                         fontWeight: 600,
@@ -279,7 +279,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.PLAY</span>
                                 ) : (
-                                    <span style={{
+                                    <span key="cric" style={{
                                         fontFamily: '"BBH Bartle", sans-serif',
                                         fontSize: '16px',
                                         fontWeight: 600,
