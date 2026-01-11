@@ -79,24 +79,6 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
         );
     }
 
-    // Sort by wins (descending), then by matches played (ascending for tie-breaker)
-    const sorted = [...standings].sort((a, b) => {
-        if (b.wins !== a.wins) return b.wins - a.wins;
-        // If wins equal, check NRR (if we had it in sort, but here matches played is proxy)
-        return a.matches - b.matches;
-        // Note: Real sorting usually relies on Points -> NRR.
-        // We calculate points below but sorting happens here.
-        // Ideally sorting should use calculated Points > NRR.
-    });
-
-    // Re-sort based on Points (Wins * 2 + Tied) just to be safe
-    sorted.sort((a, b) => {
-        const ptsA = (a.wins * 2) + (a.tied || 0) + (a.draw || 0);
-        const ptsB = (b.wins * 2) + (b.tied || 0) + (b.draw || 0);
-        if (ptsB !== ptsA) return ptsB - ptsA;
-        return 0; // Need NRR here for true tie-break
-    });
-
     // State for NRR data
     const [nrrData, setNrrData] = React.useState<Record<string, number>>({});
 
@@ -151,6 +133,21 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
     }, [matches]);
 
     const getPoints = (team: TeamStanding) => (team.wins * 2) + (team.tied || 0) + (team.draw || 0);
+
+    // Sort standings by Points (desc), then NRR (desc) for tiebreaking
+    const sorted = React.useMemo(() => {
+        return [...standings].sort((a, b) => {
+            // Primary: Points (descending)
+            const ptsA = getPoints(a);
+            const ptsB = getPoints(b);
+            if (ptsB !== ptsA) return ptsB - ptsA;
+
+            // Tiebreaker: NRR (descending - higher NRR is better)
+            const nrrA = nrrData[String(a.id)] ?? 0;
+            const nrrB = nrrData[String(b.id)] ?? 0;
+            return nrrB - nrrA;
+        });
+    }, [standings, nrrData]);
 
     const getNRRDisplay = (teamId: number) => {
         const nrr = nrrData[String(teamId)];
