@@ -97,7 +97,7 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     style={{
-                        transform: isCric ? 'rotate(45deg)' : 'rotate(-135deg)',
+                        transform: isCric ? 'scaleY(1)' : 'scaleY(-1)',
                         transition: 'transform 0.3s ease',
                     }}
                 >
