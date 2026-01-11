@@ -114,27 +114,30 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
 
                 const nrrMap: Record<string, number> = {};
                 data.forEach((stat: any) => {
-                    const ballsFaced = stat.balls_faced || 1;
-                    const oversFaced = ballsFaced / 6;
-                    const battingRate = (stat.runs_scored || 0) / oversFaced;
+                    // Data already has overs_faced and overs_bowled in decimal format (e.g., 20.0 overs)
+                    const oversFaced = stat.overs_faced || 0;
+                    const oversBowled = stat.overs_bowled || 0;
 
-                    const ballsBowled = stat.overs_bowled_decimal || 1;
-                    const oversBowled = ballsBowled / 6;
-                    const bowlingRate = (stat.runs_conceded || 0) / oversBowled;
+                    // NRR = (Runs Scored / Overs Faced) - (Runs Conceded / Overs Bowled)
+                    const battingRate = oversFaced > 0 ? (stat.runs_scored || 0) / oversFaced : 0;
+                    const bowlingRate = oversBowled > 0 ? (stat.runs_conceded || 0) / oversBowled : 0;
 
-                    const nrr = battingRate - bowlingRate;
+                    // If API provides pre-calculated NRR, use it; otherwise calculate
+                    const nrr = stat.nrr !== undefined && stat.nrr !== null
+                        ? stat.nrr
+                        : battingRate - bowlingRate;
                     nrrMap[stat.team_id] = nrr;
 
                     console.log(`[PointsTable] NRR for Team ${stat.team_id} (${stat.team_name || 'Unknown'}):`, {
-                        ballsFaced,
-                        oversFaced: oversFaced.toFixed(2),
                         runsScored: stat.runs_scored,
+                        oversFaced,
                         battingRate: battingRate.toFixed(3),
-                        ballsBowled,
-                        oversBowled: oversBowled.toFixed(2),
                         runsConceded: stat.runs_conceded,
+                        oversBowled,
                         bowlingRate: bowlingRate.toFixed(3),
-                        NRR: nrr.toFixed(3)
+                        calculatedNRR: (battingRate - bowlingRate).toFixed(3),
+                        apiNRR: stat.nrr,
+                        usedNRR: nrr.toFixed(3)
                     });
                 });
                 console.log('[PointsTable] Final NRR Map:', nrrMap);
