@@ -391,44 +391,7 @@ export function isFeatured(match: Match): boolean {
     return getMatchPriority(match) <= 15;
 }
 
-/**
- * Filter for "Just Finished" section
- * Rules:
- * 1. Match is completed (event_state === 'R' or 'C')
- * 2. High Priority (<= 15: ICC, Top Int'l, Premium Leagues)
- * 3. Ended within last 12 hours
- */
-export function filterJustFinished(matches: Match[]): Match[] {
-    const now = Date.now();
-    const TWELVE_HOURS = 12 * 60 * 60 * 1000;
 
-    return matches.filter(match => {
-        // 1. Must be completed
-        // APIs use 'R' for results, sometimes 'C'
-        if (match.event_state !== 'R' && match.event_state !== 'C') return false;
-
-        // 2. High Priority Only
-        // Top 10 Int'l (2) + ICC Events (1-3) + Premium Leagues (4-14)
-        // Strictly exclude priority > 15 (Domestic, Lower Leagues)
-        // Note: Top Women's Teams (India W, etc.) are now Priority 12 so they pass this check.
-        if (getMatchPriority(match) > 15) return false;
-
-        // 3. Recency Check
-        // If end_date exists, use it. Otherwise skip (don't reliably know when it ended)
-        if (!match.end_date) return false;
-
-        const endTime = new Date(match.end_date).getTime();
-        const timeSinceEnd = now - endTime;
-
-        // Must be in the past (completed) and within 12 hours
-        return timeSinceEnd >= 0 && timeSinceEnd <= TWELVE_HOURS;
-    }).sort((a, b) => {
-        // Sort most recently finished first
-        const endA = a.end_date ? new Date(a.end_date).getTime() : 0;
-        const endB = b.end_date ? new Date(b.end_date).getTime() : 0;
-        return endB - endA;
-    });
-}
 
 /**
  * Filter for ".FEAT" section
