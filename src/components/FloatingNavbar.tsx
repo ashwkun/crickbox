@@ -70,7 +70,6 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         animation: isCric ? 'navShimmer 2s ease-in-out infinite alternate' : 'none',
-                        transition: 'all 0.3s ease',
                     }}>
                         .CRIC
                     </span>
@@ -122,7 +121,6 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         animation: !isCric ? 'navShimmer 2s ease-in-out infinite alternate' : 'none',
-                        transition: 'all 0.3s ease',
                     }}>
                         .PLAY
                     </span>
