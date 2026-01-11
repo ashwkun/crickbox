@@ -9,7 +9,7 @@ interface PlayPageProps {
  * PlayPage - Fantasy Cricket Game Section
  * 
  * Placeholder with "Coming Soon" premium design
- * Theme: Electric Purple (#8b5cf6)
+ * Theme: Electric Blue (#0ea5e9)
  */
 const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
     if (!isVisible) return null;
@@ -29,16 +29,16 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                 width: 100,
                 height: 100,
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.05))',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
+                background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(14, 165, 233, 0.05))',
+                border: '1px solid rgba(14, 165, 233, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 32,
-                boxShadow: '0 0 60px rgba(139, 92, 246, 0.3)',
+                boxShadow: '0 0 60px rgba(14, 165, 233, 0.3)',
                 animation: 'pulse 3s ease-in-out infinite',
             }}>
-                <LuGamepad2 size={44} color="#8b5cf6" />
+                <LuGamepad2 size={44} color="#0ea5e9" />
             </div>
 
             {/* Title */}
@@ -48,7 +48,7 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                 letterSpacing: '-1px',
                 margin: 0,
                 marginBottom: 12,
-                background: 'linear-gradient(135deg, #8b5cf6, #c4b5fd)',
+                background: 'linear-gradient(135deg, #0ea5e9, #7dd3fc)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
             }}>
@@ -81,11 +81,11 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                     gap: 6,
                     padding: '8px 16px',
                     borderRadius: 100,
-                    background: 'rgba(139, 92, 246, 0.1)',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    background: 'rgba(14, 165, 233, 0.1)',
+                    border: '1px solid rgba(14, 165, 233, 0.2)',
                 }}>
-                    <LuSparkles size={14} color="#8b5cf6" />
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#c4b5fd' }}>AI Insights</span>
+                    <LuSparkles size={14} color="#0ea5e9" />
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#7dd3fc' }}>AI Insights</span>
                 </div>
                 <div style={{
                     display: 'flex',
@@ -93,11 +93,11 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                     gap: 6,
                     padding: '8px 16px',
                     borderRadius: 100,
-                    background: 'rgba(139, 92, 246, 0.1)',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    background: 'rgba(14, 165, 233, 0.1)',
+                    border: '1px solid rgba(14, 165, 233, 0.2)',
                 }}>
-                    <LuTrophy size={14} color="#8b5cf6" />
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#c4b5fd' }}>Leaderboards</span>
+                    <LuTrophy size={14} color="#0ea5e9" />
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#7dd3fc' }}>Leaderboards</span>
                 </div>
             </div>
 
@@ -105,16 +105,16 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
             <div style={{
                 padding: '12px 28px',
                 borderRadius: 100,
-                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1))',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
-                boxShadow: '0 4px 20px rgba(139, 92, 246, 0.2)',
+                background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(14, 165, 233, 0.1))',
+                border: '1px solid rgba(14, 165, 233, 0.3)',
+                boxShadow: '0 4px 20px rgba(14, 165, 233, 0.2)',
             }}>
                 <span style={{
                     fontSize: 13,
                     fontWeight: 700,
                     letterSpacing: '2px',
                     textTransform: 'uppercase',
-                    background: 'linear-gradient(90deg, #8b5cf6, #c4b5fd)',
+                    background: 'linear-gradient(90deg, #0ea5e9, #7dd3fc)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                 }}>
