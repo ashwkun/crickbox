@@ -356,7 +356,7 @@ const FeatSection: React.FC<FeatSectionProps> = ({ matches, onMatchClick }) => {
             </div>
 
             {/* Gradient Accent Line below FEAT section */}
-            <div style={{ margin: '-12px 20px 8px' }}>
+            <div style={{ margin: '12px 20px 8px 16px' }}>
                 <div style={{
                     height: '1px',
                     background: 'linear-gradient(90deg, #06b6d4 0%, rgba(6, 182, 212, 0) 100%)',
