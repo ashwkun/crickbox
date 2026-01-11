@@ -1,5 +1,6 @@
-import React from 'react';
-import { LuGamepad2, LuSparkles, LuTrophy } from 'react-icons/lu';
+import React, { useState } from 'react';
+import { LuGamepad2, LuMail, LuLoader2, LuCheck, LuLogOut } from 'react-icons/lu';
+import { useAuth } from '../utils/useAuth';
 
 interface PlayPageProps {
     isVisible?: boolean;
@@ -8,12 +9,162 @@ interface PlayPageProps {
 /**
  * PlayPage - Fantasy Cricket Game Section
  * 
- * Placeholder with "Coming Soon" premium design
+ * Shows login UI if not authenticated, game content if authenticated
  * Theme: Hot Pink (#ec4899)
  */
 const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
+    const { user, loading, signInWithGoogle, signInWithMagicLink, signOut } = useAuth();
+    const [email, setEmail] = useState('');
+    const [emailSent, setEmailSent] = useState(false);
+    const [emailLoading, setEmailLoading] = useState(false);
+    const [emailError, setEmailError] = useState('');
+
     if (!isVisible) return null;
 
+    const handleMagicLink = async () => {
+        if (!email || !email.includes('@')) {
+            setEmailError('Please enter a valid email');
+            return;
+        }
+        setEmailLoading(true);
+        setEmailError('');
+        const { error } = await signInWithMagicLink(email);
+        setEmailLoading(false);
+        if (error) {
+            setEmailError('Failed to send link. Try again.');
+        } else {
+            setEmailSent(true);
+        }
+    };
+
+    // Loading state
+    if (loading) {
+        return (
+            <div style={{
+                minHeight: 'calc(100vh - 85px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                <LuLoader2 size={32} color="#ec4899" style={{ animation: 'spin 1s linear infinite' }} />
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+        );
+    }
+
+    // Authenticated - Show game content (Coming Soon for now)
+    if (user) {
+        return (
+            <div style={{
+                minHeight: 'calc(100vh - 85px)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '40px 24px 120px',
+                textAlign: 'center',
+            }}>
+                {/* User greeting */}
+                <div style={{
+                    marginBottom: 32,
+                    padding: '12px 20px',
+                    borderRadius: 100,
+                    background: 'rgba(236, 72, 153, 0.1)',
+                    border: '1px solid rgba(236, 72, 153, 0.2)',
+                }}>
+                    <span style={{ fontSize: 14, color: '#f9a8d4' }}>
+                        Welcome, <strong style={{ color: '#ec4899' }}>{user.email?.split('@')[0] || 'Player'}</strong>
+                    </span>
+                </div>
+
+                {/* Glowing Icon */}
+                <div style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.05))',
+                    border: '1px solid rgba(236, 72, 153, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 32,
+                    boxShadow: '0 0 60px rgba(236, 72, 153, 0.3)',
+                }}>
+                    <LuGamepad2 size={44} color="#ec4899" />
+                </div>
+
+                {/* Title */}
+                <h1 style={{
+                    fontSize: 32,
+                    fontWeight: 800,
+                    letterSpacing: '-1px',
+                    margin: 0,
+                    marginBottom: 12,
+                    background: 'linear-gradient(135deg, #ec4899, #f9a8d4)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                }}>
+                    Fantasy Cricket
+                </h1>
+
+                {/* Subtitle */}
+                <p style={{
+                    fontSize: 16,
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    margin: 0,
+                    marginBottom: 40,
+                    maxWidth: 280,
+                    lineHeight: 1.5,
+                }}>
+                    Build your dream XI. Compete with friends. Win glory.
+                </p>
+
+                {/* Coming Soon Badge */}
+                <div style={{
+                    padding: '12px 28px',
+                    borderRadius: 100,
+                    background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.1))',
+                    border: '1px solid rgba(236, 72, 153, 0.3)',
+                    marginBottom: 24,
+                }}>
+                    <span style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        letterSpacing: '2px',
+                        textTransform: 'uppercase',
+                        background: 'linear-gradient(90deg, #ec4899, #f9a8d4)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                    }}>
+                        Coming Soon
+                    </span>
+                </div>
+
+                {/* Sign Out */}
+                <button
+                    onClick={signOut}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '10px 20px',
+                        borderRadius: 100,
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        background: 'transparent',
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        fontSize: 13,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                    }}
+                >
+                    <LuLogOut size={16} />
+                    Sign Out
+                </button>
+            </div>
+        );
+    }
+
+    // Not authenticated - Show login UI
     return (
         <div style={{
             minHeight: 'calc(100vh - 85px)',
@@ -21,113 +172,161 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '40px 24px 120px', // Extra bottom padding for navbar
+            padding: '40px 24px 120px',
             textAlign: 'center',
         }}>
-            {/* Glowing Icon */}
+            {/* Icon */}
             <div style={{
-                width: 100,
-                height: 100,
+                width: 80,
+                height: 80,
                 borderRadius: '50%',
                 background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.05))',
                 border: '1px solid rgba(236, 72, 153, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: 32,
-                boxShadow: '0 0 60px rgba(236, 72, 153, 0.3)',
-                animation: 'pulse 3s ease-in-out infinite',
+                marginBottom: 24,
             }}>
-                <LuGamepad2 size={44} color="#ec4899" />
+                <LuGamepad2 size={36} color="#ec4899" />
             </div>
 
             {/* Title */}
             <h1 style={{
-                fontSize: 32,
+                fontSize: 28,
                 fontWeight: 800,
-                letterSpacing: '-1px',
+                letterSpacing: '-0.5px',
                 margin: 0,
-                marginBottom: 12,
-                background: 'linear-gradient(135deg, #ec4899, #f9a8d4)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                marginBottom: 8,
+                color: '#fff',
             }}>
-                Fantasy Cricket
+                Join the Game
             </h1>
 
             {/* Subtitle */}
             <p style={{
-                fontSize: 16,
+                fontSize: 15,
                 color: 'rgba(255, 255, 255, 0.5)',
                 margin: 0,
-                marginBottom: 40,
-                maxWidth: 280,
+                marginBottom: 32,
+                maxWidth: 260,
                 lineHeight: 1.5,
             }}>
-                Build your dream XI. Compete with friends. Win glory.
+                Sign in to create your dream XI and compete with friends
             </p>
 
-            {/* Feature Pills */}
+            {/* Google Sign In */}
+            <button
+                onClick={signInWithGoogle}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 12,
+                    width: '100%',
+                    maxWidth: 300,
+                    padding: '14px 24px',
+                    borderRadius: 12,
+                    border: 'none',
+                    background: '#fff',
+                    color: '#1f2937',
+                    fontSize: 15,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    marginBottom: 16,
+                    transition: 'transform 0.2s ease',
+                }}
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                Continue with Google
+            </button>
+
+            {/* Divider */}
             <div style={{
                 display: 'flex',
-                gap: 12,
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                marginBottom: 48,
+                alignItems: 'center',
+                width: '100%',
+                maxWidth: 300,
+                margin: '8px 0 24px',
             }}>
+                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+                <span style={{ padding: '0 16px', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>or</span>
+                <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+            </div>
+
+            {/* Magic Link */}
+            {!emailSent ? (
+                <div style={{ width: '100%', maxWidth: 300 }}>
+                    <div style={{
+                        display: 'flex',
+                        gap: 8,
+                        marginBottom: emailError ? 8 : 0,
+                    }}>
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleMagicLink()}
+                            style={{
+                                flex: 1,
+                                padding: '14px 16px',
+                                borderRadius: 12,
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                background: 'rgba(255,255,255,0.05)',
+                                color: '#fff',
+                                fontSize: 15,
+                                outline: 'none',
+                            }}
+                        />
+                        <button
+                            onClick={handleMagicLink}
+                            disabled={emailLoading}
+                            style={{
+                                padding: '14px 18px',
+                                borderRadius: 12,
+                                border: 'none',
+                                background: '#ec4899',
+                                color: '#fff',
+                                cursor: emailLoading ? 'wait' : 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            {emailLoading ? (
+                                <LuLoader2 size={20} style={{ animation: 'spin 1s linear infinite' }} />
+                            ) : (
+                                <LuMail size={20} />
+                            )}
+                        </button>
+                    </div>
+                    {emailError && (
+                        <p style={{ fontSize: 12, color: '#ef4444', margin: 0, textAlign: 'left' }}>{emailError}</p>
+                    )}
+                </div>
+            ) : (
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 6,
-                    padding: '8px 16px',
-                    borderRadius: 100,
-                    background: 'rgba(236, 72, 153, 0.1)',
-                    border: '1px solid rgba(236, 72, 153, 0.2)',
+                    gap: 12,
+                    padding: '16px 24px',
+                    borderRadius: 12,
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    border: '1px solid rgba(34, 197, 94, 0.3)',
                 }}>
-                    <LuSparkles size={14} color="#ec4899" />
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#f9a8d4' }}>AI Insights</span>
+                    <LuCheck size={20} color="#22c55e" />
+                    <span style={{ fontSize: 14, color: '#86efac' }}>
+                        Magic link sent! Check your email.
+                    </span>
                 </div>
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '8px 16px',
-                    borderRadius: 100,
-                    background: 'rgba(236, 72, 153, 0.1)',
-                    border: '1px solid rgba(236, 72, 153, 0.2)',
-                }}>
-                    <LuTrophy size={14} color="#ec4899" />
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#f9a8d4' }}>Leaderboards</span>
-                </div>
-            </div>
+            )}
 
-            {/* Coming Soon Badge */}
-            <div style={{
-                padding: '12px 28px',
-                borderRadius: 100,
-                background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.1))',
-                border: '1px solid rgba(236, 72, 153, 0.3)',
-                boxShadow: '0 4px 20px rgba(236, 72, 153, 0.2)',
-            }}>
-                <span style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    letterSpacing: '2px',
-                    textTransform: 'uppercase',
-                    background: 'linear-gradient(90deg, #ec4899, #f9a8d4)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                }}>
-                    Coming Soon
-                </span>
-            </div>
-
-            <style>{`
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); opacity: 1; }
-                    50% { transform: scale(1.05); opacity: 0.8; }
-                }
-            `}</style>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
     );
 };
