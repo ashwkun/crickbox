@@ -196,7 +196,8 @@ function transformScorecard(scorecard, match) {
     // Skip Abandoned or No Result matches (should not affect NRR)
     if (matchData.result && (
         matchData.result.includes('Abandoned') ||
-        matchData.result.includes('No Result')
+        matchData.result.includes('No Result') ||
+        matchData.result.includes('Rain Stoppage')
     )) {
         return null;
     }
