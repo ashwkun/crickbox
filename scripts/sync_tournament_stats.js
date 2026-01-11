@@ -368,11 +368,18 @@ async function main() {
     }
 
     try {
-        // 1. Fetch recent completed matches (last 2 days)
+        // 1. Fetch recent matches (last 2 days)
         const allMatches = await fetchRecentMatches(2);
 
+        // 1b. Filter to only COMPLETED matches (R = Result, C = Cancelled/Completed)
+        // This prevents syncing live matches with incomplete innings data
+        const completedMatches = allMatches.filter(m =>
+            m.event_state === 'R' || m.event_state === 'C'
+        );
+        console.log(`Filtered to ${completedMatches.length} completed matches (R/C only)`);
+
         // 2. Filter to premium tournaments
-        const premiumMatches = filterPremiumTournaments(allMatches);
+        const premiumMatches = filterPremiumTournaments(completedMatches);
 
         // 3. Check which matches are already synced (Optimized & Limit-Safe)
         const matchIdsToCheck = premiumMatches.map(m => String(m.game_id));
