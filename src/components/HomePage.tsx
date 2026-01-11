@@ -215,12 +215,17 @@ export default function HomePage({
     const upcomingChips = useMemo(() => generateUpcomingChips(upcomingMatches), [upcomingMatches]);
 
     // Smart default for time filter: Today > Tomorrow > Week > All
+    // Now respects the active chip (Category) so we don't set 'Today' if the only match today is hidden by the chip
     useEffect(() => {
         if (hasInitializedTimeFilter || upcomingMatches.length === 0) return;
 
-        const hasToday = upcomingMatches.some(m => isToday(new Date(m.start_date)));
-        const hasTomorrow = upcomingMatches.some(m => isTomorrow(new Date(m.start_date)));
-        const hasThisWeek = upcomingMatches.some(m => isThisWeek(new Date(m.start_date)));
+        // 1. Filter by current category first (usually 'featured')
+        const relevantMatches = filterByChip(upcomingMatches, activeUpcomingChip);
+
+        // 2. Check dates on RELEVANT matches only
+        const hasToday = relevantMatches.some(m => isToday(new Date(m.start_date)));
+        const hasTomorrow = relevantMatches.some(m => isTomorrow(new Date(m.start_date)));
+        const hasThisWeek = relevantMatches.some(m => isThisWeek(new Date(m.start_date)));
 
         if (hasToday) {
             setUpcomingTimeFilter('today');
@@ -228,11 +233,13 @@ export default function HomePage({
             setUpcomingTimeFilter('tomorrow');
         } else if (hasThisWeek) {
             setUpcomingTimeFilter('week');
+        } else {
+            // If no relevant matches in near future, widen to ALL
+            setUpcomingTimeFilter('all');
         }
-        // else keep 'all'
 
         setHasInitializedTimeFilter(true);
-    }, [upcomingMatches, hasInitializedTimeFilter]);
+    }, [upcomingMatches, hasInitializedTimeFilter, activeUpcomingChip]);
 
     const completedMatches = useMemo(() =>
         matches
