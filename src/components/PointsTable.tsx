@@ -91,7 +91,6 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
 
             try {
                 const data = await getTeamTournamentStats(seriesId);
-                console.log('[PointsTable] NRR Raw Data:', data);
                 if (!data.length) return;
 
                 const nrrMap: Record<string, number> = {};
@@ -108,22 +107,8 @@ const PointsTable: React.FC<PointsTableProps> = ({ standings, matches = [], styl
                     const battingRate = oversFaced > 0 ? (stat.runs_scored || 0) / oversFaced : 0;
                     const bowlingRate = oversBowled > 0 ? (stat.runs_conceded || 0) / oversBowled : 0;
 
-                    const nrr = battingRate - bowlingRate;
-                    nrrMap[stat.team_id] = nrr;
-
-                    console.log(`[PointsTable] NRR for Team ${stat.team_id}:`, {
-                        runsScored: stat.runs_scored,
-                        ballsFaced,
-                        oversFaced: oversFaced.toFixed(2),
-                        battingRate: battingRate.toFixed(3),
-                        runsConceded: stat.runs_conceded,
-                        ballsBowled,
-                        oversBowled: oversBowled.toFixed(2),
-                        bowlingRate: bowlingRate.toFixed(3),
-                        NRR: nrr.toFixed(3)
-                    });
+                    nrrMap[stat.team_id] = battingRate - bowlingRate;
                 });
-                console.log('[PointsTable] Final NRR Map:', nrrMap);
                 setNrrData(nrrMap);
             } catch (e) {
                 console.error('NRR fetch error:', e);
