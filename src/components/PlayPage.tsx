@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LuGamepad2, LuMail, LuLoader2, LuCheck, LuLogOut } from 'react-icons/lu';
+import { LuGamepad2, LuMail, LuRefreshCw, LuCheck, LuLogIn } from 'react-icons/lu';
 import { useAuth } from '../utils/useAuth';
 
 interface PlayPageProps {
@@ -46,7 +46,7 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
             }}>
-                <LuLoader2 size={32} color="#ec4899" style={{ animation: 'spin 1s linear infinite' }} />
+                <LuRefreshCw size={32} color="#ec4899" style={{ animation: 'spin 1s linear infinite' }} />
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
         );
@@ -157,7 +157,7 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                         transition: 'all 0.2s ease',
                     }}
                 >
-                    <LuLogOut size={16} />
+                    <LuLogIn size={16} />
                     Sign Out
                 </button>
             </div>
@@ -299,7 +299,7 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                             }}
                         >
                             {emailLoading ? (
-                                <LuLoader2 size={20} style={{ animation: 'spin 1s linear infinite' }} />
+                                <LuRefreshCw size={20} style={{ animation: 'spin 1s linear infinite' }} />
                             ) : (
                                 <LuMail size={20} />
                             )}
