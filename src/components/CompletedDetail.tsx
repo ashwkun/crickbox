@@ -214,8 +214,15 @@ const CompletedDetail: React.FC<CompletedDetailProps> = ({ match, scorecard, onC
     const [aiModel, setAiModel] = useState<string | null>(null);
     const [aiAudio, setAiAudio] = useState<string | null>(null);
 
-    // Scorecard Tab State
+    // Scorecard Tab State - default to latest (last) innings
     const [selectedInningsIdx, setSelectedInningsIdx] = useState(0);
+
+    // Set to latest innings when scorecard loads
+    useEffect(() => {
+        if (scorecard?.Innings?.length) {
+            setSelectedInningsIdx(scorecard.Innings.length - 1);
+        }
+    }, [scorecard?.Innings?.length]);
 
     // Insights Data State (fetched ONCE)
     const [h2hData, setH2hData] = useState<any>(null);
