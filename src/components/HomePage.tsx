@@ -324,8 +324,12 @@ export default function HomePage({
     const resultsChips = useMemo(() => generateUpcomingChips(completedMatches), [completedMatches]);
 
     // Smart default for results time filter: Today > Yesterday > Week > All
+    // Now respects the active chip (Category) so we don't set 'Today' if the only match today is hidden by the chip
     useEffect(() => {
         if (hasInitializedResultsTimeFilter || completedMatches.length === 0) return;
+
+        // 1. Filter by current category first (usually 'featured')
+        const relevantMatches = filterByChip(completedMatches, activeResultsChip);
 
         const checkDate = (m: Match, checkFn: (d: Date) => boolean) => {
             if (m.end_date && (m.event_format?.includes('TEST') || m.event_format?.includes('FC'))) {
@@ -334,9 +338,9 @@ export default function HomePage({
             return checkFn(new Date(m.start_date));
         };
 
-        const hasToday = completedMatches.some(m => checkDate(m, isToday));
-        const hasYesterday = completedMatches.some(m => checkDate(m, isYesterday));
-        const hasLastWeek = completedMatches.some(m => checkDate(m, wasLastWeek));
+        const hasToday = relevantMatches.some(m => checkDate(m, isToday));
+        const hasYesterday = relevantMatches.some(m => checkDate(m, isYesterday));
+        const hasLastWeek = relevantMatches.some(m => checkDate(m, wasLastWeek));
 
         if (hasToday) {
             setResultsTimeFilter('today');
@@ -344,11 +348,13 @@ export default function HomePage({
             setResultsTimeFilter('yesterday');
         } else if (hasLastWeek) {
             setResultsTimeFilter('week');
+        } else {
+            // If no relevant matches in near past, widen to ALL
+            setResultsTimeFilter('all');
         }
-        // else keep 'all'
 
         setHasInitializedResultsTimeFilter(true);
-    }, [completedMatches, hasInitializedResultsTimeFilter]);
+    }, [completedMatches, hasInitializedResultsTimeFilter, activeResultsChip]);
 
     // Apply time AND category filters to processed completed
     const filteredCompleted = useMemo(() => {
