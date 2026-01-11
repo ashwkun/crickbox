@@ -14,6 +14,8 @@ import CompletedListPage from './components/completed/CompletedListPage';
 import SeriesHub from './components/SeriesHub';
 import TournamentHub from './components/TournamentHub';
 import HowItWorks from './components/dev/HowItWorks';
+import FloatingNavbar, { NavTab } from './components/FloatingNavbar';
+import PlayPage from './components/PlayPage';
 
 // --- Navigation Types ---
 export type ViewType = 'HOME' | 'MATCH' | 'SERIES' | 'TOURNAMENT' | 'UPCOMING_LIST' | 'COMPLETED_LIST' | 'HOW_IT_WORKS';
@@ -36,6 +38,7 @@ export default function App(): React.ReactElement {
     // Navigation State: Stack-based History
     // Stack always starts with HOME. Overlays are pushed on top.
     const [viewStack, setViewStack] = useState<ViewItem[]>([{ type: 'HOME' }]);
+    const [activeTab, setActiveTab] = useState<NavTab>('CRIC');
 
     // Derived state for backward compatibility with existing components
     const currentView = viewStack[viewStack.length - 1];
@@ -441,29 +444,33 @@ export default function App(): React.ReactElement {
                 We pass isVisible=false if stack > 1. 
             */}
             <main className="main-content" style={{ paddingTop: 85 }}>
-                <HomePage
-                    matches={matches}
-                    loading={loading}
-                    fetchExtendedResults={fetchExtendedResults}
-                    onSelectMatch={handleSelectMatch}
+                {activeTab === 'CRIC' ? (
+                    <HomePage
+                        matches={matches}
+                        loading={loading}
+                        fetchExtendedResults={fetchExtendedResults}
+                        onSelectMatch={handleSelectMatch}
 
-                    // Legacy props neutralized
-                    selectedSeries={null}
-                    selectedTournament={null}
-                    onOpenSeries={(sid, m) => handleOpenSeries(sid, m)}
-                    onCloseSeries={() => { }}
-                    onOpenTournament={handleOpenTournament}
-                    onCloseTournament={() => { }}
+                        // Legacy props neutralized
+                        selectedSeries={null}
+                        selectedTournament={null}
+                        onOpenSeries={(sid, m) => handleOpenSeries(sid, m)}
+                        onCloseSeries={() => { }}
+                        onOpenTournament={handleOpenTournament}
+                        onCloseTournament={() => { }}
 
-                    onOpenUpcomingList={() => {
-                        handleNavigate({ type: 'UPCOMING_LIST' });
-                    }}
-                    onOpenCompletedList={() => {
-                        handleNavigate({ type: 'COMPLETED_LIST' });
-                    }}
+                        onOpenUpcomingList={() => {
+                            handleNavigate({ type: 'UPCOMING_LIST' });
+                        }}
+                        onOpenCompletedList={() => {
+                            handleNavigate({ type: 'COMPLETED_LIST' });
+                        }}
 
-                    isVisible={viewStack.length === 1}
-                />
+                        isVisible={viewStack.length === 1}
+                    />
+                ) : (
+                    <PlayPage isVisible={viewStack.length === 1} />
+                )}
             </main>
 
             {/* Overlay Stack */}
@@ -618,6 +625,14 @@ export default function App(): React.ReactElement {
             )}
 
             <InstallPrompt />
+
+            {/* Floating Navbar - Only show on root view */}
+            {viewStack.length === 1 && (
+                <FloatingNavbar
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
+                />
+            )}
         </div>
     );
 }
