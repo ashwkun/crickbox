@@ -251,7 +251,7 @@ export default function useCricketData(): UseCricketDataReturn {
             const hasLiveMatches = bucketsRef.current.live.length > 0;
             const interval = hasLiveMatches ? LIVE_INTERVAL_FAST : LIVE_INTERVAL_SLOW;
 
-            console.log(`[Engine A] Next poll in ${interval / 1000}s (${hasLiveMatches ? 'FAST: live matches exist' : 'SLOW: no live matches'})`);
+
 
             liveTimerId = setTimeout(() => {
                 fetchLive();
@@ -268,7 +268,7 @@ export default function useCricketData(): UseCricketDataReturn {
         // VISIBILITY HANDLER: Refresh match list when app returns from background
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-                console.log('[Engine A] Visibility change detected - fetching immediately');
+
                 // PWA visibility refresh - always fetch immediately
                 fetchLive();
                 // Reschedule polling with fresh interval check
@@ -279,7 +279,7 @@ export default function useCricketData(): UseCricketDataReturn {
 
         const handlePageShow = (event: PageTransitionEvent) => {
             if (event.persisted) {
-                console.log('[Engine A] PageShow (BFCache) detected - fetching immediately');
+
                 // PWA BFCache refresh
                 fetchLive();
                 fetchHeavy(false);
