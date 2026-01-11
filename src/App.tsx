@@ -38,7 +38,21 @@ export default function App(): React.ReactElement {
     // Navigation State: Stack-based History
     // Stack always starts with HOME. Overlays are pushed on top.
     const [viewStack, setViewStack] = useState<ViewItem[]>([{ type: 'HOME' }]);
-    const [activeTab, setActiveTab] = useState<NavTab>('CRIC');
+
+    // Tab state - persisted via URL hash
+    const getInitialTab = (): NavTab => {
+        if (typeof window !== 'undefined' && window.location.hash === '#play') {
+            return 'PLAY';
+        }
+        return 'CRIC';
+    };
+    const [activeTab, setActiveTab] = useState<NavTab>(getInitialTab);
+
+    // Sync URL hash with activeTab
+    const handleTabChange = (tab: NavTab) => {
+        setActiveTab(tab);
+        window.location.hash = tab === 'PLAY' ? 'play' : '';
+    };
 
     // Derived state for backward compatibility with existing components
     const currentView = viewStack[viewStack.length - 1];
@@ -631,7 +645,7 @@ export default function App(): React.ReactElement {
             {viewStack.length === 1 && (
                 <FloatingNavbar
                     activeTab={activeTab}
-                    onTabChange={setActiveTab}
+                    onTabChange={handleTabChange}
                 />
             )}
         </div>

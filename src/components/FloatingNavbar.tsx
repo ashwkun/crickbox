@@ -8,9 +8,11 @@ interface FloatingNavbarProps {
 }
 
 /**
- * FloatingNavbar - Pure Liquid Glass Dock
+ * FloatingNavbar - Liquid Glass Dock with Colored Tabs
  * 
- * Minimal, translucent, Apple-style design
+ * Theme Colors:
+ * - .CRIC: Electric Green (#22c55e)
+ * - .PLAY: Hot Pink (#ec4899)
  */
 const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange }) => {
     const isCric = activeTab === 'CRIC';
@@ -27,13 +29,11 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
             gap: 2,
             padding: '4px',
             borderRadius: 50,
-            // Liquid Glass: Ultra-light translucent white
+            // Liquid Glass
             background: 'rgba(255, 255, 255, 0.08)',
             backdropFilter: 'blur(20px) saturate(180%)',
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-            // Delicate border
             border: '1px solid rgba(255, 255, 255, 0.12)',
-            // Soft ambient shadow
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
         }}>
             {/* .CRIC Tab */}
@@ -44,9 +44,8 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                     borderRadius: 50,
                     border: 'none',
                     cursor: 'pointer',
-                    // Active: Subtle white pill
                     background: isCric
-                        ? 'rgba(255, 255, 255, 0.15)'
+                        ? 'rgba(34, 197, 94, 0.15)'
                         : 'transparent',
                     transition: 'all 0.25s ease',
                 }}
@@ -56,8 +55,8 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                     fontSize: 13,
                     fontWeight: 600,
                     letterSpacing: '0.5px',
-                    // Active: Bright white, Inactive: Muted
-                    color: isCric ? '#fff' : 'rgba(255, 255, 255, 0.45)',
+                    // Active: Green, Inactive: Muted
+                    color: isCric ? '#22c55e' : 'rgba(255, 255, 255, 0.4)',
                     transition: 'color 0.25s ease',
                 }}>
                     .CRIC
@@ -72,9 +71,8 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                     borderRadius: 50,
                     border: 'none',
                     cursor: 'pointer',
-                    // Active: Subtle white pill
                     background: !isCric
-                        ? 'rgba(255, 255, 255, 0.15)'
+                        ? 'rgba(236, 72, 153, 0.15)'
                         : 'transparent',
                     transition: 'all 0.25s ease',
                 }}
@@ -84,8 +82,8 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ activeTab, onTabChange 
                     fontSize: 13,
                     fontWeight: 600,
                     letterSpacing: '0.5px',
-                    // Active: Bright white, Inactive: Muted
-                    color: !isCric ? '#fff' : 'rgba(255, 255, 255, 0.45)',
+                    // Active: Pink, Inactive: Muted
+                    color: !isCric ? '#ec4899' : 'rgba(255, 255, 255, 0.4)',
                     transition: 'color 0.25s ease',
                 }}>
                     .PLAY
