@@ -1,4 +1,6 @@
 import React from 'react';
+import { User } from 'firebase/auth';
+import { LuUser } from 'react-icons/lu';
 
 export interface HeaderDisplayData {
     mainText: string;
@@ -19,13 +21,13 @@ interface FloatingHeaderProps {
     isUpcoming?: boolean;
     isPast?: boolean;
     isPlay?: boolean;
+    user?: User | null;
 }
 
-const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast, isPlay }) => {
+const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast, isPlay, user }) => {
     const [celebrating, setCelebrating] = React.useState(false);
     const prevBallId = React.useRef<string | undefined>(undefined);
 
-    // Detect Ball Change
     // Detect Ball Change
     React.useEffect(() => {
         if (data?.ball?.id) {
@@ -60,7 +62,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         width: '100%',
         padding: '20px',
         display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr', // Left, Center, Right (empty)
+        gridTemplateColumns: 'minmax(44px, 1fr) auto minmax(44px, 1fr)', // Balanced columns
         alignItems: 'center',
         pointerEvents: 'none', // Allow clicking through empty space
         zIndex: 3000,
@@ -84,22 +86,12 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         transition: 'background 0.2s ease, transform 0.2s ease',
     };
 
-    // Dynamic Background Logic
-    // If celebrating, use Ball Color. Else use Team Color. Else Default.
-    // We mix with some transparency for glass effect.
-    // Since ball colors are usually solid (e.g. #ff0000), we wrap in 'rgba(..., 0.8)' or use specific logic?
-    // User wants "header bg... change to colour of the ball".
-    // I'll assume data.ball.color is a valid color string.
     // Dynamic Background Logic: Corner Spotlight
     const activeBg = celebrating && data?.ball?.color
         ? data.ball.color
         : data?.teamColor
             ? `radial-gradient(circle at top left, ${data.teamColor}, rgba(20, 20, 20, 0.4) 70%)`
             : 'rgba(20, 20, 20, 0.4)';
-
-    // If celebrating, we might want higher opacity to make text readable against bright colors?
-    // Glassmorphism usually likes lower opacity.
-    // I will apply an opacity override if it's a ball color? No, let's trust the color passed.
 
     const logoStyle: React.CSSProperties = {
         ...btnStyle,
@@ -208,9 +200,6 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                     <div style={{
                                         width: 20, height: 20, borderRadius: '50%',
                                         background: celebrating ? '#fff' : data.ball.color, // Inverted on celebration? Or keep color? 
-                                        // User asked for "header bg ... change to colour of the ball".
-                                        // If Header BG is RED, Ball Circle should be WHITE for contrast?
-                                        // Yes making it White with Colored Text is smart.
                                         color: celebrating ? data.ball.color : '#fff',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         fontSize: 9, fontWeight: 800,
@@ -303,8 +292,31 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                 </div>
             </div>
 
-            {/* Right: Empty spacer */}
-            <div style={{ width: 44 }}></div>
+            {/* Right: User Profile (or spacer) */}
+            <div style={{ justifySelf: 'end', pointerEvents: 'auto' }}>
+                {user ? (
+                    <div
+                        style={{
+                            ...btnStyle,
+                            padding: 0,
+                            overflow: 'hidden',
+                            border: '1px solid rgba(236, 72, 153, 0.4)',
+                        }}
+                    >
+                        {user.photoURL ? (
+                            <img
+                                src={user.photoURL}
+                                alt="Profile"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                        ) : (
+                            <LuUser color="#ec4899" size={20} />
+                        )}
+                    </div>
+                ) : (
+                    <div style={{ width: 44 }} />
+                )}
+            </div>
         </div>
     );
 };

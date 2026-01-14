@@ -26,8 +26,11 @@ interface ViewItem {
     data?: any;  // Extra context (matches list, series name, etc.)
 }
 
+import { useFirebaseAuth } from './utils/useFirebaseAuth';
+
 export default function App(): React.ReactElement {
     const { matches, loading, isRefreshing, fetchScorecard, fetchExtendedResults, fetchWallstream, fetchByDateRange } = useCricketData();
+    const { user } = useFirebaseAuth(); // Authenticated user for Header
 
     const [headerData, setHeaderData] = useState<HeaderDisplayData | null>(null);
     const [scorecard, setScorecard] = useState<Scorecard | null>(null);
@@ -452,6 +455,7 @@ export default function App(): React.ReactElement {
                 isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
                 isPast={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && !!currentView.data && (currentView.data as Match)?.event_state !== 'L' && (currentView.data as Match)?.event_state !== 'U')}
                 isPlay={activeTab === 'PLAY' && currentView.type === 'HOME'}
+                user={user}
             />
 
             {/* Base Layer: HomePage */}

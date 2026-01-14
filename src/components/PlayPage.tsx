@@ -1,27 +1,9 @@
-import React, { useEffect } from 'react';
-import { LuRefreshCw } from 'react-icons/lu';
-import { useFirebaseAuth } from '../utils/useFirebaseAuth';
-import AuthSuccessPage from './play/AuthSuccessPage';
-import LoginPage from './play/LoginPage';
-import GameDashboard from './play/GameDashboard';
+import WelcomeOverlay from './play/WelcomeOverlay';
+import { User } from 'firebase/auth';
 
-import SkeletonLoginPage from './play/SkeletonLoginPage';
+// Session storage key to track if welcome has been shown this session
+const WELCOME_SHOWN_KEY = 'boxcric_welcome_shown_session';
 
-interface PlayPageProps {
-    isVisible?: boolean;
-    onSuccessPage?: (isSuccess: boolean) => void;
-}
-
-/**
- * PlayPage - Fantasy Cricket Game Section
- * 
- * Orchestrates authentication flow and renders appropriate sub-component:
- * - AuthSuccessPage: After magic link sign-in
- * - LoginPage: For unauthenticated users
- * - GameDashboard: For authenticated users
- * 
- * Theme: Hot Pink (#ec4899)
- */
 const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) => {
     const {
         user,
@@ -32,10 +14,27 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
         signOut
     } = useFirebaseAuth();
 
+    const [showWelcome, setShowWelcome] = React.useState(false);
+    const [welcomeComplete, setWelcomeComplete] = React.useState(false);
+
     // Notify parent when success page is shown
     useEffect(() => {
         onSuccessPage?.(showSuccessPage);
     }, [showSuccessPage, onSuccessPage]);
+
+    // Handle Welcome Overlay Logic
+    useEffect(() => {
+        if (user && !loading) {
+            const hasShownWelcome = sessionStorage.getItem(WELCOME_SHOWN_KEY);
+            if (!hasShownWelcome) {
+                setShowWelcome(true);
+                sessionStorage.setItem(WELCOME_SHOWN_KEY, 'true');
+            } else {
+                // If already shown this session, skip straight to content
+                setWelcomeComplete(true);
+            }
+        }
+    }, [user, loading]);
 
     if (!isVisible) return null;
 
@@ -49,9 +48,31 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
         return <AuthSuccessPage />;
     }
 
-    // Authenticated - Show game dashboard
+    // Authenticated State
     if (user) {
-        return <GameDashboard user={user} onSignOut={signOut} />;
+        return (
+            <>
+                <WelcomeOverlay
+                    name={user.displayName?.split(' ')[0] || 'Player'}
+                    show={showWelcome}
+                    onComplete={() => {
+                        setShowWelcome(false);
+                        setWelcomeComplete(true);
+                    }}
+                />
+
+                {/* 
+                  Only show dashboard when welcome is dismissed (or if it was skipped).
+                  This prevents the dashboard from flashing behind the overlay if we want a clean transition,
+                  OR we can render it behind to have it ready. 
+                  Let's render it behind so it's ready when fluid overlay fades out.
+                */}
+                <GameDashboard user={user} onSignOut={() => {
+                    sessionStorage.removeItem(WELCOME_SHOWN_KEY); // Reset for next login
+                    signOut();
+                }} />
+            </>
+        );
     }
 
     // Not authenticated - Show login
