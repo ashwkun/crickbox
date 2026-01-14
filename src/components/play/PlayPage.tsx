@@ -42,6 +42,9 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
     // Combined loading state
     const loading = authLoading || (user && profileLoading);
 
+    // DEBUG: Log loading states
+    console.log('[PlayPage] authLoading:', authLoading, 'user:', !!user, 'profileLoading:', profileLoading, 'combined loading:', loading);
+
     // Notify parent when success page is shown
     useEffect(() => {
         onSuccessPage?.(showSuccessPage);
