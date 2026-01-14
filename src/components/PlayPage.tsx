@@ -71,6 +71,13 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                 padding: '40px 24px 120px',
                 textAlign: 'center',
             }}>
+                <style>{`
+                    @keyframes shimmer {
+                        0% { background-position: 100% 0; }
+                        100% { background-position: 0% 0; }
+                    }
+                `}</style>
+
                 {/* Success Icon */}
                 <div style={{
                     width: 100,
@@ -93,27 +100,38 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                     fontWeight: 800,
                     letterSpacing: '-0.5px',
                     margin: 0,
-                    marginBottom: 12,
+                    marginBottom: 16,
                     color: '#22c55e',
                 }}>
                     Sign In Successful!
                 </h1>
 
-                {/* Subtitle */}
+                {/* Subtitle with branded .PLAY */}
                 <p style={{
                     fontSize: 18,
                     color: 'rgba(255, 255, 255, 0.8)',
                     margin: 0,
                     marginBottom: 40,
                     lineHeight: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
                 }}>
-                    You're ready to <span style={{
-                        color: '#ec4899',
-                        fontWeight: 800,
+                    You're ready to
+                    <span style={{
+                        fontFamily: '"BBH Bartle", sans-serif',
+                        fontSize: 20,
+                        fontWeight: 600,
+                        letterSpacing: '1px',
+                        background: 'linear-gradient(90deg, #ec4899 0%, #ec4899 35%, #f9a8d4 50%, #ec4899 65%, #ec4899 100%)',
+                        backgroundSize: '200% 100%',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        animation: 'shimmer 1.5s ease-in-out infinite alternate',
                     }}>.PLAY</span>
                 </p>
 
-                {/* Visual hint */}
+                {/* Visual hint with branded logo */}
                 <div style={{
                     padding: '16px 24px',
                     borderRadius: 16,
@@ -124,12 +142,30 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                         fontSize: 14,
                         color: 'rgba(255, 255, 255, 0.5)',
                         margin: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
                     }}>
-                        Open <span style={{
-                            color: '#ec4899',
-                            fontWeight: 700,
-                            fontFamily: 'BBH Bartle, sans-serif',
-                        }}>box.cric</span> from your home screen
+                        Open
+                        <span style={{
+                            fontFamily: '"BBH Bartle", sans-serif',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            letterSpacing: '1px',
+                            color: '#fff',
+                        }}>BOX</span>
+                        <span style={{
+                            fontFamily: '"BBH Bartle", sans-serif',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            letterSpacing: '1px',
+                            background: 'linear-gradient(90deg, #22c55e 0%, #22c55e 35%, #86efac 50%, #22c55e 65%, #22c55e 100%)',
+                            backgroundSize: '200% 100%',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            animation: 'shimmer 1.5s ease-in-out infinite alternate',
+                        }}>.CRIC</span>
+                        from your home screen
                     </p>
                 </div>
             </div>
