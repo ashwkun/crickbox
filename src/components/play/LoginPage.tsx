@@ -24,20 +24,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
             return;
         }
 
-        // Test email bypass for UI testing
-        if (email === 'test@test.com') {
-            setEmailSent(true);
-            return;
-        }
-
         setEmailLoading(true);
         setEmailError('');
         const { error } = await onMagicLink(email);
         setEmailLoading(false);
-        if (error) {
-            setEmailError('Failed to send link. Try again.');
-        } else {
+
+        // For test@test.com, the mock sign-in happens instantly in useFirebaseAuth
+        // For real emails, show the "email sent" state
+        if (!error && email !== 'test@test.com') {
             setEmailSent(true);
+        } else if (error) {
+            setEmailError('Failed to send link. Try again.');
         }
     };
 
