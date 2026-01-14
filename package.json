@@ -1,6 +1,6 @@
 {
   "name": "boxcric",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html && cp src/sw.js dist/sw.js",
