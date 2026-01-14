@@ -15,7 +15,7 @@ import SeriesHub from './components/SeriesHub';
 import TournamentHub from './components/TournamentHub';
 import HowItWorks from './components/dev/HowItWorks';
 import FloatingNavbar, { NavTab } from './components/FloatingNavbar';
-import PlayPage from './components/PlayPage';
+import PlayPage from './components/play/PlayPage';
 
 // --- Navigation Types ---
 export type ViewType = 'HOME' | 'MATCH' | 'SERIES' | 'TOURNAMENT' | 'UPCOMING_LIST' | 'COMPLETED_LIST' | 'HOW_IT_WORKS';

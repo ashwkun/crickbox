@@ -1,5 +1,16 @@
-import WelcomeOverlay from './play/WelcomeOverlay';
+import React, { useEffect } from 'react';
 import { User } from 'firebase/auth';
+import { useFirebaseAuth } from '../../utils/useFirebaseAuth';
+import AuthSuccessPage from './AuthSuccessPage';
+import LoginPage from './LoginPage';
+import GameDashboard from './GameDashboard';
+import SkeletonLoginPage from './SkeletonLoginPage';
+import WelcomeOverlay from './WelcomeOverlay';
+
+interface PlayPageProps {
+    isVisible?: boolean;
+    onSuccessPage?: (isSuccess: boolean) => void;
+}
 
 // Session storage key to track if welcome has been shown this session
 const WELCOME_SHOWN_KEY = 'boxcric_welcome_shown_session';
