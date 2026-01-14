@@ -6,6 +6,7 @@
  * - Loading state
  * - Sign in methods (Google, Magic Link)
  * - Sign out
+ * - Email link status for custom handling
  */
 
 import { useState, useEffect } from 'react';
@@ -15,7 +16,14 @@ import { auth, googleProvider } from '../firebase';
 interface AuthState {
     user: User | null;
     loading: boolean;
+    emailLinkStatus: 'none' | 'needs_email' | 'success' | 'error';
 }
+
+// Check if running in standalone PWA mode
+const isStandalonePWA = () => {
+    return (window.matchMedia('(display-mode: standalone)').matches) ||
+        ((window.navigator as any).standalone === true);
+};
 
 // Email link settings
 const actionCodeSettings = {
@@ -27,7 +35,9 @@ export function useFirebaseAuth() {
     const [authState, setAuthState] = useState<AuthState>({
         user: null,
         loading: true,
+        emailLinkStatus: 'none',
     });
+    const [pendingEmail, setPendingEmail] = useState<string>('');
 
     useEffect(() => {
         // Check for redirect result (for mobile OAuth)
@@ -37,31 +47,52 @@ export function useFirebaseAuth() {
         if (isSignInWithEmailLink(auth, window.location.href)) {
             const email = window.localStorage.getItem('emailForSignIn');
             if (email) {
+                // We have the email - complete sign in
                 signInWithEmailLink(auth, email, window.location.href)
                     .then(() => {
                         window.localStorage.removeItem('emailForSignIn');
-                        // Clean up URL
                         window.history.replaceState(null, '', window.location.origin + '/#play');
+                        setAuthState(prev => ({ ...prev, emailLinkStatus: 'success' }));
                     })
-                    .catch(console.error);
+                    .catch((error) => {
+                        console.error('Email link sign-in error:', error);
+                        setAuthState(prev => ({ ...prev, emailLinkStatus: 'error' }));
+                    });
+            } else {
+                // User opened link in different browser/context - need email
+                setAuthState(prev => ({ ...prev, emailLinkStatus: 'needs_email', loading: false }));
             }
         }
 
         // Listen for auth state changes
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setAuthState({
+            setAuthState(prev => ({
+                ...prev,
                 user,
                 loading: false,
-            });
+            }));
         });
 
         return () => unsubscribe();
     }, []);
 
+    // Complete email link sign in (when email is provided manually)
+    const completeEmailSignIn = async (email: string) => {
+        try {
+            await signInWithEmailLink(auth, email, window.location.href);
+            window.history.replaceState(null, '', window.location.origin + '/#play');
+            setAuthState(prev => ({ ...prev, emailLinkStatus: 'success' }));
+            return { error: null };
+        } catch (error) {
+            console.error('Email link completion error:', error);
+            setAuthState(prev => ({ ...prev, emailLinkStatus: 'error' }));
+            return { error };
+        }
+    };
+
     // Sign in with Google
     const signInWithGoogle = async () => {
         try {
-            // Use redirect on mobile for better PWA experience
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             if (isMobile) {
                 await signInWithRedirect(auth, googleProvider);
@@ -77,7 +108,6 @@ export function useFirebaseAuth() {
     const signInWithMagicLink = async (email: string) => {
         try {
             await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-            // Save email for when user returns
             window.localStorage.setItem('emailForSignIn', email);
             return { error: null };
         } catch (error) {
@@ -98,8 +128,11 @@ export function useFirebaseAuth() {
     return {
         user: authState.user,
         loading: authState.loading,
+        emailLinkStatus: authState.emailLinkStatus,
+        isStandalonePWA: isStandalonePWA(),
         signInWithGoogle,
         signInWithMagicLink,
+        completeEmailSignIn,
         signOut,
     };
 }
