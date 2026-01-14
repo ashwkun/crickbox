@@ -292,9 +292,9 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                 </div>
             </div>
 
-            {/* Right: User Profile (or spacer) */}
+            {/* Right: User Profile (only on PlayPage) */}
             <div style={{ justifySelf: 'end', pointerEvents: 'auto' }}>
-                {user ? (
+                {isPlay && user ? (
                     <div
                         style={{
                             ...btnStyle,
