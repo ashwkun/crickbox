@@ -92,7 +92,10 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
     }
 
     // Authenticated but profile incomplete - show setup
-    if (user && !isProfileComplete) {
+    // Only required if Firebase displayName is missing (Magic Link users)
+    const needsProfileSetup = user && !user.displayName && !isProfileComplete;
+
+    if (needsProfileSetup) {
         return (
             <ProfileSetupPage
                 onComplete={saveProfile}
@@ -103,15 +106,15 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
     }
 
     // Authenticated with profile - waiting for visibility check
-    if (user && isProfileComplete && !isVisibilityChecked) {
+    if (user && !isVisibilityChecked) {
         return <SkeletonLoginPage />;
     }
 
-    // Authenticated State with complete profile
-    if (user && isProfileComplete) {
-        // Get display name from profile (Supabase) or fallback to Firebase/email
-        const displayName = profile?.display_name
-            || user.displayName?.split(' ')[0]
+    // Authenticated State with complete profile (Google or Magic Link with profile)
+    if (user) {
+        // Get display name: Firebase > Supabase > Email prefix > fallback
+        const displayName = user.displayName?.split(' ')[0]
+            || profile?.display_name
             || user.email?.split('@')[0]
             || 'Player';
 
