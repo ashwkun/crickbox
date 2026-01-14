@@ -80,11 +80,13 @@ interface UseCricketDataReturn {
     fetchBatsmanSplits: (gameId: string, innings: number) => Promise<BatsmanSplitsResponse | null>;
     fetchOverByOver: (gameId: string, innings: number) => Promise<OverByOverResponse | null>;
     fetchSeriesInfo: (seriesId: string) => Promise<any | null>;
+    isRefreshing: boolean;
 }
 
 export default function useCricketData(): UseCricketDataReturn {
     const [matches, setMatches] = useState<Match[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isRefreshing, setIsRefreshing] = useState<boolean>(true);
 
     // BUCKETS STATE: Store data in separate silos to prevent "ghost" records
     const bucketsRef = useRef({
@@ -235,13 +237,19 @@ export default function useCricketData(): UseCricketDataReturn {
             } catch (e) { }
         }
 
-        // 2. Use preloaded data (started in HTML, should be ready or almost ready)
-        usePreloadedData().then(usedPreload => {
-            if (!usedPreload) {
-                // 3. Fallback to normal fetch if preload failed
-                fetchLive();
-                fetchHeavy(true);
-            }
+        // 2. Fire fresh APIs IMMEDIATELY in parallel (don't wait for preload)
+        setIsRefreshing(true);
+        const freshFetch = Promise.all([
+            fetchLive(),
+            fetchHeavy(true)
+        ]);
+
+        // Also try preload in parallel (fire-and-forget style)
+        usePreloadedData();
+
+        // When fresh data arrives, stop refreshing indicator
+        freshFetch.finally(() => {
+            setIsRefreshing(false);
         });
 
         // ADAPTIVE POLLING: Adjust interval based on live match count
@@ -551,6 +559,7 @@ export default function useCricketData(): UseCricketDataReturn {
     return {
         matches,
         loading,
+        isRefreshing,
         fetchScorecard,
         fetchExtendedResults,
         fetchWallstream,

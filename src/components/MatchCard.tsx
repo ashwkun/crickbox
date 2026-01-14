@@ -61,9 +61,10 @@ interface MatchCardProps {
     onClick: (match: any) => void;
     isHero?: boolean;
     onSeriesClick?: (seriesId: string) => void;
+    isRefreshing?: boolean;
 }
 
-const MatchCard: React.FC<MatchCardProps> = ({ match, onClick, isHero = false, onSeriesClick }) => {
+const MatchCard: React.FC<MatchCardProps> = ({ match, onClick, isHero = false, onSeriesClick, isRefreshing = false }) => {
     const team1 = match.participants?.[0];
     const team2 = match.participants?.[1];
 
@@ -152,7 +153,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onClick, isHero = false, o
     if (isHero) {
         return (
             <div style={heroStyle} onClick={() => onClick(match)}>
-                {/* Row 1: Series/Tour name - centered */}
+                {isRefreshing && <div className="shimmer-overlay" />}
                 <div
                     onClick={(e) => {
                         if (onSeriesClick) {
@@ -365,7 +366,8 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onClick, isHero = false, o
     }
 
     return (
-        <div className="match-card" onClick={() => onClick(match)}>
+        <div className="match-card" onClick={() => onClick(match)} style={{ position: 'relative' }}>
+            {isRefreshing && <div className="shimmer-overlay" />}
             <div className="match-card-header">
                 <span className="match-series">{match.series_name}</span>
                 {match.event_state === 'L' ? (

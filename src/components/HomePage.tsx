@@ -93,6 +93,7 @@ interface HomePageProps {
     onOpenUpcomingList: () => void;
     onOpenCompletedList: () => void;
     isVisible?: boolean;
+    isRefreshing?: boolean;
 }
 
 export default function HomePage({
@@ -106,7 +107,8 @@ export default function HomePage({
     onCloseTournament,
     onOpenUpcomingList,
     onOpenCompletedList,
-    isVisible = true
+    isVisible = true,
+    isRefreshing = false
 }: HomePageProps): React.ReactElement {
     const [upcomingLimit, setUpcomingLimit] = useState(10);
     const [resultsLimit, setResultsLimit] = useState(8);
@@ -518,6 +520,7 @@ export default function HomePage({
                                     onClick={openMatch}
                                     isHero={true}
                                     onSeriesClick={(seriesId) => openSeries(seriesId, undefined)}
+                                    isRefreshing={isRefreshing}
                                 />
                             ))}
                         </div>
@@ -727,6 +730,7 @@ export default function HomePage({
                                     onClick={openMatch}
                                     showSeriesButton={true}
                                     onViewSeries={openSeries}
+                                    isRefreshing={isRefreshing}
                                 />
                             ) : item.type === 'tournament' && (item as ProcessedMatchItem).match ? (
                                 <UpcomingCard
@@ -735,6 +739,7 @@ export default function HomePage({
                                     onClick={openMatch}
                                     showTournamentButton={true}
                                     onViewTournament={openTournament}
+                                    isRefreshing={isRefreshing}
                                 />
                             ) : (
                                 <UpcomingCard
@@ -743,6 +748,7 @@ export default function HomePage({
                                     onClick={openMatch}
                                     showSeriesButton={(item as ProcessedMatchItem).seriesId !== undefined}
                                     onViewSeries={(item as ProcessedMatchItem).seriesId ? openSeries : undefined}
+                                    isRefreshing={isRefreshing}
                                 />
                             )
                         )}
@@ -871,6 +877,7 @@ export default function HomePage({
                                 onViewSeries={(sid: string) => openSeries(sid, completedSeriesGroups[sid] || [])}
                                 showTournamentButton={item.type === 'tournament'}
                                 onViewTournament={openTournament}
+                                isRefreshing={isRefreshing}
                             />
                         ))}
 

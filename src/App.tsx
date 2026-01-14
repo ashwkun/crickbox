@@ -27,7 +27,7 @@ interface ViewItem {
 }
 
 export default function App(): React.ReactElement {
-    const { matches, loading, fetchScorecard, fetchExtendedResults, fetchWallstream, fetchByDateRange } = useCricketData();
+    const { matches, loading, isRefreshing, fetchScorecard, fetchExtendedResults, fetchWallstream, fetchByDateRange } = useCricketData();
 
     const [headerData, setHeaderData] = useState<HeaderDisplayData | null>(null);
     const [scorecard, setScorecard] = useState<Scorecard | null>(null);
@@ -482,6 +482,7 @@ export default function App(): React.ReactElement {
                         }}
 
                         isVisible={viewStack.length === 1}
+                        isRefreshing={isRefreshing}
                     />
                 ) : (
                     <PlayPage isVisible={viewStack.length === 1} />

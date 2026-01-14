@@ -2,6 +2,31 @@
    CARD STYLES - Match, Hero, News, Tour Cards
    =========================================== */
 
+/* -------------------- Shimmer Overlay (Stale Data Indicator) -------------------- */
+.shimmer-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.04) 50%,
+            transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 10;
+    border-radius: inherit;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
 /* -------------------- Match Card -------------------- */
 .match-card {
     background: var(--bg-card);
@@ -1373,23 +1398,30 @@
     border-radius: 12px;
     margin-top: 4px;
 }
+
 /* Past Variant for View More Card */
 .view-more-card.past {
-    height: auto; /* Allow sizing by flex container */
-    align-self: stretch; /* Match height of CompletedCards in the row */
-    min-height: 160px; /* Fallback match */
+    height: auto;
+    /* Allow sizing by flex container */
+    align-self: stretch;
+    /* Match height of CompletedCards in the row */
+    min-height: 160px;
+    /* Fallback match */
 }
 
 .view-more-card.past:hover {
-    background: rgba(245, 158, 11, 0.08); /* Amber tint */
+    background: rgba(245, 158, 11, 0.08);
+    /* Amber tint */
     border-color: rgba(245, 158, 11, 0.4);
 }
 
 .view-more-card.past:hover .view-more-icon {
-    background: #f59e0b; /* Amber-500 */
+    background: #f59e0b;
+    /* Amber-500 */
     color: #fff;
 }
 
 .view-more-card.past:hover .view-more-text {
-    color: #fcd34d; /* Amber-300 */
+    color: #fcd34d;
+    /* Amber-300 */
 }

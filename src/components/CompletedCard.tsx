@@ -11,6 +11,7 @@ interface CompletedCardProps {
     onViewSeries?: (seriesId: string, matches?: Match[]) => void;
     showTournamentButton?: boolean;
     onViewTournament?: (seriesId: string) => void;
+    isRefreshing?: boolean;
 }
 
 // Normalize format to only ODI, TEST, or T20
@@ -44,7 +45,8 @@ const CompletedCard: React.FC<CompletedCardProps> = React.memo(({
     showSeriesButton,
     onViewSeries,
     showTournamentButton,
-    onViewTournament
+    onViewTournament,
+    isRefreshing = false
 }) => {
     if (!match) return null;
 
@@ -135,6 +137,7 @@ const CompletedCard: React.FC<CompletedCardProps> = React.memo(({
             onClick={() => onClick(match)}
             style={{ background, borderColor }}
         >
+            {isRefreshing && <div className="shimmer-overlay" />}
             {/* Background Watermarks */}
             <div className="completed-bg-logo home">
                 <WikiImage name={team1Name} id={team1Id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />

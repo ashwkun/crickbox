@@ -13,6 +13,7 @@ interface UpcomingCardProps {
     onViewSeries?: (seriesId: string, matches?: Match[]) => void;
     showTournamentButton?: boolean;
     onViewTournament?: (seriesId: string) => void;
+    isRefreshing?: boolean;
 }
 
 // Normalize format to only ODI, TEST, or T20
@@ -46,7 +47,8 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
     showSeriesButton,
     onViewSeries,
     showTournamentButton,
-    onViewTournament
+    onViewTournament,
+    isRefreshing = false
 }) => {
     if (!match) return null;
 
@@ -127,6 +129,7 @@ const UpcomingCard: React.FC<UpcomingCardProps> = React.memo(({
             onClick={() => onClick(match)}
             style={{ background, borderColor }}
         >
+            {isRefreshing && <div className="shimmer-overlay" />}
             {/* Background Watermarks */}
             {/* Background Watermarks */}
             <div className="upcoming-bg-logo home">
