@@ -20,10 +20,10 @@ interface UseUserProfileReturn {
 
 /**
  * useUserProfile - Fetches and manages user profile from Supabase
- * 
+ *
  * Used to check if a user has completed their profile setup
  * and to save new profiles for Magic Link users.
- * 
+ *
  * SECURE: Passes Firebase ID Token to Supabase for RLS verification.
  */
 export function useUserProfile(user: User | null): UseUserProfileReturn {
@@ -68,36 +68,37 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
                 .maybeSingle();
 
             if (fetchError) {
-                // PGRST116 = no rows found, which is expected for new users
-                if (fetchError.code === 'PGRST116') {
-                    // Start: Auto-sync for Google Users
-                    // If user has a Firebase displayName (e.g. Google Sign-In) but no Supabase profile, create it now.
-                    if (user.displayName) {
-                        try {
-                            const { data: newData, error: createError } = await client
-                                .from('profiles')
-                                .upsert({
-                                    id: user.uid,
-                                    display_name: user.displayName,
-                                })
-                                .select()
-                                .single();
+                console.error('❌ [FetchProfile] Error fetching profile:', fetchError);
+                setError(fetchError.message);
+            } else if (!data) {
+                // Profile not found (maybeSingle returned null)
+                console.log('ℹ️ [FetchProfile] No profile found for user:', user.uid);
 
-                            if (createError) throw createError;
+                // Start: Auto-sync for Google Users
+                // If user has a Firebase displayName (e.g. Google Sign-In) but no Supabase profile, create it now.
+                if (user.displayName) {
+                    console.log('🔄 [Auto-Sync] Attempting to create profile for:', user.displayName);
+                    try {
+                        const { data: newData, error: createError } = await client
+                            .from('profiles')
+                            .upsert({
+                                id: user.uid,
+                                display_name: user.displayName,
+                            })
+                            .select()
+                            .single();
 
-                            console.log('✅ [Auto-Sync] Profile created for:', user.displayName);
-                            setProfile(newData as UserProfile);
-                        } catch (autoCreateError) {
-                            console.error('❌ [Auto-Sync] Error creating profile:', autoCreateError);
-                            setProfile(null);
-                        }
-                    } else {
-                        // Magic Link user with no name yet -> triggers ProfileSetupPage
+                        if (createError) throw createError;
+
+                        console.log('✅ [Auto-Sync] Profile created for:', user.displayName);
+                        setProfile(newData as UserProfile);
+                    } catch (autoCreateError) {
+                        console.error('❌ [Auto-Sync] Error creating profile:', autoCreateError);
                         setProfile(null);
                     }
                 } else {
-                    console.error('Error fetching profile:', fetchError);
-                    setError(fetchError.message);
+                    // Magic Link user with no name yet -> triggers ProfileSetupPage
+                    setProfile(null);
                 }
             } else {
                 setProfile(data as UserProfile);
