@@ -83,6 +83,7 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
             <>
                 <WelcomeOverlay
                     name={user.displayName?.split(' ')[0] || 'Player'}
+                    photoURL={user.photoURL}
                     show={showWelcome}
                     onComplete={() => {
                         setShowWelcome(false);
