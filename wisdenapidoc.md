@@ -566,7 +566,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   'https://ycumznofytwntinxlxkc.supabase.co',
-  '***REMOVED***'
+  'sb_publishable_Cwxlp3Az6TKQBXsIXnUemg_A4Avw-71'
 );
 
 // Get all matches for a team (either home or away)
