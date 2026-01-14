@@ -238,8 +238,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
                     <div style={{
                         width: '100%',
                         padding: '24px',
-                        background: 'rgba(236, 72, 153, 0.08)',
-                        border: '1px solid rgba(236, 72, 153, 0.2)',
+                        background: 'rgba(34, 197, 94, 0.08)',
+                        border: '1px solid rgba(34, 197, 94, 0.2)',
                         borderRadius: 20,
                         display: 'flex',
                         flexDirection: 'column',
@@ -250,13 +250,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
                             width: 48,
                             height: 48,
                             borderRadius: '50%',
-                            background: '#ec4899',
+                            background: 'rgba(34, 197, 94, 0.2)',
+                            border: '1px solid rgba(34, 197, 94, 0.3)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            boxShadow: '0 4px 12px rgba(236, 72, 153, 0.4)'
                         }}>
-                            <LuMail size={24} color="#fff" />
+                            <LuCheck size={24} color="#22c55e" />
                         </div>
 
                         <div style={{ textAlign: 'center' }}>
@@ -265,16 +265,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
                                 We sent a secure link to<br />
                                 <strong style={{ color: '#fff' }}>{email}</strong>
                             </p>
+                            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '8px 0 0', fontStyle: 'italic' }}>
+                                (Check spam if you don't see it)
+                            </p>
                         </div>
 
                         <button
                             onClick={() => setEmailSent(false)}
                             style={{
-                                marginTop: 8,
+                                marginTop: 4,
                                 background: 'transparent',
                                 border: 'none',
-                                color: '#ec4899',
-                                fontSize: 13,
+                                color: 'rgba(255, 255, 255, 0.5)',
+                                fontSize: 12,
                                 fontWeight: 600,
                                 cursor: 'pointer',
                                 textDecoration: 'underline'
