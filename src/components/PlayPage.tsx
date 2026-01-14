@@ -5,6 +5,8 @@ import AuthSuccessPage from './play/AuthSuccessPage';
 import LoginPage from './play/LoginPage';
 import GameDashboard from './play/GameDashboard';
 
+import SkeletonLoginPage from './play/SkeletonLoginPage';
+
 interface PlayPageProps {
     isVisible?: boolean;
     onSuccessPage?: (isSuccess: boolean) => void;
@@ -37,19 +39,9 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
 
     if (!isVisible) return null;
 
-    // Loading state
+    // Loading state - show skeleton
     if (loading) {
-        return (
-            <div style={{
-                minHeight: 'calc(100vh - 85px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}>
-                <LuRefreshCw size={32} color="#ec4899" style={{ animation: 'spin 1s linear infinite' }} />
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            </div>
-        );
+        return <SkeletonLoginPage />;
     }
 
     // Success page after magic link (full-screen overlay)
