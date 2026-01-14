@@ -153,7 +153,7 @@ const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ name, show, onComplete 
                                 exit={{ y: -20, opacity: 0, filter: 'blur(5px)', transition: { duration: 0.4 } }}
                                 style={{
                                     fontFamily: '"BBH Bartle", sans-serif',
-                                    fontSize: 'clamp(1.5rem, 9vw, 3.5rem)',
+                                    fontSize: 'clamp(1.2rem, 7vw, 2.8rem)',
                                     width: '100%',
                                     maxWidth: '100vw',
                                     color: 'rgba(255,255,255,0.95)',
