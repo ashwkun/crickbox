@@ -100,14 +100,20 @@ export function useFirebaseAuth() {
     // Sign in with Google
     const signInWithGoogle = async () => {
         try {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            if (isMobile) {
-                await signInWithRedirect(auth, googleProvider);
-            } else {
-                await signInWithPopup(auth, googleProvider);
-            }
+            console.log('🔐 [useFirebaseAuth] Starting Google Sign In');
+            console.log('🔐 [useFirebaseAuth] User Agent:', navigator.userAgent);
+
+            // Force Popup for now to debug redirect issues
+            // const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            // if (isMobile) {
+            //     console.log('🔐 [useFirebaseAuth] Mobile detected, using Redirect');
+            //     await signInWithRedirect(auth, googleProvider);
+            // } else {
+            console.log('🔐 [useFirebaseAuth] Using Popup');
+            await signInWithPopup(auth, googleProvider);
+            // }
         } catch (error) {
-            console.error('Google sign-in error:', error);
+            console.error('🔐 [useFirebaseAuth] Google sign-in error:', error);
         }
     };
 
