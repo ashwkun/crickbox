@@ -210,7 +210,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
                         textAlign: 'center',
                         lineHeight: 1.5,
                     }}>
-                        Check your email and click the link. Then come back to this app.
+                        Check your email and click the link.<br />
+                        <span style={{ color: 'rgba(255,255,255,0.35)' }}>
+                            (Check spam if you don't see it)
+                        </span>
                     </p>
                 </div>
             )}
