@@ -27,30 +27,48 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
 
     const [showWelcome, setShowWelcome] = React.useState(false);
     const [welcomeComplete, setWelcomeComplete] = React.useState(false);
+    const [isVisibilityChecked, setIsVisibilityChecked] = React.useState(false);
 
     // Notify parent when success page is shown
     useEffect(() => {
         onSuccessPage?.(showSuccessPage);
     }, [showSuccessPage, onSuccessPage]);
 
-    // Handle Welcome Overlay Logic
+    // Handle Welcome Overlay Logic with Visibility Check
     useEffect(() => {
         if (user && !loading) {
             const hasShownWelcome = sessionStorage.getItem(WELCOME_SHOWN_KEY);
-            if (!hasShownWelcome) {
-                setShowWelcome(true);
-                sessionStorage.setItem(WELCOME_SHOWN_KEY, 'true');
+
+            const triggerWelcome = () => {
+                if (!hasShownWelcome) {
+                    setShowWelcome(true);
+                    sessionStorage.setItem(WELCOME_SHOWN_KEY, 'true');
+                } else {
+                    setWelcomeComplete(true);
+                }
+                setIsVisibilityChecked(true);
+            };
+
+            if (document.visibilityState === 'visible') {
+                triggerWelcome();
             } else {
-                // If already shown this session, skip straight to content
-                setWelcomeComplete(true);
+                // Wait for tab to become visible
+                const onVisibilityChange = () => {
+                    if (document.visibilityState === 'visible') {
+                        triggerWelcome();
+                        document.removeEventListener('visibilitychange', onVisibilityChange);
+                    }
+                };
+                document.addEventListener('visibilitychange', onVisibilityChange);
+                return () => document.removeEventListener('visibilitychange', onVisibilityChange);
             }
         }
     }, [user, loading]);
 
     if (!isVisible) return null;
 
-    // Loading state - show skeleton
-    if (loading) {
+    // Loading state or waiting for visibility check
+    if (loading || (user && !isVisibilityChecked)) {
         return <SkeletonLoginPage />;
     }
 
