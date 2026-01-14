@@ -23,6 +23,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
             setEmailError('Please enter a valid email');
             return;
         }
+
+        // Test email bypass for UI testing
+        if (email === 'test@test.com') {
+            setEmailSent(true);
+            return;
+        }
+
         setEmailLoading(true);
         setEmailError('');
         const { error } = await onMagicLink(email);
