@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseClient';
 
 export interface UserProfile {
-    id: string;
+    uid: string;
     display_name: string;
     created_at: string;
 }
@@ -64,7 +64,7 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
             const { data, error: fetchError } = await client
                 .from('profiles')
                 .select('*')
-                .eq('id', user.uid)
+                .eq('uid', user.uid)
                 .maybeSingle();
 
             if (fetchError) {
@@ -82,7 +82,7 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
                         const { data: newData, error: createError } = await client
                             .from('profiles')
                             .upsert({
-                                id: user.uid,
+                                uid: user.uid,
                                 display_name: user.displayName,
                             })
                             .select()
@@ -131,7 +131,7 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
             const { data, error: upsertError } = await client
                 .from('profiles')
                 .upsert({
-                    id: user.uid,
+                    uid: user.uid,
                     display_name: displayName.trim(),
                 })
                 .select()
