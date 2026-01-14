@@ -6,7 +6,7 @@
  * - Loading state
  * - Sign in methods (Google, Magic Link)
  * - Sign out
- * - Email link status for custom handling
+ * - Email link detection
  */
 
 import { useState, useEffect } from 'react';
@@ -16,7 +16,7 @@ import { auth, googleProvider } from '../firebase';
 interface AuthState {
     user: User | null;
     loading: boolean;
-    emailLinkStatus: 'none' | 'needs_email' | 'success' | 'error';
+    showSuccessPage: boolean; // Show static success page after email link sign-in
 }
 
 // Check if running in standalone PWA mode
@@ -35,9 +35,8 @@ export function useFirebaseAuth() {
     const [authState, setAuthState] = useState<AuthState>({
         user: null,
         loading: true,
-        emailLinkStatus: 'none',
+        showSuccessPage: false,
     });
-    const [pendingEmail, setPendingEmail] = useState<string>('');
 
     useEffect(() => {
         // Check for redirect result (for mobile OAuth)
@@ -47,21 +46,23 @@ export function useFirebaseAuth() {
         if (isSignInWithEmailLink(auth, window.location.href)) {
             const email = window.localStorage.getItem('emailForSignIn');
             if (email) {
-                // We have the email - complete sign in
+                // We have the email - complete sign in silently
                 signInWithEmailLink(auth, email, window.location.href)
                     .then(() => {
                         window.localStorage.removeItem('emailForSignIn');
-                        window.history.replaceState(null, '', window.location.origin + '/#play');
-                        setAuthState(prev => ({ ...prev, emailLinkStatus: 'success' }));
+                        // Show success page, don't redirect
+                        setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
                     })
                     .catch((error) => {
                         console.error('Email link sign-in error:', error);
-                        setAuthState(prev => ({ ...prev, emailLinkStatus: 'error' }));
+                        setAuthState(prev => ({ ...prev, loading: false }));
                     });
             } else {
-                // User opened link in different browser/context - need email
-                setAuthState(prev => ({ ...prev, emailLinkStatus: 'needs_email', loading: false }));
+                // User opened link in different browser - still show success page
+                // because the sign-in happened in the original context
+                setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
             }
+            return;
         }
 
         // Listen for auth state changes
@@ -75,20 +76,6 @@ export function useFirebaseAuth() {
 
         return () => unsubscribe();
     }, []);
-
-    // Complete email link sign in (when email is provided manually)
-    const completeEmailSignIn = async (email: string) => {
-        try {
-            await signInWithEmailLink(auth, email, window.location.href);
-            window.history.replaceState(null, '', window.location.origin + '/#play');
-            setAuthState(prev => ({ ...prev, emailLinkStatus: 'success' }));
-            return { error: null };
-        } catch (error) {
-            console.error('Email link completion error:', error);
-            setAuthState(prev => ({ ...prev, emailLinkStatus: 'error' }));
-            return { error };
-        }
-    };
 
     // Sign in with Google
     const signInWithGoogle = async () => {
@@ -128,11 +115,10 @@ export function useFirebaseAuth() {
     return {
         user: authState.user,
         loading: authState.loading,
-        emailLinkStatus: authState.emailLinkStatus,
+        showSuccessPage: authState.showSuccessPage,
         isStandalonePWA: isStandalonePWA(),
         signInWithGoogle,
         signInWithMagicLink,
-        completeEmailSignIn,
         signOut,
     };
 }

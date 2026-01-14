@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LuGamepad2, LuMail, LuRefreshCw, LuCheck, LuLogIn, LuArrowLeft, LuExternalLink } from 'react-icons/lu';
+import { LuGamepad2, LuMail, LuRefreshCw, LuCheck, LuLogIn, LuCheckCircle } from 'react-icons/lu';
 import { useFirebaseAuth } from '../utils/useFirebaseAuth';
 
 interface PlayPageProps {
@@ -16,18 +16,15 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
     const {
         user,
         loading,
-        emailLinkStatus,
-        isStandalonePWA,
+        showSuccessPage,
         signInWithGoogle,
         signInWithMagicLink,
-        completeEmailSignIn,
         signOut
     } = useFirebaseAuth();
     const [email, setEmail] = useState('');
     const [emailSent, setEmailSent] = useState(false);
     const [emailLoading, setEmailLoading] = useState(false);
     const [emailError, setEmailError] = useState('');
-    const [confirmEmail, setConfirmEmail] = useState('');
 
     if (!isVisible) return null;
 
@@ -47,20 +44,6 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
         }
     };
 
-    const handleConfirmEmail = async () => {
-        if (!confirmEmail || !confirmEmail.includes('@')) {
-            setEmailError('Please enter a valid email');
-            return;
-        }
-        setEmailLoading(true);
-        setEmailError('');
-        const { error } = await completeEmailSignIn(confirmEmail);
-        setEmailLoading(false);
-        if (error) {
-            setEmailError('Invalid or expired link. Please try again.');
-        }
-    };
-
     // Loading state
     if (loading) {
         return (
@@ -76,8 +59,8 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
         );
     }
 
-    // Email link opened in different browser - need email confirmation
-    if (emailLinkStatus === 'needs_email') {
+    // Static success page after magic link (no interactions)
+    if (showSuccessPage) {
         return (
             <div style={{
                 minHeight: 'calc(100vh - 85px)',
@@ -88,121 +71,67 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                 padding: '40px 24px 120px',
                 textAlign: 'center',
             }}>
-                {/* Icon */}
+                {/* Success Icon */}
                 <div style={{
-                    width: 80,
-                    height: 80,
+                    width: 100,
+                    height: 100,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.05))',
-                    border: '1px solid rgba(236, 72, 153, 0.3)',
+                    background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05))',
+                    border: '2px solid rgba(34, 197, 94, 0.4)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginBottom: 24,
+                    marginBottom: 32,
+                    boxShadow: '0 0 60px rgba(34, 197, 94, 0.3)',
                 }}>
-                    <LuMail size={36} color="#ec4899" />
+                    <LuCheckCircle size={50} color="#22c55e" />
                 </div>
 
                 {/* Title */}
                 <h1 style={{
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: 800,
                     letterSpacing: '-0.5px',
                     margin: 0,
-                    marginBottom: 8,
-                    color: '#fff',
+                    marginBottom: 12,
+                    color: '#22c55e',
                 }}>
-                    Confirm Your Email
+                    Sign In Successful!
                 </h1>
 
                 {/* Subtitle */}
                 <p style={{
-                    fontSize: 15,
-                    color: 'rgba(255, 255, 255, 0.5)',
+                    fontSize: 18,
+                    color: 'rgba(255, 255, 255, 0.8)',
                     margin: 0,
-                    marginBottom: 24,
-                    maxWidth: 280,
+                    marginBottom: 40,
                     lineHeight: 1.5,
                 }}>
-                    Enter the email you used to request the sign-in link
+                    You're ready to <span style={{
+                        color: '#ec4899',
+                        fontWeight: 800,
+                    }}>.PLAY</span>
                 </p>
 
-                {/* Email input */}
-                <div style={{ width: '100%', maxWidth: 300 }}>
-                    <input
-                        type="email"
-                        placeholder="your@email.com"
-                        value={confirmEmail}
-                        onChange={(e) => setConfirmEmail(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleConfirmEmail()}
-                        style={{
-                            width: '100%',
-                            padding: '14px 16px',
-                            borderRadius: 12,
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            background: 'rgba(255,255,255,0.05)',
-                            color: '#fff',
-                            fontSize: 15,
-                            outline: 'none',
-                            marginBottom: 12,
-                            boxSizing: 'border-box',
-                        }}
-                    />
-                    <button
-                        onClick={handleConfirmEmail}
-                        disabled={emailLoading}
-                        style={{
-                            width: '100%',
-                            padding: '14px 24px',
-                            borderRadius: 12,
-                            border: 'none',
-                            background: '#ec4899',
-                            color: '#fff',
-                            fontSize: 15,
-                            fontWeight: 600,
-                            cursor: emailLoading ? 'wait' : 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: 8,
-                        }}
-                    >
-                        {emailLoading ? (
-                            <LuRefreshCw size={20} style={{ animation: 'spin 1s linear infinite' }} />
-                        ) : (
-                            <>
-                                <LuCheck size={20} />
-                                Confirm & Sign In
-                            </>
-                        )}
-                    </button>
-                    {emailError && (
-                        <p style={{ fontSize: 12, color: '#ef4444', margin: '8px 0 0', textAlign: 'center' }}>{emailError}</p>
-                    )}
-                </div>
-
-                {/* Hint about PWA */}
-                {!isStandalonePWA && (
-                    <div style={{
-                        marginTop: 32,
-                        padding: '16px 20px',
-                        borderRadius: 12,
-                        background: 'rgba(34, 197, 94, 0.1)',
-                        border: '1px solid rgba(34, 197, 94, 0.2)',
-                        maxWidth: 300,
+                {/* Visual hint */}
+                <div style={{
+                    padding: '16px 24px',
+                    borderRadius: 16,
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                }}>
+                    <p style={{
+                        fontSize: 14,
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        margin: 0,
                     }}>
-                        <p style={{
-                            fontSize: 13,
-                            color: 'rgba(255,255,255,0.7)',
-                            margin: 0,
-                            lineHeight: 1.5,
-                        }}>
-                            💡 <strong>Tip:</strong> For the best experience, open the box.cric app from your home screen after signing in.
-                        </p>
-                    </div>
-                )}
-
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                        Open <span style={{
+                            color: '#ec4899',
+                            fontWeight: 700,
+                            fontFamily: 'BBH Bartle, sans-serif',
+                        }}>box.cric</span> from your home screen
+                    </p>
+                </div>
             </div>
         );
     }
