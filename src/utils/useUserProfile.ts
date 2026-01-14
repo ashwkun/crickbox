@@ -87,7 +87,7 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
                 .single();
 
             if (upsertError) {
-                console.error('Error saving profile:', upsertError);
+                // console.error('Error saving profile:', upsertError);
                 setError(upsertError.message);
                 return false;
             }
@@ -95,7 +95,7 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
             setProfile(data as UserProfile);
             return true;
         } catch (err) {
-            console.error('Unexpected error saving profile:', err);
+            // console.error('Unexpected error saving profile:', err);
             setError('Failed to save profile');
             return false;
         } finally {
