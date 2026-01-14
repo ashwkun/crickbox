@@ -153,59 +153,55 @@ const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ name, show, onComplete 
                                 exit={{ y: -20, opacity: 0, filter: 'blur(5px)', transition: { duration: 0.4 } }}
                                 style={{
                                     fontFamily: '"BBH Bartle", sans-serif',
-                                    fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+                                    fontSize: 'clamp(2.5rem, 10vw, 5.5rem)', // Adjusted clamp
+                                    width: '100%',
+                                    maxWidth: '100vw',
                                     color: 'rgba(255,255,255,0.95)',
-                                    marginBottom: '0.2em',
+                                    marginBottom: '0.1em',
                                     lineHeight: 1.1,
                                     letterSpacing: '0.02em',
-                                    textShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                                    textShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                                    wordWrap: 'break-word', // Prevent overflow
+                                    padding: '0 10px'
                                 }}
                             >
                                 Welcome,
                             </motion.h1>
 
-                            {/* 4. Staggered Text Reveal */}
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                flexWrap: 'wrap',
-                                gap: '0.05em'
-                            }}>
-                                {letters.map((char, index) => (
-                                    <motion.span
-                                        key={index}
-                                        initial={{ y: 40, opacity: 0, filter: 'blur(8px)' }}
-                                        animate={{
-                                            y: 0,
-                                            opacity: 1,
-                                            filter: 'blur(0px)',
-                                            transition: {
-                                                delay: 0.4 + (index * 0.06), // Stagger delay
-                                                duration: 0.8,
-                                                ease: [0.34, 1.56, 0.64, 1] // Elastic pop
-                                            }
-                                        }}
-                                        exit={{
-                                            y: 20,
-                                            opacity: 0,
-                                            filter: 'blur(8px)',
-                                            transition: { duration: 0.4 }
-                                        }}
-                                        style={{
-                                            fontSize: 'clamp(2rem, 6vw, 3.5rem)',
-                                            fontWeight: 800,
-                                            background: 'linear-gradient(135deg, #fff 20%, #ec4899 100%)',
-                                            WebkitBackgroundClip: 'text',
-                                            WebkitTextFillColor: 'transparent',
-                                            // Fallback for non-webkit
-                                            color: '#fff',
-                                            display: 'inline-block'
-                                        }}
-                                    >
-                                        {char === ' ' ? '\u00A0' : char}
-                                    </motion.span>
-                                ))}
-                            </div>
+                            {/* Name Text - .PLAY Style */}
+                            <motion.div
+                                initial={{ y: 20, opacity: 0, filter: 'blur(10px)' }}
+                                animate={{
+                                    y: 0,
+                                    opacity: 1,
+                                    filter: 'blur(0px)',
+                                    transition: { delay: 0.2, duration: 1, ease: [0.16, 1, 0.3, 1] }
+                                }}
+                                exit={{ y: 20, opacity: 0, filter: 'blur(5px)', transition: { duration: 0.4 } }}
+                                style={{
+                                    fontFamily: '"BBH Bartle", sans-serif',
+                                    fontSize: 'clamp(2rem, 8vw, 4rem)',
+                                    fontWeight: 600,
+                                    letterSpacing: '1px',
+                                    background: 'linear-gradient(90deg, #ec4899 0%, #ec4899 35%, #f9a8d4 50%, #ec4899 65%, #ec4899 100%)',
+                                    backgroundSize: '200% 100%',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    color: '#ec4899', // Fallback
+                                    animation: 'liveShimmer 1.5s ease-in-out infinite alternate',
+                                    marginTop: '10px'
+                                }}
+                            >
+                                {name}
+                            </motion.div>
+
+                            {/* Keyframes for shimmer */}
+                            <style>{`
+                                @keyframes liveShimmer {
+                                    0% { background-position: 100% 0; }
+                                    100% { background-position: 0% 0; }
+                                }
+                            `}</style>
                         </motion.div>
                     </div>
                 </motion.div>
