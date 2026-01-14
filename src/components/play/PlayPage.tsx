@@ -39,10 +39,6 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
     const [welcomeComplete, setWelcomeComplete] = React.useState(false);
     const [isVisibilityChecked, setIsVisibilityChecked] = React.useState(false);
 
-    // TEST MODE: Set to true to bypass auth and test ProfileSetupPage
-    // Remove or set to false in production
-    const [testMode, setTestMode] = React.useState(false);
-
     // Combined loading state
     const loading = authLoading || (user && profileLoading);
 
@@ -141,39 +137,14 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
         );
     }
 
-    // Not authenticated - Show login with test mode option
+    // Not authenticated - Show login
     return (
-        <>
-            <LoginPage
-                onGoogleSignIn={signInWithGoogle}
-                onMagicLink={signInWithMagicLink}
-            />
-            {/* Hidden Test Button - Triple tap on bottom of screen */}
-            <div
-                onClick={() => setTestMode(true)}
-                style={{
-                    position: 'fixed',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 30,
-                    cursor: 'pointer',
-                    zIndex: 9999
-                }}
-            />
-            {testMode && (
-                <ProfileSetupPage
-                    onComplete={async (name) => {
-                        console.log('Test mode - name entered:', name);
-                        setTestMode(false);
-                        return true;
-                    }}
-                    loading={false}
-                    error={null}
-                />
-            )}
-        </>
+        <LoginPage
+            onGoogleSignIn={signInWithGoogle}
+            onMagicLink={signInWithMagicLink}
+        />
     );
 };
 
 export default PlayPage;
+
