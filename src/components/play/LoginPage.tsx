@@ -88,22 +88,33 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
                     fontWeight: 800,
                     margin: 0,
                     marginBottom: 8,
-                    background: 'linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    letterSpacing: '-0.5px'
+                    color: '#fff',
+                    letterSpacing: '-0.5px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 4
                 }}>
-                    Welcome Back to
+                    Lets
                     <span style={{
-                        display: 'block',
-                        fontSize: 32,
-                        fontWeight: 900,
-                        marginTop: 4,
-                        background: 'linear-gradient(135deg, #ec4899, #f9a8d4)',
+                        fontFamily: '"BBH Bartle", sans-serif',
+                        fontSize: 36,
+                        fontWeight: 600,
+                        letterSpacing: '1px',
+                        background: 'linear-gradient(90deg, #ec4899 0%, #ec4899 35%, #f9a8d4 50%, #ec4899 65%, #ec4899 100%)',
+                        backgroundSize: '200% 100%',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
+                        animation: 'shimmer 3s ease-in-out infinite alternate',
                     }}>.PLAY</span>
                 </h1>
+
+                <style>{`
+                    @keyframes shimmer {
+                        0% { background-position: 100% 0; }
+                        100% { background-position: 0% 0; }
+                    }
+                `}</style>
 
                 <p style={{
                     fontSize: 14,

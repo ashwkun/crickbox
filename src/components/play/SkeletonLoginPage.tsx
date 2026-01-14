@@ -3,8 +3,7 @@ import React from 'react';
 /**
  * SkeletonLoginPage - Shimmer loading state for Login Page
  * 
- * Mimics the layout of the actual Login Page using standard shimmer skeletons.
- * Replaces the spinner with a skeleton UI as requested.
+ * Mimics the layout of the actual Glassmorphic Login Page using standard shimmer skeletons.
  */
 const SkeletonLoginPage = () => {
     return (
@@ -14,14 +13,14 @@ const SkeletonLoginPage = () => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '40px 24px 120px',
+            padding: '24px',
             textAlign: 'center',
             width: '100%'
         }}>
-            {/* Shimmer Animation Styles - reusing from cards.css concepts */}
+            {/* Shimmer Animation Styles */}
             <style>{`
                 .skeleton-shimmer {
-                    background: #1a1a1a;
+                    background: rgba(255, 255, 255, 0.05);
                     position: relative;
                     overflow: hidden;
                 }
@@ -46,75 +45,68 @@ const SkeletonLoginPage = () => {
                 }
             `}</style>
 
-            {/* Icon Skeleton */}
-            <div className="skeleton-shimmer" style={{
-                width: 80,
-                height: 80,
-                borderRadius: '50%',
-                marginBottom: 24,
-            }} />
-
-            {/* Title Skeleton */}
-            <div className="skeleton-shimmer" style={{
-                width: 200,
-                height: 32,
-                borderRadius: 8,
-                marginBottom: 12,
-            }} />
-
-            {/* Subtitle Skeleton */}
-            <div className="skeleton-shimmer" style={{
-                width: 260,
-                height: 20,
-                borderRadius: 6,
-                marginBottom: 8,
-            }} />
-            <div className="skeleton-shimmer" style={{
-                width: 180,
-                height: 20,
-                borderRadius: 6,
-                marginBottom: 32,
-            }} />
-
-            {/* Google Button Skeleton */}
-            <div className="skeleton-shimmer" style={{
-                width: '100%',
-                maxWidth: 300,
-                height: 48,
-                borderRadius: 12,
-                marginBottom: 16,
-            }} />
-
-            {/* Divider Skeleton */}
+            {/* Glassmorphic Card Construction */}
             <div style={{
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: 24,
+                padding: '40px 32px',
+                width: '100%',
+                maxWidth: 360,
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                width: '100%',
-                maxWidth: 300,
-                margin: '8px 0 24px',
-                gap: 16
+                position: 'relative',
+                overflow: 'hidden'
             }}>
-                <div className="skeleton-shimmer" style={{ flex: 1, height: 1 }} />
-                <div className="skeleton-shimmer" style={{ width: 20, height: 12, borderRadius: 2 }} />
-                <div className="skeleton-shimmer" style={{ flex: 1, height: 1 }} />
-            </div>
-
-            {/* Email Input Skeleton */}
-            <div style={{
-                display: 'flex',
-                gap: 8,
-                width: '100%',
-                maxWidth: 300,
-            }}>
+                {/* Title Skeletons */}
                 <div className="skeleton-shimmer" style={{
-                    flex: 1,
-                    height: 48,
-                    borderRadius: 12,
+                    width: 80,
+                    height: 24,
+                    borderRadius: 6,
+                    marginBottom: 8,
                 }} />
                 <div className="skeleton-shimmer" style={{
-                    width: 50,
+                    width: 140,
                     height: 48,
-                    borderRadius: 12,
+                    borderRadius: 8,
+                    marginBottom: 12,
+                }} />
+
+                {/* Subtitle Skeleton */}
+                <div className="skeleton-shimmer" style={{
+                    width: 200,
+                    height: 16,
+                    borderRadius: 4,
+                    marginBottom: 32,
+                }} />
+
+                {/* Google Button Skeleton */}
+                <div className="skeleton-shimmer" style={{
+                    width: '100%',
+                    height: 52,
+                    borderRadius: 16,
+                    marginBottom: 20,
+                }} />
+
+                {/* Divider Skeleton */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    gap: 12,
+                    marginBottom: 20,
+                }}>
+                    <div className="skeleton-shimmer" style={{ flex: 1, height: 1 }} />
+                    <div className="skeleton-shimmer" style={{ width: 60, height: 12, borderRadius: 2 }} />
+                    <div className="skeleton-shimmer" style={{ flex: 1, height: 1 }} />
+                </div>
+
+                {/* Email Input Skeleton */}
+                <div className="skeleton-shimmer" style={{
+                    width: '100%',
+                    height: 54,
+                    borderRadius: 16,
                 }} />
             </div>
         </div>
