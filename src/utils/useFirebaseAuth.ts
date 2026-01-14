@@ -39,42 +39,53 @@ export function useFirebaseAuth() {
     });
 
     useEffect(() => {
-        // Check for redirect result (for mobile OAuth)
-        getRedirectResult(auth).catch(console.error);
+        let unsubscribe: () => void;
 
-        // Check if returning from email link
-        if (isSignInWithEmailLink(auth, window.location.href)) {
-            const email = window.localStorage.getItem('emailForSignIn');
-            if (email) {
-                // We have the email - complete sign in silently
-                signInWithEmailLink(auth, email, window.location.href)
-                    .then(() => {
-                        window.localStorage.removeItem('emailForSignIn');
-                        // Show success page, don't redirect
-                        setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
-                    })
-                    .catch((error) => {
-                        console.error('Email link sign-in error:', error);
-                        setAuthState(prev => ({ ...prev, loading: false }));
-                    });
-            } else {
-                // User opened link in different browser - still show success page
-                // because the sign-in happened in the original context
-                setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
+        const initAuth = async () => {
+            // Check for redirect result (for mobile OAuth)
+            // We await this to ensure we don't show the login page momentarily
+            // if the user is actually signing in via redirect.
+            try {
+                await getRedirectResult(auth);
+            } catch (error) {
+                console.error('Redirect sign-in error:', error);
             }
-            return;
-        }
 
-        // Listen for auth state changes
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setAuthState(prev => ({
-                ...prev,
-                user,
-                loading: false,
-            }));
-        });
+            // Check if returning from email link
+            if (isSignInWithEmailLink(auth, window.location.href)) {
+                // ... (existing email link logic)
+                const email = window.localStorage.getItem('emailForSignIn');
+                if (email) {
+                    signInWithEmailLink(auth, email, window.location.href)
+                        .then(() => {
+                            window.localStorage.removeItem('emailForSignIn');
+                            setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
+                        })
+                        .catch((error) => {
+                            console.error('Email link sign-in error:', error);
+                            setAuthState(prev => ({ ...prev, loading: false }));
+                        });
+                } else {
+                    setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
+                }
+                return;
+            }
 
-        return () => unsubscribe();
+            // Listen for auth state changes
+            unsubscribe = onAuthStateChanged(auth, (user) => {
+                setAuthState(prev => ({
+                    ...prev,
+                    user,
+                    loading: false,
+                }));
+            });
+        };
+
+        initAuth();
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
     }, []);
 
     // Sign in with Google
