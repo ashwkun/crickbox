@@ -51,67 +51,90 @@ const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ name, show, onComplete 
                     }}
                 >
                     {/* 1. Aurora Mesh Background */}
-                    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', opacity: 0.6 }}>
-                        {/* Blob 1: Pink/Rose */}
+                    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', opacity: 0.7 }}>
+                        {/* Blob 1: Pink/Rose - Fast orbiting */}
                         <motion.div
                             animate={{
-                                scale: [1, 1.4, 1],
-                                x: ['-10%', '10%', '-10%'],
-                                y: ['-10%', '10%', '-10%'],
-                                rotate: [0, 90, 0]
+                                scale: [1, 1.6, 0.9, 1],
+                                x: ['-20%', '30%', '-10%', '-20%'],
+                                y: ['-15%', '20%', '-25%', '-15%'],
+                                rotate: [0, 180, 360]
                             }}
-                            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+                            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                             style={{
                                 position: 'absolute',
-                                top: '20%',
-                                left: '30%',
-                                width: '50vw',
-                                height: '50vw',
+                                top: '15%',
+                                left: '20%',
+                                width: '55vw',
+                                height: '55vw',
                                 background: '#ec4899',
-                                filter: 'blur(100px)',
+                                filter: 'blur(80px)',
                                 borderRadius: '40%',
+                                opacity: 0.6,
+                                mixBlendMode: 'screen'
+                            }}
+                        />
+                        {/* Blob 2: Indigo - Counter rotation */}
+                        <motion.div
+                            animate={{
+                                scale: [1.2, 0.8, 1.4, 1.2],
+                                x: ['20%', '-25%', '15%', '20%'],
+                                y: ['15%', '-20%', '25%', '15%'],
+                                rotate: [0, -120, -240, -360]
+                            }}
+                            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                            style={{
+                                position: 'absolute',
+                                bottom: '10%',
+                                right: '15%',
+                                width: '65vw',
+                                height: '65vw',
+                                background: '#6366f1',
+                                filter: 'blur(100px)',
+                                borderRadius: '50%',
                                 opacity: 0.5,
                                 mixBlendMode: 'screen'
                             }}
                         />
-                        {/* Blob 2: Indigo */}
+                        {/* Blob 3: Cyan Accent - Pulsing */}
                         <motion.div
                             animate={{
-                                scale: [1, 1.2, 1],
-                                x: ['10%', '-10%', '10%'],
-                                y: ['10%', '-15%', '10%'],
+                                scale: [1, 1.5, 1, 1.3, 1],
+                                x: ['-5%', '15%', '-10%', '5%', '-5%'],
+                                y: ['5%', '-10%', '15%', '-5%', '5%'],
                             }}
-                            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                             style={{
                                 position: 'absolute',
-                                bottom: '20%',
-                                right: '20%',
-                                width: '60vw',
-                                height: '60vw',
-                                background: '#6366f1',
-                                filter: 'blur(120px)',
-                                borderRadius: '50%',
+                                top: '35%',
+                                right: '35%',
+                                width: '45vw',
+                                height: '45vw',
+                                background: '#06b6d4',
+                                filter: 'blur(70px)',
+                                borderRadius: '60%',
                                 opacity: 0.4,
                                 mixBlendMode: 'screen'
                             }}
                         />
-                        {/* Blob 3: Cyan Accent */}
+                        {/* Blob 4: Orange/Amber - Quick pulse */}
                         <motion.div
                             animate={{
-                                scale: [1, 1.3, 1],
-                                x: ['0%', '5%', '0%'],
+                                scale: [0.8, 1.3, 0.9, 1.1, 0.8],
+                                x: ['10%', '-15%', '20%', '-5%', '10%'],
+                                y: ['-10%', '15%', '-5%', '10%', '-10%'],
                             }}
-                            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                             style={{
                                 position: 'absolute',
-                                top: '40%',
-                                right: '40%',
-                                width: '40vw',
-                                height: '40vw',
-                                background: '#06b6d4',
-                                filter: 'blur(90px)',
-                                borderRadius: '60%',
-                                opacity: 0.3,
+                                top: '60%',
+                                left: '50%',
+                                width: '35vw',
+                                height: '35vw',
+                                background: '#f97316',
+                                filter: 'blur(60px)',
+                                borderRadius: '45%',
+                                opacity: 0.35,
                                 mixBlendMode: 'screen'
                             }}
                         />
