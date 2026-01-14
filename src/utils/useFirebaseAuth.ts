@@ -88,8 +88,8 @@ export function useFirebaseAuth() {
     // Sign in with Google
     const signInWithGoogle = async () => {
         try {
-            // Force Popup for now to ensure reliability across devices
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            // Use Popup ensures reliability across devices (including iOS PWA)
+            // Redirects can be flaky due to state loss during navigation
             await signInWithPopup(auth, googleProvider);
         } catch (error) {
             console.error('Google sign-in error:', error);
