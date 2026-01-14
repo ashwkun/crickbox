@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LuGamepad2, LuMail, LuRefreshCw, LuCheck, LuLogIn } from 'react-icons/lu';
 import { useFirebaseAuth } from '../utils/useFirebaseAuth';
 
 interface PlayPageProps {
     isVisible?: boolean;
+    onSuccessPage?: (isSuccess: boolean) => void;
 }
 
 /**
@@ -12,7 +13,7 @@ interface PlayPageProps {
  * Uses Firebase Auth for Google Sign-In and Magic Link
  * Theme: Hot Pink (#ec4899)
  */
-const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
+const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) => {
     const {
         user,
         loading,
@@ -25,6 +26,11 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
     const [emailSent, setEmailSent] = useState(false);
     const [emailLoading, setEmailLoading] = useState(false);
     const [emailError, setEmailError] = useState('');
+
+    // Notify parent when success page is shown
+    useEffect(() => {
+        onSuccessPage?.(showSuccessPage);
+    }, [showSuccessPage, onSuccessPage]);
 
     if (!isVisible) return null;
 
@@ -59,115 +65,91 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
         );
     }
 
-    // Static success page after magic link (no interactions)
+    // Static success page after magic link - clean full-screen
     if (showSuccessPage) {
         return (
             <div style={{
-                minHeight: 'calc(100vh - 85px)',
+                position: 'fixed',
+                inset: 0,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '40px 24px 120px',
-                textAlign: 'center',
+                background: '#0a0a0a',
+                zIndex: 9999,
             }}>
                 <style>{`
+                    @keyframes pulse {
+                        0%, 100% { transform: scale(1); opacity: 1; }
+                        50% { transform: scale(1.05); opacity: 0.9; }
+                    }
                     @keyframes shimmer {
                         0% { background-position: 100% 0; }
                         100% { background-position: 0% 0; }
                     }
                 `}</style>
 
-                {/* Success Icon */}
+                {/* Success checkmark */}
                 <div style={{
-                    width: 100,
-                    height: 100,
+                    width: 120,
+                    height: 120,
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05))',
-                    border: '2px solid rgba(34, 197, 94, 0.4)',
+                    background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05))',
+                    border: '2px solid rgba(34, 197, 94, 0.3)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginBottom: 32,
-                    boxShadow: '0 0 60px rgba(34, 197, 94, 0.3)',
+                    marginBottom: 40,
+                    animation: 'pulse 2s ease-in-out infinite',
                 }}>
-                    <LuCheck size={50} color="#22c55e" />
+                    <LuCheck size={60} color="#22c55e" />
                 </div>
 
                 {/* Title */}
                 <h1 style={{
-                    fontSize: 28,
-                    fontWeight: 800,
-                    letterSpacing: '-0.5px',
+                    fontFamily: '"BBH Bartle", sans-serif',
+                    fontSize: 24,
+                    fontWeight: 600,
+                    letterSpacing: '1px',
                     margin: 0,
                     marginBottom: 16,
-                    color: '#22c55e',
+                    color: '#fff',
                 }}>
-                    Sign In Successful!
+                    You're in!
                 </h1>
 
-                {/* Subtitle with branded .PLAY */}
+                {/* Branded message */}
                 <p style={{
-                    fontSize: 18,
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    fontSize: 16,
+                    color: 'rgba(255, 255, 255, 0.6)',
                     margin: 0,
-                    marginBottom: 40,
-                    lineHeight: 1.5,
                     display: 'flex',
                     alignItems: 'center',
                     gap: 6,
                 }}>
-                    You're ready to
+                    Ready to
                     <span style={{
                         fontFamily: '"BBH Bartle", sans-serif',
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: 600,
                         letterSpacing: '1px',
-                        background: 'linear-gradient(90deg, #ec4899 0%, #ec4899 35%, #f9a8d4 50%, #ec4899 65%, #ec4899 100%)',
+                        background: 'linear-gradient(90deg, #ec4899, #f9a8d4, #ec4899)',
                         backgroundSize: '200% 100%',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
-                        animation: 'shimmer 1.5s ease-in-out infinite alternate',
+                        animation: 'shimmer 2s ease-in-out infinite',
                     }}>.PLAY</span>
                 </p>
 
-                {/* Visual hint with branded logo */}
-                <div style={{
-                    padding: '16px 24px',
-                    borderRadius: 16,
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                {/* Subtle instruction */}
+                <p style={{
+                    fontSize: 13,
+                    color: 'rgba(255, 255, 255, 0.3)',
+                    margin: 0,
+                    marginTop: 60,
                 }}>
-                    <p style={{
-                        fontSize: 14,
-                        color: 'rgba(255, 255, 255, 0.5)',
-                        margin: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                    }}>
-                        Open
-                        <span style={{
-                            fontFamily: '"BBH Bartle", sans-serif',
-                            fontSize: 14,
-                            fontWeight: 600,
-                            letterSpacing: '1px',
-                            color: '#fff',
-                        }}>BOX</span>
-                        <span style={{
-                            fontFamily: '"BBH Bartle", sans-serif',
-                            fontSize: 14,
-                            fontWeight: 600,
-                            letterSpacing: '1px',
-                            background: 'linear-gradient(90deg, #22c55e 0%, #22c55e 35%, #86efac 50%, #22c55e 65%, #22c55e 100%)',
-                            backgroundSize: '200% 100%',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            animation: 'shimmer 1.5s ease-in-out infinite alternate',
-                        }}>.CRIC</span>
-                        from your home screen
-                    </p>
-                </div>
+                    Return to the app to continue
+                </p>
             </div>
         );
     }
