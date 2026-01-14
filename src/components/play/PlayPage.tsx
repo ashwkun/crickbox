@@ -40,9 +40,6 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
     // Combined loading state
     const loading = authLoading || (user && profileLoading);
 
-    // DEBUG: Log loading states
-    console.log('[PlayPage] authLoading:', authLoading, 'user:', !!user, 'profileLoading:', profileLoading, 'justSignedIn:', justSignedIn);
-
     // Notify parent when success page is shown
     useEffect(() => {
         onSuccessPage?.(showSuccessPage);
@@ -130,7 +127,6 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
                 />
 
                 <GameDashboard user={user} onSignOut={() => {
-                    sessionStorage.removeItem(WELCOME_SHOWN_KEY); // Reset for next login
                     signOut();
                 }} />
             </>
