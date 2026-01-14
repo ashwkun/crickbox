@@ -17,6 +17,7 @@ interface AuthState {
     user: User | null;
     loading: boolean;
     showSuccessPage: boolean; // Show static success page after email link sign-in
+    justSignedIn: boolean; // True only when user actively signs in this session
 }
 
 // Check if running in standalone PWA mode
@@ -36,6 +37,7 @@ export function useFirebaseAuth() {
         user: null,
         loading: true,
         showSuccessPage: false,
+        justSignedIn: false,
     });
 
     useEffect(() => {
@@ -56,14 +58,14 @@ export function useFirebaseAuth() {
                     signInWithEmailLink(auth, email, window.location.href)
                         .then(() => {
                             window.localStorage.removeItem('emailForSignIn');
-                            setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
+                            setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false, justSignedIn: true }));
                         })
                         .catch((error) => {
                             console.error('Email link sign-in error:', error);
                             setAuthState(prev => ({ ...prev, loading: false }));
                         });
                 } else {
-                    setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
+                    setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false, justSignedIn: true }));
                 }
                 return;
             }
@@ -91,6 +93,8 @@ export function useFirebaseAuth() {
             // Use Popup ensures reliability across devices (including iOS PWA)
             // Redirects can be flaky due to state loss during navigation
             await signInWithPopup(auth, googleProvider);
+            // Mark as fresh sign-in
+            setAuthState(prev => ({ ...prev, justSignedIn: true }));
         } catch (error) {
             console.error('Google sign-in error:', error);
         }
@@ -117,6 +121,7 @@ export function useFirebaseAuth() {
                 user: mockUser,
                 loading: false,
                 showSuccessPage: false,
+                justSignedIn: true,
             });
             return { error: null };
         }
@@ -146,6 +151,7 @@ export function useFirebaseAuth() {
         user: authState.user,
         loading: authState.loading,
         showSuccessPage: authState.showSuccessPage,
+        justSignedIn: authState.justSignedIn,
         isStandalonePWA: isStandalonePWA(),
         signInWithGoogle,
         signInWithMagicLink,

@@ -14,14 +14,12 @@ interface PlayPageProps {
     onSuccessPage?: (isSuccess: boolean) => void;
 }
 
-// Session storage key to track if welcome has been shown this session
-const WELCOME_SHOWN_KEY = 'boxcric_welcome_shown_session';
-
 const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) => {
     const {
         user,
         loading: authLoading,
         showSuccessPage,
+        justSignedIn,
         signInWithGoogle,
         signInWithMagicLink,
         signOut
@@ -43,7 +41,7 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
     const loading = authLoading || (user && profileLoading);
 
     // DEBUG: Log loading states
-    console.log('[PlayPage] authLoading:', authLoading, 'user:', !!user, 'profileLoading:', profileLoading, 'combined loading:', loading);
+    console.log('[PlayPage] authLoading:', authLoading, 'user:', !!user, 'profileLoading:', profileLoading, 'justSignedIn:', justSignedIn);
 
     // Notify parent when success page is shown
     useEffect(() => {
@@ -51,20 +49,13 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
     }, [showSuccessPage, onSuccessPage]);
 
     // Handle Welcome Overlay Logic with Visibility Check
-    // Trigger for users who either have complete profile OR have Firebase displayName (Google users)
-    const canShowWelcome = user && !authLoading && !profileLoading && (isProfileComplete || user.displayName);
+    // Only show welcome if user JUST signed in (not returning to app already signed in)
+    const canShowWelcome = user && !authLoading && !profileLoading && justSignedIn && (isProfileComplete || user.displayName);
 
     useEffect(() => {
         if (canShowWelcome) {
-            const hasShownWelcome = sessionStorage.getItem(WELCOME_SHOWN_KEY);
-
             const triggerWelcome = () => {
-                if (!hasShownWelcome) {
-                    setShowWelcome(true);
-                    sessionStorage.setItem(WELCOME_SHOWN_KEY, 'true');
-                } else {
-                    setWelcomeComplete(true);
-                }
+                setShowWelcome(true);
                 setIsVisibilityChecked(true);
             };
 
@@ -81,8 +72,12 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
                 document.addEventListener('visibilitychange', onVisibilityChange);
                 return () => document.removeEventListener('visibilitychange', onVisibilityChange);
             }
+        } else if (user && !authLoading && !profileLoading && (isProfileComplete || user.displayName)) {
+            // User is signed in but didn't just sign in - skip welcome
+            setIsVisibilityChecked(true);
+            setWelcomeComplete(true);
         }
-    }, [canShowWelcome]);
+    }, [canShowWelcome, user, authLoading, profileLoading, isProfileComplete]);
 
     if (!isVisible) return null;
 
