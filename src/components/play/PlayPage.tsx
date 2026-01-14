@@ -51,9 +51,11 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
     }, [showSuccessPage, onSuccessPage]);
 
     // Handle Welcome Overlay Logic with Visibility Check
-    // Only trigger after profile is complete
+    // Trigger for users who either have complete profile OR have Firebase displayName (Google users)
+    const canShowWelcome = user && !authLoading && !profileLoading && (isProfileComplete || user.displayName);
+
     useEffect(() => {
-        if (user && !authLoading && !profileLoading && isProfileComplete) {
+        if (canShowWelcome) {
             const hasShownWelcome = sessionStorage.getItem(WELCOME_SHOWN_KEY);
 
             const triggerWelcome = () => {
@@ -80,7 +82,7 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, onSuccessPage }) 
                 return () => document.removeEventListener('visibilitychange', onVisibilityChange);
             }
         }
-    }, [user, authLoading, profileLoading, isProfileComplete]);
+    }, [canShowWelcome]);
 
     if (!isVisible) return null;
 
