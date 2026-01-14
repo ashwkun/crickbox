@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LuGamepad2, LuMail, LuRefreshCw, LuCheck, LuLogIn, LuCheckCircle } from 'react-icons/lu';
+import { LuGamepad2, LuMail, LuRefreshCw, LuCheck, LuLogIn } from 'react-icons/lu';
 import { useFirebaseAuth } from '../utils/useFirebaseAuth';
 
 interface PlayPageProps {
@@ -84,7 +84,7 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                     marginBottom: 32,
                     boxShadow: '0 0 60px rgba(34, 197, 94, 0.3)',
                 }}>
-                    <LuCheckCircle size={50} color="#22c55e" />
+                    <LuCheck size={50} color="#22c55e" />
                 </div>
 
                 {/* Title */}
