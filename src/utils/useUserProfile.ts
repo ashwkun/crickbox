@@ -61,8 +61,9 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
             const client = await getScopedClient();
             if (!client) throw new Error('No user');
 
+            // Use 'user_profiles' table (clean slate)
             const { data, error: fetchError } = await client
-                .from('profiles')
+                .from('user_profiles')
                 .select('*')
                 .eq('uid', user.uid)
                 .maybeSingle();
@@ -80,7 +81,7 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
                     console.log('🔄 [Auto-Sync] Attempting to create profile for:', user.displayName);
                     try {
                         const { data: newData, error: createError } = await client
-                            .from('profiles')
+                            .from('user_profiles')
                             .upsert({
                                 uid: user.uid,
                                 display_name: user.displayName,
@@ -129,7 +130,7 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
             if (!client) throw new Error('No user');
 
             const { data, error: upsertError } = await client
-                .from('profiles')
+                .from('user_profiles')
                 .upsert({
                     uid: user.uid,
                     display_name: displayName.trim(),
