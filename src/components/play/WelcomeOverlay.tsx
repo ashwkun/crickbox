@@ -180,7 +180,7 @@ const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ name, show, onComplete 
                                 exit={{ y: 20, opacity: 0, filter: 'blur(5px)', transition: { duration: 0.4 } }}
                                 style={{
                                     fontFamily: '"BBH Bartle", sans-serif',
-                                    fontSize: 'clamp(2rem, 8vw, 4rem)',
+                                    fontSize: 'clamp(1.3rem, 5.2vw, 2.6rem)',
                                     fontWeight: 600,
                                     letterSpacing: '1px',
                                     background: 'linear-gradient(90deg, #ec4899 0%, #ec4899 35%, #f9a8d4 50%, #ec4899 65%, #ec4899 100%)',
@@ -192,7 +192,7 @@ const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ name, show, onComplete 
                                     marginTop: '10px'
                                 }}
                             >
-                                {name}
+                                .{name.toUpperCase()}
                             </motion.div>
 
                             {/* Keyframes for shimmer */}
