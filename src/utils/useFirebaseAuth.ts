@@ -42,37 +42,46 @@ export function useFirebaseAuth() {
         let unsubscribe: () => void;
 
         const initAuth = async () => {
+            console.log('🔐 [useFirebaseAuth] Starting initAuth');
+
             // Check for redirect result (for mobile OAuth)
-            // We await this to ensure we don't show the login page momentarily
-            // if the user is actually signing in via redirect.
             try {
-                await getRedirectResult(auth);
+                console.log('🔐 [useFirebaseAuth] Checking getRedirectResult...');
+                const result = await getRedirectResult(auth);
+                console.log('🔐 [useFirebaseAuth] getRedirectResult complete. Result:', result ? 'User found' : 'No result');
+                if (result) {
+                    console.log('🔐 [useFirebaseAuth] Redirect sign-in success for:', result.user.email);
+                }
             } catch (error) {
-                console.error('Redirect sign-in error:', error);
+                console.error('🔐 [useFirebaseAuth] Redirect sign-in error:', error);
             }
 
             // Check if returning from email link
             if (isSignInWithEmailLink(auth, window.location.href)) {
-                // ... (existing email link logic)
+                console.log('🔐 [useFirebaseAuth] Detected Email Link Sign-in');
                 const email = window.localStorage.getItem('emailForSignIn');
                 if (email) {
                     signInWithEmailLink(auth, email, window.location.href)
                         .then(() => {
+                            console.log('🔐 [useFirebaseAuth] Email link sign-in success');
                             window.localStorage.removeItem('emailForSignIn');
                             setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
                         })
                         .catch((error) => {
-                            console.error('Email link sign-in error:', error);
+                            console.error('🔐 [useFirebaseAuth] Email link sign-in error:', error);
                             setAuthState(prev => ({ ...prev, loading: false }));
                         });
                 } else {
+                    console.log('🔐 [useFirebaseAuth] Email link present but no local email found');
                     setAuthState(prev => ({ ...prev, showSuccessPage: true, loading: false }));
                 }
                 return;
             }
 
             // Listen for auth state changes
+            console.log('🔐 [useFirebaseAuth] Setting up onAuthStateChanged listener');
             unsubscribe = onAuthStateChanged(auth, (user) => {
+                console.log('🔐 [useFirebaseAuth] Auth state changed. User:', user ? user.email : 'null');
                 setAuthState(prev => ({
                     ...prev,
                     user,
