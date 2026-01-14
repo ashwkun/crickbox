@@ -102,8 +102,7 @@ const ProfileSetupPage: React.FC<ProfileSetupPageProps> = ({ onComplete, loading
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
                 style={{
-                    fontFamily: '"BBH Bartle", sans-serif',
-                    fontSize: 'clamp(1.5rem, 6vw, 2rem)',
+                    fontSize: 'clamp(1.2rem, 5vw, 1.5rem)',
                     fontWeight: 600,
                     color: '#fff',
                     margin: 0,
