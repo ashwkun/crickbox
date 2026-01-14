@@ -10,13 +10,13 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
  * See: https://firebase.google.com/docs/projects/api-keys
  */
 const firebaseConfig = {
-    apiKey: "***REMOVED***",
+    apiKey: "AIzaSyDF_OMVxkV1TG2KgO0Q0o5mZMr9apz5K5g",
     authDomain: "theboxcric.firebaseapp.com",
     projectId: "theboxcric",
     storageBucket: "theboxcric.firebasestorage.app",
-    messagingSenderId: "438552981311",
-    appId: "1:438552981311:web:af0107f0f7a7de61f03888",
-    measurementId: "G-VLW9XDKXCS"
+    messagingSenderId: "146609239836",
+    appId: "1:146609239836:web:6b0f8842272b1392e02cd9",
+    measurementId: "G-XL02JHL6P6"
 };
 
 // Initialize Firebase
