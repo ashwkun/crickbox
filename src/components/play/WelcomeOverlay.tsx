@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface WelcomeOverlayProps {
     name: string;
-    photoURL?: string | null;
     show: boolean;
     onComplete: () => void;
 }
@@ -14,27 +13,15 @@ interface WelcomeOverlayProps {
  * displayed only on fresh logins. Uses BBH Bartle font
  * and glassmorphic aesthetics.
  */
-const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ name, photoURL, show, onComplete }) => {
-    const [phase, setPhase] = useState<'text' | 'avatar' | 'done'>('text');
+const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ name, show, onComplete }) => {
 
-    // Phase transition logic
+    // Auto-dismiss logic
     useEffect(() => {
         if (show) {
-            // Phase 1: Show text for 2.5s
-            const textTimer = setTimeout(() => {
-                setPhase('avatar');
-            }, 2500);
-
-            // Phase 2: Show avatar for 1.5s then complete
-            const avatarTimer = setTimeout(() => {
-                setPhase('done');
+            const timer = setTimeout(() => {
                 onComplete();
-            }, 4000);
-
-            return () => {
-                clearTimeout(textTimer);
-                clearTimeout(avatarTimer);
-            };
+            }, 3800); // Extended slightly for staggered text
+            return () => clearTimeout(timer);
         }
     }, [show, onComplete]);
 
@@ -239,48 +226,6 @@ const WelcomeOverlay: React.FC<WelcomeOverlayProps> = ({ name, photoURL, show, o
                                 }
                             `}</style>
                         </motion.div>
-
-                        {/* Profile Picture Reveal */}
-                        <AnimatePresence>
-                            {phase === 'avatar' && photoURL && (
-                                <motion.div
-                                    layoutId="user-avatar-shared"
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    animate={{
-                                        scale: 1,
-                                        opacity: 1,
-                                        transition: {
-                                            type: "spring",
-                                            stiffness: 200,
-                                            damping: 20
-                                        }
-                                    }}
-                                    exit={{
-                                        opacity: 0,
-                                        transition: { duration: 0.3 }
-                                    }}
-                                    style={{
-                                        width: 100,
-                                        height: 100,
-                                        borderRadius: '50%',
-                                        overflow: 'hidden',
-                                        border: '3px solid rgba(236, 72, 153, 0.6)',
-                                        boxShadow: '0 0 40px rgba(236, 72, 153, 0.4), 0 20px 50px rgba(0,0,0,0.5)',
-                                        marginTop: 30
-                                    }}
-                                >
-                                    <img
-                                        src={photoURL}
-                                        alt="Profile"
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover'
-                                        }}
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
                     </div>
                 </motion.div>
             )}
