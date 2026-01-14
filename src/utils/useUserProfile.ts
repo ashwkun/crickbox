@@ -85,9 +85,10 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
 
                             if (createError) throw createError;
 
+                            console.log('✅ [Auto-Sync] Profile created for:', user.displayName);
                             setProfile(newData as UserProfile);
                         } catch (autoCreateError) {
-                            console.error('Error auto-creating profile:', autoCreateError);
+                            console.error('❌ [Auto-Sync] Error creating profile:', autoCreateError);
                             setProfile(null);
                         }
                     } else {
@@ -136,15 +137,16 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
                 .single();
 
             if (upsertError) {
-                // console.error('Error saving profile:', upsertError);
+                console.error('❌ [SaveProfile] Error saving profile:', upsertError);
                 setError(upsertError.message);
                 return false;
             }
 
+            console.log('✅ [SaveProfile] Profile saved successfully for:', displayName);
             setProfile(data as UserProfile);
             return true;
         } catch (err) {
-            // console.error('Unexpected error saving profile:', err);
+            console.error('❌ [SaveProfile] Unexpected error saving profile:', err);
             setError('Failed to save profile');
             return false;
         } finally {
