@@ -70,7 +70,30 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
             if (fetchError) {
                 // PGRST116 = no rows found, which is expected for new users
                 if (fetchError.code === 'PGRST116') {
-                    setProfile(null);
+                    // Start: Auto-sync for Google Users
+                    // If user has a Firebase displayName (e.g. Google Sign-In) but no Supabase profile, create it now.
+                    if (user.displayName) {
+                        try {
+                            const { data: newData, error: createError } = await client
+                                .from('profiles')
+                                .upsert({
+                                    id: user.uid,
+                                    display_name: user.displayName,
+                                })
+                                .select()
+                                .single();
+
+                            if (createError) throw createError;
+
+                            setProfile(newData as UserProfile);
+                        } catch (autoCreateError) {
+                            console.error('Error auto-creating profile:', autoCreateError);
+                            setProfile(null);
+                        }
+                    } else {
+                        // Magic Link user with no name yet -> triggers ProfileSetupPage
+                        setProfile(null);
+                    }
                 } else {
                     console.error('Error fetching profile:', fetchError);
                     setError(fetchError.message);
