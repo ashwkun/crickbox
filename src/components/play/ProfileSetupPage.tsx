@@ -59,7 +59,7 @@ const ProfileSetupPage: React.FC<ProfileSetupPageProps> = ({ onComplete, loading
             padding: 20,
         }}>
             <style>{`
-                @keyframes shimmer {
+                @keyframes liveShimmer {
                     0% { background-position: 100% 0; }
                     100% { background-position: 0% 0; }
                 }
@@ -88,11 +88,11 @@ const ProfileSetupPage: React.FC<ProfileSetupPageProps> = ({ onComplete, loading
                     fontSize: 24,
                     fontWeight: 600,
                     letterSpacing: '1px',
-                    background: 'linear-gradient(90deg, #ec4899, #f9a8d4, #ec4899)',
+                    background: 'linear-gradient(90deg, #ec4899 0%, #ec4899 35%, #f9a8d4 50%, #ec4899 65%, #ec4899 100%)',
                     backgroundSize: '200% 100%',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                    animation: 'shimmer 2s ease-in-out infinite',
+                    animation: 'liveShimmer 1.5s ease-in-out infinite alternate',
                 }}>.PLAY</span>
             </motion.div>
 
