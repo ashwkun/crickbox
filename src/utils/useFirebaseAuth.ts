@@ -102,30 +102,6 @@ export function useFirebaseAuth() {
 
     // Sign in with Magic Link (email)
     const signInWithMagicLink = async (email: string) => {
-        // TEST MODE: Simulate Magic Link sign-in for test@test.com
-        if (email === 'test@test.com') {
-            // Create a mock user object that looks like a Firebase User
-            const mockUser = {
-                uid: 'test-user-' + Date.now(),
-                email: 'test@test.com',
-                emailVerified: true,
-                displayName: null, // No displayName to trigger profile setup
-                photoURL: null,
-                isAnonymous: false,
-                providerData: [],
-                getIdToken: async () => 'mock-token',
-                toJSON: () => ({}),
-            } as any;
-
-            setAuthState({
-                user: mockUser,
-                loading: false,
-                showSuccessPage: false,
-                justSignedIn: true,
-            });
-            return { error: null };
-        }
-
         try {
             await sendSignInLinkToEmail(auth, email, actionCodeSettings);
             window.localStorage.setItem('emailForSignIn', email);

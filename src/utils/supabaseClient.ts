@@ -14,5 +14,5 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
 
 export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Export the URL for any components that need it
-export { SUPABASE_URL };
+// Export the URL and Key for any components that need to create scoped clients
+export { SUPABASE_URL, SUPABASE_ANON_KEY };

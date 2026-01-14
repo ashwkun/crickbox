@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { User } from 'firebase/auth';
-import { supabase } from './supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseClient';
 
 export interface UserProfile {
     id: string;
@@ -22,11 +23,28 @@ interface UseUserProfileReturn {
  * 
  * Used to check if a user has completed their profile setup
  * and to save new profiles for Magic Link users.
+ * 
+ * SECURE: Passes Firebase ID Token to Supabase for RLS verification.
  */
 export function useUserProfile(user: User | null): UseUserProfileReturn {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Helper to get a scoped Supabase client with the current user's token
+    const getScopedClient = async () => {
+        if (!user) return null;
+        const token = await user.getIdToken();
+
+        // Create a new client instance with the custom header
+        return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            global: {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        });
+    };
 
     const fetchProfile = useCallback(async () => {
         if (!user) {
@@ -39,7 +57,11 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
         setError(null);
 
         try {
-            const { data, error: fetchError } = await supabase
+            // Get secure client
+            const client = await getScopedClient();
+            if (!client) throw new Error('No user');
+
+            const { data, error: fetchError } = await client
                 .from('profiles')
                 .select('*')
                 .eq('id', user.uid)
@@ -77,7 +99,11 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
         setError(null);
 
         try {
-            const { data, error: upsertError } = await supabase
+            // Get secure client
+            const client = await getScopedClient();
+            if (!client) throw new Error('No user');
+
+            const { data, error: upsertError } = await client
                 .from('profiles')
                 .upsert({
                     id: user.uid,

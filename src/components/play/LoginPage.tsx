@@ -29,11 +29,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
         const { error } = await onMagicLink(email);
         setEmailLoading(false);
 
-        // For test@test.com, the mock sign-in happens instantly in useFirebaseAuth
         // For real emails, show the "email sent" state
-        if (!error && email !== 'test@test.com') {
+        if (!error) {
             setEmailSent(true);
-        } else if (error) {
+        } else {
             setEmailError('Failed to send link. Try again.');
         }
     };
