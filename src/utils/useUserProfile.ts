@@ -43,7 +43,7 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
                 .from('profiles')
                 .select('*')
                 .eq('id', user.uid)
-                .single();
+                .maybeSingle();
 
             if (fetchError) {
                 // PGRST116 = no rows found, which is expected for new users
