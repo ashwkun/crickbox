@@ -4,8 +4,10 @@ import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseClient';
 
 export interface UserProfile {
-    firebase_uid: string;
+    id: string; // Restored to 'id'
     display_name: string;
+    first_name?: string;
+    last_name?: string;
     created_at: string;
 }
 
@@ -17,6 +19,21 @@ interface UseUserProfileReturn {
     saveProfile: (displayName: string) => Promise<boolean>;
     refetch: () => Promise<void>;
 }
+
+// Helper to split full name into first and last name
+const splitName = (fullName: string) => {
+    const trimmed = fullName.trim();
+    const firstSpaceIndex = trimmed.indexOf(' ');
+
+    if (firstSpaceIndex === -1) {
+        return { firstName: trimmed, lastName: null };
+    }
+
+    return {
+        firstName: trimmed.substring(0, firstSpaceIndex),
+        lastName: trimmed.substring(firstSpaceIndex + 1).trim() || null
+    };
+};
 
 /**
  * useUserProfile - Fetches and manages user profile from Supabase
@@ -61,11 +78,11 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
             const client = await getScopedClient();
             if (!client) throw new Error('No user');
 
-            // Use 'user_profiles' table with 'firebase_uid' column
+            // Use 'profiles' table (restored)
             const { data, error: fetchError } = await client
-                .from('user_profiles')
+                .from('profiles')
                 .select('*')
-                .eq('firebase_uid', user.uid)
+                .eq('id', user.uid)
                 .maybeSingle();
 
             if (fetchError) {
@@ -79,12 +96,17 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
                 // If user has a Firebase displayName (e.g. Google Sign-In) but no Supabase profile, create it now.
                 if (user.displayName) {
                     console.log('🔄 [Auto-Sync] Attempting to create profile for:', user.displayName);
+
+                    const { firstName, lastName } = splitName(user.displayName);
+
                     try {
                         const { data: newData, error: createError } = await client
-                            .from('user_profiles')
+                            .from('profiles')
                             .upsert({
-                                firebase_uid: user.uid,
+                                id: user.uid,
                                 display_name: user.displayName,
+                                first_name: firstName,
+                                last_name: lastName,
                             })
                             .select()
                             .single();
@@ -124,16 +146,20 @@ export function useUserProfile(user: User | null): UseUserProfileReturn {
         setLoading(true);
         setError(null);
 
+        const { firstName, lastName } = splitName(displayName);
+
         try {
             // Get secure client
             const client = await getScopedClient();
             if (!client) throw new Error('No user');
 
             const { data, error: upsertError } = await client
-                .from('user_profiles')
+                .from('profiles')
                 .upsert({
-                    firebase_uid: user.uid,
+                    id: user.uid,
                     display_name: displayName.trim(),
+                    first_name: firstName,
+                    last_name: lastName,
                 })
                 .select()
                 .single();
