@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LuGamepad2, LuMail, LuRefreshCw, LuCheck, LuLogIn } from 'react-icons/lu';
-import { useAuth } from '../utils/useAuth';
+import { useFirebaseAuth } from '../utils/useFirebaseAuth';
 
 interface PlayPageProps {
     isVisible?: boolean;
@@ -9,11 +9,11 @@ interface PlayPageProps {
 /**
  * PlayPage - Fantasy Cricket Game Section
  * 
- * Shows login UI if not authenticated, game content if authenticated
+ * Uses Firebase Auth for Google Sign-In and Magic Link
  * Theme: Hot Pink (#ec4899)
  */
 const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
-    const { user, loading, signInWithGoogle, signInWithMagicLink, signOut } = useAuth();
+    const { user, loading, signInWithGoogle, signInWithMagicLink, signOut } = useFirebaseAuth();
     const [email, setEmail] = useState('');
     const [emailSent, setEmailSent] = useState(false);
     const [emailLoading, setEmailLoading] = useState(false);
@@ -73,25 +73,42 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                     border: '1px solid rgba(236, 72, 153, 0.2)',
                 }}>
                     <span style={{ fontSize: 14, color: '#f9a8d4' }}>
-                        Welcome, <strong style={{ color: '#ec4899' }}>{user.email?.split('@')[0] || 'Player'}</strong>
+                        Welcome, <strong style={{ color: '#ec4899' }}>{user.displayName || user.email?.split('@')[0] || 'Player'}</strong>
                     </span>
                 </div>
 
+                {/* User Avatar */}
+                {user.photoURL && (
+                    <img
+                        src={user.photoURL}
+                        alt="Profile"
+                        style={{
+                            width: 64,
+                            height: 64,
+                            borderRadius: '50%',
+                            marginBottom: 24,
+                            border: '2px solid rgba(236, 72, 153, 0.3)',
+                        }}
+                    />
+                )}
+
                 {/* Glowing Icon */}
-                <div style={{
-                    width: 100,
-                    height: 100,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.05))',
-                    border: '1px solid rgba(236, 72, 153, 0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 32,
-                    boxShadow: '0 0 60px rgba(236, 72, 153, 0.3)',
-                }}>
-                    <LuGamepad2 size={44} color="#ec4899" />
-                </div>
+                {!user.photoURL && (
+                    <div style={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.05))',
+                        border: '1px solid rgba(236, 72, 153, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 32,
+                        boxShadow: '0 0 60px rgba(236, 72, 153, 0.3)',
+                    }}>
+                        <LuGamepad2 size={44} color="#ec4899" />
+                    </div>
+                )}
 
                 {/* Title */}
                 <h1 style={{
