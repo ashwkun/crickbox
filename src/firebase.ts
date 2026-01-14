@@ -2,15 +2,16 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
-// Your web app's Firebase configuration
+// Firebase configuration loaded from environment variables
+// These are safe to expose in client-side code as they're restricted by domain
 const firebaseConfig = {
-    apiKey: "***REMOVED***",
-    authDomain: "theboxcric.firebaseapp.com",
-    projectId: "theboxcric",
-    storageBucket: "theboxcric.firebasestorage.app",
-    messagingSenderId: "438552981311",
-    appId: "1:438552981311:web:af0107f0f7a7de61f03888",
-    measurementId: "G-VLW9XDKXCS"
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID,
+    measurementId: process.env.FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
