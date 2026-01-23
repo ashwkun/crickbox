@@ -238,5 +238,11 @@
     "model": "grok-3",
     "audio": "268178.mp3",
     "generated_at": "2026-01-22T17:48:23.646Z"
+  },
+  "268676": {
+    "text": "**Ireland scrape past Italy in nervy three-wicket thriller**\n\nIreland stumbled their way to a jittery three-wicket win over Italy, chasing down 119 with just three balls to spare. Italy, bowled out for 118 in 18.1 overs, owed much to Anthony Mosca’s brisk 35, but Matthew Humphreys’ 4 for 16 gutted their middle order. In reply, Harry Tector’s gritty 41 and Lorcan Tucker’s 34 kept Ireland afloat. The finish turned ugly—Grant Stewart’s double-wicket 18th over (1 run, 2 wickets) nearly derailed the chase, but Ireland limped home at 119 for 7 in 19.3. Phew.",
+    "model": "grok-3",
+    "audio": "268676.mp3",
+    "generated_at": "2026-01-23T09:39:16.814Z"
   }
 }
