@@ -275,6 +275,12 @@
     "audio": "268179.mp3",
     "generated_at": "2026-01-24T17:17:32.906Z"
   },
+  "268180": {
+    "text": "**Nat Sciver-Brunt’s ton powers Mumbai past RCB in a high-scoring thriller**  \n\nNat Sciver-Brunt’s scintillating 100 off 57 balls set the stage for Mumbai Indians’ 15-run victory over Royal Challengers Bengaluru. Chasing 200, RCB wobbled early but Richa Ghosh kept them alive with a blistering 90 off 50. However, Hayley Matthews’ golden arm (3/10) and Shabnim Ismail’s sharp spells (2/25) ensured Mumbai stayed on top. The drama peaked in the 19th over when Amanjot Kaur leaked 27 runs, briefly reviving RCB’s hopes, but Amelia Kerr’s nerveless final over sealed the deal. Earlier, Matthews’ 56 and Harmanpreet’s cameo complemented Sciver-Brunt’s masterclass in a dominant Mumbai batting effort.",
+    "model": "gpt-4o",
+    "audio": "268180.mp3",
+    "generated_at": "2026-01-26T17:57:33.207Z"
+  },
   "268676": {
     "text": "**Ireland scrape past Italy in nervy three-wicket thriller**\n\nIreland stumbled their way to a jittery three-wicket win over Italy, chasing down 119 with just three balls to spare. Italy, bowled out for 118 in 18.1 overs, owed much to Anthony Mosca’s brisk 35, but Matthew Humphreys’ 4 for 16 gutted their middle order. In reply, Harry Tector’s gritty 41 and Lorcan Tucker’s 34 kept Ireland afloat. The finish turned ugly—Grant Stewart’s double-wicket 18th over (1 run, 2 wickets) nearly derailed the chase, but Ireland limped home at 119 for 7 in 19.3. Phew.",
     "model": "grok-3",
@@ -286,5 +292,11 @@
     "model": "grok-3",
     "audio": "268677.mp3",
     "generated_at": "2026-01-25T09:21:08.939Z"
+  },
+  "268678": {
+    "text": "**Italy Stuns Ireland in Dramatic Last-Over Heist**\n\nItaly pulled off a jaw-dropping 4-wicket upset over Ireland, chasing down 154 with just three balls to spare. Ireland, bowled out for 154 in 19.4 overs, relied on Paul Stirling’s gritty 45, but Crishan Kalugamage’s 3/28 kept them in check. Italy’s reply hinged on Wayne Madsen’s composed 39 and Grant Stewart’s fiery 33. The finish was pure chaos—18 runs off Barry McCarthy’s final over sealed it after a tense 14-run 19th over from Mark Adair. Italy’s nerve held; Ireland’s didn’t.",
+    "model": "grok-3",
+    "audio": "268678.mp3",
+    "generated_at": "2026-01-26T17:57:20.742Z"
   }
 }
