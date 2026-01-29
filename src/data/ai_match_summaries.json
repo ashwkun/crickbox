@@ -322,5 +322,11 @@
     "model": "grok-3",
     "audio": "268678.mp3",
     "generated_at": "2026-01-26T17:57:20.742Z"
+  },
+  "269212": {
+    "text": "**Pakistan edge Australia in thrilling 22-run finish**\n\nPakistan clinched a gritty 22-run victory over Australia in a pulsating T20 clash, powered by Saim Ayub’s dual brilliance. Ayub’s brisk 40 off 22 anchored Pakistan to 168/8, with Salman Agha’s 39 lending spine, despite Adam Zampa’s lethal 4/24. Australia’s chase faltered at 146/8, even as Cameron Green (36) and Xavier Bartlett (34) fought hard. Ayub (2/29) and Abrar Ahmed (2/10) turned the screws, especially in the tense final overs, where Pakistan held firm, conceding just 35 runs in the last five to seal the deal.",
+    "model": "grok-3",
+    "audio": "269212.mp3",
+    "generated_at": "2026-01-29T14:50:35.028Z"
   }
 }
