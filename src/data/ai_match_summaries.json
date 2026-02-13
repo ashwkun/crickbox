@@ -335,6 +335,12 @@
     "audio": "268071.mp3",
     "generated_at": "2026-02-12T17:41:45.511Z"
   },
+  "268072": {
+    "text": "**Zimbabwe Stun Australia in 23-Run Upset**\n\nZimbabwe pulled off a jaw-dropping 23-run victory over Australia, defending 169/2 with a ruthless bowling display led by Blessing Muzarabani (4/17). Brian Bennett’s composed 64 set the tone for Zimbabwe, while Australia’s chase faltered despite Matt Renshaw’s fighting 65. The finish was a chokehold—Australia crumbled in the last five overs, managing just 32 runs for 7 wickets, with Muzarabani’s devastating 19th over (5 runs, 2 wickets) sealing the deal. A historic upset, proving Zimbabwe can bite when least expected.",
+    "model": "grok-3",
+    "audio": "268072.mp3",
+    "generated_at": "2026-02-13T09:42:53.369Z"
+  },
   "268159": {
     "text": "**Sri Lanka edge Pakistan in 14-run thriller**\n\nSri Lanka clinched a gritty 14-run victory over Pakistan in a pulsating 12-over clash, defending 160/6 with ice in their veins. Dasun Shanaka’s blistering 34 off 9 and Kusal Mendis’ 30 off 16 set the tone, while Wanindu Hasaranga’s 4/35 dismantled Pakistan’s chase of 146/8. The finish was a rollercoaster—Hasaranga’s double-wicket 10th over (15 runs, 2 scalps) and Matheesha Pathirana’s tight 11th (10 runs, 1 wicket) squeezed Pakistan, despite Salman Agha’s valiant 45 off 12. Sri Lanka held firm when it mattered most.",
     "model": "grok-3",
