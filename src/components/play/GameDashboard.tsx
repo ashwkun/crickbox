@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { LuCalendarClock, LuUser, LuSwords, LuChevronRight } from 'react-icons/lu';
 import { User } from 'firebase/auth';
 import useCricketData from '../../utils/useCricketData';
@@ -12,6 +12,39 @@ interface GameDashboardProps {
     user: User;
     onSignOut: () => void;
 }
+
+/* ── Countdown Hook ────────────────────────────────────────────── */
+const useCountdown = (targetDate: string) => {
+    const [now, setNow] = useState(Date.now());
+    useEffect(() => {
+        const id = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(id);
+    }, []);
+    const diff = Math.max(0, new Date(targetDate).getTime() - now);
+    const h = Math.floor(diff / 3_600_000);
+    const m = Math.floor((diff % 3_600_000) / 60_000);
+    const s = Math.floor((diff % 60_000) / 1000);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return { h, m, s, total: diff, display: `${pad(h)}:${pad(m)}:${pad(s)}` };
+};
+
+/* ── Countdown Badge ───────────────────────────────────────────── */
+const CountdownBadge: React.FC<{ startDate: string }> = ({ startDate }) => {
+    const { display, h } = useCountdown(startDate);
+    // Color: green > amber > red as time decreases
+    const color = h < 2 ? '#ef4444' : h < 6 ? '#f59e0b' : '#22c55e';
+    return (
+        <div style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            fontVariantNumeric: 'tabular-nums',
+        }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, animation: h < 2 ? 'pulse 1.5s infinite' : 'none' }} />
+            <span style={{ fontSize: 13, fontWeight: 900, color, letterSpacing: '1px', fontFamily: 'monospace' }}>
+                {display}
+            </span>
+        </div>
+    );
+};
 
 /* ── Shared Match Card ─────────────────────────────────────────── */
 const MatchCard: React.FC<{
@@ -29,6 +62,8 @@ const MatchCard: React.FC<{
     const c2 = getTeamColor(team2) || '#1a1a2e';
 
     const isLive = match.event_state === 'L';
+    const hoursAway = (new Date(match.start_date).getTime() - Date.now()) / 3_600_000;
+    const showCountdown = variant === 'upcoming' && hoursAway > 0 && hoursAway < 24;
 
     return (
         <div onClick={onClick} style={{
@@ -84,6 +119,8 @@ const MatchCard: React.FC<{
                     <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         Pts <span style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginLeft: 4, letterSpacing: '-1px' }}>{team?.total_points ?? '–'}</span>
                     </div>
+                ) : showCountdown ? (
+                    <CountdownBadge startDate={match.start_date} />
                 ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 700 }}>
                         <LuCalendarClock size={12} /> {dateStr}
