@@ -19,6 +19,7 @@ import PlayPage from './components/play/PlayPage';
 import Dream11Page from './components/dream11/Dream11Page';
 import Dream11MatchView from './components/dream11/Dream11MatchView';
 import Dream11Playground from './components/dream11/Dream11Playground';
+import { getTeamColor } from './utils/teamColors';
 
 // --- Navigation Types ---
 export type ViewType = 'HOME' | 'MATCH' | 'SERIES' | 'TOURNAMENT' | 'UPCOMING_LIST' | 'COMPLETED_LIST' | 'HOW_IT_WORKS' | 'DR11' | 'DR11_MATCH' | 'DR11_PLAYGROUND';
@@ -183,7 +184,7 @@ export default function App(): React.ReactElement {
 
             return newStack;
         });
-    }, []);
+    }, [playSelectedMatchId]);
 
     // Initial Load: Parse URL to build initial stack
     useEffect(() => {
@@ -495,6 +496,8 @@ export default function App(): React.ReactElement {
                         team2Id: m.participants?.[1]?.id,
                         team1Name: m.participants?.[0]?.name,
                         team2Name: m.participants?.[1]?.name,
+                        team1Color: getTeamColor(m.participants?.[0]?.name) || '#888',
+                        team2Color: getTeamColor(m.participants?.[1]?.name) || '#888',
                     };
                 })() : undefined}
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}

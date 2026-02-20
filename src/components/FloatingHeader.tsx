@@ -19,6 +19,8 @@ export interface PlayContextData {
     team2Id?: string;
     team1Name?: string;
     team2Name?: string;
+    team1Color?: string;
+    team2Color?: string;
 }
 
 interface FloatingHeaderProps {
@@ -117,6 +119,11 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
 
     const contentKey = playContext ? 'play' : data ? 'score' : 'logo';
 
+    // Override the pill background for play context
+    const centerBg = playContext
+        ? `linear-gradient(135deg, ${playContext.team1Color || '#333'}cc, rgba(20,20,20,0.8), ${playContext.team2Color || '#333'}cc)`
+        : activeBg;
+
     return (
         <div style={containerStyle}>
             <style>
@@ -148,6 +155,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
             <div
                 style={{
                     ...logoStyle,
+                    background: centerBg,
                     justifySelf: 'center',
                     pointerEvents: 'auto',
                     cursor: onLogoClick ? 'pointer' : 'default',
