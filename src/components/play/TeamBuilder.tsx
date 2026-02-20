@@ -101,7 +101,7 @@ export default function TeamBuilder({ match, user, existingTeam, onBack }: TeamB
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', padding: '20px 16px', paddingBottom: 120, maxWidth: 600, margin: '0 auto', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', padding: '0 16px', paddingBottom: 120, maxWidth: 600, margin: '0 auto', width: '100%' }}>
 
             {/* Error Toast */}
             {uiError && (
@@ -114,23 +114,32 @@ export default function TeamBuilder({ match, user, existingTeam, onBack }: TeamB
                 </div>
             )}
 
-            {/* ── Header ── */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-                <button onClick={onBack} style={{
-                    background: 'rgba(255,255,255,0.06)', border: 'none', color: '#fff',
-                    cursor: 'pointer', display: 'flex', padding: 8, borderRadius: 12,
-                }}>
-                    <LuChevronLeft size={20} />
-                </button>
-                <div style={{ flex: 1 }}>
+            {/* ── Breadcrumb Back ── */}
+            <button onClick={onBack} style={{
+                background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
+                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
+                fontSize: 12, fontWeight: 600, padding: '4px 0', marginBottom: 12,
+            }}>
+                <LuChevronLeft size={14} /> Back
+            </button>
+            {/* ── Match Info + Team Logos ── */}
+            <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginBottom: 16, padding: '12px 14px', borderRadius: 14,
+                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)',
+            }}>
+                <div>
                     <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, letterSpacing: '-0.5px', color: '#fff' }}>Build Your XI</h2>
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                        {t1?.short_name || team1Name} vs {t2?.short_name || team2Name}
+                    </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ width: 28, height: 28 }}>
+                    <div style={{ width: 32, height: 32 }}>
                         <WikiImage name={team1Name} id={t1?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)' }}>vs</span>
-                    <div style={{ width: 28, height: 28 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.2)' }}>vs</span>
+                    <div style={{ width: 32, height: 32 }}>
                         <WikiImage name={team2Name} id={t2?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                 </div>
