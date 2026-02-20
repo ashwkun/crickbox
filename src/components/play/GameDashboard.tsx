@@ -122,14 +122,35 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
                                                 flexDirection: 'column'
                                             }}
                                         >
-                                            {/* Solid Color Backgrounds */}
-                                            <div style={{ position: 'absolute', inset: 0, display: 'flex', zIndex: 0 }}>
-                                                <div style={{ flex: 1, backgroundColor: color1 }} />
-                                                <div style={{ flex: 1, backgroundColor: color2 }} />
+                                            {/* Solid Color Backgrounds with integrated VS Thunder */}
+                                            <div style={{ position: 'absolute', inset: 0, display: 'flex', zIndex: 0, overflow: 'hidden' }}>
+                                                {/* Left Color */}
+                                                <div style={{ flex: 1, backgroundColor: color1, position: 'relative' }}>
+                                                </div>
+
+                                                {/* Right Color */}
+                                                <div style={{ flex: 1, backgroundColor: color2, position: 'relative' }}>
+                                                </div>
+
+                                                {/* Full-Height Background Thunder Separator */}
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    left: '50%',
+                                                    top: '50%',
+                                                    transform: 'translate(-50%, -50%)',
+                                                    height: '120%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    zIndex: 1,
+                                                    opacity: 0.8
+                                                }}>
+                                                    <LuZap size={220} color="#ffbd00" strokeWidth={1.5} fill="#ffbd00" style={{ transform: 'rotate(15deg)' }} />
+                                                </div>
                                             </div>
 
                                             {/* Top Banner: Status & Points */}
-                                            <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.6)', borderBottom: '1px solid rgba(0,0,0,0.5)', zIndex: 1 }}>
+                                            <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.6)', borderBottom: '1px solid rgba(0,0,0,0.5)', zIndex: 2 }}>
                                                 <div style={{
                                                     fontSize: 10,
                                                     fontWeight: 800,
@@ -152,26 +173,21 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
                                             </div>
 
                                             {/* Contenders */}
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px', zIndex: 1, background: 'rgba(0,0,0,0.2)' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px', zIndex: 2, background: 'rgba(0,0,0,0.2)' }}>
                                                 {/* Team 1 */}
                                                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8 }}>
                                                         <WikiImage name={team1Name} id={match.participants?.[0]?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                                     </div>
                                                     <span style={{ fontWeight: 900, fontSize: 16, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{team1Name}</span>
                                                 </div>
 
-                                                {/* Big VS Badge */}
-                                                <div style={{
-                                                    width: 60, height: 60, borderRadius: '50%', background: '#ffbd00', border: '4px solid #000',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, flexShrink: 0, boxShadow: '0 0 20px rgba(0,0,0,0.6)'
-                                                }}>
-                                                    <LuZap size={32} color="#000" strokeWidth={3} />
-                                                </div>
+                                                {/* Invisible Spacer to keep layout balanced around the background thunder */}
+                                                <div style={{ width: 60, flexShrink: 0 }}></div>
 
                                                 {/* Team 2 */}
                                                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8 }}>
                                                         <WikiImage name={team2Name} id={match.participants?.[1]?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                                     </div>
                                                     <span style={{ fontWeight: 900, fontSize: 16, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{team2Name}</span>
@@ -250,14 +266,35 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
                                                 border: team ? '2px solid rgba(255, 255, 255, 0.4)' : '1px solid rgba(255,255,255,0.1)'
                                             }}
                                         >
-                                            {/* Solid Color Backgrounds */}
-                                            <div style={{ position: 'absolute', inset: 0, display: 'flex', zIndex: 0 }}>
-                                                <div style={{ flex: 1, backgroundColor: color1 }} />
-                                                <div style={{ flex: 1, backgroundColor: color2 }} />
+                                            {/* Solid Color Backgrounds with integrated VS Thunder */}
+                                            <div style={{ position: 'absolute', inset: 0, display: 'flex', zIndex: 0, overflow: 'hidden' }}>
+                                                {/* Left Color */}
+                                                <div style={{ flex: 1, backgroundColor: color1, position: 'relative' }}>
+                                                </div>
+
+                                                {/* Right Color */}
+                                                <div style={{ flex: 1, backgroundColor: color2, position: 'relative' }}>
+                                                </div>
+
+                                                {/* Full-Height Background Thunder Separator */}
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    left: '50%',
+                                                    top: '50%',
+                                                    transform: 'translate(-50%, -50%)',
+                                                    height: '120%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    zIndex: 1,
+                                                    opacity: 0.8
+                                                }}>
+                                                    <LuZap size={220} color="#ffbd00" strokeWidth={1.5} fill="#ffbd00" style={{ transform: 'rotate(15deg)' }} />
+                                                </div>
                                             </div>
 
                                             {/* Top Info Banner */}
-                                            <div style={{ padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 1, borderBottom: '1px solid rgba(0,0,0,0.5)' }}>
+                                            <div style={{ padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 2, borderBottom: '1px solid rgba(0,0,0,0.5)' }}>
                                                 <div style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 10, color: '#fff', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.5px', maxWidth: '65%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                                     {match.series_name || match.championship_name}
                                                 </div>
@@ -268,26 +305,21 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
                                             </div>
 
                                             {/* Contenders */}
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px', zIndex: 1, background: 'rgba(0,0,0,0.2)' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px', zIndex: 2, background: 'rgba(0,0,0,0.2)' }}>
                                                 {/* Team 1 */}
                                                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8 }}>
                                                         <WikiImage name={team1Name} id={match.participants?.[0]?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                                     </div>
                                                     <span style={{ fontWeight: 900, fontSize: 16, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{team1Name}</span>
                                                 </div>
 
-                                                {/* Big VS Badge */}
-                                                <div style={{
-                                                    width: 60, height: 60, borderRadius: '50%', background: '#ffbd00', border: '4px solid #000',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2, flexShrink: 0, boxShadow: '0 0 20px rgba(0,0,0,0.6)'
-                                                }}>
-                                                    <LuZap size={32} color="#000" strokeWidth={3} />
-                                                </div>
+                                                {/* Invisible Spacer to keep layout balanced around the background thunder */}
+                                                <div style={{ width: 60, flexShrink: 0 }}></div>
 
                                                 {/* Team 2 */}
                                                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8 }}>
                                                         <WikiImage name={team2Name} id={match.participants?.[1]?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                                     </div>
                                                     <span style={{ fontWeight: 900, fontSize: 16, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{team2Name}</span>
