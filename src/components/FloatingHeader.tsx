@@ -121,7 +121,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
 
     // Override the pill background for play context
     const centerBg = playContext
-        ? `linear-gradient(135deg, ${playContext.team1Color || '#333'}cc, rgba(20,20,20,0.8), ${playContext.team2Color || '#333'}cc)`
+        ? `radial-gradient(circle at 0% 50%, ${playContext.team1Color || '#333'}40, transparent 60%), radial-gradient(circle at 100% 50%, ${playContext.team2Color || '#333'}40, transparent 60%), rgba(20, 20, 20, 0.4)`
         : activeBg;
 
     return (
