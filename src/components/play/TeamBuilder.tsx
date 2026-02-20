@@ -115,28 +115,6 @@ export default function TeamBuilder({ match, user, existingTeam, onBack }: TeamB
             )}
 
 
-            {/* ── Match Info + Team Logos ── */}
-            <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                marginBottom: 16, padding: '12px 14px', borderRadius: 14,
-                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)',
-            }}>
-                <div>
-                    <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, letterSpacing: '-0.5px', color: '#fff' }}>Build Your XI</h2>
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-                        {t1?.short_name || team1Name} vs {t2?.short_name || team2Name}
-                    </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ width: 32, height: 32 }}>
-                        <WikiImage name={team1Name} id={t1?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                    </div>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.2)' }}>vs</span>
-                    <div style={{ width: 32, height: 32 }}>
-                        <WikiImage name={team2Name} id={t2?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                    </div>
-                </div>
-            </div>
 
             {/* ── Formation Dots ── */}
             <div style={{

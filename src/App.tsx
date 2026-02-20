@@ -484,7 +484,13 @@ export default function App(): React.ReactElement {
                     window.history.pushState({}, '', '/dr11');
                     setViewStack([{ type: 'HOME' }, { type: 'DR11' }]);
                 }}
-                data={headerData}
+                data={playSelectedMatchId ? (() => {
+                    const m = matches.find(x => x.game_id === playSelectedMatchId);
+                    if (!m) return headerData;
+                    const t1 = m.participants?.[0]?.short_name || '?';
+                    const t2 = m.participants?.[1]?.short_name || '?';
+                    return { mainText: `${t1} vs ${t2}` } as HeaderDisplayData;
+                })() : headerData}
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
                 isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
                 isPast={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && !!currentView.data && (currentView.data as Match)?.event_state !== 'L' && (currentView.data as Match)?.event_state !== 'U')}
