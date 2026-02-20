@@ -484,13 +484,19 @@ export default function App(): React.ReactElement {
                     window.history.pushState({}, '', '/dr11');
                     setViewStack([{ type: 'HOME' }, { type: 'DR11' }]);
                 }}
-                data={playSelectedMatchId ? (() => {
+                data={headerData}
+                playContext={playSelectedMatchId ? (() => {
                     const m = matches.find(x => x.game_id === playSelectedMatchId);
-                    if (!m) return headerData;
-                    const t1 = m.participants?.[0]?.short_name || '?';
-                    const t2 = m.participants?.[1]?.short_name || '?';
-                    return { mainText: `${t1} vs ${t2}` } as HeaderDisplayData;
-                })() : headerData}
+                    if (!m) return undefined;
+                    return {
+                        team1Short: m.participants?.[0]?.short_name || '?',
+                        team2Short: m.participants?.[1]?.short_name || '?',
+                        team1Id: m.participants?.[0]?.id,
+                        team2Id: m.participants?.[1]?.id,
+                        team1Name: m.participants?.[0]?.name,
+                        team2Name: m.participants?.[1]?.name,
+                    };
+                })() : undefined}
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
                 isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
                 isPast={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && !!currentView.data && (currentView.data as Match)?.event_state !== 'L' && (currentView.data as Match)?.event_state !== 'U')}

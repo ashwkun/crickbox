@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from 'firebase/auth';
-import { LuUser } from 'react-icons/lu';
+import { LuUser, LuSwords } from 'react-icons/lu';
 
 export interface HeaderDisplayData {
     mainText: string;
@@ -12,11 +12,21 @@ export interface HeaderDisplayData {
     };
 }
 
+export interface PlayContextData {
+    team1Short: string;
+    team2Short: string;
+    team1Id?: string;
+    team2Id?: string;
+    team1Name?: string;
+    team2Name?: string;
+}
+
 interface FloatingHeaderProps {
     showBack: boolean;
     onBack: () => void;
     onLogoClick?: () => void;
     data?: HeaderDisplayData | null;
+    playContext?: PlayContextData;
     isLive?: boolean;
     isUpcoming?: boolean;
     isPast?: boolean;
@@ -25,7 +35,7 @@ interface FloatingHeaderProps {
     user?: User | null;
 }
 
-const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast, isPlay, isDr11, user }) => {
+const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, playContext, isLive, isUpcoming, isPast, isPlay, isDr11, user }) => {
     const [celebrating, setCelebrating] = React.useState(false);
     const prevBallId = React.useRef<string | undefined>(undefined);
 
@@ -105,7 +115,7 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
         boxShadow: celebrating ? `0 0 20px ${activeBg}80` : btnStyle.boxShadow, // Glow on celebration
     };
 
-    const contentKey = data ? 'score' : 'logo';
+    const contentKey = playContext ? 'play' : data ? 'score' : 'logo';
 
     return (
         <div style={containerStyle}>
@@ -159,7 +169,22 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                         position: 'relative', // Context for absolute ball
                     }}
                 >
-                    {data ? (
+                    {playContext ? (
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            animation: 'blurFocus 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                        }}>
+                            <span style={{
+                                fontSize: 13, fontWeight: 800, color: '#fff',
+                                textTransform: 'uppercase', letterSpacing: '1px',
+                            }}>{playContext.team1Short}</span>
+                            <LuSwords size={14} color="rgba(255,255,255,0.3)" />
+                            <span style={{
+                                fontSize: 13, fontWeight: 800, color: '#fff',
+                                textTransform: 'uppercase', letterSpacing: '1px',
+                            }}>{playContext.team2Short}</span>
+                        </div>
+                    ) : data ? (
                         <>
                             {/* Score Text */}
                             <div style={{
