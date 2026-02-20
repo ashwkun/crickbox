@@ -57,6 +57,7 @@ const CountdownCard: React.FC<{
     const c2 = getTeamColor(team2) || '#1a1a2e';
     const { h, m, s, pad } = useCountdown(match.start_date);
     const urgency = h < 2 ? '#ef4444' : h < 6 ? '#f59e0b' : '#4ade80';
+    const startTime = new Date(match.start_date).toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' });
 
     return (
         <div onClick={onClick} style={{
@@ -83,16 +84,23 @@ const CountdownCard: React.FC<{
                 }}>
                     {match.series_name || match.championship_name}
                 </div>
-                <div style={{
-                    fontSize: 9, fontWeight: 800, color: urgency,
-                    textTransform: 'uppercase', letterSpacing: '1px',
-                    display: 'flex', alignItems: 'center', gap: 4,
-                }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
+                        {startTime}
+                    </div>
                     <div style={{
-                        width: 5, height: 5, borderRadius: '50%', background: urgency,
-                        animation: h < 2 ? 'pulse 1.5s infinite' : 'none',
-                    }} />
-                    STARTS SOON
+                        fontSize: 9, fontWeight: 800, color: urgency,
+                        textTransform: 'uppercase', letterSpacing: '1px',
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        padding: '3px 8px', borderRadius: 6,
+                        background: `${urgency}15`,
+                    }}>
+                        <div style={{
+                            width: 5, height: 5, borderRadius: '50%', background: urgency,
+                            animation: h < 2 ? 'pulse 1.5s infinite' : 'none',
+                        }} />
+                        STARTS SOON
+                    </div>
                 </div>
             </div>
 
@@ -119,6 +127,9 @@ const CountdownCard: React.FC<{
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
                     flexShrink: 0,
                 }}>
+                    <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                        Team locks in
+                    </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                         <Digit value={pad(h)} color={urgency} />
                         <ClockSeparator color={urgency} />
