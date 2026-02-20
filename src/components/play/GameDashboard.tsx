@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { LuChevronRight, LuCalendarClock, LuUser, LuSwords, LuZap } from 'react-icons/lu';
+import { LuCalendarClock, LuUser, LuSwords, LuChevronRight } from 'react-icons/lu';
 import { User } from 'firebase/auth';
 import useCricketData from '../../utils/useCricketData';
 import { useFantasyTeam } from '../../utils/useFantasyTeam';
@@ -13,337 +13,237 @@ interface GameDashboardProps {
     onSignOut: () => void;
 }
 
+/* ── Shared Match Card ─────────────────────────────────────────── */
+const MatchCard: React.FC<{
+    match: any;
+    team: any;
+    onClick: () => void;
+    variant: 'live' | 'upcoming';
+    dateStr?: string;
+}> = ({ match, team, onClick, variant, dateStr }) => {
+    const t1 = match.participants?.[0];
+    const t2 = match.participants?.[1];
+    const team1 = t1?.name || 'TBC';
+    const team2 = t2?.name || 'TBC';
+    const c1 = getTeamColor(team1) || '#1a1a2e';
+    const c2 = getTeamColor(team2) || '#1a1a2e';
+
+    const isLive = match.event_state === 'L';
+
+    return (
+        <div onClick={onClick} style={{
+            position: 'relative', overflow: 'hidden', borderRadius: 20,
+            cursor: 'pointer', border: '1px solid rgba(255,255,255,0.06)',
+        }}>
+            {/* ── Background: Diagonal Split ── */}
+            <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+                {/* Full left color */}
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: c1 }} />
+                {/* Right color with diagonal clip */}
+                <div style={{
+                    position: 'absolute', inset: 0, backgroundColor: c2,
+                    clipPath: 'polygon(42% 0, 100% 0, 100% 100%, 58% 100%)',
+                }} />
+                {/* Dark overlay for readability */}
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)' }} />
+                {/* Diagonal seam accent */}
+                <div style={{
+                    position: 'absolute', inset: 0, zIndex: 1,
+                    background: 'linear-gradient(115deg, transparent 46%, rgba(255,255,255,0.08) 49%, rgba(255,255,255,0.08) 51%, transparent 54%)',
+                }} />
+            </div>
+
+            {/* ── Top Strip ── */}
+            <div style={{
+                position: 'relative', zIndex: 2,
+                padding: '10px 16px',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(0,0,0,0.25)',
+            }}>
+                {variant === 'live' ? (
+                    <div style={{
+                        fontSize: 10, fontWeight: 800, padding: '4px 10px', borderRadius: 6,
+                        background: isLive ? '#ef4444' : 'rgba(255,255,255,0.08)',
+                        color: '#fff', textTransform: 'uppercase', letterSpacing: '1px',
+                        display: 'flex', alignItems: 'center', gap: 5,
+                    }}>
+                        {isLive && <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#fff', display: 'inline-block' }} />}
+                        {isLive ? 'Live' : 'Completed'}
+                    </div>
+                ) : (
+                    <div style={{
+                        fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.6)',
+                        maxWidth: '60%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        textTransform: 'uppercase', letterSpacing: '0.5px',
+                    }}>
+                        {match.series_name || match.championship_name}
+                    </div>
+                )}
+                {variant === 'live' ? (
+                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Pts <span style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginLeft: 4, letterSpacing: '-1px' }}>{team?.total_points ?? '–'}</span>
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 700 }}>
+                        <LuCalendarClock size={12} /> {dateStr}
+                    </div>
+                )}
+            </div>
+
+            {/* ── Teams Row ── */}
+            <div style={{
+                position: 'relative', zIndex: 2,
+                display: 'flex', alignItems: 'center', padding: '20px 16px',
+            }}>
+                {/* Team 1 */}
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 52, height: 52, flexShrink: 0 }}>
+                        <WikiImage name={team1} id={t1?.id} type="team"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.4))' }} />
+                    </div>
+                    <span style={{ fontWeight: 800, fontSize: 13, color: '#fff', lineHeight: 1.25, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+                        {team1}
+                    </span>
+                </div>
+
+                {/* VS */}
+                <div style={{
+                    flexShrink: 0, width: 44, textAlign: 'center',
+                    fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.3)',
+                    letterSpacing: '3px', textTransform: 'uppercase',
+                }}>
+                    VS
+                </div>
+
+                {/* Team 2 */}
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'flex-end', textAlign: 'right' }}>
+                    <span style={{ fontWeight: 800, fontSize: 13, color: '#fff', lineHeight: 1.25, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+                        {team2}
+                    </span>
+                    <div style={{ width: 52, height: 52, flexShrink: 0 }}>
+                        <WikiImage name={team2} id={t2?.id} type="team"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.4))' }} />
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Bottom CTA (upcoming only) ── */}
+            {variant === 'upcoming' && (
+                <div style={{ position: 'relative', zIndex: 2, padding: '0 16px 14px' }}>
+                    <button style={{
+                        width: '100%', padding: '12px', borderRadius: 12, border: 'none',
+                        fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                        cursor: 'pointer', transition: 'opacity 0.15s',
+                        ...(team
+                            ? { background: 'rgba(34,197,94,0.15)', color: '#4ade80' }
+                            : { background: 'rgba(255,255,255,0.1)', color: '#fff' }
+                        ),
+                    }}>
+                        {team ? <><LuUser size={14} /> Squad Ready</> : <><LuSwords size={14} /> Build Squad</>}
+                        <LuChevronRight size={14} style={{ marginLeft: 2, opacity: 0.5 }} />
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+/* ── Dashboard ─────────────────────────────────────────────────── */
 const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
     const { matches, loading: cricketLoading } = useCricketData();
     const { myTeams, loading: teamsLoading } = useFantasyTeam(user);
     const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
 
-    // Get upcoming matches within 3 days
     const upcomingMatches = useMemo(() => {
-        const threeDaysFromNow = new Date();
-        threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-
-        return matches.filter(m => {
-            if (m.event_state !== 'U') return false;
-            const matchDate = new Date(m.start_date);
-            return matchDate <= threeDaysFromNow;
-        }).sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+        const cap = new Date();
+        cap.setDate(cap.getDate() + 3);
+        return matches
+            .filter(m => m.event_state === 'U' && new Date(m.start_date) <= cap)
+            .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
     }, [matches]);
 
     const liveMatches = useMemo(() => {
-        return matches.filter(m => m.event_state === 'L' || m.event_state === 'C' || m.event_state === 'R')
-            .filter(m => myTeams[m.game_id]) // Only show live/completed if user created a team
+        return matches
+            .filter(m => (m.event_state === 'L' || m.event_state === 'C' || m.event_state === 'R') && myTeams[m.game_id])
             .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
     }, [matches, myTeams]);
 
     const loading = cricketLoading || teamsLoading;
 
+    // ── Detail views ──
     if (selectedMatchId) {
         const match = matches.find(m => m.game_id === selectedMatchId);
         const existingTeam = myTeams[selectedMatchId];
-
         if (match) {
             if (match.event_state === 'U') {
-                return (
-                    <TeamBuilder
-                        match={match}
-                        user={user}
-                        existingTeam={existingTeam}
-                        onBack={() => setSelectedMatchId(null)}
-                    />
-                );
+                return <TeamBuilder match={match} user={user} existingTeam={existingTeam} onBack={() => setSelectedMatchId(null)} />;
             } else if (existingTeam) {
-                return (
-                    <TeamView
-                        match={match}
-                        user={user}
-                        team={existingTeam}
-                        onBack={() => setSelectedMatchId(null)}
-                    />
-                );
+                return <TeamView match={match} user={user} team={existingTeam} onBack={() => setSelectedMatchId(null)} />;
             }
         }
     }
 
-    return (
-        <div style={{
-            padding: '24px 20px',
-            paddingBottom: 110,
-            maxWidth: 600,
-            margin: '0 auto',
-            width: '100%',
-        }}>
+    // ── Helper: readable date ──
+    const fmtDate = (iso: string) => {
+        const d = new Date(iso);
+        const now = new Date();
+        const tom = new Date(); tom.setDate(tom.getDate() + 1);
+        const time = d.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' });
+        if (d.toDateString() === now.toDateString()) return `Today, ${time}`;
+        if (d.toDateString() === tom.toDateString()) return `Tomorrow, ${time}`;
+        return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    };
 
+    const sectionTitle = (icon: React.ReactNode, label: string) => (
+        <h2 style={{
+            fontSize: 13, textTransform: 'uppercase', letterSpacing: '2px',
+            color: 'rgba(255,255,255,0.5)', marginBottom: 16, fontWeight: 700,
+            display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+            {icon} {label}
+        </h2>
+    );
+
+    return (
+        <div style={{ padding: '24px 16px', paddingBottom: 110, maxWidth: 600, margin: '0 auto', width: '100%' }}>
             {loading ? (
                 <div style={{ textAlign: 'center', padding: '60px 0', opacity: 0.5 }}>
                     <div className="login-spinner" style={{ margin: '0 auto', borderColor: '#ec4899', borderRightColor: 'transparent' }} />
                 </div>
             ) : (
                 <>
-                    {/* Live/Completed Teams (active contests) */}
+                    {/* Live / Completed */}
                     {liveMatches.length > 0 && (
-                        <div style={{ marginBottom: 48 }}>
-                            <h2 style={{
-                                fontSize: 14,
-                                textTransform: 'uppercase',
-                                letterSpacing: '2px',
-                                color: '#fff',
-                                marginBottom: 20,
-                                fontWeight: 800,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 10
-                            }}>
-                                <div style={{ padding: 8, background: 'rgba(236,72,153,0.15)', borderRadius: 10, color: '#ec4899', display: 'flex' }}>
-                                    <LuSwords size={18} />
-                                </div>
-                                Your Contests
-                            </h2>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                {liveMatches.map(match => {
-                                    const team = myTeams[match.game_id];
-                                    const team1Name = match.participants?.[0]?.name || 'TBC';
-                                    const team2Name = match.participants?.[1]?.name || 'TBC';
-                                    const color1 = getTeamColor(team1Name) || '#1e1e24';
-                                    const color2 = getTeamColor(team2Name) || '#1e1e24';
-
-                                    return (
-                                        <div
-                                            key={match.game_id}
-                                            onClick={() => setSelectedMatchId(match.game_id)}
-                                            style={{
-                                                position: 'relative',
-                                                overflow: 'hidden',
-                                                borderRadius: 24,
-                                                cursor: 'pointer',
-                                                boxShadow: match.event_state === 'L' ? `0 8px 32px ${color1}40, 0 8px 32px ${color2}40` : '0 8px 32px rgba(0,0,0,0.4)',
-                                                border: match.event_state === 'L' ? '2px solid rgba(255, 255, 255, 0.4)' : '1px solid rgba(255,255,255,0.1)',
-                                                display: 'flex',
-                                                flexDirection: 'column'
-                                            }}
-                                        >
-                                            {/* Solid Color Backgrounds with integrated VS Thunder */}
-                                            <div style={{ position: 'absolute', inset: 0, display: 'flex', zIndex: 0, overflow: 'hidden' }}>
-                                                {/* Left Color */}
-                                                <div style={{ flex: 1, backgroundColor: color1, position: 'relative' }}>
-                                                </div>
-
-                                                {/* Right Color */}
-                                                <div style={{ flex: 1, backgroundColor: color2, position: 'relative' }}>
-                                                </div>
-
-                                                {/* Full-Height Background Thunder Separator */}
-                                                <div style={{
-                                                    position: 'absolute',
-                                                    left: '50%',
-                                                    top: '50%',
-                                                    transform: 'translate(-50%, -50%)',
-                                                    height: '120%',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    zIndex: 1,
-                                                    opacity: 0.8
-                                                }}>
-                                                    <LuZap size={220} color="#ffbd00" strokeWidth={1.5} fill="#ffbd00" style={{ transform: 'rotate(15deg)' }} />
-                                                </div>
-                                            </div>
-
-                                            {/* Top Banner: Status & Points */}
-                                            <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.6)', borderBottom: '1px solid rgba(0,0,0,0.5)', zIndex: 2 }}>
-                                                <div style={{
-                                                    fontSize: 10,
-                                                    fontWeight: 800,
-                                                    padding: '6px 12px',
-                                                    borderRadius: 100,
-                                                    background: match.event_state === 'L' ? '#ef4444' : 'rgba(255,255,255,0.1)',
-                                                    color: '#fff',
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: '1px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: 6
-                                                }}>
-                                                    {match.event_state === 'L' && <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }} />}
-                                                    {match.event_state === 'L' ? 'LIVE NOW' : 'COMPLETED'}
-                                                </div>
-                                                <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: 12 }}>
-                                                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: '1px' }}>Points <br /><span style={{ fontSize: 24, fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: '-1px' }}>{team?.total_points ?? '--'}</span></div>
-                                                </div>
-                                            </div>
-
-                                            {/* Contenders */}
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px', zIndex: 2, background: 'rgba(0,0,0,0.2)' }}>
-                                                {/* Team 1 */}
-                                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8 }}>
-                                                        <WikiImage name={team1Name} id={match.participants?.[0]?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                                    </div>
-                                                    <span style={{ fontWeight: 900, fontSize: 16, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{team1Name}</span>
-                                                </div>
-
-                                                {/* Invisible Spacer to keep layout balanced around the background thunder */}
-                                                <div style={{ width: 60, flexShrink: 0 }}></div>
-
-                                                {/* Team 2 */}
-                                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8 }}>
-                                                        <WikiImage name={team2Name} id={match.participants?.[1]?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                                    </div>
-                                                    <span style={{ fontWeight: 900, fontSize: 16, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{team2Name}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                        <div style={{ marginBottom: 40 }}>
+                            {sectionTitle(<LuSwords size={14} />, 'Your Contests')}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                                {liveMatches.map(m => (
+                                    <MatchCard key={m.game_id} match={m} team={myTeams[m.game_id]}
+                                        onClick={() => setSelectedMatchId(m.game_id)} variant="live" />
+                                ))}
                             </div>
                         </div>
                     )}
 
-                    {/* Upcoming Matches */}
+                    {/* Upcoming */}
                     <div>
-                        <h2 style={{
-                            fontSize: 14,
-                            textTransform: 'uppercase',
-                            letterSpacing: '2px',
-                            color: '#fff',
-                            marginBottom: 20,
-                            fontWeight: 800,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 10
-                        }}>
-                            <div style={{ padding: 8, background: 'rgba(255,255,255,0.05)', borderRadius: 10, color: '#fff', display: 'flex' }}>
-                                <LuCalendarClock size={18} />
-                            </div>
-                            Upcoming Battles
-                        </h2>
+                        {sectionTitle(<LuCalendarClock size={14} />, 'Upcoming')}
                         {upcomingMatches.length === 0 ? (
                             <div style={{
-                                padding: '40px 20px',
-                                textAlign: 'center',
-                                background: 'rgba(255,255,255,0.02)',
-                                borderRadius: 24,
-                                color: 'rgba(255,255,255,0.4)',
-                                border: '1px dashed rgba(255,255,255,0.1)'
+                                padding: '40px 20px', textAlign: 'center', borderRadius: 20,
+                                color: 'rgba(255,255,255,0.3)', border: '1px dashed rgba(255,255,255,0.08)',
+                                fontSize: 13,
                             }}>
-                                No upcoming battles in the next 3 days.<br />Check back later!
+                                Nothing in the next 3 days. Check back later!
                             </div>
                         ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                                {upcomingMatches.map(match => {
-                                    const team = myTeams[match.game_id];
-                                    const date = new Date(match.start_date);
-                                    const team1Name = match.participants?.[0]?.name || 'TBC';
-                                    const team2Name = match.participants?.[1]?.name || 'TBC';
-                                    const color1 = getTeamColor(team1Name) || '#1e1e24';
-                                    const color2 = getTeamColor(team2Name) || '#1e1e24';
-
-                                    // Determine if it's today or tomorrow
-                                    const today = new Date();
-                                    const tomorrow = new Date();
-                                    tomorrow.setDate(tomorrow.getDate() + 1);
-
-                                    let dateStr = date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-                                    if (date.toDateString() === today.toDateString()) {
-                                        dateStr = `Today, ${date.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
-                                    } else if (date.toDateString() === tomorrow.toDateString()) {
-                                        dateStr = `Tomorrow, ${date.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
-                                    }
-
-                                    return (
-                                        <div
-                                            key={match.game_id}
-                                            onClick={() => setSelectedMatchId(match.game_id)}
-                                            style={{
-                                                position: 'relative',
-                                                borderRadius: 24,
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                overflow: 'hidden',
-                                                boxShadow: team ? `0 8px 32px ${color1}40, 0 8px 32px ${color2}40` : '0 8px 24px rgba(0,0,0,0.4)',
-                                                border: team ? '2px solid rgba(255, 255, 255, 0.4)' : '1px solid rgba(255,255,255,0.1)'
-                                            }}
-                                        >
-                                            {/* Solid Color Backgrounds with integrated VS Thunder */}
-                                            <div style={{ position: 'absolute', inset: 0, display: 'flex', zIndex: 0, overflow: 'hidden' }}>
-                                                {/* Left Color */}
-                                                <div style={{ flex: 1, backgroundColor: color1, position: 'relative' }}>
-                                                </div>
-
-                                                {/* Right Color */}
-                                                <div style={{ flex: 1, backgroundColor: color2, position: 'relative' }}>
-                                                </div>
-
-                                                {/* Full-Height Background Thunder Separator */}
-                                                <div style={{
-                                                    position: 'absolute',
-                                                    left: '50%',
-                                                    top: '50%',
-                                                    transform: 'translate(-50%, -50%)',
-                                                    height: '120%',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    zIndex: 1,
-                                                    opacity: 0.8
-                                                }}>
-                                                    <LuZap size={220} color="#ffbd00" strokeWidth={1.5} fill="#ffbd00" style={{ transform: 'rotate(15deg)' }} />
-                                                </div>
-                                            </div>
-
-                                            {/* Top Info Banner */}
-                                            <div style={{ padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.6)', zIndex: 2, borderBottom: '1px solid rgba(0,0,0,0.5)' }}>
-                                                <div style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 10, color: '#fff', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.5px', maxWidth: '65%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                    {match.series_name || match.championship_name}
-                                                </div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#fff', fontWeight: 900 }}>
-                                                    <LuCalendarClock size={14} />
-                                                    {dateStr}
-                                                </div>
-                                            </div>
-
-                                            {/* Contenders */}
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 20px', zIndex: 2, background: 'rgba(0,0,0,0.2)' }}>
-                                                {/* Team 1 */}
-                                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8 }}>
-                                                        <WikiImage name={team1Name} id={match.participants?.[0]?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                                    </div>
-                                                    <span style={{ fontWeight: 900, fontSize: 16, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{team1Name}</span>
-                                                </div>
-
-                                                {/* Invisible Spacer to keep layout balanced around the background thunder */}
-                                                <div style={{ width: 60, flexShrink: 0 }}></div>
-
-                                                {/* Team 2 */}
-                                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, textAlign: 'center' }}>
-                                                    <div style={{ width: 64, height: 64, background: 'rgba(0,0,0,0.2)', borderRadius: '50%', padding: 8 }}>
-                                                        <WikiImage name={team2Name} id={match.participants?.[1]?.id} type="team" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                                    </div>
-                                                    <span style={{ fontWeight: 900, fontSize: 16, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{team2Name}</span>
-                                                </div>
-                                            </div>
-
-                                            <div style={{ padding: '0 20px 20px 20px', zIndex: 1, background: 'rgba(0,0,0,0.2)' }}>
-                                                {team ? (
-                                                    <button style={{
-                                                        width: '100%', padding: '14px', borderRadius: 16, background: '#22c55e', border: 'none', color: '#fff', fontSize: 14, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s', textTransform: 'uppercase', letterSpacing: '1px', boxShadow: '0 4px 20px rgba(34, 197, 94, 0.4)'
-                                                    }}>
-                                                        <LuUser size={18} /> Team Ready
-                                                    </button>
-                                                ) : (
-                                                    <button style={{
-                                                        width: '100%', padding: '14px', borderRadius: 16, background: '#fff', border: 'none', color: '#000', fontSize: 14, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, textTransform: 'uppercase', letterSpacing: '1px', boxShadow: '0 4px 20px rgba(0,0,0,0.3)', transition: 'all 0.2s'
-                                                    }}>
-                                                        <LuSwords size={18} /> Build Squad
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                                {upcomingMatches.map(m => (
+                                    <MatchCard key={m.game_id} match={m} team={myTeams[m.game_id]}
+                                        onClick={() => setSelectedMatchId(m.game_id)} variant="upcoming" dateStr={fmtDate(m.start_date)} />
+                                ))}
                             </div>
                         )}
                     </div>
