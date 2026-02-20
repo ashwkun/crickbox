@@ -114,14 +114,7 @@ export default function TeamBuilder({ match, user, existingTeam, onBack }: TeamB
                 </div>
             )}
 
-            {/* ── Breadcrumb Back ── */}
-            <button onClick={onBack} style={{
-                background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
-                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
-                fontSize: 12, fontWeight: 600, padding: '4px 0', marginBottom: 12,
-            }}>
-                <LuChevronLeft size={14} /> Back
-            </button>
+
             {/* ── Match Info + Team Logos ── */}
             <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',

@@ -11,6 +11,8 @@ import { getTeamColor } from '../../utils/teamColors';
 interface GameDashboardProps {
     user: User;
     onSignOut: () => void;
+    selectedMatchId: string | null;
+    setSelectedMatchId: (id: string | null) => void;
 }
 
 /* ── Countdown Hook ────────────────────────────────────────────── */
@@ -304,10 +306,9 @@ const MatchCard: React.FC<{
 };
 
 /* ── Dashboard ─────────────────────────────────────────────────── */
-const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
+const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut, selectedMatchId, setSelectedMatchId }) => {
     const { matches, loading: cricketLoading } = useCricketData();
     const { myTeams, loading: teamsLoading } = useFantasyTeam(user);
-    const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
 
     const upcomingMatches = useMemo(() => {
         const cap = new Date();

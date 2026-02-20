@@ -7,9 +7,11 @@ import WelcomeOverlay from './WelcomeOverlay';
 
 interface PlayPageProps {
     isVisible?: boolean;
+    playSelectedMatchId: string | null;
+    setPlaySelectedMatchId: (id: string | null) => void;
 }
 
-const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
+const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true, playSelectedMatchId, setPlaySelectedMatchId }) => {
     const {
         user,
         loading: authLoading,
@@ -58,7 +60,7 @@ const PlayPage: React.FC<PlayPageProps> = ({ isVisible = true }) => {
                         setWelcomeComplete(true);
                     }}
                 />
-                <GameDashboard user={user} onSignOut={signOut} />
+                <GameDashboard user={user} onSignOut={signOut} selectedMatchId={playSelectedMatchId} setSelectedMatchId={setPlaySelectedMatchId} />
             </>
         );
     }

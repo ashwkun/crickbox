@@ -40,6 +40,7 @@ export default function App(): React.ReactElement {
     const [wallstream, setWallstream] = useState<WallstreamData | null>(null);
     const [pendingMatchId, setPendingMatchId] = useState<string | null>(null);
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+    const [playSelectedMatchId, setPlaySelectedMatchId] = useState<string | null>(null);
 
     // Navigation State: Stack-based History
     // Stack always starts with HOME. Overlays are pushed on top.
@@ -155,6 +156,11 @@ export default function App(): React.ReactElement {
     }, []);
 
     const handleBack = useCallback(() => {
+        // If inside Play tab's team builder, go back to dashboard first
+        if (playSelectedMatchId) {
+            setPlaySelectedMatchId(null);
+            return;
+        }
         setViewStack(prev => {
             if (prev.length <= 1) return prev; // Can't go back from Home
             const newStack = prev.slice(0, prev.length - 1);
@@ -472,7 +478,7 @@ export default function App(): React.ReactElement {
             {/* Floating Header (Global) - Only show for HOME, MATCH, and UPCOMING_LIST */}
             {/* Floating Header (Global) - Always Visible per User Request */}
             <FloatingHeader
-                showBack={currentView.type !== 'HOME'}
+                showBack={currentView.type !== 'HOME' || !!playSelectedMatchId}
                 onBack={handleBack}
                 onLogoClick={() => {
                     window.history.pushState({}, '', '/dr11');
@@ -482,7 +488,7 @@ export default function App(): React.ReactElement {
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
                 isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
                 isPast={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && !!currentView.data && (currentView.data as Match)?.event_state !== 'L' && (currentView.data as Match)?.event_state !== 'U')}
-                isPlay={activeTab === 'PLAY' && currentView.type === 'HOME'}
+                isPlay={activeTab === 'PLAY' && currentView.type === 'HOME' && !playSelectedMatchId}
                 isDr11={currentView?.type === 'DR11' || currentView?.type === 'DR11_MATCH' || currentView?.type === 'DR11_PLAYGROUND'}
                 user={user}
             />
@@ -518,7 +524,7 @@ export default function App(): React.ReactElement {
                         setExcludeWomens={setExcludeWomens}
                     />
                 ) : (
-                    <PlayPage isVisible={viewStack.length === 1} />
+                    <PlayPage isVisible={viewStack.length === 1} playSelectedMatchId={playSelectedMatchId} setPlaySelectedMatchId={setPlaySelectedMatchId} />
                 )}
             </main>
 
