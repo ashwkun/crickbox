@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import useCricketData from '../utils/useCricketData';
 import MatchCard from './MatchCard';
-import { LuMoonStar, LuCalendarClock, LuCalendarDays } from "react-icons/lu";
+import { LuMoonStar, LuCalendarClock, LuCalendarDays, LuFilter, LuTrophy, LuStar, LuGlobe, LuX } from "react-icons/lu";
 import CompletedCard from './CompletedCard';
 import FeatSection from './FeatSection';
 import UpcomingCard from './UpcomingCard';
@@ -15,6 +15,7 @@ import { filterByPastTime, isYesterday, wasLastWeek, PastTimeFilterValue } from 
 import SkeletonMatchCard from './SkeletonMatchCard';
 import { Match, Scorecard } from '../types';
 import { sortByPriority, generateChips, generateUpcomingChips, filterByChip, filterFeatured24hr } from '../utils/matchPriority';
+import { MatchFilterLevel } from '../utils/useCricketData';
 
 // Types for processed items
 interface ProcessedSeriesItem {
@@ -94,6 +95,10 @@ interface HomePageProps {
     onOpenCompletedList: () => void;
     isVisible?: boolean;
     isRefreshing?: boolean;
+    matchFilterLevel: MatchFilterLevel;
+    setMatchFilterLevel: (level: MatchFilterLevel) => void;
+    excludeWomens: boolean;
+    setExcludeWomens: (exclude: boolean) => void;
 }
 
 export default function HomePage({
@@ -108,7 +113,11 @@ export default function HomePage({
     onOpenUpcomingList,
     onOpenCompletedList,
     isVisible = true,
-    isRefreshing = false
+    isRefreshing = false,
+    matchFilterLevel,
+    setMatchFilterLevel,
+    excludeWomens,
+    setExcludeWomens
 }: HomePageProps): React.ReactElement {
     const [upcomingLimit, setUpcomingLimit] = useState(10);
     const [resultsLimit, setResultsLimit] = useState(8);
@@ -930,9 +939,123 @@ export default function HomePage({
                 </div>
             </div>
 
-            {/* Wisden Attribution Footer */}
+            {/* Match Feed Preferences */}
+            <div style={{ padding: '24px 20px 12px' }}>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginBottom: 12,
+                }}>
+                    <LuFilter size={12} color="rgba(255,255,255,0.4)" />
+                    <span style={{
+                        fontSize: 10,
+                        textTransform: 'uppercase',
+                        letterSpacing: '1.2px',
+                        fontWeight: 600,
+                        color: 'rgba(255,255,255,0.4)',
+                    }}>Match Feed</span>
+                </div>
+
+                {/* 3-level priority filter */}
+                <div style={{ display: 'flex', gap: 8 }}>
+                    {([1, 2, 3] as MatchFilterLevel[]).map(level => {
+                        const config: Record<MatchFilterLevel, { Icon: typeof LuTrophy; label: string; desc: string }> = {
+                            1: { Icon: LuTrophy, label: 'Top Only', desc: 'ICC + IPL' },
+                            2: { Icon: LuStar, label: 'Featured', desc: '+ Leagues' },
+                            3: { Icon: LuGlobe, label: 'Everything', desc: 'All cricket' },
+                        };
+                        const { Icon, label, desc } = config[level];
+                        const isActive = matchFilterLevel === level;
+                        return (
+                            <button
+                                key={level}
+                                onClick={() => setMatchFilterLevel(level)}
+                                style={{
+                                    flex: 1,
+                                    padding: '10px 6px 8px',
+                                    borderRadius: 12,
+                                    border: isActive
+                                        ? '1px solid rgba(99, 102, 241, 0.4)'
+                                        : '1px solid rgba(255,255,255,0.06)',
+                                    background: isActive
+                                        ? 'linear-gradient(145deg, rgba(99,102,241,0.15) 0%, rgba(99,102,241,0.05) 100%)'
+                                        : 'rgba(255,255,255,0.02)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    display: 'flex',
+                                    flexDirection: 'column' as const,
+                                    alignItems: 'center',
+                                    gap: 3,
+                                }}
+                            >
+                                <Icon size={15} color={isActive ? '#a5b4fc' : 'rgba(255,255,255,0.3)'} />
+                                <span style={{
+                                    fontSize: 11,
+                                    fontWeight: isActive ? 700 : 500,
+                                    color: isActive ? '#c7d2fe' : 'rgba(255,255,255,0.45)',
+                                    letterSpacing: '-0.2px',
+                                }}>{label}</span>
+                                <span style={{
+                                    fontSize: 9,
+                                    color: isActive ? 'rgba(165,180,252,0.6)' : 'rgba(255,255,255,0.2)',
+                                    fontWeight: 500,
+                                }}>{desc}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Exclude Women's toggle */}
+                <button
+                    onClick={() => setExcludeWomens(!excludeWomens)}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        marginTop: 8,
+                        padding: '8px 12px',
+                        borderRadius: 10,
+                        border: excludeWomens
+                            ? '1px solid rgba(239, 68, 68, 0.3)'
+                            : '1px solid rgba(255,255,255,0.06)',
+                        background: excludeWomens
+                            ? 'rgba(239, 68, 68, 0.08)'
+                            : 'rgba(255,255,255,0.02)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                    }}
+                >
+                    <span style={{
+                        fontSize: 11,
+                        fontWeight: 500,
+                        color: excludeWomens ? '#fca5a5' : 'rgba(255,255,255,0.35)',
+                    }}>Exclude Women's Matches</span>
+                    <div style={{
+                        width: 32,
+                        height: 18,
+                        borderRadius: 9,
+                        background: excludeWomens ? '#ef4444' : 'rgba(255,255,255,0.1)',
+                        position: 'relative',
+                        transition: 'background 0.2s ease',
+                    }}>
+                        <div style={{
+                            width: 14,
+                            height: 14,
+                            borderRadius: '50%',
+                            background: '#fff',
+                            position: 'absolute',
+                            top: 2,
+                            left: excludeWomens ? 16 : 2,
+                            transition: 'left 0.2s ease',
+                        }} />
+                    </div>
+                </button>
+            </div>
+
             {/* Wisden Attribution Footer - Premium Glass Card */}
-            <div style={{ padding: '24px 20px 64px' }}>
+            <div style={{ padding: '0 20px 64px' }}>
                 <a
                     href="https://wisden.com"
                     target="_blank"
@@ -960,7 +1083,6 @@ export default function HomePage({
                         e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
                     }}
                 >
-                    {/* Text Section */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         <span style={{
                             color: 'rgba(255, 255, 255, 0.5)',
@@ -990,8 +1112,6 @@ export default function HomePage({
                             }} />
                         </div>
                     </div>
-
-                    {/* Logo Section - Yellow Pill + Bigger Logo */}
                     <div style={{
                         background: '#fbbf24',
                         padding: '8px 16px',

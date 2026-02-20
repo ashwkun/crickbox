@@ -5,6 +5,20 @@
 
 import { Match } from '../types';
 
+/**
+ * Check if a match is a women's match (by league_code, series name, or team names)
+ */
+export function isWomensMatch(match: Match): boolean {
+    const lc = match.league_code || '';
+    if (lc === 'womens_international') return true;
+    const sn = (match.series_name || '').toLowerCase();
+    const psn = (match.parent_series_name || '').toLowerCase();
+    if (sn.includes('women') || psn.includes('women')) return true;
+    // Check team names
+    const names = match.participants?.map(p => (p.name || '').toLowerCase()) || [];
+    return names.some(n => n.includes(' women') || n.includes(' w ') || n.endsWith(' w'));
+}
+
 // Top 5 ICC Men's Teams (by ID)
 const TOP_ICC_TEAMS = ['4', '1', '3', '13', '5'];
 // IND=4, AUS=1, ENG=3, SA=13, NZ=5
@@ -167,14 +181,23 @@ export function getMatchPriority(match: Match): number {
     const searchFields = [parentSeries, seriesName, championship];
     const combined = searchFields.join(' ').toLowerCase();
 
+    // EARLY CHECK: Women's matches get lower priority regardless of tournament name
+    // This prevents "Women's Asia Cup" from matching ICC_EVENTS "Asia Cup" at priority 3
+    if (isWomensMatch(match)) {
+        // Top women's teams get moderate priority
+        if (isTopWomenTeamMatch(match)) return 15;
+        return 25;
+    }
+
+    // EARLY CHECK: Youth matches
+    if (leagueCode === 'youth_international') return 30;
+
     // EARLY DEMOTION: Warm-ups and Qualifiers get lower priority
-    // They should appear in the app but sort below actual tournaments
     const isWarmupOrQualifier = combined.includes('warm-up') ||
         combined.includes('warm up') ||
         combined.includes('qualifier') ||
         combined.includes('warm up matches');
 
-    // If warm-up/qualifier, return priority 18 (above domestic P100, below premium leagues P4-14)
     if (isWarmupOrQualifier) {
         return 18;
     }
@@ -205,24 +228,16 @@ export function getMatchPriority(match: Match): number {
         }
     }
 
-    // 5. Top Women's Teams (Bilateral)
-    // Give them border-line priority (15) so they appear in Just Finished but sort below leagues
-    if (isTopWomenTeamMatch(match)) {
-        return 15;
-    }
-
-    // 6. Use API event_priority if available
+    // 5. Use API event_priority if available
     const apiPriority = parseInt(match.event_priority || '') || 999;
     if (apiPriority < 50) {
         return 15 + apiPriority; // Offset to keep below premium leagues
     }
 
-    // 7. League-based fallback
+    // 6. League-based fallback
     if (leagueCode === 'icc') return 20;
-    if (leagueCode === 'womens_international') return 25;
-    if (leagueCode === 'youth_international') return 30;
 
-    // 8. Domestic/Other
+    // 7. Domestic/Other
     return 100;
 }
 

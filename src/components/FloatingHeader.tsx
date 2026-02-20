@@ -21,10 +21,11 @@ interface FloatingHeaderProps {
     isUpcoming?: boolean;
     isPast?: boolean;
     isPlay?: boolean;
+    isDr11?: boolean;
     user?: User | null;
 }
 
-const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast, isPlay, user }) => {
+const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLogoClick, data, isLive, isUpcoming, isPast, isPlay, isDr11, user }) => {
     const [celebrating, setCelebrating] = React.useState(false);
     const prevBallId = React.useRef<string | undefined>(undefined);
 
@@ -267,6 +268,18 @@ const FloatingHeader: React.FC<FloatingHeaderProps> = ({ showBack, onBack, onLog
                                         WebkitTextFillColor: 'transparent',
                                         animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
                                     }}>.PLAY</span>
+                                ) : isDr11 ? (
+                                    <span key="d11" style={{
+                                        fontFamily: '"BBH Bartle", sans-serif',
+                                        fontSize: '16px',
+                                        fontWeight: 600,
+                                        letterSpacing: '1px',
+                                        background: 'linear-gradient(90deg, #10b981 0%, #10b981 35%, #6ee7b7 50%, #10b981 65%, #10b981 100%)',
+                                        backgroundSize: '200% 100%',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        animation: 'liveShimmer 1.5s ease-in-out infinite alternate'
+                                    }}>.D11</span>
                                 ) : (
                                     <span key="cric" style={{
                                         fontFamily: '"BBH Bartle", sans-serif',

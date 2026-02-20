@@ -1,0 +1,1038 @@
+/* ===========================================
+   DREAM 11 PREDICTOR STYLES
+   Uses existing dark theme variables from base.css
+   =========================================== */
+
+/* ---- Page Layout ---- */
+.dr11-page {
+    padding: 0 16px 32px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ---- Header ---- */
+.dr11-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 0 8px;
+}
+
+.dr11-header-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #22c55e 0%, #059669 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.dr11-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.dr11-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* ---- Weights Bar ---- */
+.dr11-section-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 16px 0 6px;
+    font-weight: 600;
+}
+
+.dr11-signal-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.dr11-signal-dot--weights {
+    background: var(--accent-primary);
+}
+
+.dr11-weights-bar {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 28px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.dr11-weight-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 0 4px;
+}
+
+.dr11-weight-item:nth-child(1) {
+    background: #22c55e22;
+    color: #22c55e;
+}
+
+.dr11-weight-item:nth-child(2) {
+    background: #3b82f622;
+    color: #3b82f6;
+}
+
+.dr11-weight-item:nth-child(3) {
+    background: #8b5cf622;
+    color: #8b5cf6;
+}
+
+.dr11-weight-item:nth-child(4) {
+    background: #f59e0b22;
+    color: #f59e0b;
+}
+
+.dr11-weight-item:nth-child(5) {
+    background: #ef444422;
+    color: #ef4444;
+}
+
+.dr11-weight-label {
+    font-weight: 700;
+}
+
+.dr11-weight-pct {
+    opacity: 0.8;
+}
+
+/* ---- Match Sections ---- */
+.dr11-match-section {
+    margin-bottom: 20px;
+}
+
+.dr11-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dr11-section-title--clickable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.dr11-section-title--clickable:hover {
+    color: var(--text-primary);
+}
+
+.dr11-chevron {
+    font-size: 10px;
+    margin-left: auto;
+    color: var(--text-muted);
+}
+
+.dr11-copy-btn {
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.dr11-copy-btn:hover {
+    background: var(--bg-card-hover);
+}
+
+/* ---- Match Card ---- */
+.dr11-match-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dr11-match-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+}
+
+.dr11-match-card--live {
+    border-color: #22c55e44;
+    background: linear-gradient(135deg, var(--bg-card) 0%, #22c55e08 100%);
+}
+
+.dr11-match-card--result {
+    opacity: 0.75;
+}
+
+.dr11-match-card-teams {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.dr11-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    gap: 4px;
+}
+
+.dr11-team-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.dr11-team-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.dr11-team-score--result {
+    color: var(--text-muted);
+}
+
+.dr11-vs {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.dr11-vs-live {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent-primary);
+    font-weight: 700;
+    font-size: 11px;
+}
+
+.dr11-match-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+.dr11-match-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.dr11-match-cta {
+    font-size: 12px;
+    color: var(--accent-primary);
+    font-weight: 600;
+}
+
+/* ---- Loading ---- */
+.dr11-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    gap: 12px;
+}
+
+.dr11-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.dr11-loading-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* ---- Error ---- */
+.dr11-error {
+    padding: 40px 20px;
+    text-align: center;
+    color: #ef4444;
+}
+
+/* ---- Empty ---- */
+.dr11-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.dr11-empty-hint {
+    font-size: 12px;
+    margin-top: 8px;
+    opacity: 0.6;
+}
+
+/* ---- Match Header (Prediction Page) ---- */
+.dr11-match-header {
+    text-align: center;
+    padding: 20px 0 16px;
+}
+
+.dr11-match-header-teams {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.dr11-mh-team {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.dr11-mh-vs {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.dr11-match-header-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* ---- Tabs ---- */
+.dr11-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.dr11-tab {
+    flex: 1;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.dr11-tab--active {
+    background: var(--accent-primary);
+    color: #fff;
+}
+
+/* ---- Section ---- */
+.dr11-section {
+    margin-bottom: 16px;
+}
+
+/* ---- Team Grid ---- */
+.dr11-team-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ---- Player Card ---- */
+.dr11-player-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.dr11-player-card--captain {
+    border-color: #f59e0b66;
+    background: linear-gradient(135deg, var(--bg-card) 0%, #f59e0b08 100%);
+}
+
+.dr11-player-card--vc {
+    border-color: #3b82f644;
+    background: linear-gradient(135deg, var(--bg-card) 0%, #3b82f608 100%);
+}
+
+.dr11-player-card--bench {
+    opacity: 0.6;
+}
+
+.dr11-player-card--backup {
+    opacity: 0.8;
+    border-style: dashed;
+}
+
+.dr11-badge--backup {
+    background: #6b7280;
+    color: #fff;
+}
+
+.dr11-player-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    cursor: pointer;
+    gap: 8px;
+}
+
+.dr11-player-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+}
+
+.dr11-player-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.dr11-player-rank {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    width: 24px;
+}
+
+.dr11-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.dr11-badge--captain {
+    background: #f59e0b;
+    color: #000;
+}
+
+.dr11-badge--vc {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.dr11-player-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dr11-player-team-tag {
+    font-size: 10px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.dr11-role-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid;
+}
+
+.dr11-player-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-primary);
+    min-width: 40px;
+    text-align: right;
+}
+
+.dr11-chevron-sm {
+    font-size: 8px;
+    color: var(--text-muted);
+}
+
+/* ---- Score Bar ---- */
+.dr11-score-bar-container {
+    padding: 0 14px 8px;
+}
+
+.dr11-score-bar {
+    display: flex;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--bg-primary);
+    gap: 1px;
+}
+
+.dr11-score-bar-segment {
+    height: 100%;
+    border-radius: 1px;
+    transition: width 0.5s ease;
+}
+
+.dr11-score-bar--form {
+    background: #22c55e;
+}
+
+.dr11-score-bar--career {
+    background: #3b82f6;
+}
+
+.dr11-score-bar--icc {
+    background: #8b5cf6;
+}
+
+.dr11-score-bar--role {
+    background: #f59e0b;
+}
+
+.dr11-score-bar--pitch {
+    background: #ef4444;
+}
+
+/* ---- Breakdown (Expanded) ---- */
+.dr11-breakdown {
+    border-top: 1px solid var(--border-color);
+    padding: 8px 14px 14px;
+}
+
+/* ---- Signal Section ---- */
+.dr11-signal {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.dr11-signal:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.dr11-signal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.dr11-signal-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dr11-signal--form .dr11-signal-title {
+    color: #22c55e;
+}
+
+.dr11-signal--career .dr11-signal-title {
+    color: #3b82f6;
+}
+
+.dr11-signal--icc .dr11-signal-title {
+    color: #8b5cf6;
+}
+
+.dr11-signal--role .dr11-signal-title {
+    color: #f59e0b;
+}
+
+.dr11-signal--pitch .dr11-signal-title {
+    color: #ef4444;
+}
+
+.dr11-signal-scores {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+}
+
+.dr11-signal-raw {
+    color: var(--text-secondary);
+}
+
+.dr11-signal-multiply {
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
+.dr11-signal-weighted {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.dr11-signal-bar-wrap {
+    margin-bottom: 6px;
+}
+
+.dr11-signal-bar-wrap {
+    height: 3px;
+    background: var(--bg-primary);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.dr11-signal-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+.dr11-signal-bar--form {
+    background: #22c55e;
+}
+
+.dr11-signal-bar--career {
+    background: #3b82f6;
+}
+
+.dr11-signal-bar--icc {
+    background: #8b5cf6;
+}
+
+.dr11-signal-bar--role {
+    background: #f59e0b;
+}
+
+.dr11-signal-bar--pitch {
+    background: #ef4444;
+}
+
+/* ---- Signal Detail ---- */
+.dr11-signal-detail {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.dr11-signal-reasoning {
+    font-style: italic;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-size: 11px;
+}
+
+.dr11-stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.dr11-no-data {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.dr11-rank-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: #8b5cf6;
+    margin: 4px 0;
+}
+
+/* ---- Match History ---- */
+.dr11-match-history {
+    margin-top: 8px;
+}
+
+.dr11-mh-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.dr11-mh-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+    border-bottom: 1px dotted var(--border-color);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+}
+
+.dr11-mh-date {
+    color: var(--text-muted);
+    width: 50px;
+    flex-shrink: 0;
+}
+
+.dr11-mh-stat {
+    color: var(--text-primary);
+}
+
+.dr11-mh-stat--bowl {
+    color: #ef4444;
+}
+
+/* ---- Composition ---- */
+.dr11-composition {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.dr11-comp-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border: 1px solid;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+.dr11-comp-badge-role {
+    font-weight: 700;
+    font-size: 10px;
+}
+
+.dr11-comp-badge-count {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.dr11-comp-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border-color);
+}
+
+.dr11-comp-team-split {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* ---- Decision Log ---- */
+.dr11-logs {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.dr11-log-line {
+    color: var(--text-secondary);
+    display: flex;
+    gap: 8px;
+}
+
+.dr11-log-line--header {
+    color: var(--accent-primary);
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.dr11-log-line--error {
+    color: #ef4444;
+}
+
+.dr11-log-num {
+    color: var(--text-muted);
+    min-width: 20px;
+    text-align: right;
+    flex-shrink: 0;
+    font-size: 10px;
+}
+
+/* ---- Playground Button (on D11 Page) ---- */
+.dr11-playground-btn {
+    margin-left: auto;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid #8b5cf644;
+    background: #8b5cf611;
+    color: #8b5cf6;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.dr11-playground-btn:hover {
+    background: #8b5cf622;
+    border-color: #8b5cf6;
+}
+
+/* ---- Playground Page ---- */
+.dr11-playground {
+    padding: 0 16px 32px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.playground-controls {
+    margin-bottom: 20px;
+}
+
+.playground-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.playground-select-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.playground-select-row select {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    appearance: none;
+}
+
+.playground-select-row select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+/* ---- Metrics Cards ---- */
+.playground-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+}
+
+.metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent-primary);
+    line-height: 1.1;
+}
+
+.metric-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+/* ---- Comparison Table ---- */
+.playground-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.playground-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.playground-table th {
+    background: var(--bg-card);
+    padding: 10px 8px;
+    text-align: left;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    white-space: nowrap;
+}
+
+.playground-table td {
+    padding: 8px 8px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.playground-table td.num {
+    font-family: 'JetBrains Mono', monospace;
+    text-align: right;
+}
+
+.playground-table td.center {
+    text-align: center;
+}
+
+.playground-table tr:last-child td {
+    border-bottom: none;
+}
+
+.playground-table tr.row-selected {
+    background: #22c55e0a;
+}
+
+.playground-table tr.row-selected td {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.playground-table tr.row-top11 {
+    border-left: 3px solid #f59e0b44;
+}
+
+.playground-table .role-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.playground-table .role-badge.WK {
+    background: #8b5cf622;
+    color: #8b5cf6;
+}
+
+.playground-table .role-badge.BAT {
+    background: #3b82f622;
+    color: #3b82f6;
+}
+
+.playground-table .role-badge.AR {
+    background: #22c55e22;
+    color: #22c55e;
+}
+
+.playground-table .role-badge.BOWL {
+    background: #ef444422;
+    color: #ef4444;
+}
+
+/* ---- Legend ---- */
+.playground-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+/* ---- Decision Log styling ---- */
+.dr11-log-section {
+    margin-top: 16px;
+}
+
+.dr11-log-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.dr11-log-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.dr11-decision-log {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px;
+    max-height: 500px;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
+}

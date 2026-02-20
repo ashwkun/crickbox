@@ -35,6 +35,9 @@ export interface Match {
     match_id?: string; // Numeric ID used for scorecard/wallstream/AI summaries
     match_title?: string;
     genders?: string;
+    parent_series_name?: string;
+    championship_name?: string;
+    event_priority?: string;
 }
 
 // Player info in scorecard

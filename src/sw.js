@@ -1,5 +1,5 @@
 // Service Worker for box.cric PWA
-const CACHE_NAME = 'boxcric-v4';
+const CACHE_NAME = 'boxcric-v5';
 const STATIC_ASSETS = [
     '/',
     '/index.html'

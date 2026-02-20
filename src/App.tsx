@@ -16,9 +16,12 @@ import TournamentHub from './components/TournamentHub';
 import HowItWorks from './components/dev/HowItWorks';
 import FloatingNavbar, { NavTab } from './components/FloatingNavbar';
 import PlayPage from './components/play/PlayPage';
+import Dream11Page from './components/dream11/Dream11Page';
+import Dream11MatchView from './components/dream11/Dream11MatchView';
+import Dream11Playground from './components/dream11/Dream11Playground';
 
 // --- Navigation Types ---
-export type ViewType = 'HOME' | 'MATCH' | 'SERIES' | 'TOURNAMENT' | 'UPCOMING_LIST' | 'COMPLETED_LIST' | 'HOW_IT_WORKS';
+export type ViewType = 'HOME' | 'MATCH' | 'SERIES' | 'TOURNAMENT' | 'UPCOMING_LIST' | 'COMPLETED_LIST' | 'HOW_IT_WORKS' | 'DR11' | 'DR11_MATCH' | 'DR11_PLAYGROUND';
 
 interface ViewItem {
     type: ViewType;
@@ -29,7 +32,7 @@ interface ViewItem {
 import { useFirebaseAuth } from './utils/useFirebaseAuth';
 
 export default function App(): React.ReactElement {
-    const { matches, loading, isRefreshing, fetchScorecard, fetchExtendedResults, fetchWallstream, fetchByDateRange } = useCricketData();
+    const { matches, loading, isRefreshing, fetchScorecard, fetchExtendedResults, fetchWallstream, fetchByDateRange, matchFilterLevel, setMatchFilterLevel, excludeWomens, setExcludeWomens } = useCricketData();
     const { user } = useFirebaseAuth(); // Authenticated user for Header
 
     const [headerData, setHeaderData] = useState<HeaderDisplayData | null>(null);
@@ -101,6 +104,18 @@ export default function App(): React.ReactElement {
                 path = '/howitworks';
                 query = '';
                 break;
+            case 'DR11':
+                path = '/dr11';
+                query = '';
+                break;
+            case 'DR11_MATCH':
+                path = '/dr11';
+                query = `?match=${view.id}`;
+                break;
+            case 'DR11_PLAYGROUND':
+                path = '/dr11';
+                query = '?playground=true';
+                break;
             case 'HOME':
             default:
                 query = '';
@@ -170,10 +185,10 @@ export default function App(): React.ReactElement {
         const matchId = params.get('match');
         const seriesId = params.get('series');
         const tournamentId = params.get('tournament');
-        const tournamentId = params.get('tournament');
         const upcoming = params.get('upcoming'); // check string 'true'
         const results = params.get('results');
         const isGuide = window.location.pathname.replace(/\/$/, '') === '/howitworks';
+        const isDr11 = window.location.pathname.replace(/\/$/, '') === '/dr11';
 
         const initialStack: ViewItem[] = [{ type: 'HOME' }];
 
@@ -181,7 +196,12 @@ export default function App(): React.ReactElement {
         // Simple: Just push the specific deep link view.
         // We don't know parent series for a match without fetching.
 
-        if (matchId) {
+        if (isDr11) {
+            initialStack.push({ type: 'DR11' });
+            if (matchId) {
+                initialStack.push({ type: 'DR11_MATCH', id: matchId });
+            }
+        } else if (matchId) {
             initialStack.push({ type: 'MATCH', id: matchId });
             setPendingMatchId(matchId);
         } else if (seriesId) {
@@ -216,10 +236,11 @@ export default function App(): React.ReactElement {
             const upcoming = params.get('upcoming');
             const results = params.get('results');
             const isGuide = window.location.pathname.replace(/\/$/, '') === '/howitworks';
+            const isDr11 = window.location.pathname.replace(/\/$/, '') === '/dr11';
 
             setViewStack(prev => {
                 // If we are at Home URL
-                if (!matchId && !seriesId && !tournamentId && !upcoming && !results && !isGuide) {
+                if (!matchId && !seriesId && !tournamentId && !upcoming && !results && !isGuide && !isDr11) {
                     return [{ type: 'HOME' }];
                 }
 
@@ -231,7 +252,11 @@ export default function App(): React.ReactElement {
                 // Home -> Target
 
                 const newStack: ViewItem[] = [{ type: 'HOME' }];
-                if (matchId) newStack.push({ type: 'MATCH', id: matchId });
+                if (isDr11) {
+                    newStack.push({ type: 'DR11' });
+                    if (matchId) newStack.push({ type: 'DR11_MATCH', id: matchId });
+                }
+                else if (matchId) newStack.push({ type: 'MATCH', id: matchId });
                 else if (seriesId) newStack.push({ type: 'SERIES', id: seriesId });
                 else if (tournamentId) newStack.push({ type: 'TOURNAMENT', id: tournamentId });
                 else if (upcoming === 'true') newStack.push({ type: 'UPCOMING_LIST' });
@@ -449,12 +474,16 @@ export default function App(): React.ReactElement {
             <FloatingHeader
                 showBack={currentView.type !== 'HOME'}
                 onBack={handleBack}
-                onLogoClick={() => window.location.href = '/'}
+                onLogoClick={() => {
+                    window.history.pushState({}, '', '/dr11');
+                    setViewStack([{ type: 'HOME' }, { type: 'DR11' }]);
+                }}
                 data={headerData}
                 isLive={currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'L'}
                 isUpcoming={currentView?.type === 'UPCOMING_LIST' || (currentView?.type === 'MATCH' && (currentView.data as Match)?.event_state === 'U')}
                 isPast={currentView?.type === 'COMPLETED_LIST' || (currentView?.type === 'MATCH' && !!currentView.data && (currentView.data as Match)?.event_state !== 'L' && (currentView.data as Match)?.event_state !== 'U')}
                 isPlay={activeTab === 'PLAY' && currentView.type === 'HOME'}
+                isDr11={currentView?.type === 'DR11' || currentView?.type === 'DR11_MATCH' || currentView?.type === 'DR11_PLAYGROUND'}
                 user={user}
             />
 
@@ -469,10 +498,6 @@ export default function App(): React.ReactElement {
                         loading={loading}
                         fetchExtendedResults={fetchExtendedResults}
                         onSelectMatch={handleSelectMatch}
-
-                        // Legacy props neutralized
-                        selectedSeries={null}
-                        selectedTournament={null}
                         onOpenSeries={(sid, m) => handleOpenSeries(sid, m)}
                         onCloseSeries={() => { }}
                         onOpenTournament={handleOpenTournament}
@@ -487,6 +512,10 @@ export default function App(): React.ReactElement {
 
                         isVisible={viewStack.length === 1}
                         isRefreshing={isRefreshing}
+                        matchFilterLevel={matchFilterLevel}
+                        setMatchFilterLevel={setMatchFilterLevel}
+                        excludeWomens={excludeWomens}
+                        setExcludeWomens={setExcludeWomens}
                     />
                 ) : (
                     <PlayPage isVisible={viewStack.length === 1} />
@@ -630,6 +659,40 @@ export default function App(): React.ReactElement {
                                         setViewStack([{ type: 'HOME' }]);
                                     }}
                                 />
+                            </div>
+                        );
+                    case 'DR11':
+                        return (
+                            <div key="dr11" style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-primary)', overflowY: 'auto' }}>
+                                <div style={{ height: 85 }}></div>
+                                <Dream11Page
+                                    matches={matches}
+                                    onMatchClick={(m) => {
+                                        handleNavigate({ type: 'DR11_MATCH', id: m.game_id, data: m });
+                                    }}
+                                    onPlayground={() => {
+                                        handleNavigate({ type: 'DR11_PLAYGROUND' });
+                                    }}
+                                    isVisible={isVisible}
+                                />
+                            </div>
+                        );
+                    case 'DR11_MATCH':
+                        return (
+                            <div key={`dr11-${view.id}`} style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-primary)', overflowY: 'auto' }}>
+                                <div style={{ height: 85 }}></div>
+                                <Dream11MatchView
+                                    match={activeData || view.data}
+                                    onBack={handleBack}
+                                    isVisible={isVisible}
+                                />
+                            </div>
+                        );
+                    case 'DR11_PLAYGROUND':
+                        return (
+                            <div key="dr11-playground" style={{ position: 'fixed', inset: 0, zIndex, background: 'var(--bg-primary)', overflowY: 'auto' }}>
+                                <div style={{ height: 85 }}></div>
+                                <Dream11Playground onBack={handleBack} />
                             </div>
                         );
                     default:

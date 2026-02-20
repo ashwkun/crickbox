@@ -4,6 +4,16 @@ import { safeSetItem } from './storage';
 import { Match, Scorecard, MatchesResponse } from '../types';
 import { H2HData, BatsmanSplitsResponse, OverByOverResponse, SquadData } from './h2hApi';
 import { WallstreamData, BallData, extractMatchId } from './wallstreamApi';
+import { getMatchPriority, isWomensMatch } from './matchPriority';
+
+// Match filter levels:
+// 1 = Strict: ICC World Cups + Top team internationals + IPL only (priority ≤ 4)
+// 2 = Moderate: Above + all premium leagues + top women's (priority ≤ 15) — DEFAULT
+// 3 = All: No filter
+export type MatchFilterLevel = 1 | 2 | 3;
+const MATCH_FILTER_KEY = 'boxcric_match_filter_level';
+const EXCLUDE_WOMENS_KEY = 'boxcric_exclude_womens';
+const MATCH_FILTER_THRESHOLDS: Record<MatchFilterLevel, number> = { 1: 4, 2: 15, 3: Infinity };
 
 const CACHE_KEY = 'wisden_matches_v6';
 const LIVE_INTERVAL_FAST = 15000; // 15 seconds when live matches exist
@@ -80,13 +90,45 @@ interface UseCricketDataReturn {
     fetchBatsmanSplits: (gameId: string, innings: number) => Promise<BatsmanSplitsResponse | null>;
     fetchOverByOver: (gameId: string, innings: number) => Promise<OverByOverResponse | null>;
     fetchSeriesInfo: (seriesId: string) => Promise<any | null>;
+    fetchByDateRange: (startDate: Date, endDate: Date) => Promise<void>;
     isRefreshing: boolean;
+    matchFilterLevel: MatchFilterLevel;
+    setMatchFilterLevel: (level: MatchFilterLevel) => void;
+    excludeWomens: boolean;
+    setExcludeWomens: (exclude: boolean) => void;
 }
 
 export default function useCricketData(): UseCricketDataReturn {
     const [matches, setMatches] = useState<Match[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [isRefreshing, setIsRefreshing] = useState<boolean>(true);
+
+    // Match filter level (persisted)
+    const [matchFilterLevel, setMatchFilterLevelState] = useState<MatchFilterLevel>(() => {
+        const saved = localStorage.getItem(MATCH_FILTER_KEY);
+        return (saved ? parseInt(saved) : 2) as MatchFilterLevel;
+    });
+    const matchFilterRef = useRef(matchFilterLevel);
+
+    // Exclude women's matches (persisted)
+    const [excludeWomens, setExcludeWomensState] = useState<boolean>(() => {
+        return localStorage.getItem(EXCLUDE_WOMENS_KEY) === 'true';
+    });
+    const excludeWomensRef = useRef(excludeWomens);
+
+    const setMatchFilterLevel = useCallback((level: MatchFilterLevel) => {
+        setMatchFilterLevelState(level);
+        matchFilterRef.current = level;
+        localStorage.setItem(MATCH_FILTER_KEY, String(level));
+        recomputeMatches();
+    }, []);
+
+    const setExcludeWomens = useCallback((exclude: boolean) => {
+        setExcludeWomensState(exclude);
+        excludeWomensRef.current = exclude;
+        localStorage.setItem(EXCLUDE_WOMENS_KEY, String(exclude));
+        recomputeMatches();
+    }, []);
 
     // BUCKETS STATE: Store data in separate silos to prevent "ghost" records
     const bucketsRef = useRef({
@@ -109,9 +151,15 @@ export default function useCricketData(): UseCricketDataReturn {
         // Priority 1: Live matches (Overwrites Upcoming/Completed - Source of Truth)
         live.forEach(m => merged.set(m.game_id, m));
 
-        const finalArray = Array.from(merged.values());
+        const allMatches = Array.from(merged.values());
+        const threshold = MATCH_FILTER_THRESHOLDS[matchFilterRef.current];
+        const finalArray = allMatches.filter(m => {
+            if (threshold !== Infinity && getMatchPriority(m) > threshold) return false;
+            if (excludeWomensRef.current && isWomensMatch(m)) return false;
+            return true;
+        });
         setMatches(finalArray);
-        safeSetItem(CACHE_KEY, JSON.stringify(finalArray));
+        safeSetItem(CACHE_KEY, JSON.stringify(allMatches)); // Cache ALL, filter is UI-only
     };
 
     const updateBucket = (type: 'live' | 'upcoming' | 'completed', newMatches: Match[]) => {
@@ -568,6 +616,10 @@ export default function useCricketData(): UseCricketDataReturn {
         fetchBatsmanSplits,
         fetchOverByOver,
         fetchSeriesInfo,
-        fetchByDateRange
+        fetchByDateRange,
+        matchFilterLevel,
+        setMatchFilterLevel,
+        excludeWomens,
+        setExcludeWomens,
     };
 }

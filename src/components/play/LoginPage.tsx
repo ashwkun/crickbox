@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { LuMail, LuRefreshCw, LuCheck, LuArrowRight } from 'react-icons/lu';
+import React from 'react';
 
 interface LoginPageProps {
     onGoogleSignIn: () => void;
-    onMagicLink: (email: string) => Promise<{ error: any }>;
 }
 
 /**
@@ -12,31 +10,7 @@ interface LoginPageProps {
  * Redesigned with Glassmorphic Card Style
  * Theme: Hot Pink (#ec4899)
  */
-const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) => {
-    const [email, setEmail] = useState('');
-    const [emailSent, setEmailSent] = useState(false);
-    const [emailLoading, setEmailLoading] = useState(false);
-    const [emailError, setEmailError] = useState('');
-
-    const handleMagicLink = async () => {
-        if (!email || !email.includes('@')) {
-            setEmailError('Please enter a valid email');
-            return;
-        }
-
-        setEmailLoading(true);
-        setEmailError('');
-        const { error } = await onMagicLink(email);
-        setEmailLoading(false);
-
-        // For real emails, show the "email sent" state
-        if (!error) {
-            setEmailSent(true);
-        } else {
-            setEmailError('Failed to send link. Try again.');
-        }
-    };
-
+const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn }) => {
     return (
         <div style={{
             minHeight: 'calc(100vh - 85px)',
@@ -139,7 +113,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
                         fontSize: 15,
                         fontWeight: 700,
                         cursor: 'pointer',
-                        marginBottom: 20,
+                        marginBottom: 10,
                         transition: 'transform 0.2s ease, opacity 0.2s ease',
                         boxShadow: '0 4px 12px rgba(255, 255, 255, 0.1)',
                     }}
@@ -154,138 +128,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onGoogleSignIn, onMagicLink }) =>
                     </svg>
                     Continue with Google
                 </button>
-
-                {/* Divider */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    width: '100%',
-                    gap: 12,
-                    marginBottom: 20,
-                }}>
-                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
-                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>OR EMAIL</span>
-                    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.08)' }} />
-                </div>
-
-                {/* Magic Link Section */}
-                {!emailSent ? (
-                    <div style={{ width: '100%' }}>
-                        <div style={{
-                            position: 'relative',
-                            marginBottom: 8,
-                        }}>
-                            <input
-                                type="email"
-                                placeholder="name@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleMagicLink()}
-                                style={{
-                                    width: '100%',
-                                    padding: '16px',
-                                    paddingRight: 50,
-                                    borderRadius: 16,
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    background: 'rgba(0,0,0,0.2)',
-                                    color: '#fff',
-                                    fontSize: 15,
-                                    outline: 'none',
-                                    transition: 'border-color 0.2s',
-                                    fontFamily: 'inherit'
-                                }}
-                                onFocus={(e) => e.target.style.borderColor = 'rgba(236, 72, 153, 0.5)'}
-                                onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-                            />
-                            <button
-                                onClick={handleMagicLink}
-                                disabled={emailLoading}
-                                style={{
-                                    position: 'absolute',
-                                    right: 8,
-                                    top: 8,
-                                    bottom: 8,
-                                    width: 40,
-                                    borderRadius: 10,
-                                    border: 'none',
-                                    background: emailLoading ? 'rgba(255,255,255,0.1)' : '#ec4899',
-                                    color: '#fff',
-                                    cursor: emailLoading ? 'default' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    transition: 'background 0.2s',
-                                }}
-                            >
-                                {emailLoading ? (
-                                    <LuRefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} />
-                                ) : (
-                                    <LuArrowRight size={20} />
-                                )}
-                            </button>
-                        </div>
-                        {emailError && (
-                            <p style={{ fontSize: 13, color: '#ef4444', margin: '8px 0 0', textAlign: 'left', paddingLeft: 4 }}>
-                                {emailError}
-                            </p>
-                        )}
-                    </div>
-                ) : (
-                    <div style={{
-                        width: '100%',
-                        padding: '24px',
-                        background: 'rgba(34, 197, 94, 0.08)',
-                        border: '1px solid rgba(34, 197, 94, 0.2)',
-                        borderRadius: 20,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 12
-                    }}>
-                        <div style={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: '50%',
-                            background: 'rgba(34, 197, 94, 0.2)',
-                            border: '1px solid rgba(34, 197, 94, 0.3)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}>
-                            <LuCheck size={24} color="#22c55e" />
-                        </div>
-
-                        <div style={{ textAlign: 'center' }}>
-                            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>Check Your Inbox</h3>
-                            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.4 }}>
-                                We sent a secure link to<br />
-                                <strong style={{ color: '#fff' }}>{email}</strong>
-                            </p>
-                            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '8px 0 0', fontStyle: 'italic' }}>
-                                (Check spam if you don't see it)
-                            </p>
-                        </div>
-
-                        <button
-                            onClick={() => setEmailSent(false)}
-                            style={{
-                                marginTop: 4,
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'rgba(255, 255, 255, 0.5)',
-                                fontSize: 12,
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                textDecoration: 'underline'
-                            }}
-                        >
-                            Use different email
-                        </button>
-                    </div>
-                )}
             </div>
-
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
     );
 };
