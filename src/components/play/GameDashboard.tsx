@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { LuCalendarClock, LuUser, LuSwords, LuChevronRight } from 'react-icons/lu';
+import { LuCalendarClock, LuUser, LuSwords, LuChevronRight, LuZap } from 'react-icons/lu';
 import { User } from 'firebase/auth';
 import useCricketData from '../../utils/useCricketData';
 import { useFantasyTeam } from '../../utils/useFantasyTeam';
@@ -25,34 +25,152 @@ const useCountdown = (targetDate: string) => {
     const m = Math.floor((diff % 3_600_000) / 60_000);
     const s = Math.floor((diff % 60_000) / 1000);
     const pad = (n: number) => String(n).padStart(2, '0');
-    return { h, m, s, total: diff, display: `${pad(h)}:${pad(m)}:${pad(s)}` };
+    return { h, m, s, total: diff, pad };
 };
 
-/* ── Countdown Badge ───────────────────────────────────────────── */
-const CountdownBadge: React.FC<{ startDate: string }> = ({ startDate }) => {
-    const { display, h } = useCountdown(startDate);
-    // Color: green > amber > red as time decreases
-    const color = h < 2 ? '#ef4444' : h < 6 ? '#f59e0b' : '#22c55e';
+/* ── Flip Clock Digit ──────────────────────────────────────────── */
+const Digit: React.FC<{ value: string; color: string }> = ({ value, color }) => (
+    <div style={{
+        background: 'rgba(0,0,0,0.5)', borderRadius: 6, padding: '4px 6px',
+        minWidth: 28, textAlign: 'center', fontSize: 18, fontWeight: 900,
+        fontFamily: 'monospace', color, lineHeight: 1,
+        border: `1px solid ${color}22`,
+        fontVariantNumeric: 'tabular-nums',
+    }}>
+        {value}
+    </div>
+);
+
+const ClockSeparator: React.FC<{ color: string }> = ({ color }) => (
+    <span style={{ fontSize: 16, fontWeight: 900, color, opacity: 0.5, lineHeight: 1 }}>:</span>
+);
+
+/* ── Countdown Card (< 24h) ────────────────────────────────────── */
+const CountdownCard: React.FC<{
+    match: any; team: any; onClick: () => void;
+}> = ({ match, team, onClick }) => {
+    const t1 = match.participants?.[0];
+    const t2 = match.participants?.[1];
+    const team1 = t1?.name || 'TBC';
+    const team2 = t2?.name || 'TBC';
+    const c1 = getTeamColor(team1) || '#1a1a2e';
+    const c2 = getTeamColor(team2) || '#1a1a2e';
+    const { h, m, s, pad } = useCountdown(match.start_date);
+    const urgency = h < 2 ? '#ef4444' : h < 6 ? '#f59e0b' : '#4ade80';
+
     return (
-        <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            fontVariantNumeric: 'tabular-nums',
+        <div onClick={onClick} style={{
+            position: 'relative', overflow: 'hidden', borderRadius: 20,
+            cursor: 'pointer', border: '1px solid rgba(255,255,255,0.08)',
+            background: '#0a0a12',
         }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, animation: h < 2 ? 'pulse 1.5s infinite' : 'none' }} />
-            <span style={{ fontSize: 13, fontWeight: 900, color, letterSpacing: '1px', fontFamily: 'monospace' }}>
-                {display}
-            </span>
+            {/* Background glow from team colors */}
+            <div style={{
+                position: 'absolute', inset: 0, opacity: 0.15,
+                background: `linear-gradient(135deg, ${c1} 0%, transparent 50%, ${c2} 100%)`,
+            }} />
+
+            {/* Series strip */}
+            <div style={{
+                position: 'relative', zIndex: 1, padding: '10px 16px',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                borderBottom: '1px solid rgba(255,255,255,0.04)',
+            }}>
+                <div style={{
+                    fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+                    textTransform: 'uppercase', letterSpacing: '1px',
+                    maxWidth: '70%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>
+                    {match.series_name || match.championship_name}
+                </div>
+                <div style={{
+                    fontSize: 9, fontWeight: 800, color: urgency,
+                    textTransform: 'uppercase', letterSpacing: '1px',
+                    display: 'flex', alignItems: 'center', gap: 4,
+                }}>
+                    <div style={{
+                        width: 5, height: 5, borderRadius: '50%', background: urgency,
+                        animation: h < 2 ? 'pulse 1.5s infinite' : 'none',
+                    }} />
+                    STARTS SOON
+                </div>
+            </div>
+
+            {/* Main content: Team — Countdown — Team */}
+            <div style={{
+                position: 'relative', zIndex: 1,
+                display: 'flex', alignItems: 'center', padding: '16px',
+                gap: 12,
+            }}>
+                {/* Team 1 */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 56, height: 56 }}>
+                        <WikiImage name={team1} id={t1?.id} type="team"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    </div>
+                    <span style={{
+                        fontWeight: 800, fontSize: 11, color: '#fff', textTransform: 'uppercase',
+                        letterSpacing: '0.5px', textAlign: 'center', lineHeight: 1.2,
+                    }}>{team1}</span>
+                </div>
+
+                {/* Countdown Center */}
+                <div style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                    flexShrink: 0,
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <Digit value={pad(h)} color={urgency} />
+                        <ClockSeparator color={urgency} />
+                        <Digit value={pad(m)} color={urgency} />
+                        <ClockSeparator color={urgency} />
+                        <Digit value={pad(s)} color={urgency} />
+                    </div>
+                    <div style={{
+                        display: 'flex', gap: 18, fontSize: 8, fontWeight: 600,
+                        color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '1px',
+                    }}>
+                        <span>HRS</span><span>MIN</span><span>SEC</span>
+                    </div>
+                </div>
+
+                {/* Team 2 */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 56, height: 56 }}>
+                        <WikiImage name={team2} id={t2?.id} type="team"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    </div>
+                    <span style={{
+                        fontWeight: 800, fontSize: 11, color: '#fff', textTransform: 'uppercase',
+                        letterSpacing: '0.5px', textAlign: 'center', lineHeight: 1.2,
+                    }}>{team2}</span>
+                </div>
+            </div>
+
+            {/* CTA */}
+            <div style={{ position: 'relative', zIndex: 1, padding: '0 16px 14px' }}>
+                <button style={{
+                    width: '100%', padding: '11px', borderRadius: 12, border: 'none',
+                    fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    cursor: 'pointer',
+                    ...(team
+                        ? { background: 'rgba(34,197,94,0.12)', color: '#4ade80' }
+                        : { background: `linear-gradient(135deg, ${c1}90, ${c2}90)`, color: '#fff' }
+                    ),
+                }}>
+                    {team ? <><LuUser size={13} /> Squad Ready</> : <><LuSwords size={13} /> Build Squad</>}
+                    <LuChevronRight size={13} style={{ opacity: 0.5 }} />
+                </button>
+            </div>
         </div>
     );
 };
 
-/* ── Shared Match Card ─────────────────────────────────────────── */
+/* ── Standard Match Card (live/completed + upcoming > 24h) ─────── */
 const MatchCard: React.FC<{
-    match: any;
-    team: any;
-    onClick: () => void;
-    variant: 'live' | 'upcoming';
-    dateStr?: string;
+    match: any; team: any; onClick: () => void;
+    variant: 'live' | 'upcoming'; dateStr?: string;
 }> = ({ match, team, onClick, variant, dateStr }) => {
     const t1 = match.participants?.[0];
     const t2 = match.participants?.[1];
@@ -60,10 +178,7 @@ const MatchCard: React.FC<{
     const team2 = t2?.name || 'TBC';
     const c1 = getTeamColor(team1) || '#1a1a2e';
     const c2 = getTeamColor(team2) || '#1a1a2e';
-
     const isLive = match.event_state === 'L';
-    const hoursAway = (new Date(match.start_date).getTime() - Date.now()) / 3_600_000;
-    const showCountdown = variant === 'upcoming' && hoursAway > 0 && hoursAway < 24;
 
     return (
         <div onClick={onClick} style={{
@@ -72,16 +187,12 @@ const MatchCard: React.FC<{
         }}>
             {/* ── Background: Diagonal Split ── */}
             <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-                {/* Full left color */}
                 <div style={{ position: 'absolute', inset: 0, backgroundColor: c1 }} />
-                {/* Right color with diagonal clip */}
                 <div style={{
                     position: 'absolute', inset: 0, backgroundColor: c2,
                     clipPath: 'polygon(42% 0, 100% 0, 100% 100%, 58% 100%)',
                 }} />
-                {/* Dark overlay for readability */}
                 <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)' }} />
-                {/* Diagonal seam accent */}
                 <div style={{
                     position: 'absolute', inset: 0, zIndex: 1,
                     background: 'linear-gradient(115deg, transparent 46%, rgba(255,255,255,0.08) 49%, rgba(255,255,255,0.08) 51%, transparent 54%)',
@@ -90,8 +201,7 @@ const MatchCard: React.FC<{
 
             {/* ── Top Strip ── */}
             <div style={{
-                position: 'relative', zIndex: 2,
-                padding: '10px 16px',
+                position: 'relative', zIndex: 2, padding: '10px 16px',
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 borderBottom: '1px solid rgba(255,255,255,0.06)',
                 background: 'rgba(0,0,0,0.25)',
@@ -119,8 +229,6 @@ const MatchCard: React.FC<{
                     <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         Pts <span style={{ fontSize: 20, fontWeight: 900, color: '#fff', marginLeft: 4, letterSpacing: '-1px' }}>{team?.total_points ?? '–'}</span>
                     </div>
-                ) : showCountdown ? (
-                    <CountdownBadge startDate={match.start_date} />
                 ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 700 }}>
                         <LuCalendarClock size={12} /> {dateStr}
@@ -133,18 +241,16 @@ const MatchCard: React.FC<{
                 position: 'relative', zIndex: 2,
                 display: 'flex', alignItems: 'center', padding: '20px 16px',
             }}>
-                {/* Team 1 */}
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 52, height: 52, flexShrink: 0 }}>
                         <WikiImage name={team1} id={t1?.id} type="team"
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.4))' }} />
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                     <span style={{ fontWeight: 800, fontSize: 13, color: '#fff', lineHeight: 1.25, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
                         {team1}
                     </span>
                 </div>
 
-                {/* VS */}
                 <div style={{
                     flexShrink: 0, width: 44, textAlign: 'center',
                     fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.3)',
@@ -153,14 +259,13 @@ const MatchCard: React.FC<{
                     VS
                 </div>
 
-                {/* Team 2 */}
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'flex-end', textAlign: 'right' }}>
                     <span style={{ fontWeight: 800, fontSize: 13, color: '#fff', lineHeight: 1.25, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
                         {team2}
                     </span>
                     <div style={{ width: 52, height: 52, flexShrink: 0 }}>
                         <WikiImage name={team2} id={t2?.id} type="team"
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.4))' }} />
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                 </div>
             </div>
@@ -172,7 +277,7 @@ const MatchCard: React.FC<{
                         width: '100%', padding: '12px', borderRadius: 12, border: 'none',
                         fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                        cursor: 'pointer', transition: 'opacity 0.15s',
+                        cursor: 'pointer',
                         ...(team
                             ? { background: 'rgba(34,197,94,0.15)', color: '#4ade80' }
                             : { background: 'rgba(255,255,255,0.1)', color: '#fff' }
@@ -209,7 +314,6 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
 
     const loading = cricketLoading || teamsLoading;
 
-    // ── Detail views ──
     if (selectedMatchId) {
         const match = matches.find(m => m.game_id === selectedMatchId);
         const existingTeam = myTeams[selectedMatchId];
@@ -222,7 +326,6 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
         }
     }
 
-    // ── Helper: readable date ──
     const fmtDate = (iso: string) => {
         const d = new Date(iso);
         const now = new Date();
@@ -231,6 +334,11 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
         if (d.toDateString() === now.toDateString()) return `Today, ${time}`;
         if (d.toDateString() === tom.toDateString()) return `Tomorrow, ${time}`;
         return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    };
+
+    const isWithin24h = (iso: string) => {
+        const diff = new Date(iso).getTime() - Date.now();
+        return diff > 0 && diff < 24 * 3_600_000;
     };
 
     const sectionTitle = (icon: React.ReactNode, label: string) => (
@@ -277,10 +385,15 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut }) => {
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                                {upcomingMatches.map(m => (
-                                    <MatchCard key={m.game_id} match={m} team={myTeams[m.game_id]}
-                                        onClick={() => setSelectedMatchId(m.game_id)} variant="upcoming" dateStr={fmtDate(m.start_date)} />
-                                ))}
+                                {upcomingMatches.map(m =>
+                                    isWithin24h(m.start_date) ? (
+                                        <CountdownCard key={m.game_id} match={m} team={myTeams[m.game_id]}
+                                            onClick={() => setSelectedMatchId(m.game_id)} />
+                                    ) : (
+                                        <MatchCard key={m.game_id} match={m} team={myTeams[m.game_id]}
+                                            onClick={() => setSelectedMatchId(m.game_id)} variant="upcoming" dateStr={fmtDate(m.start_date)} />
+                                    )
+                                )}
                             </div>
                         )}
                     </div>
