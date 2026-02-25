@@ -128,14 +128,14 @@ export interface Dream11Prediction {
     error?: string;
 }
 
-// ============ WEIGHTS ============
+// ============ WEIGHTS (v3 — form-dominant) ============
 
 const WEIGHTS = {
-    TOURNAMENT_FORM: 0.35,
-    CAREER_STATS: 0.20,
-    ICC_RANKING: 0.15,
-    ROLE_VALUE: 0.15,
-    PITCH_FIT: 0.15,
+    TOURNAMENT_FORM: 0.55,
+    CAREER_STATS: 0.15,
+    ICC_RANKING: 0.05,
+    ROLE_VALUE: 0.20,
+    PITCH_FIT: 0.05,
 };
 
 // ============ D11 FANTASY POINTS (T20) ============
@@ -162,7 +162,9 @@ function normalize(value: number, min: number, max: number): number {
 }
 
 function recencyWeight(index: number): number {
-    return Math.max(0.3, 1.0 - index * 0.18);
+    // v3: flatter decay — older standout performances still matter
+    // 1.00, 0.90, 0.75, 0.60, 0.45
+    return Math.max(0.45, 1.0 - index * 0.15);
 }
 
 function mapD11Role(
@@ -506,14 +508,27 @@ function scoreRoleValue(
     isCaptain: boolean,
     isKeeper: boolean,
     d11Role: D11Role,
-    battingPosition?: number
+    battingPosition?: number,
+    batInningsCount: number = 0,
+    bowlInningsCount: number = 0
 ): RoleValueBreakdown {
     let multiplier = 1.0;
     const reasoning: string[] = [];
 
     if (d11Role === 'AR') {
-        multiplier = 1.25;
-        reasoning.push('All-rounder: 1.25× (multi-point source)');
+        // v3: AR bonus proportional to actual dual contribution
+        // Full 1.25× only if they have both bat AND bowl innings
+        // Otherwise closer to 1.10× (still some credit for versatility)
+        if (batInningsCount >= 2 && bowlInningsCount >= 2) {
+            multiplier = 1.25;
+            reasoning.push('All-rounder (proven dual): 1.25×');
+        } else if (batInningsCount >= 1 && bowlInningsCount >= 1) {
+            multiplier = 1.18;
+            reasoning.push('All-rounder (some dual): 1.18×');
+        } else {
+            multiplier = 1.10;
+            reasoning.push('All-rounder (single-skill so far): 1.10×');
+        }
     } else if (d11Role === 'WK') {
         multiplier = 1.15;
         reasoning.push('WK-Batter: 1.15× (catches + stumpings + batting)');
@@ -572,11 +587,12 @@ function scorePitchFit(
         playerType = 'power-hitter';
     }
 
+    // v3: much less extreme pitch differentiation — floor raised to 50
     if (pitch.includes('bat') || pitch.includes('flat')) {
-        if (playerType.includes('bat') || playerType === 'power-hitter') { score = 75; reasoning.push('Batting pitch → batters boosted'); }
-        else if (playerType === 'pace-bowler') { score = 35; reasoning.push('Batting pitch → pacers suppressed'); }
-        else if (playerType === 'spin-bowler') { score = 40; reasoning.push('Batting pitch → spinners suppressed'); }
-        else { score = 60; reasoning.push('Batting pitch → AR slightly boosted'); }
+        if (playerType.includes('bat') || playerType === 'power-hitter') { score = 65; reasoning.push('Batting pitch → batters slightly boosted'); }
+        else if (playerType === 'pace-bowler') { score = 50; reasoning.push('Batting pitch → pacers neutral'); }
+        else if (playerType === 'spin-bowler') { score = 50; reasoning.push('Batting pitch → spinners neutral'); }
+        else { score = 55; reasoning.push('Batting pitch → AR neutral'); }
     } else if (pitch.includes('bowl') || pitch.includes('seam') || pitch.includes('pace')) {
         if (playerType === 'pace-bowler') { score = 80; reasoning.push('Seaming pitch → pacers boosted'); }
         else if (playerType === 'top-order-bat') { score = 40; reasoning.push('Seaming → top-order risk'); }
@@ -644,13 +660,29 @@ function buildTeam(allPlayers: PlayerScore[], logs: string[]): { selected: Playe
         logs.push(`Added ${player.role}: ${player.name} (${player.totalScore.toFixed(1)})`);
     }
 
-    // Captain & Vice-Captain: top 2 by score, no team preference
-    const selectedSorted = [...selected].sort((a, b) => b.totalScore - a.totalScore);
-    const captain = selectedSorted[0];
-    const viceCaptain = selectedSorted[1];
+    // v3: Captain & Vice-Captain — form-weighted score with consistency + ceiling bonus
+    const selectedWithCaptainScore = selected.map(p => {
+        const formScore = p.tournamentForm.score;
+        const consistency = p.tournamentForm.reasoning.includes('Consistent') ? 15
+            : p.tournamentForm.reasoning.includes('Moderate') ? 8 : 0;
+        // Ceiling bonus: reward players with at least one big FP match
+        const matchFPs = p.tournamentForm.matchByMatch.map(m => {
+            let fp = 0;
+            if (m.runs !== undefined && m.balls !== undefined) fp += calcBatFP(m.runs, m.balls, m.fours || 0, m.sixes || 0);
+            if (m.wickets !== undefined && m.bowlingRuns !== undefined && m.overs !== undefined) fp += calcBowlFP(m.wickets, m.bowlingRuns, m.overs);
+            return fp;
+        });
+        const maxFP = matchFPs.length > 0 ? Math.max(...matchFPs) : 0;
+        const ceilingBonus = maxFP >= 80 ? 15 : maxFP >= 50 ? 8 : 0;
+        const captainScore = p.totalScore * 0.35 + formScore * 0.35 + consistency + ceilingBonus;
+        return { player: p, captainScore };
+    }).sort((a, b) => b.captainScore - a.captainScore);
 
-    logs.push(`Captain: ${captain.name} (${captain.totalScore.toFixed(1)}) — highest score`);
-    logs.push(`Vice-Captain: ${viceCaptain.name} (${viceCaptain.totalScore.toFixed(1)}) — 2nd highest`);
+    const captain = selectedWithCaptainScore[0].player;
+    const viceCaptain = selectedWithCaptainScore[1].player;
+
+    logs.push(`Captain: ${captain.name} (total=${captain.totalScore.toFixed(1)}, captainScore=${selectedWithCaptainScore[0].captainScore.toFixed(1)}) — form-weighted`);
+    logs.push(`Vice-Captain: ${viceCaptain.name} (total=${viceCaptain.totalScore.toFixed(1)}, captainScore=${selectedWithCaptainScore[1].captainScore.toFixed(1)}) — form-weighted`);
     logs.push(`Composition: WK=${roleCounts.WK}, BAT=${roleCounts.BAT}, AR=${roleCounts.AR}, BOWL=${roleCounts.BOWL}`);
     logs.push(`From ${Object.entries(teamCounts).map(([id, c]) => `team ${id}: ${c}`).join(', ')}`);
 
@@ -764,7 +796,7 @@ export async function predictDream11(gameId: string, excludeMatchId?: string): P
             const tournamentForm = scoreTournamentForm(rawPlayer.id, batInnings, bowlInnings, role);
             const careerStats = scoreCareerStats(p);
             const iccRanking = scoreICCRanking(rawPlayer.id, h2hData, rawPlayer.teamId, careerStats.score);
-            const roleValue = scoreRoleValue(p.Skill_Name || '', p.Role || '', isCaptain, isKeeper, role, avgBatPos);
+            const roleValue = scoreRoleValue(p.Skill_Name || '', p.Role || '', isCaptain, isKeeper, role, avgBatPos, batInnings.length, bowlInnings.length);
             const pitchFit = scorePitchFit(role, p.Batting?.Style || '', p.Bowling?.Style || '', pitchType, avgSpeed, avgBatPos);
 
             const totalScore =
