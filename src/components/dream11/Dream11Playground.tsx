@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../utils/supabaseClient';
-import { predictDream11, fetchScorecard, calcBatFP, calcBowlFP, D11 } from '../../utils/dream11Predictor';
+import { predictDream11, fetchScorecard } from '../../utils/dream11Predictor';
+import { calcRealTimeBatFP, calcRealTimeBowlFP } from '../../utils/fantasyPoints';
 
 interface CompletedMatch {
     id: string;
@@ -61,7 +62,7 @@ function calculateActualFP(scorecard: any): Map<string, { batFP: number; bowlFP:
             const balls = parseInt(bat.Balls) || 0;
             const fours = parseInt(bat.Fours) || 0;
             const sixes = parseInt(bat.Sixes) || 0;
-            const fp = calcBatFP(runs, balls, fours, sixes);
+            const fp = calcRealTimeBatFP({ runs, balls, fours, sixes }, 'T20');
 
             const existing = fpMap.get(playerId) || { batFP: 0, bowlFP: 0, totalFP: 0, batDetail: '', bowlDetail: '' };
             existing.batFP += fp;
@@ -79,7 +80,10 @@ function calculateActualFP(scorecard: any): Map<string, { batFP: number; bowlFP:
             const wickets = parseInt(bowl.Wickets) || 0;
             const runs = parseInt(bowl.Runs) || 0;
             const overs = parseFloat(bowl.Overs) || 0;
-            const fp = calcBowlFP(wickets, runs, overs);
+            const dots = parseInt(bowl.Dots) || 0;
+            const maidens = parseInt(bowl.Maidens) || 0;
+
+            const fp = calcRealTimeBowlFP({ wickets, runsConceded: runs, overs, dots, maidens, lbwBowled: 0 }, 'T20');
 
             const existing = fpMap.get(playerId) || { batFP: 0, bowlFP: 0, totalFP: 0, batDetail: '', bowlDetail: '' };
             existing.bowlFP += fp;

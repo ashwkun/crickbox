@@ -3,7 +3,8 @@ import { Match, Scorecard } from '../../types';
 import { User } from 'firebase/auth';
 import { FantasyTeam } from '../../utils/useFantasyTeam';
 import { LuChevronLeft, LuShield, LuSwords, LuStar, LuTrophy, LuUser } from 'react-icons/lu';
-import { fetchScorecard, calcBatFP, calcBowlFP } from '../../utils/dream11Predictor';
+import { fetchScorecard } from '../../utils/dream11Predictor';
+import { calcRealTimeBatFP, calcRealTimeBowlFP, determineFantasyFormat } from '../../utils/fantasyPoints';
 import WikiImage from '../WikiImage';
 
 interface TeamViewProps {
@@ -36,7 +37,9 @@ export default function TeamView({ match, user, team, onBack }: TeamViewProps) {
             setError(null);
             try {
                 // Fetch full scorecard to calculate points
+                console.log('[TeamView] Fetching scorecard for', match.game_id);
                 const scorecard = await fetchScorecard(match.game_id);
+                console.log('[TeamView] Scorecard result:', scorecard ? 'OK' : 'NULL', 'has Teams:', !!scorecard?.Teams, 'has Innings:', !!scorecard?.Innings);
                 if (!scorecard || !scorecard.Teams) {
                     throw new Error('Scorecard not available yet.');
                 }
@@ -51,9 +54,12 @@ export default function TeamView({ match, user, team, onBack }: TeamViewProps) {
                         }
                     }
                 }
+                console.log('[TeamView] playerMeta size:', playerMeta.size);
 
                 // Calculate FP for all players in scorecard
                 const fpMap = new Map<string, { batFP: number; bowlFP: number; totalFP: number }>();
+                const format = determineFantasyFormat(match as any, scorecard);
+                console.log('[TeamView] format:', format, 'innings count:', scorecard.Innings?.length ?? 0);
 
                 const innings = scorecard?.Innings || [];
                 if (Array.isArray(innings)) {
@@ -62,7 +68,7 @@ export default function TeamView({ match, user, team, onBack }: TeamViewProps) {
                         for (const bat of batsmen) {
                             const pId = bat.Batsman;
                             if (!pId) continue;
-                            const fp = calcBatFP(parseInt(bat.Runs) || 0, parseInt(bat.Balls) || 0, parseInt(bat.Fours) || 0, parseInt(bat.Sixes) || 0);
+                            const fp = calcRealTimeBatFP({ runs: parseInt(bat.Runs) || 0, balls: parseInt(bat.Balls) || 0, fours: parseInt(bat.Fours) || 0, sixes: parseInt(bat.Sixes) || 0 }, format);
                             const exist = fpMap.get(pId) || { batFP: 0, bowlFP: 0, totalFP: 0 };
                             exist.batFP += fp;
                             exist.totalFP = exist.batFP + exist.bowlFP;
@@ -73,7 +79,7 @@ export default function TeamView({ match, user, team, onBack }: TeamViewProps) {
                         for (const bowl of bowlers) {
                             const pId = bowl.Bowler;
                             if (!pId) continue;
-                            const fp = calcBowlFP(parseInt(bowl.Wickets) || 0, parseInt(bowl.Runs) || 0, parseFloat(bowl.Overs) || 0);
+                            const fp = calcRealTimeBowlFP({ wickets: parseInt(bowl.Wickets) || 0, runsConceded: parseInt(bowl.Runs) || 0, overs: parseFloat(bowl.Overs) || 0, dots: parseInt(bowl.Dots) || 0, maidens: parseInt(bowl.Maidens) || 0, lbwBowled: 0 }, format);
                             const exist = fpMap.get(pId) || { batFP: 0, bowlFP: 0, totalFP: 0 };
                             exist.bowlFP += fp;
                             exist.totalFP = exist.batFP + exist.bowlFP;
@@ -81,11 +87,13 @@ export default function TeamView({ match, user, team, onBack }: TeamViewProps) {
                         }
                     }
                 }
+                console.log('[TeamView] fpMap size:', fpMap.size, '| team.players:', team.players.length);
 
                 // Combine user's selected team with calculated points
                 const resultPlayers = team.players.map(p => {
                     const meta = playerMeta.get(p.playerId);
                     const fp = fpMap.get(p.playerId);
+                    console.log(`[TeamView] player ${p.playerId}: meta=${!!meta} fp=${fp?.totalFP ?? 'none'}`);
 
                     let basePoints = fp?.totalFP || 0;
                     // Apply multipliers
@@ -105,9 +113,10 @@ export default function TeamView({ match, user, team, onBack }: TeamViewProps) {
                     };
                 });
 
+                console.log('[TeamView] Setting', resultPlayers.length, 'players');
                 setPlayersWithPoints(resultPlayers);
             } catch (err: any) {
-                console.error("Error calculating points:", err);
+                console.error('[TeamView] Error:', err);
                 setError(err.message || 'Failed to calculate points');
             } finally {
                 setLoading(false);

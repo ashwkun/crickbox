@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { LuCalendarClock, LuUser, LuSwords, LuChevronRight, LuZap, LuTrophy, LuClock, LuRadio } from 'react-icons/lu';
+import { LuCalendarClock, LuUser, LuSwords, LuChevronRight, LuZap, LuTrophy, LuClock, LuRadio, LuCheck } from 'react-icons/lu';
 import { User } from 'firebase/auth';
 import useCricketData from '../../utils/useCricketData';
 import { useFantasyTeam } from '../../utils/useFantasyTeam';
+import { useContests, Contest } from '../../utils/useContests';
 import TeamBuilder from './TeamBuilder';
-import TeamView from './TeamView';
+import LiveTeamView from './LiveTeamView';
+import ContestList from './ContestList';
 import WikiImage from '../WikiImage';
 import { getTeamColor } from '../../utils/teamColors';
 
@@ -41,16 +43,15 @@ const TAB_LABELS: Record<TabType, { icon: React.ReactNode; label: string }> = {
 
 /* ── Helper: can user still build/edit squad? ──────────────── */
 function canBuildSquad(match: any): boolean {
-    // Allow squad building until the match has actually started (by time)
-    // Even if event_state flips to 'L' early, if start_date is in the future, allow it
+
     const startTime = new Date(match.start_date).getTime();
     return startTime > Date.now();
 }
 
 /* ── Compact Match Card ───────────────────────────────────────── */
 const MatchCard: React.FC<{
-    match: any; team: any; onClick: () => void; tab: TabType;
-}> = ({ match, team, onClick, tab }) => {
+    match: any; team: any; onClick: () => void; tab: TabType; hasLeague?: boolean;
+}> = ({ match, team, onClick, tab, hasLeague }) => {
     const t1 = match.participants?.[0];
     const t2 = match.participants?.[1];
     const team1 = t1?.name || 'TBC';
@@ -205,11 +206,29 @@ const MatchCard: React.FC<{
                         fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                         ...(team
-                            ? { background: 'rgba(34,197,94,0.1)', color: '#4ade80' }
+                            ? { background: 'rgba(34,197,94,0.08)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.15)' }
                             : { background: `linear-gradient(135deg, ${c1}60, ${c2}60)`, color: '#fff' }
                         ),
                     }}>
-                        {team ? <><LuUser size={12} /> Squad Ready</> : <><LuSwords size={12} /> Build Squad</>}
+                        {team ? (
+                            hasLeague ? (
+                                <>
+                                    <LuTrophy size={12} strokeWidth={2.5} />
+                                    <span>My Leagues</span>
+                                    <span style={{ opacity: 0.5 }}>·</span>
+                                    <span style={{ fontSize: 10, fontWeight: 800 }}>View</span>
+                                </>
+                            ) : (
+                                <>
+                                    <LuCheck size={12} strokeWidth={3} />
+                                    <span>Team Ready</span>
+                                    <span style={{ opacity: 0.5 }}>·</span>
+                                    <span style={{ fontSize: 10, fontWeight: 800 }}>Compete with Friends</span>
+                                </>
+                            )
+                        ) : (
+                            <><LuSwords size={12} /> Create/Join League</>
+                        )}
                         <LuChevronRight size={12} style={{ opacity: 0.5 }} />
                     </div>
                 )}
@@ -239,7 +258,7 @@ const MatchCard: React.FC<{
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                                 background: `linear-gradient(135deg, ${c1}60, ${c2}60)`, color: '#fff',
                             }}>
-                                <LuZap size={12} /> Still time! Build Squad
+                                <LuZap size={12} /> Still time! Create/Join League
                                 <LuChevronRight size={12} style={{ opacity: 0.5 }} />
                             </div>
                         ) : (
@@ -279,8 +298,8 @@ const MatchCard: React.FC<{
 
 /* ── Countdown Highlight Card (first upcoming match within 24h) ── */
 const CountdownHighlight: React.FC<{
-    match: any; team: any; onClick: () => void;
-}> = ({ match, team, onClick }) => {
+    match: any; team: any; onClick: () => void; hasLeague?: boolean;
+}> = ({ match, team, onClick, hasLeague }) => {
     const t1 = match.participants?.[0];
     const t2 = match.participants?.[1];
     const team1 = t1?.name || 'TBC';
@@ -319,16 +338,13 @@ const CountdownHighlight: React.FC<{
                     {match.series_name || match.championship_name}
                 </div>
                 <div style={{
-                    fontSize: 9, fontWeight: 800, color: urgency,
+                    fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
                     display: 'flex', alignItems: 'center', gap: 4,
-                    padding: '3px 8px', borderRadius: 6,
-                    background: `${urgency}15`,
                 }}>
-                    <span style={{
-                        width: 5, height: 5, borderRadius: '50%', background: urgency,
-                        animation: h < 2 ? 'pulse 1.5s infinite' : 'none',
-                    }} />
-                    STARTS SOON
+                    <LuClock size={10} />
+                    {new Date(match.start_date).toLocaleString('en-US', {
+                        month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+                    })}
                 </div>
             </div>
 
@@ -395,18 +411,23 @@ const CountdownHighlight: React.FC<{
                 </div>
             </div>
 
-            {/* CTA */}
             <div style={{ position: 'relative', zIndex: 1, padding: '0 16px 14px' }}>
                 <div style={{
                     padding: '10px', borderRadius: 12,
                     fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     ...(team
-                        ? { background: 'rgba(34,197,94,0.1)', color: '#4ade80' }
+                        ? { background: 'rgba(236,72,153,0.1)', color: '#ec4899' }
                         : { background: `linear-gradient(135deg, ${c1}80, ${c2}80)`, color: '#fff' }
                     ),
                 }}>
-                    {team ? <><LuUser size={12} /> Squad Ready — Tap to Edit</> : <><LuSwords size={12} /> Build Your Squad</>}
+                    {team ? (
+                        hasLeague
+                            ? <><LuTrophy size={12} strokeWidth={2.5} /> My Leagues<span style={{ opacity: 0.5 }}>·</span><span style={{ fontSize: 10, fontWeight: 800 }}>View</span></>
+                            : <><LuCheck size={12} strokeWidth={3} /> Team Ready<span style={{ opacity: 0.5 }}>·</span><span style={{ fontSize: 10, fontWeight: 800 }}>Compete with Friends</span></>
+                    ) : (
+                        <><LuSwords size={12} /> Create / Join League</>
+                    )}
                     <LuChevronRight size={12} style={{ opacity: 0.5 }} />
                 </div>
             </div>
@@ -417,13 +438,16 @@ const CountdownHighlight: React.FC<{
 /* ── Dashboard ─────────────────────────────────────────────────── */
 const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut, selectedMatchId, setSelectedMatchId }) => {
     const { matches, loading: cricketLoading } = useCricketData();
-    const { myTeams, loading: teamsLoading } = useFantasyTeam(user);
+    const { myTeams, loading: teamsLoading, refreshTeams } = useFantasyTeam(user);
+    const contestsHook = useContests(user);
     const [activeTab, setActiveTab] = useState<TabType>('upcoming');
+    const [detailView, setDetailView] = useState<'contests' | 'build' | 'live'>('contests');
+    const [activeContest, setActiveContest] = useState<Contest | null>(null);
 
     // Categorize matches
     const upcoming = useMemo(() => {
         const cap = new Date();
-        cap.setDate(cap.getDate() + 5);
+        cap.setDate(cap.getDate() + 1); // Only show matches within 24 hours
         return matches
             .filter(m => m.event_state === 'U' || (m.event_state === 'L' && canBuildSquad(m)))
             .filter(m => new Date(m.start_date) <= cap)
@@ -432,13 +456,13 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut, selected
 
     const live = useMemo(() => {
         return matches
-            .filter(m => (m.event_state === 'L' || m.event_state === 'R') && !canBuildSquad(m))
+            .filter(m => m.event_state === 'L' && !canBuildSquad(m))
             .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
     }, [matches]);
 
     const completed = useMemo(() => {
         return matches
-            .filter(m => m.event_state === 'C')
+            .filter(m => m.event_state === 'C' || m.event_state === 'R')
             .sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())
             .slice(0, 20); // Last 20
     }, [matches]);
@@ -453,6 +477,9 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut, selected
         else if (completed.length > 0) setActiveTab('completed');
     }, [upcoming.length, live.length, completed.length]);
 
+    // Reset detailView when match changes
+    useEffect(() => { setDetailView('contests'); setActiveContest(null); }, [selectedMatchId]);
+
     const loading = cricketLoading || teamsLoading;
 
     // Detail view
@@ -460,11 +487,41 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut, selected
         const match = matches.find(m => m.game_id === selectedMatchId);
         const existingTeam = myTeams[selectedMatchId];
         if (match) {
-            // Allow TeamBuilder if match hasn't actually started yet
-            if (canBuildSquad(match)) {
-                return <TeamBuilder match={match} user={user} existingTeam={existingTeam} onBack={() => setSelectedMatchId(null)} />;
-            } else if (existingTeam) {
-                return <TeamView match={match} user={user} team={existingTeam} onBack={() => setSelectedMatchId(null)} />;
+            // TeamBuilder — for upcoming matches or when explicitly building
+            if (detailView === 'build' || (canBuildSquad(match) && !existingTeam)) {
+                return <TeamBuilder match={match} user={user} existingTeam={existingTeam}
+                    onBack={() => setSelectedMatchId(null)}
+                    onTeamSaved={() => { refreshTeams(); setDetailView('contests'); }}
+                />;
+            }
+
+            // LiveTeamView — when viewing a contest for a live/completed match
+            if (detailView === 'live' && existingTeam) {
+                return <LiveTeamView match={match} user={user} team={existingTeam} contest={activeContest} contestsHook={contestsHook} onBack={() => setDetailView('contests')} />;
+            }
+
+            // ContestList — shown after team save or for live matches with existing team
+            if (detailView === 'contests' && existingTeam) {
+                return <ContestList
+                    match={match}
+                    user={user}
+                    existingTeam={existingTeam}
+                    onBuildSquad={() => setDetailView('build')}
+                    onViewContest={(contest) => { setActiveContest(contest); setDetailView('live'); }}
+                    onBack={() => setSelectedMatchId(null)}
+                />;
+            }
+
+            // Fallback for live/completed with team — go to contests
+            if (existingTeam && !canBuildSquad(match)) {
+                return <ContestList
+                    match={match}
+                    user={user}
+                    existingTeam={existingTeam}
+                    onBuildSquad={() => setDetailView('build')}
+                    onViewContest={(contest) => { setActiveContest(contest); setDetailView('live'); }}
+                    onBack={() => setSelectedMatchId(null)}
+                />;
             }
         }
     }
@@ -529,6 +586,7 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut, selected
                         <CountdownHighlight
                             match={heroMatch}
                             team={myTeams[heroMatch.game_id]}
+                            hasLeague={(contestsHook.myContests[heroMatch.game_id]?.length ?? 0) > 0}
                             onClick={() => setSelectedMatchId(heroMatch.game_id)}
                         />
                     )}
@@ -551,6 +609,7 @@ const GameDashboard: React.FC<GameDashboardProps> = ({ user, onSignOut, selected
                                     key={m.game_id}
                                     match={m}
                                     team={myTeams[m.game_id]}
+                                    hasLeague={(contestsHook.myContests[m.game_id]?.length ?? 0) > 0}
                                     onClick={() => setSelectedMatchId(m.game_id)}
                                     tab={activeTab}
                                 />

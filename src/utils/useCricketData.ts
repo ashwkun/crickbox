@@ -112,7 +112,7 @@ export default function useCricketData(): UseCricketDataReturn {
 
     // Exclude women's matches (persisted)
     const [excludeWomens, setExcludeWomensState] = useState<boolean>(() => {
-        return localStorage.getItem(EXCLUDE_WOMENS_KEY) === 'true';
+        return localStorage.getItem(EXCLUDE_WOMENS_KEY) !== 'false';
     });
     const excludeWomensRef = useRef(excludeWomens);
 

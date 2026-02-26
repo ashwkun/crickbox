@@ -20,6 +20,7 @@
 import { supabase } from './supabaseClient';
 import { proxyFetch } from './api';
 import { CLIENT_SCORECARD } from './wisdenConfig';
+import { calcRealTimeBatFP, calcRealTimeBowlFP, determineFantasyFormat, FantasyFormat } from './fantasyPoints';
 
 // ============ TYPES ============
 
@@ -139,20 +140,7 @@ const WEIGHTS = {
 };
 
 // ============ D11 FANTASY POINTS (T20) ============
-
-export const D11 = {
-    RUN: 1, FOUR: 1, SIX: 2,
-    FIFTY: 16, CENTURY: 16, // additive, so 50+ = 16, 100+ = 32
-    DUCK: -2,
-    WICKET: 25, FOUR_W: 16, FIVE_W: 16,
-    MAIDEN: 16,
-    // Economy (min 2 overs)
-    ECO_LT5: 6, ECO_5_6: 4, ECO_6_7: 2,
-    ECO_9_10: -2, ECO_10_11: -4, ECO_GT11: -6,
-    // Strike Rate (min 10 balls)
-    SR_GT170: 6, SR_150_170: 4, SR_130_150: 2,
-    SR_60_70: -2, SR_50_60: -4, SR_LT50: -6,
-};
+// Removed locally hardcoded D11 constants to utilize central fantasyPoints.ts ruleset
 
 // ============ HELPERS ============
 
@@ -199,47 +187,14 @@ function mapD11Role(
     return 'BAT';
 }
 
-export function calcBatFP(runs: number, balls: number, fours: number, sixes: number): number {
-    let fp = runs * D11.RUN + fours * D11.FOUR + sixes * D11.SIX;
-    if (runs >= 100) fp += D11.FIFTY + D11.CENTURY;
-    else if (runs >= 50) fp += D11.FIFTY;
-    if (runs === 0 && balls > 0) fp += D11.DUCK;
-
-    if (balls >= 10) {
-        const sr = (runs / balls) * 100;
-        if (sr > 170) fp += D11.SR_GT170;
-        else if (sr >= 150) fp += D11.SR_150_170;
-        else if (sr >= 130) fp += D11.SR_130_150;
-        else if (sr < 50) fp += D11.SR_LT50;
-        else if (sr < 60) fp += D11.SR_50_60;
-        else if (sr < 70) fp += D11.SR_60_70;
-    }
-    return fp;
-}
-
-export function calcBowlFP(wickets: number, runs: number, overs: number): number {
-    let fp = wickets * D11.WICKET;
-    if (wickets >= 5) fp += D11.FOUR_W + D11.FIVE_W;
-    else if (wickets >= 4) fp += D11.FOUR_W;
-
-    if (overs >= 2) {
-        const eco = runs / overs;
-        if (eco < 5) fp += D11.ECO_LT5;
-        else if (eco < 6) fp += D11.ECO_5_6;
-        else if (eco < 7) fp += D11.ECO_6_7;
-        else if (eco > 11) fp += D11.ECO_GT11;
-        else if (eco > 10) fp += D11.ECO_10_11;
-        else if (eco > 9) fp += D11.ECO_9_10;
-    }
-    return fp;
-}
+// Removed old unformatted implementations in favor of format-aware ones from fantasyPoints.ts
 
 // ============ DATA FETCHERS ============
 
 export async function fetchScorecard(gameId: string) {
     const url = `https://www.wisden.com/cricket/v1/game/scorecard?lang=en&feed_format=json&client_id=${CLIENT_SCORECARD}&game_id=${gameId}`;
     const data = await proxyFetch(url);
-    return data?.data || null;
+    return data?.data || null; // API wraps the object in a "data" property
 }
 
 async function fetchH2H(gameId: string) {
@@ -316,7 +271,8 @@ function scoreTournamentForm(
     playerId: string,
     battingInnings: any[],
     bowlingInnings: any[],
-    role: D11Role
+    role: D11Role,
+    format: FantasyFormat
 ): TournamentFormBreakdown {
     const batInns = battingInnings || [];
     const bowlInns = bowlingInnings || [];
@@ -336,7 +292,7 @@ function scoreTournamentForm(
     const perMatchFP: number[] = [];
 
     sortedBat.forEach((inn, idx) => {
-        const fp = calcBatFP(inn.runs || 0, inn.balls || 0, inn.fours || 0, inn.sixes || 0);
+        const fp = calcRealTimeBatFP({ runs: inn.runs || 0, balls: inn.balls || 0, fours: inn.fours || 0, sixes: inn.sixes || 0 }, format);
         const w = recencyWeight(idx);
         totalWeightedFP += fp * w;
         totalWeight += w;
@@ -344,7 +300,7 @@ function scoreTournamentForm(
     });
 
     sortedBowl.forEach((inn, idx) => {
-        const fp = calcBowlFP(inn.wickets || 0, inn.runs || 0, inn.overs || 0);
+        const fp = calcRealTimeBowlFP({ wickets: inn.wickets || 0, runsConceded: inn.runs || 0, overs: inn.overs || 0, dots: inn.dots || 0, maidens: inn.maidens || 0, lbwBowled: 0 }, format);
         const w = recencyWeight(idx);
         totalWeightedFP += fp * w;
         totalWeight += w;
@@ -612,7 +568,7 @@ function scorePitchFit(
 
 // ============ TEAM BUILDER ============
 
-function buildTeam(allPlayers: PlayerScore[], logs: string[]): { selected: PlayerScore[]; captain: PlayerScore; viceCaptain: PlayerScore; backups: PlayerScore[] } {
+function buildTeam(allPlayers: PlayerScore[], logs: string[], format: FantasyFormat): { selected: PlayerScore[]; captain: PlayerScore; viceCaptain: PlayerScore; backups: PlayerScore[] } {
     const sorted = [...allPlayers].sort((a, b) => b.totalScore - a.totalScore);
 
     // Smart bowler minimum: need 2 bowlers UNLESS we have high-wicket ARs
@@ -668,8 +624,8 @@ function buildTeam(allPlayers: PlayerScore[], logs: string[]): { selected: Playe
         // Ceiling bonus: reward players with at least one big FP match
         const matchFPs = p.tournamentForm.matchByMatch.map(m => {
             let fp = 0;
-            if (m.runs !== undefined && m.balls !== undefined) fp += calcBatFP(m.runs, m.balls, m.fours || 0, m.sixes || 0);
-            if (m.wickets !== undefined && m.bowlingRuns !== undefined && m.overs !== undefined) fp += calcBowlFP(m.wickets, m.bowlingRuns, m.overs);
+            if (m.runs !== undefined && m.balls !== undefined) fp += calcRealTimeBatFP({ runs: m.runs, balls: m.balls, fours: m.fours || 0, sixes: m.sixes || 0 }, format);
+            if (m.wickets !== undefined && m.bowlingRuns !== undefined && m.overs !== undefined) fp += calcRealTimeBowlFP({ wickets: m.wickets, runsConceded: m.bowlingRuns, overs: m.overs, dots: 0, maidens: 0, lbwBowled: 0 }, format);
             return fp;
         });
         const maxFP = matchFPs.length > 0 ? Math.max(...matchFPs) : 0;
@@ -719,10 +675,14 @@ export async function predictDream11(gameId: string, excludeMatchId?: string): P
         const team1 = teams[team1Id] || {};
         const team2 = teams[team2Id] || {};
 
+        const formatInfo = matchDetail.Match?.Type || scorecard.Matchdetail?.Series?.Name || '';
+        const derivedFormat = determineFantasyFormat({ event_format: matchDetail.Match?.Type, league_code: scorecard.Matchdetail?.Series?.Name }, scorecard);
+
         logs.push(`Match: ${team1.Name_Full || 'Team 1'} vs ${team2.Name_Full || 'Team 2'}`);
         logs.push(`Venue: ${venue}`);
         logs.push(`Pitch: ${pitchType || 'Not specified'}`);
         logs.push(`Series ID: ${seriesId}`);
+        logs.push(`Fantasy Format Detected: ${derivedFormat} (from ${formatInfo})`);
 
         // Extract players
         const allRawPlayers: { id: string; data: any; teamId: string; teamName: string; teamShort: string }[] = [];
@@ -793,7 +753,7 @@ export async function predictDream11(gameId: string, excludeMatchId?: string): P
                 : undefined;
 
             // Score each signal — pass filtered batInnings (no DNB)
-            const tournamentForm = scoreTournamentForm(rawPlayer.id, batInnings, bowlInnings, role);
+            const tournamentForm = scoreTournamentForm(rawPlayer.id, batInnings, bowlInnings, role, derivedFormat);
             const careerStats = scoreCareerStats(p);
             const iccRanking = scoreICCRanking(rawPlayer.id, h2hData, rawPlayer.teamId, careerStats.score);
             const roleValue = scoreRoleValue(p.Skill_Name || '', p.Role || '', isCaptain, isKeeper, role, avgBatPos, batInnings.length, bowlInnings.length);
@@ -817,7 +777,7 @@ export async function predictDream11(gameId: string, excludeMatchId?: string): P
                     new Date(b.match_date || 0).getTime() - new Date(a.match_date || 0).getTime()
                 );
                 sortedBat.forEach((inn: any, idx: number) => {
-                    const fp = calcBatFP(inn.runs || 0, inn.balls || 0, inn.fours || 0, inn.sixes || 0);
+                    const fp = calcRealTimeBatFP({ runs: inn.runs || 0, balls: inn.balls || 0, fours: inn.fours || 0, sixes: inn.sixes || 0 }, derivedFormat);
                     const w = recencyWeight(idx);
                     logs.push(`    Bat #${idx + 1}: ${inn.runs || 0}(${inn.balls || 0}) SR=${inn.strike_rate?.toFixed(1) || '?'} 4s=${inn.fours || 0} 6s=${inn.sixes || 0} → FP=${fp} × w=${w.toFixed(2)} = ${(fp * w).toFixed(1)}`);
                 });
@@ -827,7 +787,7 @@ export async function predictDream11(gameId: string, excludeMatchId?: string): P
                     new Date(b.match_date || 0).getTime() - new Date(a.match_date || 0).getTime()
                 );
                 sortedBowl.forEach((inn: any, idx: number) => {
-                    const fp = calcBowlFP(inn.wickets || 0, inn.runs || 0, inn.overs || 0);
+                    const fp = calcRealTimeBowlFP({ wickets: inn.wickets || 0, runsConceded: inn.runs || 0, overs: inn.overs || 0, dots: inn.dots || 0, maidens: inn.maidens || 0, lbwBowled: 0 }, derivedFormat);
                     const w = recencyWeight(idx);
                     logs.push(`    Bowl #${idx + 1}: ${inn.wickets || 0}/${inn.runs || 0} in ${inn.overs || 0}ov eco=${inn.economy?.toFixed(1) || '?'} → FP=${fp} × w=${w.toFixed(2)} = ${(fp * w).toFixed(1)}`);
                 });
@@ -867,7 +827,7 @@ export async function predictDream11(gameId: string, excludeMatchId?: string): P
         });
 
         // Build team
-        const { selected, captain, viceCaptain, backups } = buildTeam(allPlayers, logs);
+        const { selected, captain, viceCaptain, backups } = buildTeam(allPlayers, logs, derivedFormat);
 
         selected.forEach(p => { p.selected = true; });
         captain.isCaptain = true;
