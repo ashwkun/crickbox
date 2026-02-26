@@ -12,7 +12,17 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
 
-export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Wrap fetch with a 10-second timeout to prevent indefinite hangs
+const fetchWithTimeout: typeof fetch = (input, init) => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    return fetch(input, { ...init, signal: controller.signal })
+        .finally(() => clearTimeout(timeout));
+};
+
+export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { fetch: fetchWithTimeout },
+});
 
 // Export the URL and Key for any components that need to create scoped clients
 export { SUPABASE_URL, SUPABASE_ANON_KEY };

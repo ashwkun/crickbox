@@ -1,5 +1,5 @@
 // Service Worker for box.cric PWA
-const CACHE_NAME = 'boxcric-v5';
+const CACHE_NAME = 'boxcric-v6';
 const STATIC_ASSETS = [
     '/',
     '/index.html'
@@ -42,7 +42,11 @@ self.addEventListener('fetch', (event) => {
     if (url.includes('wisden.com') ||
         url.includes('workers.dev') ||
         url.includes('wikipedia.org') ||
-        url.includes('flagcdn.com')) {
+        url.includes('flagcdn.com') ||
+        url.includes('supabase.co') ||
+        url.includes('supabase.in') ||
+        url.includes('googleapis.com') ||
+        url.includes('firebaseio.com')) {
         // Let browser handle it directly
         return;
     }
