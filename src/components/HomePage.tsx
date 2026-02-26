@@ -228,7 +228,8 @@ export default function HomePage({
     // Smart default for time filter: Today > Tomorrow > Week > All
     // Now respects the active chip (Category) so we don't set 'Today' if the only match today is hidden by the chip
     useEffect(() => {
-        if (hasInitializedTimeFilter || upcomingMatches.length === 0) return;
+        // Wait for loading to finish if we haven't initialized yet
+        if (hasInitializedTimeFilter || upcomingMatches.length === 0 || loading) return;
 
         // 1. Filter by current category first (usually 'featured')
         const relevantMatches = filterByChip(upcomingMatches, activeUpcomingChip);
@@ -249,8 +250,10 @@ export default function HomePage({
             setUpcomingTimeFilter('all');
         }
 
-        setHasInitializedTimeFilter(true);
-    }, [upcomingMatches, hasInitializedTimeFilter, activeUpcomingChip]);
+        if (!loading) {
+            setHasInitializedTimeFilter(true);
+        }
+    }, [upcomingMatches, hasInitializedTimeFilter, activeUpcomingChip, loading]);
 
     const completedMatches = useMemo(() =>
         matches
@@ -337,7 +340,7 @@ export default function HomePage({
     // Smart default for results time filter: Today > Yesterday > Week > All
     // Now respects the active chip (Category) so we don't set 'Today' if the only match today is hidden by the chip
     useEffect(() => {
-        if (hasInitializedResultsTimeFilter || completedMatches.length === 0) return;
+        if (hasInitializedResultsTimeFilter || completedMatches.length === 0 || loading) return;
 
         // 1. Filter by current category first (usually 'featured')
         const relevantMatches = filterByChip(completedMatches, activeResultsChip);
@@ -364,8 +367,10 @@ export default function HomePage({
             setResultsTimeFilter('all');
         }
 
-        setHasInitializedResultsTimeFilter(true);
-    }, [completedMatches, hasInitializedResultsTimeFilter, activeResultsChip]);
+        if (!loading) {
+            setHasInitializedResultsTimeFilter(true);
+        }
+    }, [completedMatches, hasInitializedResultsTimeFilter, activeResultsChip, loading]);
 
     // Apply time AND category filters to processed completed
     const filteredCompleted = useMemo(() => {
@@ -391,17 +396,13 @@ export default function HomePage({
 
     // Smart bidirectional fallback for results
     useEffect(() => {
-        if (filteredCompleted.length === 0) {
+        if (filteredCompleted.length === 0 && lastChangedResultsFilter) {
             if (lastChangedResultsFilter === 'time' && activeResultsChip !== 'all') {
                 setActiveResultsChip('all');
-                setLastChangedResultsFilter(null);
             } else if (lastChangedResultsFilter === 'type' && resultsTimeFilter !== 'all') {
                 setResultsTimeFilter('all');
-                setLastChangedResultsFilter(null);
-            } else if (!lastChangedResultsFilter && (activeResultsChip !== 'all' || resultsTimeFilter !== 'all')) {
-                setActiveResultsChip('all');
-                setResultsTimeFilter('all');
             }
+            setLastChangedResultsFilter(null);
         }
     }, [filteredCompleted.length, lastChangedResultsFilter, activeResultsChip, resultsTimeFilter]);
 
@@ -484,20 +485,17 @@ export default function HomePage({
     // Smart bidirectional fallback:
     // - If user changed TIME filter and it results in empty → reset TYPE to 'all'
     // - If user changed TYPE filter and it results in empty → reset TIME to 'all'
-    // - If it's empty on initial load (no explicit change) → widen both to 'all'
     useEffect(() => {
-        if (filteredUpcoming.length === 0) {
+        if (filteredUpcoming.length === 0 && lastChangedFilter) {
             if (lastChangedFilter === 'time' && activeUpcomingChip !== 'all') {
+                // User changed time, reset category
                 setActiveUpcomingChip('all');
-                setLastChangedFilter(null);
             } else if (lastChangedFilter === 'type' && upcomingTimeFilter !== 'all') {
-                setUpcomingTimeFilter('all');
-                setLastChangedFilter(null);
-            } else if (!lastChangedFilter && (activeUpcomingChip !== 'all' || upcomingTimeFilter !== 'all')) {
-                // If we get an empty state without user interaction, aggressively widen
-                setActiveUpcomingChip('all');
+                // User changed type, reset time
                 setUpcomingTimeFilter('all');
             }
+            // Clear the flag after handling
+            setLastChangedFilter(null);
         }
     }, [filteredUpcoming.length, lastChangedFilter, activeUpcomingChip, upcomingTimeFilter]);
 
