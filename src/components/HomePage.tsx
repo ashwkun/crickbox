@@ -391,13 +391,17 @@ export default function HomePage({
 
     // Smart bidirectional fallback for results
     useEffect(() => {
-        if (filteredCompleted.length === 0 && lastChangedResultsFilter) {
+        if (filteredCompleted.length === 0) {
             if (lastChangedResultsFilter === 'time' && activeResultsChip !== 'all') {
                 setActiveResultsChip('all');
+                setLastChangedResultsFilter(null);
             } else if (lastChangedResultsFilter === 'type' && resultsTimeFilter !== 'all') {
                 setResultsTimeFilter('all');
+                setLastChangedResultsFilter(null);
+            } else if (!lastChangedResultsFilter && (activeResultsChip !== 'all' || resultsTimeFilter !== 'all')) {
+                setActiveResultsChip('all');
+                setResultsTimeFilter('all');
             }
-            setLastChangedResultsFilter(null);
         }
     }, [filteredCompleted.length, lastChangedResultsFilter, activeResultsChip, resultsTimeFilter]);
 
@@ -480,17 +484,20 @@ export default function HomePage({
     // Smart bidirectional fallback:
     // - If user changed TIME filter and it results in empty → reset TYPE to 'all'
     // - If user changed TYPE filter and it results in empty → reset TIME to 'all'
+    // - If it's empty on initial load (no explicit change) → widen both to 'all'
     useEffect(() => {
-        if (filteredUpcoming.length === 0 && lastChangedFilter) {
+        if (filteredUpcoming.length === 0) {
             if (lastChangedFilter === 'time' && activeUpcomingChip !== 'all') {
-                // User changed time, reset category
                 setActiveUpcomingChip('all');
+                setLastChangedFilter(null);
             } else if (lastChangedFilter === 'type' && upcomingTimeFilter !== 'all') {
-                // User changed type, reset time
+                setUpcomingTimeFilter('all');
+                setLastChangedFilter(null);
+            } else if (!lastChangedFilter && (activeUpcomingChip !== 'all' || upcomingTimeFilter !== 'all')) {
+                // If we get an empty state without user interaction, aggressively widen
+                setActiveUpcomingChip('all');
                 setUpcomingTimeFilter('all');
             }
-            // Clear the flag after handling
-            setLastChangedFilter(null);
         }
     }, [filteredUpcoming.length, lastChangedFilter, activeUpcomingChip, upcomingTimeFilter]);
 
