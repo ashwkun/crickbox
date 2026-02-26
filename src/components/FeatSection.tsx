@@ -224,9 +224,10 @@ const FeatCard: React.FC<{ match: Match; onMatchClick: (match: Match) => void }>
                 zIndex: 1,
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                alignItems: 'center',
+                gap: '8px'
             }}>
-                <span style={{ maxWidth: '60%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {seriesName}
                 </span>
                 {isLive && (
@@ -237,11 +238,12 @@ const FeatCard: React.FC<{ match: Match; onMatchClick: (match: Match) => void }>
                         borderRadius: '4px',
                         fontSize: '9px',
                         fontWeight: 700,
-                        animation: 'pulse 1.5s ease-in-out infinite'
+                        animation: 'pulse 1.5s ease-in-out infinite',
+                        flexShrink: 0
                     }}>LIVE</span>
                 )}
                 {isCompleted && (
-                    <span style={{ color: '#f59e0b' }}>{matchInfo}</span>
+                    <span style={{ color: '#f59e0b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '40%', textAlign: 'right' }}>{matchInfo}</span>
                 )}
             </div>
 

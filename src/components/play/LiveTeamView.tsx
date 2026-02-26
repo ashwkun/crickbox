@@ -65,6 +65,30 @@ export default function LiveTeamView({ match, user, team, contest, contestsHook,
     const [lbLoading, setLbLoading] = useState(false);
     const [copied, setCopied] = useState(false);
     const [viewingOpponent, setViewingOpponent] = useState<LbEntry | null>(null);
+    const [timeLeft, setTimeLeft] = useState<string>('');
+
+    useEffect(() => {
+        if (!match.start_date) return;
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const start = new Date(match.start_date!).getTime();
+            const diff = start - now;
+            if (diff <= 0) {
+                setTimeLeft('Starting mometarily');
+                return;
+            }
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            if (d > 0) setTimeLeft(`${d}d ${h}h`);
+            else setTimeLeft(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
+        };
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+        return () => clearInterval(interval);
+    }, [match.start_date]);
 
     const t1 = match.participants?.[0];
     const t2 = match.participants?.[1];
@@ -393,10 +417,10 @@ export default function LiveTeamView({ match, user, team, contest, contestsHook,
 
         const medalColor = rank === 1 ? '#fbbf24' : rank === 2 ? '#9ca3af' : rank === 3 ? '#b45309' : null;
 
-        // Premium floating card styling
+        // Premium floating card styling (toned down gradients)
         const bgColors = isMe
-            ? 'linear-gradient(135deg, rgba(236,72,153,0.12) 0%, rgba(236,72,153,0.02) 100%)'
-            : 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%)';
+            ? 'linear-gradient(135deg, rgba(236,72,153,0.08) 0%, rgba(236,72,153,0.01) 100%)'
+            : 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)';
 
         const borderColor = isMe
             ? 'rgba(236,72,153,0.3)'
@@ -426,8 +450,7 @@ export default function LiveTeamView({ match, user, team, contest, contestsHook,
                         overflow: 'hidden'
                     }}
                 >
-                    {/* Subtle pulse glow for "Me" */}
-                    {isMe && <div style={{ position: 'absolute', top: -30, left: -30, width: 100, height: 100, background: '#ec4899', filter: 'blur(50px)', opacity: 0.15, borderRadius: '50%' }} />}
+                    {/* Subtle pulse glow for "Me" completely removed for cleaner look */}
 
                     {/* Avatar Container with overlapping Rank badge */}
                     <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -503,54 +526,45 @@ export default function LiveTeamView({ match, user, team, contest, contestsHook,
     return (
         <div style={{ width: '100%', paddingBottom: 120 }}>
 
-            {/* ── League Header (Redesigned) ── */}
+            {/* ── League Header (Redesigned & Toned Down) ── */}
             {contest && (
-                <div style={{ margin: '16px 16px 24px', padding: '20px', borderRadius: 24, background: 'linear-gradient(135deg, rgba(236,72,153,0.15), rgba(236,72,153,0.05))', border: '1px solid rgba(236,72,153,0.2)', boxShadow: '0 8px 32px rgba(236,72,153,0.12)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ margin: '16px 16px 24px', padding: '20px', borderRadius: 24, background: 'linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', position: 'relative', overflow: 'hidden' }}>
 
-                    {/* Background glow & icon */}
-                    <div style={{ position: 'absolute', top: -30, right: -20, width: 120, height: 120, background: '#ec4899', filter: 'blur(50px)', opacity: 0.2, borderRadius: '50%' }} />
-                    <LuTrophy size={80} color="rgba(236,72,153,0.08)" style={{ position: 'absolute', right: -10, bottom: -10, transform: 'rotate(10deg)' }} />
+                    {/* Background glow & icon (Toned down) */}
+                    <LuTrophy size={80} color="rgba(255,255,255,0.05)" style={{ position: 'absolute', right: -10, bottom: -10, transform: 'rotate(10deg)' }} />
 
                     <div style={{ position: 'relative', zIndex: 2 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ flex: 1, paddingRight: 16 }}>
                                 <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(236,72,153,0.8)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 4 }}>
                                     Private League
                                 </div>
-                                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1.2, textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
                                     {contest.name}
                                 </div>
                             </div>
 
-                            {/* Invite Code Block */}
-                            <div style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '8px 12px', textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }} onClick={copyCode}>
-                                <div style={{ fontSize: 8, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 2 }}>Invite Code</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                    <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 800, color: copied ? '#4ade80' : '#fff' }}>{contest.code?.toUpperCase()}</span>
-                                    {copied ? <LuCheck size={12} color="#4ade80" /> : <LuCopy size={12} color="rgba(255,255,255,0.4)" />}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <LuUsers size={14} color="#fff" />
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>{contest.entry_count}<span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}> / {contest.max_entries}</span></div>
+                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Spots</div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Stats Strip */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 20, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <LuUsers size={14} color="#fff" />
-                                </div>
+                        {/* Invite Code Block (Wider) */}
+                        <div style={{ marginTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 16 }}>
+                            <div style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', transition: 'all 0.2s', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }} onClick={copyCode}>
                                 <div>
-                                    <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>{contest.entry_count}<span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12 }}> / {contest.max_entries}</span></div>
-                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Spots Filled</div>
+                                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800, marginBottom: 4 }}>Invite Code</div>
+                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>Tap to copy & share</div>
                                 </div>
-                            </div>
-                            <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.1)' }} />
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(236,72,153,0.15)', border: '1px solid rgba(236,72,153,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <span style={{ fontSize: 12, fontWeight: 800, color: '#ec4899' }}>$0</span>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>Free</div>
-                                    <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Entry Fee</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <span style={{ fontFamily: 'monospace', fontSize: 24, fontWeight: 900, color: copied ? '#4ade80' : '#fff', letterSpacing: '2px' }}>{contest.code?.toUpperCase()}</span>
+                                    {copied ? <LuCheck size={20} color="#4ade80" /> : <LuCopy size={20} color="rgba(255,255,255,0.4)" />}
                                 </div>
                             </div>
                         </div>
@@ -580,15 +594,25 @@ export default function LiveTeamView({ match, user, team, contest, contestsHook,
                             Opponent squads are hidden to prevent copying. They will be revealed right here as soon as the first ball is bowled!
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 16 }}>
-                            <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: 12 }}>
-                                <div style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>11</div>
-                                <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 2 }}>Players Picked</div>
+                        <div style={{ display: 'flex', gap: 12, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 16, textAlign: 'left' }}>
+                            <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: 12 }}>
+                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 2 }}>Match Starts</div>
+                                <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>
+                                    {match.start_date ? new Date(match.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }) : 'Soon'}
+                                </div>
                             </div>
-                            <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: 12 }}>
-                                <div style={{ fontSize: 20, fontWeight: 900, color: '#4ade80' }}>Yes</div>
-                                <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 2 }}>C & VC Set</div>
+                            <div style={{ flex: 1, background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: 12 }}>
+                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 2 }}>Countdown</div>
+                                <div style={{ fontSize: 18, fontWeight: 800, color: '#ec4899', letterSpacing: '0.5px', fontFamily: 'monospace' }}>
+                                    {timeLeft || '...'}
+                                </div>
                             </div>
+                        </div>
+
+                        <div style={{ marginTop: 16 }}>
+                            <button onClick={onBack} style={{ width: '100%', padding: '14px', borderRadius: 12, background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', fontSize: 15, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, backdropFilter: 'blur(10px)' }}>
+                                Edit Your Squad
+                            </button>
                         </div>
                     </div>
 
@@ -709,11 +733,11 @@ export default function LiveTeamView({ match, user, team, contest, contestsHook,
                         {/* Points Card */}
                         <div style={{
                             flex: 1, padding: '20px 16px', borderRadius: 20, textAlign: 'center',
-                            background: 'linear-gradient(135deg, rgba(236,72,153,0.15), rgba(236,72,153,0.03))',
-                            border: '1px solid rgba(236,72,153,0.2)',
-                            boxShadow: '0 8px 24px rgba(236,72,153,0.1)', position: 'relative', overflow: 'hidden'
+                            background: 'linear-gradient(135deg, rgba(236,72,153,0.08), rgba(236,72,153,0.01))',
+                            border: '1px solid rgba(236,72,153,0.1)',
+                            boxShadow: '0 4px 16px rgba(0,0,0,0.1)', position: 'relative', overflow: 'hidden'
                         }}>
-                            <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, background: '#ec4899', filter: 'blur(40px)', opacity: 0.2, borderRadius: '50%' }} />
+                            {/* Inner glow removed */}
                             <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 4 }}>Your Points</div>
                             <div style={{ fontSize: 42, fontWeight: 900, color: '#ec4899', letterSpacing: -2, lineHeight: 1 }}>{totalPoints}</div>
                         </div>
@@ -766,10 +790,10 @@ export default function LiveTeamView({ match, user, team, contest, contestsHook,
                         boxShadow: myRank === 1 ? '0 8px 32px rgba(245,158,11,0.2)' : '0 8px 32px rgba(236,72,153,0.15)',
                         textAlign: 'center', position: 'relative', overflow: 'hidden'
                     }}>
-                        {/* Glow effect */}
+                        {/* Glow effect toned down significantly */}
                         <div style={{
                             position: 'absolute', top: -40, left: '50%', transform: 'translateX(-50%)',
-                            width: 150, height: 150, borderRadius: '50%', filter: 'blur(50px)', opacity: 0.2,
+                            width: 100, height: 100, borderRadius: '50%', filter: 'blur(20px)', opacity: 0.05,
                             background: myRank === 1 ? '#f59e0b' : '#ec4899'
                         }} />
 
@@ -862,7 +886,9 @@ export default function LiveTeamView({ match, user, team, contest, contestsHook,
                         </button>
                         <div style={{ flex: 1 }}>
                             <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px' }}>Fantasy Squad</div>
-                            <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{viewingOpponent.name}'s Team</div>
+                            <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {viewingOpponent.name === 'Your' ? 'Your Team' : `${viewingOpponent.name}'s Team`}
+                            </div>
                         </div>
                         {matchState !== 'upcoming' && hasMatchStarted && (
                             <div style={{ textAlign: 'right' }}>
