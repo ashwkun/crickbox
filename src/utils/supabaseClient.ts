@@ -1,16 +1,26 @@
 /**
  * Centralized Supabase Client Configuration
  * 
- * This file exports a single Supabase client instance used across the app.
- * The anon key is safe to expose - it only allows public reads via RLS.
+ * Routes all Supabase requests through the Cloudflare Worker proxy
+ * to bypass India region ISP connectivity issues.
  * 
- * Values loaded from .env file (gitignored)
+ * The proxy URL points to our cricket-proxy worker which forwards
+ * requests to Supabase from Cloudflare's edge network.
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = process.env.SUPABASE_URL || '';
+// The Cloudflare Worker proxy URL — all Supabase requests go through here
+const PROXY_SUPABASE_URL = 'https://cricket-proxy.boxboxcric.workers.dev/supabase';
+
+// Direct Supabase URL (fallback, kept for reference)
+const DIRECT_SUPABASE_URL = process.env.SUPABASE_URL || '';
+
+// The anon key is still needed client-side for auth token generation
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
+
+// Use the proxy URL so requests route through Cloudflare's edge network
+const SUPABASE_URL = PROXY_SUPABASE_URL;
 
 // Wrap fetch with a 10-second timeout to prevent indefinite hangs
 const fetchWithTimeout: typeof fetch = (input, init) => {

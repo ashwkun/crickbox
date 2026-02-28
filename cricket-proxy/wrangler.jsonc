@@ -8,5 +8,9 @@
 	],
 	"observability": {
 		"enabled": true
+	},
+	"vars": {
+		"SUPABASE_URL": "https://ycumznofytwntinxlxkc.supabase.co",
+		"SUPABASE_ANON_KEY": "sb_publishable_Cwxlp3Az6TKQBXsIXnUemg_A4Avw-71"
 	}
 }
