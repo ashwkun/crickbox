@@ -485,6 +485,12 @@
     "audio": "268121.mp3",
     "generated_at": "2026-02-28T17:19:29.861Z"
   },
+  "268123": {
+    "text": "**South Africa cruise past Zimbabwe in clinical chase**\n\nSouth Africa made light work of Zimbabwe’s 153/7, sealing a 5-wicket victory with 13 balls to spare. Sikandar Raza’s valiant 73 off 43 couldn’t save Zimbabwe, despite his fiery 3/29 with the ball. Dewald Brevis (42 off 18) set the tone for South Africa, with Ryan Rickelton (31) and George Linde (30) ensuring a smooth chase. The final overs were a mere formality—9-run hauls in the 16th and 17th snuffed out any tension. Raza, deservedly, walked away as Player of the Match.",
+    "model": "grok-3",
+    "audio": "268123.mp3",
+    "generated_at": "2026-03-01T13:38:16.971Z"
+  },
   "268159": {
     "text": "**Sri Lanka edge Pakistan in 14-run thriller**\n\nSri Lanka clinched a gritty 14-run victory over Pakistan in a pulsating 12-over clash, defending 160/6 with ice in their veins. Dasun Shanaka’s blistering 34 off 9 and Kusal Mendis’ 30 off 16 set the tone, while Wanindu Hasaranga’s 4/35 dismantled Pakistan’s chase of 146/8. The finish was a rollercoaster—Hasaranga’s double-wicket 10th over (15 runs, 2 scalps) and Matheesha Pathirana’s tight 11th (10 runs, 1 wicket) squeezed Pakistan, despite Salman Agha’s valiant 45 off 12. Sri Lanka held firm when it mattered most.",
     "model": "grok-3",
