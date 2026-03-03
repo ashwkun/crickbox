@@ -1,3 +1,6 @@
+
+Try out [Here ](https://theboxcric.web.app) 
+
 # boxcric
 
 A cricket tracking application built with React and TypeScript, providing real-time scores, match schedules, and series information.
