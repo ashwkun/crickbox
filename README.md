@@ -1,8 +1,16 @@
-# box.cric
+<p align="center">
+  <img src="src/icons/logo.png" alt="box.cric logo" width="280">
+</p>
 
-A cricket app that actually respects your time. Live scores, deep match insights, and fantasy tools — all in a fast, dark-themed PWA you can install on your phone.
+<p align="center">
+  <em>Live scores, deep match insights, and fantasy tools — all in a fast, dark-themed PWA you can install on your phone.</em>
+</p>
 
-**Live at** [boxboxcric.web.app](https://boxboxcric.web.app)
+<p align="center">
+  <a href="https://boxboxcric.web.app">
+    <img src="https://img.shields.io/badge/Open_box.cric-0f0f0f?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABdSURBVDhPY/hPIWBEFjh48OB/ZDZMDMgGAShNFMCq8dChQ/9BNJANYsPEkAFeDCQlJREKEQ5YNILcCqJxAkY0wDCGAaT6FEgjCODVSBAgSuN/agBKXEcUYGAAAPkvJwftEVVxAAAAAElFTkSuQmCC&logoColor=22c55e" alt="Open box.cric" height="36">
+  </a>
+</p>
 
 ---
 
