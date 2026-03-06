@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/icons/logo.png" alt="box.cric logo" width="280">
+  <img src="src/icons/logo-rounded.png" alt="box.cric logo" width="200">
 </p>
 
 <p align="center">
@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://boxboxcric.web.app">
-    <img src="https://img.shields.io/badge/Open_box.cric-0f0f0f?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABdSURBVDhPY/hPIWBEFjh48OB/ZDZMDMgGAShNFMCq8dChQ/9BNJANYsPEkAFeDCQlJREKEQ5YNILcCqJxAkY0wDCGAaT6FEgjCODVSBAgSuN/agBKXEcUYGAAAPkvJwftEVVxAAAAAElFTkSuQmCC&logoColor=22c55e" alt="Open box.cric" height="36">
+    <img src="https://img.shields.io/badge/Open_box.cric_→-22c55e?style=for-the-badge" alt="Open box.cric" height="40">
   </a>
 </p>
 
