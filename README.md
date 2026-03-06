@@ -1,30 +1,144 @@
+# box.cric
 
-## Try out [Here ](https://theboxcric.web.app) 
+A cricket app that actually respects your time. Live scores, deep match insights, and fantasy tools — all in a fast, dark-themed PWA you can install on your phone.
 
-# boxcric
+**Live at** [boxboxcric.web.app](https://boxboxcric.web.app)
 
-A cricket tracking application built with React and TypeScript, providing real-time scores, match schedules, and series information.
+---
 
-## Features
+## What It Does
 
-- **Live Match Tracking**: Real-time updates for ongoing cricket matches, including detailed scorecards and partnership data.
-- **Match Schedules**: Comprehensive lists of upcoming international and domestic fixtures.
-- **Series & Tournament Hubs**: Dedicated views for specific series and tournaments, featuring points tables, squad lists, and statistical insights.
-- **Detailed Scorecards**: In-depth match data including batsman runs, balls faced, strike rates, and bowler economy rates.
-- **News Feed**: curated cricket news and updates.
-- **Simulation Mode**: Internal tools for match simulation and testing.
-- **Progressive Web App (PWA)**: Installable on supported devices for a native-like experience.
+### Live Matches
+- Real-time scores with auto-polling every 10 seconds
+- Ball-by-ball commentary via wallstream
+- Win probability bar that updates as the match progresses
+- AI-generated match summaries
+
+### Match Insights
+When you open a live or completed match, you get a full breakdown:
+- **Wagon Wheel** — shot placement map per innings
+- **Worm Chart** — run-rate comparison between innings
+- **Manhattan Chart** — over-by-over scoring patterns
+- **Partnerships** — visual partnership breakdown
+- **Batsman vs Bowler Matchups** — head-to-head performance data
+- **Win Probability** — calculated in real time based on match situation, format, and phase
+
+### Upcoming Matches
+- Fixtures with countdown timers
+- Head-to-head records between teams
+- Recent form for both sides
+- Venue stats and pitch conditions
+- Weather information
+- Squad previews
+
+### Completed Matches
+- Full scorecards with batting, bowling, and fall-of-wickets data
+- Browse past results by date range
+- Series-level grouping
+
+### Series & Tournament Hubs
+- Points tables for multi-team tournaments
+- All matches in a series grouped together
+- Automatic detection of bilateral vs tournament format
+
+### Fantasy Tools
+- **Dream11 Predictor** — fantasy point predictions for upcoming matches
+- **Play Mode** — build your own fantasy team with a team builder, live scoring, and contest system
+- Firebase authentication for user profiles and team persistence
+
+### Installable PWA
+- Works offline for cached content
+- Add to home screen on iOS and Android
+- Service worker with network-first strategy
+
+---
+
+## Design
+
+Dark theme throughout, built for readability during night sessions. Key choices:
+
+- **Typography**: Outfit for body text, JetBrains Mono for scores and stats, Zen Dots and BBH Bartle for branding elements
+- **Color system**: High-contrast dark palette (`#0f0f0f` base) with team-specific accent colors pulled dynamically for match cards, headers, and probability bars
+- **Cards**: Glassmorphism-style cards with subtle backdrop blur and team-color radial gradients as watermarks
+- **Animations**: Shimmer loading skeletons, pulsing live indicators, smooth probability bar transitions
+- **Layout**: Mobile-first, single-column feed with horizontal scroll carousels for featured matches. Stack-based navigation with overlay transitions
+
+Team logos are sourced from Wikipedia and rendered inline. Match cards use each team's brand color for tinted backgrounds.
+
+---
 
 ## Tech Stack
 
-- **Frontend**: React 19, TypeScript
-- **Styling**: Tailwind CSS
-- **Bundler**: Parcel
-- **State Management**: React Hooks (Context/Local State)
-- **Backend/Hosting**: Firebase
+| Layer | Tech |
+|-------|------|
+| Frontend | React 19, TypeScript |
+| Styling | Tailwind CSS 4 |
+| Bundler | Parcel |
+| Hosting | Firebase Hosting |
+| API Proxy | Cloudflare Worker (`cricket-proxy`) |
+| Database | Supabase (user profiles, contests, fantasy data) |
+| Auth | Firebase Authentication |
+| Data Source | Wisden APIs (matches, scorecards, ball-by-ball) |
 
-## key Scripts
+---
 
-- `npm start`: Runs the app in development mode.
-- `npm run build`: Builds the app for production to the `dist` folder.
-- `npm run ship`: Builds and deploys the application to Firebase hosting.
+## Project Structure
+
+```
+boxcric/
+├── src/
+│   ├── components/        # React components
+│   │   ├── insights/      # Wagon wheel, worm, manhattan, matchups, conditions
+│   │   ├── upcoming/      # H2H, venue, squad, recent form, time filters
+│   │   ├── play/          # Fantasy team builder, contests, game dashboard
+│   │   ├── dream11/       # Dream11 predictions and playground
+│   │   └── completed/     # Past match list
+│   ├── utils/             # API clients, data hooks, win probability engine
+│   ├── styles/            # CSS modules (base, cards, layout, tournament)
+│   ├── data/              # Static data (AI summaries, league metadata, audio)
+│   └── sw.js              # Service worker
+├── cricket-proxy/         # Cloudflare Worker (CORS proxy + Supabase relay)
+├── supabase/              # Database migrations and schema
+├── scripts/               # Build and utility scripts
+└── firebase.json          # Hosting configuration
+```
+
+---
+
+## Getting Started
+
+```bash
+# Clone
+git clone https://github.com/ashwkun/boxcric.git
+cd boxcric
+
+# Install
+npm install
+
+# Set up environment
+cp .env.example .env
+# Fill in Firebase and Supabase credentials
+
+# Run locally
+npm start
+```
+
+### Scripts
+
+| Command | What it does |
+|---------|-------------|
+| `npm start` | Dev server via Parcel |
+| `npm run build` | Production build to `dist/` |
+| `npm run ship` | Build → deploy to Firebase → commit and push |
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions, branch workflow, and deployment guide.
+
+---
+
+## License
+
+ISC
