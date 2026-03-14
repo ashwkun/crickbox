@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://boxboxcric.web.app">
+  <a href="https://theboxcric.web.app">
     <img src="https://img.shields.io/badge/Open_box.cric_→-22c55e?style=for-the-badge" alt="Open box.cric" height="40">
   </a>
 </p>
